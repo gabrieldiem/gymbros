@@ -26,6 +26,8 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Over target | Workouts beyond 3 in a week | `over_target` |
 | Point event | One immutable scoring line (key, vars, points, workout?) | `point_event` |
 | Line item | A point event as shown on the finish screen | `line_item` |
+| Live points | What the in-progress workout would pay if finished now, computed by the API on every save | `live_points` |
+| Completed set | A checked set with reps > 0 (minutes > 0 for cardio). Only these count for points | `is_completed` |
 | Quest | A weekly personal challenge with progress and a bonus | `quest` |
 | Crew quest | A weekly shared target for the whole crew | `crew_quest` |
 | Duel | A 1v1 challenge until Sunday by points or bench volume, with a stake | `duel` |

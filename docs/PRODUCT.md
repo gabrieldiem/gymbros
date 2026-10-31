@@ -36,7 +36,7 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Leg day x2 event | +5 per leg set | Only while the weekly event is active |
 | Volume | 1 per 100 kg | Σ load × reps; bodyweight load = 80 kg + added kg (v1: fixed 80, profile bodyweight later) |
 | Cardio | 3 per minute | |
-| PR | 100 per exercise | Best e1RM in the workout beats the stored PR. e1RM = load × (1 + reps / 30) (Epley) |
+| PR | 100 per exercise | Best e1RM in the workout beats the stored PR. e1RM = load × (1 + reps / 30) (Epley). The first log of an exercise only sets the baseline (no points; see BACKLOG *Decide*) |
 | Weekly goal hit | 150 | On the 3rd workout of the week |
 | Goal streak | 20 × streak weeks, max 100 | Paid together with the weekly goal |
 | Over target | 50 | Each workout after the 3rd in a week |
@@ -47,6 +47,8 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Badge unlocked | badge points (50 to 300) | Once per badge, ever |
 
 The finish screen lists every line item (an i18n key plus variables) and the total, plus "+X% volume vs last time".
+
+A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A workout needs at least one completed set to be finished; otherwise discard it. While logging, the app shows the points the workout would pay if finished now (computed by the API).
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
@@ -103,7 +105,7 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **Crew quest:** the crew climbs 4,000 pts in a week → +200 each. Shown as a stacked bar per person.
 - **Duels:** a 1v1 until Sunday night, by points or by bench volume, with a stake ("Loser buys the protein shakes"). The winner gets 150.
 - **Bounty:** while active, passing the all-time leader pays 150.
-- **Weekly event:** one twist per week. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the shared name is undecided, see backlog).
+- **Weekly event:** one twist per week. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). It is always on in v1 (`game.weekly_event` in settings.json).
 
 ## Badges (15)
 
