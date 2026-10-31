@@ -2,7 +2,7 @@
 
 import uuid
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import and_, func, select, tuple_
 from sqlalchemy.dialects.postgresql import distinct_on
@@ -116,3 +116,52 @@ class WorkoutRepository:
             .order_by(Workout.started_at)
         )
         return [(row[0], row[1]) for row in result.all()]
+
+    async def counts_by_user_and_week(
+        self, crew_id: uuid.UUID, since: date
+    ) -> dict[uuid.UUID, dict[date, int]]:
+        """Finished workouts per member and crew-local week, from `since` on."""
+        result = await self._session.execute(
+            select(Workout.user_id, Workout.week_start, func.count())
+            .where(
+                Workout.crew_id == crew_id,
+                Workout.finished_at.is_not(None),
+                Workout.week_start >= since,
+            )
+            .group_by(Workout.user_id, Workout.week_start)
+        )
+        counts: dict[uuid.UUID, dict[date, int]] = defaultdict(dict)
+        for user_id, week, count in result.all():
+            if week is not None:
+                counts[user_id][week] = count
+        return dict(counts)
+
+    async def volume_by_week(self, user_id: uuid.UUID, since: date) -> dict[date, float]:
+        """Volume lifted per crew-local week, from `since` on."""
+        result = await self._session.execute(
+            select(Workout.week_start, func.sum(Workout.volume_kg))
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at.is_not(None),
+                Workout.week_start >= since,
+            )
+            .group_by(Workout.week_start)
+        )
+        return {week: float(volume or 0) for week, volume in result.all() if week is not None}
+
+    async def completed_lifts_before(
+        self, user_id: uuid.UUID, exercise_ids: list[str], before: datetime
+    ) -> list[tuple[str, float, int]]:
+        """(exercise, load, reps) of checked sets in workouts finished before `before`."""
+        result = await self._session.execute(
+            select(WorkoutSet.exercise_id, WorkoutSet.load_kg, WorkoutSet.reps)
+            .join(Workout, Workout.id == WorkoutSet.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at < before,
+                WorkoutSet.exercise_id.in_(exercise_ids),
+                WorkoutSet.done.is_(True),
+                WorkoutSet.reps > 0,
+            )
+        )
+        return [(ex, float(load or 0), int(reps or 0)) for ex, load, reps in result.all()]

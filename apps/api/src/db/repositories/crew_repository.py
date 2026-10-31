@@ -53,3 +53,13 @@ class CrewRepository:
             .where(Membership.crew_id == crew_id)
         )
         return set(result.scalars())
+
+    async def members(self, crew_id: uuid.UUID) -> list[User]:
+        """Everyone in the crew."""
+        result = await self._session.execute(
+            select(User)
+            .join(Membership, Membership.user_id == User.id)
+            .where(Membership.crew_id == crew_id)
+            .order_by(User.display_name)
+        )
+        return list(result.scalars())

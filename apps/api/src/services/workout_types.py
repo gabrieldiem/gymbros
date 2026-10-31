@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from db.tables.workout import Workout
+from services.climb_types import ClimbChange
 from services.scoring_types import ScoreResult
 from services.training_rules import LoggedSet
 
@@ -35,8 +36,9 @@ class WorkoutView:
 
 @dataclass(frozen=True, slots=True)
 class FinishedWorkout:
-    """A finished workout with its scored breakdown and week progress."""
+    """A finished workout with its scored breakdown, week progress and climb."""
 
     workout: Workout
     score: ScoreResult
     workouts_this_week: int
+    climb: ClimbChange

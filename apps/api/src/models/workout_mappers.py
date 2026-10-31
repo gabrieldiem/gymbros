@@ -2,6 +2,7 @@
 
 from dataclasses import asdict
 
+from models.climb_mappers import to_climb_change
 from models.workouts import (
     ExerciseOutput,
     FinishResponse,
@@ -64,6 +65,7 @@ def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishR
         ],
         workouts_this_week=finished.workouts_this_week,
         weekly_target=weekly_target,
+        climb=to_climb_change(finished.climb),
     )
 
 

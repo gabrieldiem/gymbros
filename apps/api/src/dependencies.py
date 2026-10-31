@@ -23,6 +23,8 @@ from db.tables.user import User
 from initializers import init_logger
 from services.auth_service import AuthService
 from services.catalog import load_catalog
+from services.climb_rules import CampScale
+from services.climb_service import ClimbService
 from services.crew_service import CrewService
 from services.errors import NotInCrew
 from services.member import Member
@@ -139,6 +141,27 @@ def get_workout_service(session: AsyncSession = Depends(get_session)) -> Workout
     )
 
 
+def build_climb_service(session: AsyncSession) -> ClimbService:
+    """ClimbService wired to a session."""
+    week_step = settings.game_week_scale // (settings.game_rank_count - 1)
+    return ClimbService(
+        crews=CrewRepository(session),
+        events=PointEventRepository(session),
+        workouts=WorkoutRepository(session),
+        records=PersonalRecordRepository(session),
+        scales={
+            "all": CampScale(settings.game_rank_step, settings.game_rank_count),
+            "week": CampScale(week_step, settings.game_rank_count),
+        },
+        weekly_target=settings.game_weekly_target,
+    )
+
+
+def get_climb_service(session: AsyncSession = Depends(get_session)) -> ClimbService:
+    """FastAPI dependency provider for ClimbService."""
+    return build_climb_service(session)
+
+
 def get_workout_finisher(
     session: AsyncSession = Depends(get_session),
     workouts: WorkoutService = Depends(get_workout_service),
@@ -146,6 +169,7 @@ def get_workout_finisher(
     """FastAPI dependency provider for WorkoutFinisher."""
     return WorkoutFinisher(
         workouts=workouts,
+        climb=build_climb_service(session),
         workout_rows=WorkoutRepository(session),
         context=_context(session),
         records=PersonalRecordRepository(session),

@@ -6,6 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, StringConstraints
 from typing_extensions import Annotated
 
+from models.climb import ClimbChangeModel
 from models.me import Color
 
 WorkoutName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)]
@@ -93,6 +94,7 @@ class FinishResponse(BaseModel):
     prs: list[PersonalRecordModel]
     workouts_this_week: int
     weekly_target: int
+    climb: ClimbChangeModel
 
 
 class WeekResponse(BaseModel):

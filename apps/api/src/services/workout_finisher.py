@@ -10,6 +10,7 @@ from db.repositories.workout_repository import WorkoutRepository
 from db.tables.point_event import PointEvent
 from db.tables.workout import Workout
 from services.catalog import Catalog
+from services.climb_service import ClimbService
 from services.errors import WorkoutEmpty
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
@@ -27,6 +28,7 @@ class WorkoutFinisher:
     def __init__(
         self,
         workouts: WorkoutService,
+        climb: ClimbService,
         workout_rows: WorkoutRepository,
         context: ScoringContextBuilder,
         records: PersonalRecordRepository,
@@ -37,6 +39,7 @@ class WorkoutFinisher:
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts = workouts
+        self._climb = climb
         self._rows = workout_rows
         self._context = context
         self._records = records
@@ -54,8 +57,11 @@ class WorkoutFinisher:
         score = score_workout(to_workout_log(workout, self._catalog), history, week, self._rules)
         if score.completed_sets == 0:
             raise WorkoutEmpty(str(workout_id))
+        climb = await self._climb.change(member, score.total)
         await self._close(member, workout, score, now)
-        return FinishedWorkout(workout, score, workouts_this_week=week.workouts_before + 1)
+        return FinishedWorkout(
+            workout, score, workouts_this_week=week.workouts_before + 1, climb=climb
+        )
 
     async def _close(
         self, member: Member, workout: Workout, score: ScoreResult, now: datetime

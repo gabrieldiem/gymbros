@@ -22,6 +22,8 @@ def init_logger(settings: Settings) -> Logger:
     root_logger.handlers.clear()
     root_logger.addHandler(handler)
 
+    # Silence httpx's per-request INFO lines; WARNING+ still surfaces.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     # Alembic announces every autogenerate plugin at import time; WARNING+ still surfaces.
     logging.getLogger("alembic.runtime.plugins").setLevel(logging.WARNING)
 
