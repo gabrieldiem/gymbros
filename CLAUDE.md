@@ -57,7 +57,7 @@ gymbros/
 ├── .pre-commit-config.yaml      # black, pylint, mypy, eslint, prettier
 ├── .github/workflows/
 │   ├── test.yml                 # push/PR to non-main: gitleaks, api tests (postgres service), web lint+test+build
-│   └── deploy.yml               # push to main: test.yml, trivy image scan, Coolify webhook deploy
+│   └── deploy.yml               # push to main: test.yml, trivy image scan, placeholder deploy job
 ├── .claude/                     # settings.json (plugins, permissions) + skills/
 ├── docs/                        # PRODUCT.md, DESIGN.md, GLOSSARY.md, prototype/
 └── apps/
@@ -106,7 +106,7 @@ gymbros/
 - **Config**: `apps/api/settings.json` holds game tuning (points, weekly target, rank step), env vars hold secrets and infrastructure (`.env.example` lists all of them). Any tuning key can be overridden from the environment as its flattened UPPERCASE name (`SCORING_PR=120`).
 - **Web shell**: React Router with the five tabs, a bottom nav below 960 px and a side rail above it, TanStack Query for server state (`/api/health` polled every 20 s), and typed EN/ES catalogs. Before sign-in the language comes from `localStorage` or `navigator.language`.
 - **Tests**: API tests run offline (pytest-socket) against a real Postgres, each in a rolled-back transaction; the suite creates and migrates its own `gymbros_test` database. Web unit tests use Vitest + Testing Library; Playwright smoke tests run against a live stack at 390×844 and 1440×900.
-- **CI**: `test.yml` (gitleaks, api lint + tests with a Postgres service, web lint + tests + build) on every non-main push; `deploy.yml` (tests, Trivy scan of both images, Coolify webhook) on main.
+- **CI**: `test.yml` (gitleaks, api lint + tests with a Postgres service, web lint + tests + build) on every non-main push; `deploy.yml` (tests, Trivy scan of both images, then a placeholder `deploy` job: no hosting target yet) on main.
 - Live updates use polling (TanStack Query `refetchInterval`) at first. SSE is in the backlog.
 - **Auth**: email and password (argon2id). Logging in creates a row in `auth_sessions` and sets the `gymbros_session` cookie (httpOnly, SameSite=Lax, Secure when `COOKIE_SECURE=true`); the cookie holds a random token and the table holds only its HMAC with `SESSION_SECRET`. `get_current_user` resolves it for every protected route. One crew per user (`memberships.user_id` is the key); you join with the crew's invite code at sign-up or later. Crews are created with the CLI (`make crew`), not in the app.
 - **API errors** are `{"detail": {"code": "..."}}` with a machine code (`invalid_credentials`, `email_taken`, `invite_code_not_found`, `already_in_crew`, `not_authenticated`); domain exceptions are mapped in one handler (`routes/errors.py`). The web app turns codes into copy with `t()`.

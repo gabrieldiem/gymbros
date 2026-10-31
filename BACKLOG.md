@@ -12,9 +12,9 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Weekly event name** (product, S): English says "Leg storm", Spanish says "Leg day x2". Pick one shared name. Default chosen: "Leg day x2" in both languages (`leg_event_name`). _Added 2026-10-31_
 - [ ] **Units** (product, M): kg only in v1. Add a per-user kg/lb toggle? _Added 2026-10-31_
 - [ ] **Anti-cheat** (product, L): trust the crew, or require proof (photo/video for PRs, crew confirmation)? _Added 2026-10-31_
-- [ ] **Hosting** (infra, M): reuse the data-service Coolify setup (webhook deploy in `deploy.yml`), or something else? Domain? _Added 2026-10-31_
+- [ ] **Hosting** (infra, M): where does GYMBROS run, and on which domain? `deploy.yml` has a placeholder `deploy` job (tests and the image scan still run on main); the data-service Coolify webhook flow is in its git history if that's the choice. _Added 2026-10-31_
 - [ ] **Spanish slang** (i18n, S): Spanish rank names (Novato … Imparable) and other words the crew actually uses. _Added 2026-10-31_
-- [ ] **Production migrations** (infra, S): default chosen: the api image runs `alembic upgrade head` before starting the workers, so a deploy migrates itself. Alternative: a separate one-off migrate job in Coolify. _Added 2026-10-31_
+- [ ] **Production migrations** (infra, S): default chosen: the api image runs `alembic upgrade head` before starting the workers, so a deploy migrates itself. Alternative: a separate one-off migrate job on the hosting platform. _Added 2026-10-31_
 - [ ] **Who creates a crew** (product, S): default chosen: crews are created by an operator with `make crew` (CLI) and shared by invite code; there is no in-app "create crew". Add an in-app flow if the app should onboard other groups. _Added 2026-10-31_
 - [ ] **Crew time zone** (product, S): default chosen: the demo crew uses `America/Argentina/Buenos_Aires`. Confirm the real crew's zone (weeks reset Monday 00:00 there). _Added 2026-10-31_
 - [ ] **First log of an exercise and PR points** (game, S): default chosen: the first time you log an exercise it sets your baseline PR and pays nothing; PRODUCT.md says a PR must beat the stored one. The prototype paid 100 for it, which lets anyone farm points by logging every exercise once. _Added 2026-10-31_

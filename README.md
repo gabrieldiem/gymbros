@@ -58,6 +58,6 @@ make precommit          # black, pylint, mypy, eslint, prettier, tsc
 make prod               # api + postgres + nginx serving the built web app on http://localhost:8081
 ```
 
-The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters) and `COOKIE_SECURE=true` behind HTTPS. Pushing to `main` runs `.github/workflows/deploy.yml`: tests, a Trivy scan of both images, then the Coolify webhook (secrets in the `prod` environment).
+The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters) and `COOKIE_SECURE=true` behind HTTPS. Pushing to `main` runs `.github/workflows/deploy.yml`: tests and a Trivy scan of both images. Its `deploy` job is a placeholder until a hosting target is chosen.
 
 See [CLAUDE.md](CLAUDE.md#commands) for every command and the architecture.
