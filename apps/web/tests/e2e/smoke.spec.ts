@@ -36,7 +36,7 @@ test('signed out: welcome, register and login screens in both languages', async 
   const errors = collectErrors(page);
   await page.goto('/climb');
   await expect(page).toHaveURL(/\/welcome$/);
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(
     page.getByRole('heading', { level: 1, name: 'Climb with your crew.' }),
   ).toBeVisible();
@@ -48,7 +48,7 @@ test('signed out: welcome, register and login screens in both languages', async 
   await expectNoSidewaysScroll(page);
   await shoot(page, 'register-en', testInfo);
 
-  await page.getByRole('button', { name: 'ES' }).click();
+  await page.getByRole('button', { name: 'ES', exact: true }).click();
   await page.getByRole('link', { name: 'Ya tengo cuenta' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Hola de nuevo' })).toBeVisible();
   await shoot(page, 'login-es', testInfo);
@@ -60,14 +60,14 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
 }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto('/login');
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.getByLabel('Email').fill(USERS[testInfo.project.name] ?? '');
   await page.getByLabel('Password').fill(DEMO_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
   await expect(page).toHaveURL(/\/climb$/);
   // Normalise the profile language, whatever an earlier run left behind.
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Rope order' }).getByRole('listitem')).toHaveCount(
     5,
@@ -89,7 +89,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   const profileSaved = page.waitForResponse(
     (r) => r.url().endsWith('/api/me') && r.request().method() === 'PATCH',
   );
-  await page.getByRole('button', { name: 'ES' }).click();
+  await page.getByRole('button', { name: 'ES', exact: true }).click();
   await profileSaved;
   await page
     .getByRole('navigation', { name: 'Principal' })
@@ -100,7 +100,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
   await shoot(page, 'crew-es', testInfo);
 
-  await page.getByRole('button', { name: 'EN' }).click();
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.getByRole('link', { name: 'Your profile' }).click();
   await page.getByRole('button', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/welcome$/);

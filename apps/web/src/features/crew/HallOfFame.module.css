@@ -1,0 +1,109 @@
+.hof {
+  display: grid;
+  gap: 18px;
+  max-width: 780px;
+}
+
+.panel {
+  padding: 22px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.panel h2 {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.sub {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  align-items: end;
+  gap: 8px;
+  margin-top: 16px;
+  text-align: center;
+  list-style: none;
+}
+
+.podium li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.podium b {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.val {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.step {
+  width: 100%;
+  padding-top: 8px;
+  background: var(--iron);
+  border-radius: 10px 10px 0 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--smoke);
+}
+
+.first .step {
+  height: 96px;
+  background: #3a3a2a;
+  color: var(--volt);
+}
+
+.second .step {
+  height: 66px;
+}
+
+.third .step {
+  height: 46px;
+}
+
+.records {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.records li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--steel);
+}
+
+.records b {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  grid-row: span 2;
+}
+
+.holder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--smoke);
+}
+
+.empty {
+  margin-top: 12px;
+  color: var(--smoke);
+}

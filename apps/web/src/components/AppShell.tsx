@@ -5,6 +5,7 @@ import { ActiveWorkoutBar } from './ActiveWorkoutBar';
 import styles from './AppShell.module.css';
 import { HealthStatus } from './HealthStatus';
 import { NavRail } from './NavRail';
+import { NotificationToasts } from './NotificationToasts';
 import { TopBar } from './TopBar';
 
 export function AppShell() {
@@ -20,6 +21,7 @@ export function AppShell() {
         </footer>
       </main>
       <ActiveWorkoutBar />
+      <NotificationToasts />
     </div>
   );
 }
