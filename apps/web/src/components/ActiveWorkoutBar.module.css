@@ -1,0 +1,61 @@
+.bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(var(--nav-h) + 12px + var(--safe-bottom));
+  z-index: 24;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 10px 10px 10px 16px;
+  background: var(--plate);
+  border: 1px solid #4a4a2a;
+  border-radius: var(--r-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+}
+
+.pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  flex: none;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.grow b {
+  display: block;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grow span {
+  font-size: 0.85rem;
+  color: var(--smoke);
+}
+
+.cta {
+  padding: 8px 14px;
+  border-radius: var(--r-control-sm);
+  background: var(--volt);
+  color: var(--iron);
+  font-weight: 700;
+}
+
+@media (min-width: 960px) {
+  .bar {
+    left: calc(var(--rail-w) + 24px);
+    right: 24px;
+    bottom: 24px;
+    max-width: 520px;
+  }
+}

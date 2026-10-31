@@ -1,0 +1,65 @@
+/* GYMBROS design tokens. Source: docs/DESIGN.md. Yellow is for you and the primary action. */
+:root {
+  /* color */
+  --iron: #0d0d0d; /* app background */
+  --rail: #080808; /* navigation background */
+  --plate: #171717; /* cards, panels, inputs */
+  --steel: #2a2a2a; /* borders, dividers, inactive tracks */
+  --chalk: #f2f2ee; /* primary text, most numbers */
+  --smoke: #8e8e8a; /* secondary text, labels */
+  --volt: #ffe600; /* you, primary buttons, active nav, earned pips */
+  --red: #ff3b1f; /* PRs, passed you, alerts, over-target pips, live dot */
+
+  /* tints: the color at 12-14% alpha with a lighter text tone */
+  --volt-tint: rgba(255, 230, 0, 0.14);
+  --red-tint: rgba(255, 59, 31, 0.12);
+  --red-text: #ff8470;
+  --event-tint: rgba(0, 209, 255, 0.12);
+  --event-text: #6fe3ff;
+
+  /* crew palette (avatars and markers) */
+  --crew-volt: #ffe600;
+  --crew-red: #ff3b1f;
+  --crew-cyan: #00d1ff;
+  --crew-pink: #ff4fd8;
+  --crew-violet: #b48cff;
+
+  /* type */
+  --display: 'Barlow Condensed', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-view-title: clamp(2.2rem, 7vw, 3rem);
+  --fs-hero: clamp(3rem, 11vw, 5.6rem);
+  --fs-h2: 1.5rem;
+  --fs-h3: 1.25rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+
+  /* shape */
+  --r-card: 16px;
+  --r-control: 12px;
+  --r-control-sm: 10px;
+  --r-pill: 999px;
+  --r-sheet: 20px;
+  --btn-h: 50px;
+  --btn-h-sm: 40px;
+  --touch: 44px;
+
+  /* layout */
+  --nav-h: 72px;
+  --rail-w: 240px;
+  --content-max: 1240px;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+  }
+}

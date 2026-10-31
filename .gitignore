@@ -1,0 +1,43 @@
+# ===== Secrets & local config =====
+.env
+.env.*
+!.env.example
+
+# ===== Python (apps/api) =====
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+junit_report.xml
+apps/api/reports/
+
+# ===== Node (apps/web) =====
+node_modules/
+apps/web/dist/
+apps/web/dev-dist/
+apps/web/coverage/
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/blob-report/
+*.tsbuildinfo
+
+# ===== Editors & OS =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+.DS_Store
+
+# ===== Logs =====
+*.log
+npm-debug.log*
+
+# ===== Claude Code (local only; project settings and skills are tracked) =====
+.claude/settings.local.json

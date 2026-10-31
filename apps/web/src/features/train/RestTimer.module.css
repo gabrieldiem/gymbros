@@ -1,0 +1,52 @@
+.rest {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + 16px + var(--safe-bottom));
+  z-index: 25;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  background: var(--volt);
+  color: var(--iron);
+  border-radius: var(--r-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.time {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.7rem;
+  min-width: 54px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.rest button {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  padding: 0 12px;
+  border-radius: var(--r-control-sm);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.rest .skip {
+  background: var(--iron);
+  color: var(--volt);
+}
+
+.ring {
+  width: 30px;
+  height: 30px;
+  transform: rotate(-90deg);
+}
+
+@media (min-width: 960px) {
+  .rest {
+    bottom: 24px;
+    left: calc(50% + var(--rail-w) / 2);
+  }
+}

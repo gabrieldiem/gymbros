@@ -1,0 +1,266 @@
+{
+  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km. ppl: push/pull/legs class (null for cardio).",
+  "exercises": [
+    {
+      "id": "bench",
+      "name": "Bench press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press de banca",
+        "press banca"
+      ]
+    },
+    {
+      "id": "incline",
+      "name": "Incline dumbbell press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "press inclinado con mancuernas",
+        "press inclinado"
+      ]
+    },
+    {
+      "id": "fly",
+      "name": "Cable fly",
+      "group": "Chest",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "aperturas en polea",
+        "aperturas",
+        "cruce de poleas"
+      ]
+    },
+    {
+      "id": "squat",
+      "name": "Back squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": true,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla trasera",
+        "sentadilla"
+      ]
+    },
+    {
+      "id": "rdl",
+      "name": "Romanian deadlift",
+      "group": "Legs",
+      "type": "w",
+      "barbell": true,
+      "ppl": "legs",
+      "aliases_es": [
+        "peso muerto rumano",
+        "rumano"
+      ]
+    },
+    {
+      "id": "legpress",
+      "name": "Leg press",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "prensa de piernas",
+        "prensa"
+      ]
+    },
+    {
+      "id": "lunge",
+      "name": "Walking lunge",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "zancadas caminando",
+        "zancadas",
+        "estocadas"
+      ]
+    },
+    {
+      "id": "legcurl",
+      "name": "Leg curl",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "curl femoral",
+        "femoral"
+      ]
+    },
+    {
+      "id": "deadlift",
+      "name": "Deadlift",
+      "group": "Back",
+      "type": "w",
+      "barbell": true,
+      "ppl": "pull",
+      "aliases_es": [
+        "peso muerto"
+      ]
+    },
+    {
+      "id": "row",
+      "name": "Barbell row",
+      "group": "Back",
+      "type": "w",
+      "barbell": true,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo con barra",
+        "remo"
+      ]
+    },
+    {
+      "id": "pullup",
+      "name": "Pull-up",
+      "group": "Back",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "dominadas",
+        "dominada"
+      ]
+    },
+    {
+      "id": "latpull",
+      "name": "Lat pulldown",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "jalón al pecho",
+        "jalon al pecho",
+        "polea al pecho"
+      ]
+    },
+    {
+      "id": "ohp",
+      "name": "Overhead press",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press militar",
+        "press de hombros"
+      ]
+    },
+    {
+      "id": "lateral",
+      "name": "Lateral raise",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "elevaciones laterales",
+        "vuelos laterales"
+      ]
+    },
+    {
+      "id": "curl",
+      "name": "Barbell curl",
+      "group": "Arms",
+      "type": "w",
+      "barbell": true,
+      "ppl": "pull",
+      "aliases_es": [
+        "curl con barra",
+        "curl de bíceps",
+        "bíceps"
+      ]
+    },
+    {
+      "id": "dips",
+      "name": "Dips",
+      "group": "Arms",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "fondos",
+        "fondos en paralelas"
+      ]
+    },
+    {
+      "id": "run",
+      "name": "Treadmill run",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "carrera en cinta",
+        "cinta",
+        "correr"
+      ]
+    },
+    {
+      "id": "rower",
+      "name": "Rowing machine",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "remo en máquina",
+        "remoergómetro",
+        "remo ergómetro"
+      ]
+    }
+  ],
+  "routines": [
+    {
+      "id": "push",
+      "name": "Push day",
+      "exercise_ids": [
+        "bench",
+        "ohp",
+        "incline",
+        "dips"
+      ]
+    },
+    {
+      "id": "pull",
+      "name": "Pull day",
+      "exercise_ids": [
+        "deadlift",
+        "row",
+        "pullup",
+        "curl"
+      ]
+    },
+    {
+      "id": "legs",
+      "name": "Leg day",
+      "exercise_ids": [
+        "squat",
+        "rdl",
+        "legpress",
+        "lunge"
+      ]
+    },
+    {
+      "id": "cardio",
+      "name": "Cardio",
+      "exercise_ids": [
+        "run",
+        "rower"
+      ]
+    }
+  ]
+}

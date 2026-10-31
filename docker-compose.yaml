@@ -1,0 +1,76 @@
+# GYMBROS (prod): postgres + api (uvicorn workers) + web (nginx serving the React build and
+# proxying /api to the api). Only the web container publishes a port; the browser talks to one
+# origin, so there is no CORS.
+#
+#   make prod → http://localhost:8081
+
+name: gymbros
+
+services:
+  postgres:
+    container_name: gymbros-postgres
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+      start_interval: 1s
+
+  api:
+    container_name: gymbros-api
+    image: gymbros-api
+    build:
+      context: ./apps/api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Always production here, whatever .env says: settings then demand a real SESSION_SECRET.
+      APP_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      SESSION_SECRET: ${SESSION_SECRET}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+      start_interval: 1s
+
+  web:
+    container_name: gymbros-web
+    image: gymbros-web
+    build:
+      context: ./apps/web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_HOST_PORT:-8081}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres_data:

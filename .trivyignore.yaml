@@ -1,0 +1,4 @@
+# Trivy vulnerability suppressions (used by deploy.yml for the api and web images).
+# Each entry needs an `id`, a `statement` saying why it is not exploitable here, and an
+# `expires-at` date so it is re-evaluated.
+vulnerabilities: []

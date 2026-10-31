@@ -1,0 +1,31 @@
+{
+  "game": {
+    "weekly_target": 3,
+    "rank_step": 1500,
+    "rank_count": 7,
+    "week_scale": 1500,
+    "bodyweight_kg": 80,
+    "weekly_event": "leg_day_x2"
+  },
+  "scoring": {
+    "showed_up": 50,
+    "completed_set": 5,
+    "leg_event_set_bonus": 5,
+    "volume_kg_per_point": 100,
+    "cardio_minute": 3,
+    "pr": 100,
+    "weekly_goal": 150,
+    "goal_streak_per_week": 20,
+    "goal_streak_max": 100,
+    "over_target": 50,
+    "better_than_last_time": 25,
+    "crew_quest": 200,
+    "crew_quest_goal": 4000,
+    "bounty": 150,
+    "duel_win": 150
+  },
+  "session": {
+    "cookie_name": "gymbros_session",
+    "max_age_days": 30
+  }
+}

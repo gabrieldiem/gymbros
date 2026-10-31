@@ -1,0 +1,8 @@
+.error {
+  padding: 12px 14px;
+  border-radius: var(--r-control);
+  background: var(--red-tint);
+  color: var(--red-text);
+  font-weight: 600;
+  font-size: var(--fs-small);
+}

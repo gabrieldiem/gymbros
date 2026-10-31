@@ -1,0 +1,22 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  color: var(--smoke);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--steel);
+}
+
+.up .dot {
+  background: var(--chalk);
+}
+
+.down .dot {
+  background: var(--red);
+}

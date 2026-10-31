@@ -1,0 +1,35 @@
+.steps {
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  gap: 14px;
+}
+
+.steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.steps li::before {
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--steel);
+  color: var(--chalk);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.steps b {
+  color: var(--chalk);
+}
+
+.steps span {
+  color: var(--smoke);
+}

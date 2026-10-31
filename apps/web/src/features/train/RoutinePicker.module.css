@@ -1,0 +1,99 @@
+.head {
+  margin-bottom: 22px;
+}
+
+.head h1 {
+  margin-bottom: 8px;
+}
+
+.sub {
+  color: var(--smoke);
+}
+
+.goal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.routines {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin-bottom: 30px;
+}
+
+.routine {
+  display: block;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 18px;
+  text-align: left;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+  transition: border-color var(--dur-fast);
+}
+
+.routine:hover:not(:disabled) {
+  border-color: var(--volt);
+}
+
+.routine:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.routine h3 {
+  font-size: 1.35rem;
+  margin-bottom: 6px;
+}
+
+.routine p {
+  font-size: 0.9rem;
+  color: var(--smoke);
+}
+
+.empty {
+  background: none;
+  border-style: dashed;
+}
+
+.tag {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  background: var(--event-tint);
+  color: var(--event-text);
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.earn {
+  list-style: none;
+  display: grid;
+  max-width: 600px;
+  margin-top: 10px;
+}
+
+.earn li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--steel);
+}
+
+.earn b {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.error {
+  margin-bottom: 16px;
+}

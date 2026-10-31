@@ -1,0 +1,32 @@
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: var(--fs-small);
+}
+
+.input {
+  min-height: var(--btn-h);
+  padding: 0 14px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--volt);
+}
+
+.input:focus-visible {
+  outline: 3px solid var(--volt);
+  outline-offset: 2px;
+}
+
+.hint {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}

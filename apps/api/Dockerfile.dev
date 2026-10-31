@@ -1,0 +1,27 @@
+# Based on slim Debian 13 Trixie
+FROM python:3.13-slim-trixie
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy only dependency manifests first (to leverage Docker build cache for faster builds)
+COPY pyproject.toml poetry.lock /app/
+
+# Install Poetry (dependency manager) globally, disable venvs to install into system site-packages
+RUN pip install --no-cache-dir "poetry==2.3.2" && poetry config virtualenvs.create false
+
+# Re-generate lock file if it is outdated, then install all dependencies (except dev/test deps)
+# "--without dev": keep container smaller by skipping development deps
+# "--no-root": don't install this project as a package itself, we run code mounted in /app
+RUN (poetry check --lock || poetry lock) && poetry install --without dev --no-root --no-cache
+
+# Commented on purpose. Code is mounted as a volume (./src:/app) to avoid re-building the image
+# on each change for local development. settings.json, alembic.ini and migrations/ are mounted at /.
+# COPY ./src /app
+
+# Expose port 8080 (FastAPI main.py sets default to 8080)
+EXPOSE 8080
+
+# Run the app with uvicorn and hot reload. Migrations run in the lifespan
+# (RUN_MIGRATIONS_ON_STARTUP=true in docker-compose-dev.yaml).
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

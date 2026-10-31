@@ -1,0 +1,25 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+@media (min-width: 960px) {
+  .brand {
+    visibility: hidden;
+  }
+}
+
+.me {
+  display: inline-flex;
+  border-radius: 50%;
+  text-decoration: none;
+}

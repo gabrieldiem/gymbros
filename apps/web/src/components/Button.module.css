@@ -1,0 +1,51 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--btn-h);
+  padding: 0 20px;
+  border-radius: var(--r-control);
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.primary {
+  background: var(--volt);
+  color: var(--iron);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--chalk);
+  border: 1px solid var(--steel);
+}
+
+.quiet {
+  min-height: var(--touch);
+  padding: 0 8px;
+  background: none;
+  color: var(--smoke);
+}
+
+.quiet:hover {
+  color: var(--chalk);
+}
+
+.wide {
+  width: 100%;
+}

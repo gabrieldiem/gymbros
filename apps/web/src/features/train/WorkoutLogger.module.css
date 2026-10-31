@@ -1,0 +1,134 @@
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 -18px 20px;
+  padding: 14px 18px;
+  padding-top: calc(14px + var(--safe-top));
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--steel);
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  width: 100%;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  padding: 2px 0;
+}
+
+.name:focus {
+  outline: none;
+  border-bottom-color: var(--volt);
+}
+
+.meta {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.live {
+  position: relative;
+  text-align: right;
+  line-height: 1;
+}
+
+.live b {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--volt);
+  font-variant-numeric: tabular-nums;
+}
+
+.live span {
+  font-size: 0.8rem;
+  color: var(--smoke);
+  font-weight: 600;
+}
+
+.float {
+  position: absolute;
+  right: 0;
+  top: -8px;
+  font-weight: 700;
+  color: var(--volt);
+  pointer-events: none;
+  animation: float 0.9s ease-out forwards;
+}
+
+@keyframes float {
+  to {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
+}
+
+.empty {
+  margin-bottom: 14px;
+  color: var(--smoke);
+}
+
+.add {
+  max-width: 740px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 22px;
+  max-width: 740px;
+}
+
+.actions > :first-child {
+  flex: 1;
+  min-width: 200px;
+}
+
+.status {
+  min-height: 1.4em;
+  margin-top: 10px;
+  font-size: var(--fs-small);
+  color: var(--smoke);
+}
+
+.confirm {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.danger {
+  background: var(--red);
+  color: var(--chalk);
+}
+
+@media (min-width: 960px) {
+  .head {
+    margin: 0 0 20px;
+    padding: 14px 0;
+    background: var(--iron);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    display: none;
+  }
+}
