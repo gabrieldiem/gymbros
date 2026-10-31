@@ -1,0 +1,44 @@
+.search {
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  margin: 6px 0 14px;
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+  background: var(--plate);
+  font-size: 16px;
+}
+
+.search:focus {
+  outline: none;
+  border-color: var(--volt);
+}
+
+.group {
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--smoke);
+  margin: 18px 0 2px;
+}
+
+.pick {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--steel);
+  text-align: left;
+  font-weight: 600;
+}
+
+.pick:hover {
+  color: var(--volt);
+}
+
+.empty {
+  padding: 12px 0;
+  color: var(--smoke);
+}

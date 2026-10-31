@@ -1,0 +1,69 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.72);
+  animation: fade var(--dur) ease;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 12px 22px calc(28px + var(--safe-bottom));
+  background: var(--iron);
+  border-top: 1px solid var(--steel);
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  animation: rise var(--dur) var(--ease-out);
+}
+
+.grab {
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 18px;
+  background: var(--steel);
+  border-radius: 99px;
+}
+
+.sheet h2 {
+  font-size: 1.7rem;
+  margin-bottom: 8px;
+}
+
+@media (min-width: 700px) {
+  .sheet {
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    width: min(560px, 92vw);
+    max-height: 86vh;
+    padding: 28px;
+    border: 1px solid var(--steel);
+    border-radius: var(--r-sheet);
+    transform: translate(-50%, -50%);
+    animation: fade var(--dur) ease;
+  }
+
+  .grab {
+    display: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}

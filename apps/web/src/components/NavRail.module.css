@@ -53,6 +53,17 @@
   color: var(--chalk);
 }
 
+.liveDot {
+  position: absolute;
+  top: -24px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 3px var(--rail);
+}
+
 @media (min-width: 960px) {
   .rail {
     position: sticky;
@@ -122,5 +133,13 @@
   .disc svg {
     width: 22px;
     height: 22px;
+  }
+
+  .liveDot {
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    box-shadow: none;
+    background: var(--iron);
   }
 }

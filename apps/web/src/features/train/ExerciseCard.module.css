@@ -1,0 +1,152 @@
+.card {
+  margin-bottom: 12px;
+  padding: 16px;
+  max-width: 740px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 6px;
+}
+
+.head h3 {
+  flex: 1 1 auto;
+  font-size: 1.25rem;
+}
+
+.tools {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.link {
+  min-height: var(--touch);
+  padding: 0 8px;
+  color: var(--smoke);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.link:hover {
+  color: var(--chalk);
+}
+
+.beat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--volt);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 78px 66px 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.headRow {
+  font-size: 0.78rem;
+  color: var(--smoke);
+  font-weight: 600;
+  padding-bottom: 2px;
+}
+
+.headRow span:nth-child(3),
+.headRow span:nth-child(4) {
+  text-align: center;
+}
+
+.n {
+  font-weight: 700;
+  color: var(--smoke);
+  text-align: center;
+}
+
+.prev {
+  font-size: 0.85rem;
+  color: var(--smoke);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+  background: var(--iron);
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.input::-webkit-inner-spin-button,
+.input::-webkit-outer-spin-button {
+  display: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--volt);
+}
+
+.input:focus-visible {
+  outline: 3px solid var(--volt);
+  outline-offset: 1px;
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 46px;
+  border: 2px solid var(--steel);
+  border-radius: var(--r-control-sm);
+  color: var(--smoke);
+}
+
+.done .check {
+  background: var(--volt);
+  border-color: var(--volt);
+  color: var(--iron);
+}
+
+.done .input {
+  border-color: transparent;
+  background: var(--volt-tint);
+}
+
+.addSet {
+  min-height: var(--touch);
+  margin-top: 4px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--smoke);
+}
+
+.addSet:hover {
+  color: var(--chalk);
+}
+
+@media (max-width: 360px) {
+  .row {
+    grid-template-columns: 22px minmax(0, 1fr) 68px 58px 46px;
+    gap: 6px;
+  }
+}

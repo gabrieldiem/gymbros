@@ -1,0 +1,27 @@
+.pips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--steel);
+}
+
+.large .pip {
+  width: 16px;
+  height: 16px;
+}
+
+.on {
+  background: var(--volt);
+  border-color: var(--volt);
+}
+
+.over {
+  background: var(--red);
+  border-color: var(--red);
+}

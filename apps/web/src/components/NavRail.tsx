@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router';
 
+import { useActiveWorkout } from '../api/train';
 import { useI18n } from '../i18n/context';
 import { Brand } from './Brand';
 import { cx } from './cx';
@@ -13,6 +14,7 @@ function linkClass(primary: boolean | undefined): string {
 
 export function NavRail() {
   const { t } = useI18n();
+  const training = Boolean(useActiveWorkout().data);
   return (
     <nav className={styles.rail} aria-label={t('nav_main')}>
       <div className={styles.head}>
@@ -29,6 +31,9 @@ export function NavRail() {
             <Icon name={tab.icon} />
           )}
           <span className={styles.label}>{t(tab.label)}</span>
+          {tab.primary && training && (
+            <span className={styles.liveDot} role="img" aria-label={t('training_now')} />
+          )}
         </NavLink>
       ))}
     </nav>

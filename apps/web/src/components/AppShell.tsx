@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router';
 
 import { useProfileLanguage } from '../i18n/useLanguage';
+import { ActiveWorkoutBar } from './ActiveWorkoutBar';
 import styles from './AppShell.module.css';
 import { HealthStatus } from './HealthStatus';
 import { NavRail } from './NavRail';
@@ -18,6 +19,7 @@ export function AppShell() {
           <HealthStatus />
         </footer>
       </main>
+      <ActiveWorkoutBar />
     </div>
   );
 }

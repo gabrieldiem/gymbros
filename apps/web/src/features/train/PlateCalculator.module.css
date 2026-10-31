@@ -1,0 +1,58 @@
+.input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 6px;
+}
+
+.input input {
+  width: 130px;
+  height: 56px;
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+  background: var(--plate);
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+.input button {
+  width: 56px;
+  height: 56px;
+  background: var(--steel);
+  border-radius: var(--r-control);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.unit {
+  color: var(--smoke);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  margin: 10px 0 6px;
+}
+
+.result {
+  text-align: center;
+  font-weight: 700;
+  margin: 0 auto;
+}
+
+.note {
+  text-align: center;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+  margin: 4px auto 0;
+}
+
+.sub {
+  color: var(--smoke);
+}
+
+.done {
+  margin-top: 12px;
+}
