@@ -10,6 +10,7 @@ description: Start the GYMBROS stack (postgres + FastAPI api + React web) and ve
 ```bash
 cp -n .env.example .env        # first time only, then fill in values
 make up                        # postgres + api (:8080, --reload) + web (:5173, vite)
+make seed                      # demo crew; log in as gabi@demo.gymbros.app / climb-demo-2026
 ```
 
 - API docs: http://localhost:8080/docs. Health: `curl -s localhost:8080/health`

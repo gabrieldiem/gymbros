@@ -35,6 +35,8 @@ make prod        # Production build: api + web (React build served by nginx on :
 make local       # Run the api natively with --reload against the dev postgres
 make migrate     # Apply Alembic migrations (inside the dev api container)
 make migration m="add sets table"   # Autogenerate a new migration
+make seed        # Demo crew "Iron Ridge" (invite code IRONRIDGE, password climb-demo-2026) in the dev DB
+make crew name="ATUS" tz="America/Argentina/Buenos_Aires"   # Create a crew and print its invite code
 make clean       # Stop both stacks and delete their database volumes
 ```
 
@@ -102,11 +104,13 @@ gymbros/
 - **postgres** 18 is the only data store, through async SQLAlchemy (asyncpg). Weeks run Monday 00:00 to Sunday 23:59 in the crew's time zone.
 - **Migrations** are Alembic (`apps/api/migrations`). The dev api runs them in its lifespan (`RUN_MIGRATIONS_ON_STARTUP=true`); the prod image runs `alembic upgrade head` once before starting the uvicorn workers.
 - **Config**: `apps/api/settings.json` holds game tuning (points, weekly target, rank step), env vars hold secrets and infrastructure (`.env.example` lists all of them). Any tuning key can be overridden from the environment as its flattened UPPERCASE name (`SCORING_PR=120`).
-- **Web shell**: React Router with the five tabs, a bottom nav below 960 px and a side rail above it, TanStack Query for server state (`/api/health` polled every 20 s), and typed EN/ES catalogs. The language is stored in `localStorage` for now.
+- **Web shell**: React Router with the five tabs, a bottom nav below 960 px and a side rail above it, TanStack Query for server state (`/api/health` polled every 20 s), and typed EN/ES catalogs. Before sign-in the language comes from `localStorage` or `navigator.language`.
 - **Tests**: API tests run offline (pytest-socket) against a real Postgres, each in a rolled-back transaction; the suite creates and migrates its own `gymbros_test` database. Web unit tests use Vitest + Testing Library; Playwright smoke tests run against a live stack at 390×844 and 1440×900.
 - **CI**: `test.yml` (gitleaks, api lint + tests with a Postgres service, web lint + tests + build) on every non-main push; `deploy.yml` (tests, Trivy scan of both images, Coolify webhook) on main.
 - Live updates use polling (TanStack Query `refetchInterval`) at first. SSE is in the backlog.
-- Auth will use email and password, a session in an httpOnly cookie, and an invite code to join a crew (Phase 1). One crew per user for now.
+- **Auth**: email and password (argon2id). Logging in creates a row in `auth_sessions` and sets the `gymbros_session` cookie (httpOnly, SameSite=Lax, Secure when `COOKIE_SECURE=true`); the cookie holds a random token and the table holds only its HMAC with `SESSION_SECRET`. `get_current_user` resolves it for every protected route. One crew per user (`memberships.user_id` is the key); you join with the crew's invite code at sign-up or later. Crews are created with the CLI (`make crew`), not in the app.
+- **API errors** are `{"detail": {"code": "..."}}` with a machine code (`invalid_credentials`, `email_taken`, `invite_code_not_found`, `already_in_crew`, `not_authenticated`); domain exceptions are mapped in one handler (`routes/errors.py`). The web app turns codes into copy with `t()`.
+- **Web routing**: `Gate` components guard routes using `gateRedirect()`: signed-out users see `/welcome`, `/login`, `/register`; users without a crew see `/join`; members see the five tabs. `/hello` ("This is {crew}") shows once after joining. The UI language follows the profile and the top-bar toggle saves it with `PATCH /api/me`.
 
 Update this section as the system is built. It describes what exists, not what is planned.
 

@@ -14,6 +14,8 @@ poetry run pytest tests/application/test_basic_endpoints.py::test_health_ok
 poetry run alembic upgrade head
 poetry run alembic revision --autogenerate -m "add sets table"
 pre-commit run --all-files     # black (line length 100), pylint, mypy --check-untyped-defs
+cd src && python cli.py seed-demo                                   # demo crew (refuses in production)
+cd src && python cli.py create-crew "ATUS" America/Argentina/Buenos_Aires
 ```
 
 ## Layers

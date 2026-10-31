@@ -6,6 +6,7 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 |---|---|---|
 | Crew | The group of friends competing together (5 people). Has a name, time zone and invite code | `crew` |
 | Member | A user inside a crew | `member` |
+| Invite code | The code a member shares so a friend can join the crew (case-insensitive, 8 characters when generated) | `invite_code` |
 | ATUS Climb | The trail-map leaderboard. Also the name of the first tab | `climb` |
 | Camp | A rank checkpoint on the trail (Rookie … Unstoppable) | `rank` (index 0 to 6) |
 | Rope order | The ranked list of members under the map | `standings` |

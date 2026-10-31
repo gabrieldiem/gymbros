@@ -15,6 +15,8 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Hosting** (infra, M): reuse the data-service Coolify setup (webhook deploy in `deploy.yml`), or something else? Domain? _Added 2026-10-31_
 - [ ] **Spanish slang** (i18n, S): Spanish rank names (Novato … Imparable) and other words the crew actually uses. _Added 2026-10-31_
 - [ ] **Production migrations** (infra, S): default chosen: the api image runs `alembic upgrade head` before starting the workers, so a deploy migrates itself. Alternative: a separate one-off migrate job in Coolify. _Added 2026-10-31_
+- [ ] **Who creates a crew** (product, S): default chosen: crews are created by an operator with `make crew` (CLI) and shared by invite code; there is no in-app "create crew". Add an in-app flow if the app should onboard other groups. _Added 2026-10-31_
+- [ ] **Crew time zone** (product, S): default chosen: the demo crew uses `America/Argentina/Buenos_Aires`. Confirm the real crew's zone (weeks reset Monday 00:00 there). _Added 2026-10-31_
 
 ## Later
 
@@ -26,6 +28,10 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Custom routines and exercises** (product, M): v1 ships a fixed catalog and four routines. _Added 2026-10-31_
 - [ ] **Hero height on mobile** (web, S): the headline fills the first screen and pushes the map below the fold. _Added 2026-10-31_
 - [ ] **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
+- [ ] **Login rate limiting** (api, S): `/api/auth/login` and `/register` have no throttle. Add a per-IP and per-email limit before the app is public. _Added 2026-10-31_
+- [ ] **Password reset** (product, M): there is no email client, so a forgotten password needs an operator. Add reset by email or an operator CLI command. _Added 2026-10-31_
+- [ ] **Expired session cleanup** (api, S): expired `auth_sessions` rows are ignored but never deleted. Delete them on login or in a periodic job. _Added 2026-10-31_
+- [ ] **Leave or switch crew** (product, S): one crew per user and no way to leave. Needed if someone joins the wrong crew. _Added 2026-10-31_
 
 ## Tech debt
 
@@ -34,6 +40,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
 - [ ] **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
+- [ ] **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. Give e2e its own seeded crew or reset it before the run. _Added 2026-10-31_
 
 ## Done
 
