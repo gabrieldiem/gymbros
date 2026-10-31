@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from db.tables.workout import Workout
 from services.climb_types import ClimbChange
-from services.scoring_types import ScoreResult
+from services.scoring_types import LineItem, ScoreResult
 from services.training_rules import LoggedSet
 
 
@@ -42,3 +42,14 @@ class FinishedWorkout:
     score: ScoreResult
     workouts_this_week: int
     climb: ClimbChange
+    bonus_items: tuple[LineItem, ...] = ()
+
+    @property
+    def total(self) -> int:
+        """Workout points plus every bonus it unlocked."""
+        return self.score.total + sum(item.points for item in self.bonus_items)
+
+    @property
+    def line_items(self) -> tuple[LineItem, ...]:
+        """The finish screen: the workout's lines, then the bonuses."""
+        return self.score.line_items + self.bonus_items

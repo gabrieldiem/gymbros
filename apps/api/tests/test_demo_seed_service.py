@@ -62,3 +62,16 @@ async def test_reset_removes_the_demo_crew_and_members(db_session):
     second = await service.seed()
     assert second.crew.id != first.crew.id
     assert len(second.created_members) == 5
+
+
+async def test_seeded_members_own_the_badges_their_history_earns(db_session):
+    from db.repositories.badge_repository import BadgeRepository
+
+    await _service(db_session).seed()
+    maxo = await UserRepository(db_session).get_by_email("maxo@demo.gymbros.app")
+    unlocked = await BadgeRepository(db_session).unlocked(maxo.id)
+    assert {"first", "ironmonth", "legs"} <= set(unlocked)
+    totals = await PointEventRepository(db_session).totals_by_user(
+        (await CrewRepository(db_session).get_by_invite_code("IRONRIDGE")).id
+    )
+    assert totals[maxo.id] == 4310  # unlocks in the seed pay nothing extra

@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
@@ -19,8 +20,11 @@ from db.tables.point_event import PointEvent
 from db.tables.user import User
 from db.tables.workout import Workout
 from services.activity_service import workout_post_vars
+from services.badge_service import BadgeService
+from services.badges import is_unlocked, load_badges
 from services.catalog import load_catalog
 from services.crew_service import CrewService
+from services.member import Member
 from services.demo_history import MemberStats, PlannedWorkout, plan_history
 from services.password_hasher import PasswordHasher
 from services.scoring_types import RecordSet
@@ -65,6 +69,7 @@ class DemoSeedService:
         weekly_target: int,
         bodyweight_kg: float,
         data: dict[str, Any] | None = None,
+        badges: tuple[BadgeService, BadgeRepository] | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._repos = repos
@@ -73,6 +78,8 @@ class DemoSeedService:
         self._weekly_target = weekly_target
         self._bodyweight_kg = bodyweight_kg
         self._data = data or json.loads(DEMO_CREW_PATH.read_text(encoding="utf-8"))
+        self._badges: BadgeService | None = badges[0] if badges else None
+        self._badge_rows: BadgeRepository | None = badges[1] if badges else None
 
     async def seed(self) -> SeedResult:
         """Create the crew, then every member not already registered, with their history."""
@@ -83,8 +90,20 @@ class DemoSeedService:
             if await self._repos.users.get_by_email(member["email"]) is None:
                 user = await self._add_member(crew, member, password_hash)
                 await self._add_history(crew, user, member)
+                await self._mark_earned_badges(crew, user)
                 created.append(member["key"])
         return SeedResult(crew=crew, created_members=tuple(created))
+
+    async def _mark_earned_badges(self, crew: Crew, user: User) -> None:
+        """Record badges the seeded history already earns, without paying points (the
+        prototype's totals include them)."""
+        if self._badges is None or self._badge_rows is None:
+            return
+        member = Member(user, crew)
+        stats = await self._badges.stats(member)
+        for badge in load_badges():
+            if is_unlocked(badge, stats):
+                await self._badge_rows.add(user.id, badge.id, self._now())
 
     async def reset(self) -> None:
         """Delete the demo crew and its members (and everything they logged)."""
@@ -112,6 +131,7 @@ class DemoSeedService:
             initials=member["initials"],
             color=member["color"],
             language=member["language"],
+            rest_seconds=90,
         )
         await self._repos.users.add(user)
         await self._repos.crews.add_member(crew.id, user.id)

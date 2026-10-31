@@ -40,7 +40,7 @@ async def test_a_finished_workout_is_posted_to_the_crew(client, member, other_cl
     await finish(client, [{"exercise_id": "squat", "sets": [done(100, 5), done(100, 5)]}], "legs")
 
     feed = (await other_client.get("/api/feed")).json()
-    [item] = feed["items"]
+    [item] = [i for i in feed["items"] if i["kind"] == "workout"]
     assert item["kind"] == "workout"
     assert item["actor"]["display_name"] == "Gabi"
     assert item["is_mine"] is False
@@ -66,7 +66,7 @@ async def test_reaching_a_new_camp_posts_a_rank_up(client, member, crew, db_sess
     await give_points(db_session, member["id"], crew.id, 1480)
     await finish(client)
     kinds = [i["kind"] for i in (await client.get("/api/feed")).json()["items"]]
-    assert sorted(kinds) == ["rank_up", "workout"]
+    assert sorted(kinds) == ["badge", "rank_up", "workout"]  # badge: First tracks
     rank_up = next(
         i for i in (await client.get("/api/feed")).json()["items"] if i["kind"] == "rank_up"
     )
@@ -74,8 +74,8 @@ async def test_reaching_a_new_camp_posts_a_rank_up(client, member, crew, db_sess
 
 
 async def test_feed_pages_with_a_cursor(client, member):
-    for _ in range(3):
-        await finish(client)
+    for _ in range(2):
+        await finish(client)  # 2 workout posts + the First tracks badge post
     first = (await client.get("/api/feed", params={"limit": 2})).json()
     assert len(first["items"]) == 2
     assert first["next_before"] is not None
@@ -120,7 +120,8 @@ async def test_members_who_stopped_training_show_up_to_be_nudged(
 async def test_reactions_toggle_and_notify_the_owner(client, member, other_client):
     await register_on(other_client, "maxo@example.com", "IRONRIDGE")
     await finish(client)
-    item_id = (await other_client.get("/api/feed")).json()["items"][0]["id"]
+    items = (await other_client.get("/api/feed")).json()["items"]
+    item_id = next(i["id"] for i in items if i["kind"] == "workout")
 
     on = await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fire"})
     assert on.json() == {"fist": 0, "fire": 1, "mine": ["fire"]}
@@ -134,7 +135,7 @@ async def test_reactions_toggle_and_notify_the_owner(client, member, other_clien
 
 async def test_you_cannot_react_to_your_own_post(client, member):
     await finish(client)
-    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    item_id = (await client.get("/api/feed")).json()["items"][-1]["id"]
     response = await client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fist"})
     assert response.status_code == 409
     assert response.json() == {"detail": {"code": "own_feed_item"}}

@@ -13,7 +13,9 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from clock import utc_now
+from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
@@ -21,23 +23,30 @@ from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.session_repository import SessionRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
+from db.repositories.workout_stats_repository import WorkoutStatsRepository
 from db.tables.user import User
 from initializers import init_logger
 from services.activity_service import ActivityService
 from services.auth_service import AuthService
+from services.badge_service import BadgeService
+from services.bonus_service import BonusService
 from services.catalog import load_catalog
 from services.climb_rules import CampScale
 from services.climb_service import ClimbService
 from services.crew_service import CrewService
+from services.duel_service import DuelService
 from services.errors import NotInCrew
 from services.feed_service import FeedService
 from services.hall_of_fame_service import HallOfFameService
 from services.inbox_service import InboxService
+from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.notifier import Notifier
 from services.nudge_service import NudgeService
 from services.password_hasher import Argon2PasswordHasher
 from services.profile_service import ProfileService
+from services.quest_service import QuestService
+from services.recap_service import RecapService
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
@@ -208,6 +217,7 @@ def get_workout_finisher(
         rules=get_scoring_rules(),
         now=utc_now,
         activity=build_activity_service(session),
+        bonus=build_bonus_service(session),
     )
 
 
@@ -233,6 +243,7 @@ def get_feed_service(session: AsyncSession = Depends(get_session)) -> FeedServic
         notifier=_notifier(session),
         inactive_days=settings.social_inactive_days,
         now=utc_now,
+        badges=build_badge_service(session),
     )
 
 
@@ -259,4 +270,103 @@ def get_hall_of_fame_service(
         workouts=WorkoutRepository(session),
         weekly_target=settings.game_weekly_target,
         now=utc_now,
+    )
+
+
+def build_quest_service(session: AsyncSession) -> QuestService:
+    """QuestService wired to a session."""
+    return QuestService(
+        (
+            WorkoutRepository(session),
+            PointEventRepository(session),
+            CrewRepository(session),
+            UserRepository(session),
+        ),
+        load_catalog(),
+        {
+            "bodyweight_kg": settings.game_bodyweight_kg,
+            "crew_quest_goal": settings.scoring_crew_quest_goal,
+            "crew_quest": settings.scoring_crew_quest,
+            "bounty": settings.scoring_bounty,
+            "weekly_event": settings.game_weekly_event,
+        },
+        utc_now,
+    )
+
+
+def build_badge_service(session: AsyncSession) -> BadgeService:
+    """BadgeService wired to a session."""
+    return BadgeService(
+        (
+            WorkoutRepository(session),
+            WorkoutStatsRepository(session),
+            PointEventRepository(session),
+            FeedRepository(session),
+            BadgeRepository(session),
+        ),
+        load_catalog(),
+        settings.game_weekly_target,
+        utc_now,
+    )
+
+
+def build_bonus_service(session: AsyncSession) -> BonusService:
+    """BonusService wired to a session."""
+    return BonusService(
+        build_quest_service(session),
+        build_badge_service(session),
+        PointEventRepository(session),
+        utc_now,
+    )
+
+
+def get_quest_service(session: AsyncSession = Depends(get_session)) -> QuestService:
+    """FastAPI dependency provider for QuestService."""
+    return build_quest_service(session)
+
+
+def get_badge_service(session: AsyncSession = Depends(get_session)) -> BadgeService:
+    """FastAPI dependency provider for BadgeService."""
+    return build_badge_service(session)
+
+
+def get_duel_service(session: AsyncSession = Depends(get_session)) -> DuelService:
+    """FastAPI dependency provider for DuelService."""
+    return DuelService(
+        (
+            DuelRepository(session),
+            PointEventRepository(session),
+            WorkoutStatsRepository(session),
+            CrewRepository(session),
+            UserRepository(session),
+        ),
+        _notifier(session),
+        settings.scoring_duel_win,
+        utc_now,
+    )
+
+
+def get_recap_service(session: AsyncSession = Depends(get_session)) -> RecapService:
+    """FastAPI dependency provider for RecapService."""
+    return RecapService(
+        (PointEventRepository(session), WorkoutRepository(session), CrewRepository(session)),
+        get_hall_of_fame_service(session),
+        build_quest_service(session),
+        (settings.game_weekly_target, settings.game_weekly_event or None),
+        utc_now,
+    )
+
+
+def get_me_stats_service(session: AsyncSession = Depends(get_session)) -> MeStatsService:
+    """FastAPI dependency provider for MeStatsService."""
+    return MeStatsService(
+        build_climb_service(session),
+        (
+            WorkoutRepository(session),
+            WorkoutStatsRepository(session),
+            PersonalRecordRepository(session),
+            BadgeRepository(session),
+        ),
+        load_catalog(),
+        utc_now,
     )

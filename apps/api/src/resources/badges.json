@@ -1,0 +1,20 @@
+{
+  "_comment": "The 15 badges (docs/PRODUCT.md). Each pays `points` once, ever. `metric` names an evaluator in services/badges.py; `icon` and `color` are for the web's badge patch.",
+  "badges": [
+    { "id": "first", "metric": "workouts", "goal": 1, "points": 50, "icon": "boot", "color": "#7CFF4F" },
+    { "id": "better", "metric": "better_than_last_time", "goal": 5, "points": 150, "icon": "up", "color": "#FFE600" },
+    { "id": "twoplates", "metric": "best_squat_kg", "goal": 140, "points": 200, "icon": "barbell", "color": "#00D1FF" },
+    { "id": "tonnage", "metric": "lifetime_tonnes", "goal": 100, "points": 150, "icon": "kettle", "color": "#FFE600" },
+    { "id": "ironmonth", "metric": "longest_goal_streak", "goal": 4, "points": 150, "icon": "flame", "color": "#FF3B1F" },
+    { "id": "plateclub", "metric": "best_bench_kg", "goal": 100, "points": 200, "icon": "plate", "color": "#FF4FD8" },
+    { "id": "dawn", "metric": "dawn_workouts", "goal": 5, "points": 100, "icon": "sun", "color": "#FFE600" },
+    { "id": "legs", "metric": "leg_days", "goal": 10, "points": 150, "icon": "bolt", "color": "#B48CFF" },
+    { "id": "hunter", "metric": "bounties", "goal": 1, "points": 100, "icon": "target", "color": "#FF3B1F" },
+    { "id": "rope", "metric": "crew_quests", "goal": 3, "points": 200, "icon": "rope", "color": "#00D1FF" },
+    { "id": "hype", "metric": "reactions_given", "goal": 50, "points": 50, "icon": "star", "color": "#FF4FD8" },
+    { "id": "trash", "metric": "comments_written", "goal": 10, "points": 50, "icon": "chat", "color": "#7CFF4F" },
+    { "id": "owl", "metric": "night_workouts", "goal": 1, "points": 75, "icon": "moon", "color": "#B48CFF" },
+    { "id": "comeback", "metric": "comebacks", "goal": 1, "points": 100, "icon": "loop", "color": "#7CFF4F" },
+    { "id": "unstoppable", "metric": "total_points", "goal": 9000, "points": 300, "icon": "peak", "color": "#F2F2EE" }
+  ]
+}

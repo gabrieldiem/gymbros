@@ -11,6 +11,7 @@ from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.comment import Comment
 from db.tables.feed_item import FeedItem
+from services.badge_service import BadgeService
 from services.errors import FeedItemNotFound, OwnFeedItem
 from services.member import Member
 from services.notifier import Notifier
@@ -35,6 +36,7 @@ class FeedService:
         notifier: Notifier,
         inactive_days: int,
         now: Callable[[], datetime],
+        badges: BadgeService | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._feed = feed
@@ -44,6 +46,7 @@ class FeedService:
         self._notifier = notifier
         self._inactive_days = inactive_days
         self._now = now
+        self._badges = badges
 
     async def page(self, member: Member, before: datetime | None, limit: int) -> FeedPage:
         """Newest first. The first page also carries the nudge prompts."""
@@ -67,6 +70,7 @@ class FeedService:
                 {"name": member.user.display_name, "kind": kind, "item": item.kind},
                 "/crew",
             )
+            await self._check_badges(member)
         return self._summary(await self._feed.reactions([item.id]), member.user.id)
 
     async def comment(
@@ -90,7 +94,13 @@ class FeedService:
             {"name": member.user.display_name, "item": item.kind},
             "/crew",
         )
+        await self._check_badges(member)
         return CommentView(comment=comment, author=member.user)
+
+    async def _check_badges(self, member: Member) -> None:
+        """Hype crew and Trash talker unlock from reactions and comments."""
+        if self._badges is not None:
+            await self._badges.check_and_store(member)
 
     async def _item_in_crew(self, member: Member, item_id: uuid.UUID) -> FeedItem:
         item = await self._feed.get(item_id)

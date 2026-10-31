@@ -111,7 +111,8 @@ async def test_finishing_reports_the_climb_and_who_you_passed(
 
     climb = (await finish_curl(client))["climb"]
     assert climb["points_before"] == 1480
-    assert climb["points_after"] == 1480 + 50 + 5 + 3
+    # showed up 50 + 1 set 5 + 300 kg 3, plus the First tracks badge (50)
+    assert climb["points_after"] == 1480 + 50 + 5 + 3 + 50
     assert (climb["camp_before"], climb["camp_after"]) == (0, 1)
     assert climb["passed"] == []
 

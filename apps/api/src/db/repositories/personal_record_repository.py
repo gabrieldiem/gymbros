@@ -59,3 +59,12 @@ class PersonalRecordRepository:
             .limit(1)
         )
         return result.scalar_one_or_none()
+
+    async def for_user(self, user_id: uuid.UUID) -> list[PersonalRecord]:
+        """Every PR of the user, strongest first."""
+        result = await self._session.execute(
+            select(PersonalRecord)
+            .where(PersonalRecord.user_id == user_id)
+            .order_by(PersonalRecord.e1rm.desc())
+        )
+        return list(result.scalars())

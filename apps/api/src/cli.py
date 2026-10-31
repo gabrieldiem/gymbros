@@ -17,7 +17,8 @@ from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
-from dependencies import password_hasher, session_factory, settings
+from db.repositories.badge_repository import BadgeRepository
+from dependencies import build_badge_service, password_hasher, session_factory, settings
 from services.crew_service import CrewService
 from services.demo_seed_service import DemoSeedService, SeedRepositories
 from services.errors import DomainError
@@ -39,6 +40,7 @@ def build_demo_seed(session: AsyncSession) -> DemoSeedService:
         utc_now,
         weekly_target=settings.game_weekly_target,
         bodyweight_kg=settings.game_bodyweight_kg,
+        badges=(build_badge_service(session), BadgeRepository(session)),
     )
 
 

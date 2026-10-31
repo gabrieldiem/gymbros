@@ -1,5 +1,6 @@
 """ATUS Climb standings: points from point_events, camps, pips, streaks, gaps, improvement."""
 
+import uuid
 from datetime import datetime, timedelta
 
 from db.repositories.crew_repository import CrewRepository
@@ -114,9 +115,15 @@ class ClimbService:
             best[exercise_id] = max(best.get(exercise_id, 0.0), estimated_1rm(load, reps))
         return best
 
-    async def change(self, member: Member, gained: int) -> ClimbChange:
-        """The all-time move for `gained` new points (call before storing them)."""
-        totals = await self._events.totals_by_user(member.crew.id)
+    async def totals(self, member: Member) -> dict[uuid.UUID, int]:
+        """Everyone's all-time points right now (a snapshot to measure a climb from)."""
+        return await self._events.totals_by_user(member.crew.id)
+
+    async def change(
+        self, member: Member, gained: int, totals: dict[uuid.UUID, int] | None = None
+    ) -> ClimbChange:
+        """The all-time move for `gained` new points, measured from `totals` (default: now)."""
+        totals = totals if totals is not None else await self.totals(member)
         before = totals.get(member.user.id, 0)
         after = before + gained
         names = {u.id: u.display_name for u in await self._crews.members(member.crew.id)}

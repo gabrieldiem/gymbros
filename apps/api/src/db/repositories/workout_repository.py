@@ -185,3 +185,14 @@ class WorkoutRepository:
         )
         row = result.first()
         return (row[0], int(row[1] or 0)) if row else None
+
+    async def finished_in_week(self, user_id: uuid.UUID, week_start: date) -> list[Workout]:
+        """The user's finished workouts in a crew-local week, with sets."""
+        result = await self._session.execute(
+            select(Workout).where(
+                Workout.user_id == user_id,
+                Workout.week_start == week_start,
+                Workout.finished_at.is_not(None),
+            )
+        )
+        return list(result.scalars())

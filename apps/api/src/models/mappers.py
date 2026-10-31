@@ -16,6 +16,7 @@ def to_me_response(profile: Profile) -> MeResponse:
             "initials": user.initials,
             "color": user.color,
             "language": user.language,
+            "rest_seconds": user.rest_seconds,
             "crew": crew,
         }
     )
