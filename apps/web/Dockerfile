@@ -16,7 +16,12 @@ RUN npm run build
 ################################
 # Stage 2: Serve with nginx
 ################################
-FROM nginx:1.29-alpine AS runner
+FROM nginx:1.30-alpine AS runner
+
+# Targeted fixes the current nginx:1.30-alpine base doesn't ship yet (Trivy, 2026-10-31):
+# brotli-libs CVE-2026-111497 (CRITICAL, fixed 1.2.1-r0), curl/libcurl (HIGH, fixed 8.23.0-r0).
+# Only these packages are upgraded; drop this line once the base image includes the fixes.
+RUN apk add --no-cache --upgrade brotli-libs curl libcurl
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
