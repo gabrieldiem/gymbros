@@ -66,6 +66,8 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Bonus lock has no concurrency test** (api, S): the advisory lock around crew-quest and bounty claims is exercised by every finish, but no test runs two finishes in parallel (the suite runs each test inside one rolled-back transaction). Add a test with two committed sessions. _Added 2026-10-31_
 - [ ] **E2E specs share demo members** (web, S): five demo members across five specs at two viewports means specs can see each other's side effects (an in-progress workout, unread notifications). The a11y spec now tolerates that, but each spec should own its member. _Added 2026-10-31_
 - [ ] **Precache size** (web, S): the service worker precaches ~815 KiB, mostly Barlow font weights. Trim unused weights or subset the fonts. _Added 2026-10-31_
+- [ ] **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
+- [ ] **pip-vendored HIGHs in the api image** (infra, S): Trivy reports msgpack 1.1.2, urllib3 2.7.0 and setuptools 70.3.0 as HIGH. They are copies vendored inside `pip` (base image and the venv), which the app never runs; they don't fail the deploy (CRITICAL only). Build the runtime venv without pip, or wait for a python:3.13-slim image with a newer pip. _Added 2026-10-31_
 
 ## Done
 
