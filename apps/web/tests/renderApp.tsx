@@ -10,12 +10,15 @@ import { Providers } from '../src/Providers';
 /** Render the whole app at `path`, with a fresh query client that never retries. */
 export function renderApp(path: string | { pathname: string; state?: unknown } = '/') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const container = document.body.appendChild(document.createElement('div'));
+  container.id = 'root';
   const view = render(
     <Providers client={client}>
       <MemoryRouter initialEntries={[path]}>
         <App />
       </MemoryRouter>
     </Providers>,
+    { container },
   );
   return { ...view, client };
 }

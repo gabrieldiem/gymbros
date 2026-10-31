@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useLiftHistory } from '../../api/compete';
+import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { niceMax } from './charts';
 import styles from './Me.module.css';
@@ -12,9 +13,16 @@ const PAD = { top: 16, right: 40, bottom: 24, left: 8 };
 /** Best e1RM per week for one lift: a 2px line with a 10% wash, end-labelled, crosshair tooltip. */
 export function PrChart({ exerciseId }: { exerciseId: string }) {
   const { t, n, lang } = useI18n();
-  const points = useLiftHistory(exerciseId).data;
+  const history = useLiftHistory(exerciseId);
+  const points = history.data;
   const [active, setActive] = useState<number | null>(null);
-  if (!points) return <p role="status">{t('loading')}</p>;
+  if (!points) {
+    return history.isError ? (
+      <ErrorBlock message="load_failed_generic" onRetry={() => void history.refetch()} />
+    ) : (
+      <LoadingBlock rows={1} />
+    );
+  }
   if (points.length < 2) return <p className={styles.muted}>{t('pr_chart_empty')}</p>;
 
   const values = points.map((p) => p.e1rm);

@@ -4,6 +4,7 @@ import { useMe } from '../../api/me';
 import { useFeed } from '../../api/social';
 import { useCatalog } from '../../api/train';
 import { Button } from '../../components/Button';
+import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
 import { useI18n } from '../../i18n/context';
 import styles from './CrewPage.module.css';
@@ -29,7 +30,7 @@ function Feed() {
       </div>
     );
   }
-  if (!feed.data) return <p role="status">{t('loading')}</p>;
+  if (!feed.data) return <LoadingBlock />;
   const pages = feed.data.pages;
   const items = pages.flatMap((p) => p.items);
   const inactive = pages[0]?.inactive ?? [];

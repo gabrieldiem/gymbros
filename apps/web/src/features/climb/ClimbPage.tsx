@@ -6,6 +6,7 @@ import { useMe } from '../../api/me';
 import { useActiveWorkout, useCatalog } from '../../api/train';
 import { RecapStories } from '../recap/RecapStories';
 import { Button } from '../../components/Button';
+import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
@@ -109,7 +110,7 @@ export function ClimbPage() {
           </Button>
         </div>
       ) : (
-        <p role="status">{t('loading')}</p>
+        <LoadingBlock rows={2} />
       )}
       {recapOpen && (
         <RecapStories exercises={catalog?.exercises ?? []} onClose={() => setRecapOpen(false)} />

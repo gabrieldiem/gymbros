@@ -4,6 +4,7 @@ import { useBadges, useQuests } from '../../api/compete';
 import { useMe } from '../../api/me';
 import { Button, ButtonLink } from '../../components/Button';
 import { cx } from '../../components/cx';
+import { ErrorBlock, LoadingBlock, QueryState } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
@@ -18,10 +19,17 @@ type View = 'quests' | 'badges';
 
 function QuestsView() {
   const { t, n } = useI18n();
-  const board = useQuests().data;
+  const quests = useQuests();
+  const board = quests.data;
   const myId = useMe().data?.id;
   const [duelOpen, setDuelOpen] = useState(false);
-  if (!board) return <p role="status">{t('loading')}</p>;
+  if (!board) {
+    return quests.isError ? (
+      <ErrorBlock message="quests_failed" onRetry={() => void quests.refetch()} />
+    ) : (
+      <LoadingBlock />
+    );
+  }
   const winPoints = board.duel_points;
   const bounty = board.bounty;
   const members = board.crew_quest.shares.map((s) => s.member);
@@ -107,7 +115,8 @@ function QuestsView() {
 export function QuestsPage() {
   const { t } = useI18n();
   const [view, setView] = useState<View>('quests');
-  const badges = useBadges().data;
+  const badgesQuery = useBadges();
+  const badges = badgesQuery.data;
   const unlocked = badges?.filter((b) => b.unlocked_at).length ?? 0;
   return (
     <section aria-labelledby="page-title">
@@ -132,10 +141,10 @@ export function QuestsPage() {
       </div>
       {view === 'quests' ? (
         <QuestsView />
-      ) : badges ? (
-        <Badges badges={badges} />
       ) : (
-        <p role="status">{t('loading')}</p>
+        <QueryState query={badgesQuery} failed="badges_failed">
+          {(data) => <Badges badges={data} />}
+        </QueryState>
       )}
     </section>
   );

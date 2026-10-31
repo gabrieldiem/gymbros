@@ -61,6 +61,7 @@ export function TonnageChart({ weeks }: { weeks: MeStats['weekly_volume'] }) {
                 width={slot}
                 height={plotH + 10}
                 tabIndex={0}
+                role="img"
                 aria-label={t('tonnage_bar', { date: label(week.week_start), n: value(tn) })}
                 onPointerEnter={() => setActive(i)}
                 onPointerLeave={() => setActive(null)}

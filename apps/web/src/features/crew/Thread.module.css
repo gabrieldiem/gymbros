@@ -45,7 +45,7 @@
 
 .quick button {
   flex: none;
-  min-height: 36px;
+  min-height: var(--touch);
   padding: 0 12px;
   background: var(--iron);
   border-radius: var(--r-pill);

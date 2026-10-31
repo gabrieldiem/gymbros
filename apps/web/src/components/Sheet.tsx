@@ -19,6 +19,13 @@ export function Sheet({ title, onClose, children, hideTitle }: Props) {
   const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Everything behind the sheet is inert: no focus, clicks or screen-reader reading leak out.
+    const root = document.getElementById('root');
+    root?.setAttribute('inert', '');
+    return () => root?.removeAttribute('inert');
+  }, []);
+
+  useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
     const first = panel.current?.querySelector<HTMLElement>(FOCUSABLE);
     (first ?? panel.current)?.focus();

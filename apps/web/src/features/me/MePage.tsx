@@ -4,9 +4,9 @@ import { useMyStats, type MeStats } from '../../api/compete';
 import { useMe } from '../../api/me';
 import { useCatalog } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
-import { Button } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { Pips } from '../../components/Pips';
+import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
@@ -78,14 +78,9 @@ export function MePage() {
   const data = stats.data;
   if (!me || !data) {
     return stats.isError ? (
-      <div role="alert">
-        <p>{t('stats_failed')}</p>
-        <Button variant="ghost" onClick={() => void stats.refetch()}>
-          {t('retry')}
-        </Button>
-      </div>
+      <ErrorBlock message="stats_failed" onRetry={() => void stats.refetch()} />
     ) : (
-      <p role="status">{t('loading')}</p>
+      <LoadingBlock />
     );
   }
   const climb = data.climb;

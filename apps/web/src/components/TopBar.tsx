@@ -18,7 +18,7 @@ export function TopBar() {
         <LanguageToggle />
         {me && <NotificationBell />}
         {me && (
-          <Link to="/me" className={styles.me} aria-label={t('profile')}>
+          <Link to="/me" className={styles.me} aria-label={`${t('profile')}, ${me.initials}`}>
             <Avatar initials={me.initials} color={me.color} size={44} />
           </Link>
         )}

@@ -7,7 +7,7 @@
 }
 
 .seg button {
-  min-height: 40px;
+  min-height: var(--touch);
   padding: 0 14px;
   border-radius: 9px;
   font-weight: 600;

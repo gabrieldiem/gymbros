@@ -35,7 +35,7 @@ describe('App shell (signed in)', () => {
   it('shows the avatar with initials linking to the profile', async () => {
     mockApi({ 'GET /api/me': [200, makeMe({ initials: 'GD' })] });
     renderApp('/climb');
-    const link = await screen.findByRole('link', { name: 'Your profile' });
+    const link = await screen.findByRole('link', { name: /Your profile/ });
     expect(link).toHaveAttribute('href', '/me');
     expect(link).toHaveTextContent('GD');
   });

@@ -20,3 +20,7 @@
 .down .dot {
   background: var(--red);
 }
+
+.offline .dot {
+  background: var(--red);
+}

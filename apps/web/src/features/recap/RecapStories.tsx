@@ -201,6 +201,12 @@ export function RecapStories({
   }, [index, count, step]);
 
   useEffect(() => {
+    const root = document.getElementById('root');
+    root?.setAttribute('inert', '');
+    return () => root?.removeAttribute('inert');
+  }, []);
+
+  useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
       if (event.key === 'ArrowRight') step(1);

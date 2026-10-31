@@ -3,6 +3,7 @@ import { useHallOfFame, type HallOfFame as Hof } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
+import { QueryState } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { formatLift } from '../train/format';
 import styles from './HallOfFame.module.css';
@@ -76,33 +77,40 @@ export function HallOfFame({ exercises }: { exercises: Exercise[] }) {
   const { t } = useI18n();
   const hof = useHallOfFame();
   const myId = useMe().data?.id;
-  if (!hof.data) return <p role="status">{t('loading')}</p>;
   return (
-    <div className={styles.hof}>
-      <section className={cx(styles.panel)} aria-labelledby="improved-title">
-        <h2 id="improved-title">{t('most_improved')}</h2>
-        <p className={styles.sub}>{t('most_improved_sub')}</p>
-        <Podium improved={hof.data.most_improved} />
-      </section>
-      <section className={styles.panel} aria-labelledby="records-title">
-        <h2 id="records-title">{t('records')}</h2>
-        <p className={styles.sub}>{t('records_sub')}</p>
-        {hof.data.records.length === 0 && <p className={styles.empty}>{t('records_empty')}</p>}
-        <ul className={styles.records}>
-          {hof.data.records.map((record) => (
-            <li key={`${record.key}-${String(record.vars.exercise_id ?? '')}`}>
-              <span>{recordTitle(record, exercises, t)}</span>
-              <b>
-                <RecordValue record={record} exercises={exercises} />
-              </b>
-              <span className={styles.holder}>
-                <Avatar initials={record.holder.initials} color={record.holder.color} size={24} />
-                {record.holder.user_id === myId ? t('you_hold') : record.holder.display_name}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+    <QueryState query={hof} failed="hof_failed" rows={2}>
+      {(data) => (
+        <div className={styles.hof}>
+          <section className={cx(styles.panel)} aria-labelledby="improved-title">
+            <h2 id="improved-title">{t('most_improved')}</h2>
+            <p className={styles.sub}>{t('most_improved_sub')}</p>
+            <Podium improved={data.most_improved} />
+          </section>
+          <section className={styles.panel} aria-labelledby="records-title">
+            <h2 id="records-title">{t('records')}</h2>
+            <p className={styles.sub}>{t('records_sub')}</p>
+            {data.records.length === 0 && <p className={styles.empty}>{t('records_empty')}</p>}
+            <ul className={styles.records}>
+              {data.records.map((record) => (
+                <li key={`${record.key}-${String(record.vars.exercise_id ?? '')}`}>
+                  <span>{recordTitle(record, exercises, t)}</span>
+                  <b>
+                    <RecordValue record={record} exercises={exercises} />
+                  </b>
+                  <span className={styles.holder}>
+                    <Avatar
+                      initials={record.holder.initials}
+                      color={record.holder.color}
+                      size={24}
+                    />
+                    {record.holder.user_id === myId ? t('you_hold') : record.holder.display_name}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      )}
+    </QueryState>
   );
 }

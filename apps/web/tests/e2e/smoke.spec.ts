@@ -78,7 +78,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   for (const name of ['ATUS Climb', 'Crew', 'Train', 'Quests', 'You']) {
     await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
   }
-  await expect(page.getByRole('link', { name: 'Your profile' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Your profile/ })).toBeVisible();
   await expectNoSidewaysScroll(page);
   await shoot(page, 'climb-en', testInfo);
   await page.screenshot({
@@ -101,7 +101,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await shoot(page, 'crew-es', testInfo);
 
   await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByRole('link', { name: 'Your profile' }).click();
+  await page.getByRole('link', { name: /Your profile/ }).click();
   await page.getByRole('button', { name: 'Settings' }).click();
   await page.getByRole('button', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/welcome$/);
