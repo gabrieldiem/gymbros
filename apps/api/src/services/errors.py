@@ -27,3 +27,31 @@ class AlreadyInCrew(DomainError):
 
 class InvalidTimeZone(DomainError):
     """Not an IANA time zone name."""
+
+
+class NotInCrew(DomainError):
+    """The user has to join a crew first."""
+
+
+class WorkoutNotFound(DomainError):
+    """No such workout for this user."""
+
+
+class WorkoutAlreadyActive(DomainError):
+    """The user already has a workout in progress."""
+
+
+class WorkoutAlreadyFinished(DomainError):
+    """The workout is finished and can't change."""
+
+
+class WorkoutEmpty(DomainError):
+    """A workout needs at least one completed set to be finished."""
+
+
+class UnknownExercise(DomainError):
+    """Not an exercise in the catalog."""
+
+
+class UnknownRoutine(DomainError):
+    """Not a routine in the catalog."""

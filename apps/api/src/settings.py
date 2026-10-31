@@ -41,6 +41,8 @@ class Settings:
     game_rank_count: int = 7
     game_week_scale: int = 1500
     game_bodyweight_kg: int = 80
+    # The week's twist. v1 has one event, always on: "leg_day_x2". Empty turns it off.
+    game_weekly_event: str = "leg_day_x2"
 
     scoring_showed_up: int = 50
     scoring_completed_set: int = 5

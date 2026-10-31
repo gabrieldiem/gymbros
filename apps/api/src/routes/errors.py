@@ -10,6 +10,13 @@ from services.errors import (
     InvalidTimeZone,
     InviteCodeNotFound,
     NotAuthenticated,
+    NotInCrew,
+    UnknownExercise,
+    UnknownRoutine,
+    WorkoutAlreadyActive,
+    WorkoutAlreadyFinished,
+    WorkoutEmpty,
+    WorkoutNotFound,
 )
 
 _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
@@ -19,6 +26,13 @@ _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     InviteCodeNotFound: (status.HTTP_404_NOT_FOUND, "invite_code_not_found"),
     AlreadyInCrew: (status.HTTP_409_CONFLICT, "already_in_crew"),
     InvalidTimeZone: (status.HTTP_422_UNPROCESSABLE_CONTENT, "invalid_time_zone"),
+    NotInCrew: (status.HTTP_403_FORBIDDEN, "not_in_crew"),
+    WorkoutNotFound: (status.HTTP_404_NOT_FOUND, "workout_not_found"),
+    WorkoutAlreadyActive: (status.HTTP_409_CONFLICT, "workout_already_active"),
+    WorkoutAlreadyFinished: (status.HTTP_409_CONFLICT, "workout_finished"),
+    WorkoutEmpty: (status.HTTP_409_CONFLICT, "workout_empty"),
+    UnknownExercise: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_exercise"),
+    UnknownRoutine: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_routine"),
 }
 
 

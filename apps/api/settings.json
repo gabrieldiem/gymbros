@@ -4,7 +4,8 @@
     "rank_step": 1500,
     "rank_count": 7,
     "week_scale": 1500,
-    "bodyweight_kg": 80
+    "bodyweight_kg": 80,
+    "weekly_event": "leg_day_x2"
   },
   "scoring": {
     "showed_up": 50,

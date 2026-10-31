@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from controller import general
 from db.migrate import run_migrations
 from dependencies import engine, logger, settings
-from routes import auth, crews, me
+from routes import auth, catalog, crew, crews, me, workouts
 from routes.errors import handle_domain_error
 from services.errors import DomainError
 
@@ -40,3 +40,6 @@ app.add_exception_handler(DomainError, handle_domain_error)
 app.include_router(auth.router, prefix="/api")
 app.include_router(me.router, prefix="/api")
 app.include_router(crews.router, prefix="/api")
+app.include_router(catalog.router, prefix="/api")
+app.include_router(workouts.router, prefix="/api")
+app.include_router(crew.router, prefix="/api")
