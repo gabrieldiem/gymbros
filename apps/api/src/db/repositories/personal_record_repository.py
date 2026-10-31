@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.tables.membership import Membership
 from db.tables.personal_record import PersonalRecord
 from services.scoring_types import RecordSet
 
@@ -47,3 +48,14 @@ class PersonalRecordRepository:
         await self._session.execute(
             statement.on_conflict_do_update(index_elements=["user_id", "exercise_id"], set_=values)
         )
+
+    async def heaviest_in_crew(self, crew_id: uuid.UUID, exercise_id: str) -> PersonalRecord | None:
+        """The crew's heaviest PR for an exercise (by load, then reps)."""
+        result = await self._session.execute(
+            select(PersonalRecord)
+            .join(Membership, Membership.user_id == PersonalRecord.user_id)
+            .where(Membership.crew_id == crew_id, PersonalRecord.exercise_id == exercise_id)
+            .order_by(PersonalRecord.load_kg.desc(), PersonalRecord.reps.desc())
+            .limit(1)
+        )
+        return result.scalar_one_or_none()

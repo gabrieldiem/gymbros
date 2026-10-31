@@ -9,6 +9,7 @@ from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.point_event import PointEvent
 from db.tables.workout import Workout
+from services.activity_service import ActivityService
 from services.catalog import Catalog
 from services.climb_service import ClimbService
 from services.errors import WorkoutEmpty
@@ -36,6 +37,7 @@ class WorkoutFinisher:
         catalog: Catalog,
         rules: ScoringRules,
         now: Callable[[], datetime],
+        activity: ActivityService | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts = workouts
@@ -47,6 +49,7 @@ class WorkoutFinisher:
         self._catalog = catalog
         self._rules = rules
         self._now = now
+        self._activity = activity
 
     async def finish(self, member: Member, workout_id: uuid.UUID) -> FinishedWorkout:
         """Score and close the workout. Needs at least one completed set."""
@@ -59,9 +62,12 @@ class WorkoutFinisher:
             raise WorkoutEmpty(str(workout_id))
         climb = await self._climb.change(member, score.total)
         await self._close(member, workout, score, now)
-        return FinishedWorkout(
+        finished = FinishedWorkout(
             workout, score, workouts_this_week=week.workouts_before + 1, climb=climb
         )
+        if self._activity is not None:
+            await self._activity.workout_finished(member, finished)
+        return finished
 
     async def _close(
         self, member: Member, workout: Workout, score: ScoreResult, now: datetime

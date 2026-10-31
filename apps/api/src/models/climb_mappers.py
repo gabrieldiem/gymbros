@@ -82,4 +82,10 @@ def to_climb_response(view: ClimbView) -> ClimbResponse:
 
 def to_climb_change(change: ClimbChange) -> ClimbChangeModel:
     """The climb part of the finish response."""
-    return ClimbChangeModel(**{**asdict(change), "passed": list(change.passed)})
+    return ClimbChangeModel(
+        points_before=change.points_before,
+        points_after=change.points_after,
+        camp_before=change.camp_before,
+        camp_after=change.camp_after,
+        passed=list(change.passed),
+    )

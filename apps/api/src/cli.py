@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from clock import utc_now
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.feed_repository import FeedRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
@@ -30,6 +31,7 @@ def build_demo_seed(session: AsyncSession) -> DemoSeedService:
         workouts=WorkoutRepository(session),
         events=PointEventRepository(session),
         records=PersonalRecordRepository(session),
+        feed=FeedRepository(session),
     )
     return DemoSeedService(
         repos,

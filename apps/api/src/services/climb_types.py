@@ -1,5 +1,6 @@
 """Data containers for ATUS Climb standings."""
 
+import uuid
 from dataclasses import dataclass
 from typing import Literal
 
@@ -54,3 +55,4 @@ class ClimbChange:
     camp_before: int
     camp_after: int
     passed: tuple[str, ...]
+    passed_ids: tuple[uuid.UUID, ...] = ()

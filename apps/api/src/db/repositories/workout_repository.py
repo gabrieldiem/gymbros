@@ -165,3 +165,23 @@ class WorkoutRepository:
             )
         )
         return [(ex, float(load or 0), int(reps or 0)) for ex, load, reps in result.all()]
+
+    async def last_finished_by_user(self, crew_id: uuid.UUID) -> dict[uuid.UUID, datetime]:
+        """When each member of the crew last finished a workout."""
+        result = await self._session.execute(
+            select(Workout.user_id, func.max(Workout.finished_at))
+            .where(Workout.crew_id == crew_id, Workout.finished_at.is_not(None))
+            .group_by(Workout.user_id)
+        )
+        return {user_id: last for user_id, last in result.all() if last is not None}
+
+    async def best_session(self, crew_id: uuid.UUID) -> tuple[uuid.UUID, int] | None:
+        """(user, points) of the crew's highest-scoring workout."""
+        result = await self._session.execute(
+            select(Workout.user_id, Workout.points)
+            .where(Workout.crew_id == crew_id, Workout.points.is_not(None))
+            .order_by(Workout.points.desc())
+            .limit(1)
+        )
+        row = result.first()
+        return (row[0], int(row[1] or 0)) if row else None

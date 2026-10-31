@@ -55,3 +55,23 @@ class UnknownExercise(DomainError):
 
 class UnknownRoutine(DomainError):
     """Not a routine in the catalog."""
+
+
+class FeedItemNotFound(DomainError):
+    """No such feed item in the member's crew."""
+
+
+class OwnFeedItem(DomainError):
+    """Members can't react to their own posts."""
+
+
+class MemberNotFound(DomainError):
+    """No such member in the crew."""
+
+
+class CannotNudgeSelf(DomainError):
+    """Nudges are for other members."""
+
+
+class AlreadyNudged(DomainError):
+    """One nudge per member per day."""

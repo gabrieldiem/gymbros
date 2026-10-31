@@ -5,6 +5,11 @@ from fastapi.responses import JSONResponse
 
 from services.errors import (
     AlreadyInCrew,
+    AlreadyNudged,
+    CannotNudgeSelf,
+    FeedItemNotFound,
+    MemberNotFound,
+    OwnFeedItem,
     EmailAlreadyRegistered,
     InvalidCredentials,
     InvalidTimeZone,
@@ -33,6 +38,11 @@ _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     WorkoutEmpty: (status.HTTP_409_CONFLICT, "workout_empty"),
     UnknownExercise: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_exercise"),
     UnknownRoutine: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_routine"),
+    FeedItemNotFound: (status.HTTP_404_NOT_FOUND, "feed_item_not_found"),
+    OwnFeedItem: (status.HTTP_409_CONFLICT, "own_feed_item"),
+    MemberNotFound: (status.HTTP_404_NOT_FOUND, "member_not_found"),
+    CannotNudgeSelf: (status.HTTP_422_UNPROCESSABLE_CONTENT, "cannot_nudge_self"),
+    AlreadyNudged: (status.HTTP_409_CONFLICT, "already_nudged"),
 }
 
 

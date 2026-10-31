@@ -98,3 +98,18 @@ def test_workouts_change_compares_the_last_4_weeks_with_the_4_before():
     }
     # last 4 (this week included): 2+3+3+3 = 11; the 4 before: 2+2+2+2 = 8
     assert workouts_change(this_week, counts) == 3
+
+
+def test_longest_goal_streak_finds_the_best_run_ever():
+    from services.climb_rules import longest_goal_streak
+
+    weeks = {
+        date(2026, 9, 7): 3,
+        date(2026, 9, 14): 4,
+        date(2026, 9, 21): 1,
+        date(2026, 9, 28): 3,
+        date(2026, 10, 5): 3,
+        date(2026, 10, 12): 3,
+    }
+    assert longest_goal_streak(weeks, 3) == 3
+    assert longest_goal_streak({}, 3) == 0

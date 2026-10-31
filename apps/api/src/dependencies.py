@@ -14,6 +14,8 @@ from sqlalchemy.ext.asyncio import (
 
 from clock import utc_now
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.feed_repository import FeedRepository
+from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.session_repository import SessionRepository
@@ -21,13 +23,19 @@ from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.user import User
 from initializers import init_logger
+from services.activity_service import ActivityService
 from services.auth_service import AuthService
 from services.catalog import load_catalog
 from services.climb_rules import CampScale
 from services.climb_service import ClimbService
 from services.crew_service import CrewService
 from services.errors import NotInCrew
+from services.feed_service import FeedService
+from services.hall_of_fame_service import HallOfFameService
+from services.inbox_service import InboxService
 from services.member import Member
+from services.notifier import Notifier
+from services.nudge_service import NudgeService
 from services.password_hasher import Argon2PasswordHasher
 from services.profile_service import ProfileService
 from services.scoring_context import ScoringContextBuilder
@@ -134,10 +142,32 @@ def _context(session: AsyncSession) -> ScoringContextBuilder:
     )
 
 
+def _notifier(session: AsyncSession) -> Notifier:
+    return Notifier(NotificationRepository(session), utc_now)
+
+
+def build_activity_service(session: AsyncSession) -> ActivityService:
+    """ActivityService wired to a session."""
+    return ActivityService(
+        feed=FeedRepository(session),
+        crews=CrewRepository(session),
+        events=PointEventRepository(session),
+        notifier=_notifier(session),
+        weekly_target=settings.game_weekly_target,
+        close_behind_points=settings.social_close_behind_points,
+        now=utc_now,
+    )
+
+
 def get_workout_service(session: AsyncSession = Depends(get_session)) -> WorkoutService:
     """FastAPI dependency provider for WorkoutService."""
     return WorkoutService(
-        WorkoutRepository(session), _context(session), load_catalog(), get_scoring_rules(), utc_now
+        WorkoutRepository(session),
+        _context(session),
+        load_catalog(),
+        get_scoring_rules(),
+        utc_now,
+        activity=build_activity_service(session),
     )
 
 
@@ -177,6 +207,7 @@ def get_workout_finisher(
         catalog=load_catalog(),
         rules=get_scoring_rules(),
         now=utc_now,
+        activity=build_activity_service(session),
     )
 
 
@@ -190,3 +221,42 @@ def get_training_now_service(
 ) -> TrainingNowService:
     """FastAPI dependency provider for TrainingNowService."""
     return TrainingNowService(WorkoutRepository(session))
+
+
+def get_feed_service(session: AsyncSession = Depends(get_session)) -> FeedService:
+    """FastAPI dependency provider for FeedService."""
+    return FeedService(
+        feed=FeedRepository(session),
+        users=UserRepository(session),
+        crews=CrewRepository(session),
+        workouts=WorkoutRepository(session),
+        notifier=_notifier(session),
+        inactive_days=settings.social_inactive_days,
+        now=utc_now,
+    )
+
+
+def get_nudge_service(session: AsyncSession = Depends(get_session)) -> NudgeService:
+    """FastAPI dependency provider for NudgeService."""
+    return NudgeService(
+        CrewRepository(session), NotificationRepository(session), _notifier(session), utc_now
+    )
+
+
+def get_inbox_service(session: AsyncSession = Depends(get_session)) -> InboxService:
+    """FastAPI dependency provider for InboxService."""
+    return InboxService(NotificationRepository(session), UserRepository(session), utc_now)
+
+
+def get_hall_of_fame_service(
+    session: AsyncSession = Depends(get_session),
+) -> HallOfFameService:
+    """FastAPI dependency provider for HallOfFameService."""
+    return HallOfFameService(
+        climb=build_climb_service(session),
+        crews=CrewRepository(session),
+        records=PersonalRecordRepository(session),
+        workouts=WorkoutRepository(session),
+        weekly_target=settings.game_weekly_target,
+        now=utc_now,
+    )

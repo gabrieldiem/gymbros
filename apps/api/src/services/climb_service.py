@@ -120,10 +120,13 @@ class ClimbService:
         before = totals.get(member.user.id, 0)
         after = before + gained
         names = {u.id: u.display_name for u in await self._crews.members(member.crew.id)}
-        passed = tuple(
-            names[user_id]
+        passed_ids = tuple(
+            user_id
             for user_id, points in sorted(totals.items(), key=lambda kv: -kv[1])
             if user_id != member.user.id and before < points < after and user_id in names
         )
+        passed = tuple(names[user_id] for user_id in passed_ids)
         scale = self._scales["all"]
-        return ClimbChange(before, after, rank_for(before, scale), rank_for(after, scale), passed)
+        return ClimbChange(
+            before, after, rank_for(before, scale), rank_for(after, scale), passed, passed_ids
+        )

@@ -3,19 +3,22 @@
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.feed_repository import FeedRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.crew import Crew
+from db.tables.feed_item import FeedItem
 from db.tables.point_event import PointEvent
 from db.tables.user import User
 from db.tables.workout import Workout
+from services.activity_service import workout_post_vars
 from services.catalog import load_catalog
 from services.crew_service import CrewService
 from services.demo_history import MemberStats, PlannedWorkout, plan_history
@@ -27,6 +30,8 @@ from services.workout_types import ExerciseEntry
 
 DEMO_CREW_PATH = Path(__file__).resolve().parent.parent / "resources" / "demo_crew.json"
 HISTORY_KEY = "ln_history"
+# Seeded workouts this recent also get a feed post, so the Crew tab starts populated.
+FEED_WINDOW = timedelta(days=10)
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +51,7 @@ class SeedRepositories:
     workouts: WorkoutRepository
     events: PointEventRepository
     records: PersonalRecordRepository
+    feed: FeedRepository
 
 
 class DemoSeedService:
@@ -128,6 +134,8 @@ class DemoSeedService:
         for planned in plan:
             workout = await self._add_workout(crew, user, planned)
             self._track_bests(best, planned)
+            if planned.finished_at >= self._now() - FEED_WINDOW:
+                await self._repos.feed.add(self._post(crew, user, workout))
             await self._repos.events.add_all([self._event(crew, user, workout, planned)])
         for record in best.values():
             await self._repos.records.store(user.id, record, None, self._now())
@@ -139,7 +147,7 @@ class DemoSeedService:
             crew_id=crew.id,
             routine_id=planned.routine_id,
             name=load_catalog().routine(planned.routine_id).name,  # type: ignore[union-attr]
-            started_at=planned.finished_at,
+            started_at=planned.finished_at - timedelta(minutes=50 + len(planned.exercises) * 5),
             finished_at=planned.finished_at,
             week_start=week_start(planned.finished_at, crew.time_zone),
             volume_kg=self._volume(planned),
@@ -171,6 +179,17 @@ class DemoSeedService:
                 )
                 if ex_id not in best or e1rm > best[ex_id].e1rm:
                     best[ex_id] = RecordSet(ex_id, s.load_kg or 0.0, s.reps or 0, e1rm, False)
+
+    @staticmethod
+    def _post(crew: Crew, user: User, workout: Workout) -> FeedItem:
+        return FeedItem(
+            crew_id=crew.id,
+            actor_id=user.id,
+            kind="workout",
+            workout_id=workout.id,
+            vars=workout_post_vars(workout),
+            created_at=workout.finished_at,
+        )
 
     @staticmethod
     def _event(crew: Crew, user: User, workout: Workout, planned: PlannedWorkout) -> PointEvent:

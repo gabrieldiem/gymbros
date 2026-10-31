@@ -60,6 +60,10 @@ class Settings:
     scoring_bounty: int = 150
     scoring_duel_win: int = 150
 
+    social_inactive_days: int = 3
+    social_close_behind_points: int = 300
+    social_feed_page_size: int = 20
+
     session_cookie_name: str = "gymbros_session"
     session_max_age_days: int = 30
 
@@ -67,7 +71,7 @@ class Settings:
     _JSON_KEYS = frozenset(
         key
         for key in list(locals())
-        if key.startswith(("game_", "scoring_", "session_")) and key != "session_secret"
+        if key.startswith(("game_", "scoring_", "session_", "social_")) and key != "session_secret"
     )
 
     def __init__(self) -> None:

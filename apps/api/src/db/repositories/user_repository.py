@@ -38,3 +38,10 @@ class UserRepository:
         """Remove a user; their sessions, membership, workouts and points cascade."""
         await self._session.delete(user)
         await self._session.flush()
+
+    async def get_many(self, user_ids: set[uuid.UUID]) -> dict[uuid.UUID, User]:
+        """Users by id."""
+        if not user_ids:
+            return {}
+        result = await self._session.execute(select(User).where(User.id.in_(user_ids)))
+        return {user.id: user for user in result.scalars()}

@@ -78,3 +78,14 @@ def workouts_change(this_week: date, workouts_by_week: Mapping[date, Any]) -> in
     recent = sum(workouts_by_week.get(w, 0) for w in _weeks_back(this_week, 0, 4))
     earlier = sum(workouts_by_week.get(w, 0) for w in _weeks_back(this_week, 4, 4))
     return int(recent - earlier)
+
+
+def longest_goal_streak(workouts_by_week: Mapping[date, int], target: int) -> int:
+    """The longest run of consecutive goal weeks ever."""
+    best = run = 0
+    previous: date | None = None
+    for week in sorted(w for w, count in workouts_by_week.items() if count >= target):
+        run = run + 1 if previous and week - previous == timedelta(weeks=1) else 1
+        best = max(best, run)
+        previous = week
+    return best
