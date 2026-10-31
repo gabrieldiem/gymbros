@@ -20,6 +20,8 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **First log of an exercise and PR points** (game, S): default chosen: the first time you log an exercise it sets your baseline PR and pays nothing; PRODUCT.md says a PR must beat the stored one. The prototype paid 100 for it, which lets anyone farm points by logging every exercise once. _Added 2026-10-31_
 - [ ] **Most improved formula** (game, S): default chosen: the mean of strength change (squat/bench/deadlift e1RM vs 4 weeks ago) and volume change (last 3 weeks vs the 3 before), over whichever the member has history for. The prototype's "+18%" had no formula. _Added 2026-10-31_
 - [ ] **Who hears about a goal hit** (product, S): default chosen: the rest of the crew gets "X hit the weekly goal". The finisher already sees it on the finish screen. _Added 2026-10-31_
+- [ ] **Bounty rules** (game, S): default chosen: the bounty is always on the all-time leader and pays the first member to pass them each week. The prototype only said "while a bounty is active". _Added 2026-10-31_
+- [ ] **Badges earned by seeded history** (product, S): default chosen: demo members get the badges their seeded history earns, with no extra points, so the prototype's totals stay exact. _Added 2026-10-31_
 
 ## Later
 
@@ -46,6 +48,11 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Notification fan-out to the actor's camp-mates** (api, S): "someone close behind" uses a fixed 300 pt window (`social.close_behind_points`). Consider week mode too. _Added 2026-10-31_
 - [ ] **Delete own comment / undo nudge** (product, S): neither exists. _Added 2026-10-31_
 - [ ] **Old notifications cleanup** (api, S): notifications are never deleted; the inbox shows the newest 30. Prune after 60 days. _Added 2026-10-31_
+- [ ] **Weekly recap notification** (api, S): "Your weekly recap is ready" isn't sent; the recap is a card on ATUS Climb. Send it on the first request after Monday 00:00. _Added 2026-10-31_
+- [ ] **Duel settlement needs a visit** (api, S): duels settle when someone in the crew opens the Quests tab after the week. A small scheduled job would pay winners on Monday morning even if nobody opens it. _Added 2026-10-31_
+- [ ] **Event and bounty sheets** (web, S): the prototype opens a sheet from the hero chips; the app shows them as cards on the Quests tab only. _Added 2026-10-31_
+- [ ] **Crew palette contrast** (design, S): the dataviz validator flags the crew colors on the dark surface (lightness band; pink/violet ΔE 7.0 for deutan vision). Charts that use them always add a legend with names; consider a darker violet step. _Added 2026-10-31_
+- [ ] **Tonnage chart y-axis** (web, S): only this week's bar is labelled (the rest via tooltip and table). Add light y ticks if people ask for exact values at a glance. _Added 2026-10-31_
 
 ## Tech debt
 
