@@ -1,7 +1,7 @@
 # Makefile for the GYMBROS monorepo (apps/api + apps/web)
 
 # Declare phony targets to avoid conflicts with files of the same name
-.PHONY: install up down prod local test test-api test-web e2e precommit migrate migration clean
+.PHONY: install up down prod local test test-api test-web e2e precommit migrate migration seed crew clean
 
 DEV := docker compose -f docker-compose-dev.yaml
 PROD := docker compose -f docker-compose.yaml
@@ -59,6 +59,15 @@ migrate:
 migration:
 	@test -n "$(m)" || (echo 'usage: make migration m="add sets table"' && exit 1)
 	$(DEV) exec api alembic -c /alembic.ini revision --autogenerate -m "$(m)"
+
+# Create the five-person demo crew (invite code IRONRIDGE) in the dev database. Safe to re-run.
+seed:
+	$(DEV) exec api python cli.py seed-demo
+
+# make crew name="ATUS" tz="America/Argentina/Buenos_Aires" → prints the invite code
+crew:
+	@test -n "$(name)" -a -n "$(tz)" || (echo 'usage: make crew name="ATUS" tz="America/Argentina/Buenos_Aires"' && exit 1)
+	$(DEV) exec api python cli.py create-crew "$(name)" "$(tz)"
 
 # Stop both stacks and drop their database volumes.
 clean:
