@@ -6,6 +6,7 @@ import { useMe } from '../../api/me';
 import type { Exercise } from '../../api/train';
 import { ButtonLink } from '../../components/Button';
 import { cx } from '../../components/cx';
+import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { ordinal } from '../../i18n/ordinal';
 import { formatLift } from '../train/format';
@@ -155,7 +156,7 @@ function useSlides(recap: Recap, exercises: Exercise[], onClose: () => void): Sl
         <p className={styles.sub}>
           {recap.weekly_event ? t('weather_desc') : ''}{' '}
           {recap.bounty_target
-            ? t('r_bounty', { n: 150, name: recap.bounty_target.display_name })
+            ? t('r_bounty', { n: recap.bounty_points, name: recap.bounty_target.display_name })
             : ''}
         </p>
         <ButtonLink to="/train" className={styles.cta} onClick={onClose}>
@@ -176,7 +177,8 @@ export function RecapStories({
   onClose: () => void;
 }) {
   const { t } = useI18n();
-  const recap = useRecap(true).data;
+  const recapQuery = useRecap(true);
+  const recap = recapQuery.data;
   const [index, setIndex] = useState(0);
   const slides = useSlides(recap ?? EMPTY, exercises, onClose);
   const count = recap ? slides.length : 0;
@@ -216,9 +218,11 @@ export function RecapStories({
     return () => document.removeEventListener('keydown', handleKey);
   }, [onClose, step]);
 
-  const slide = slides[Math.min(index, slides.length - 1)];
-  if (!recap || !slide) return null;
-  const style = { '--bg': slide.bg, '--fg': slide.fg } as CSSProperties;
+  const slide = recap ? slides[Math.min(index, slides.length - 1)] : undefined;
+  const style = {
+    '--bg': slide?.bg ?? '#0D0D0D',
+    '--fg': slide?.fg ?? '#F2F2EE',
+  } as CSSProperties;
   return createPortal(
     <div
       className={styles.story}
@@ -248,7 +252,13 @@ export function RecapStories({
           <button type="button" aria-label={t('recap_prev')} onClick={() => step(-1)} />
           <button type="button" aria-label={t('recap_next')} onClick={() => step(1)} />
         </div>
-        {slide.body}
+        {slide ? (
+          slide.body
+        ) : recapQuery.isError ? (
+          <ErrorBlock message="load_failed_generic" onRetry={() => void recapQuery.refetch()} />
+        ) : (
+          <LoadingBlock rows={2} />
+        )}
       </div>
     </div>,
     document.body,
@@ -272,5 +282,6 @@ const EMPTY: Recap = {
   most_improved: null,
   most_improved_pct: null,
   bounty_target: null,
+  bounty_points: 0,
   weekly_event: null,
 };

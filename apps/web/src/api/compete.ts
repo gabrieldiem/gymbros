@@ -80,6 +80,7 @@ export type Recap = {
   most_improved: Actor | null;
   most_improved_pct: number | null;
   bounty_target: Actor | null;
+  bounty_points: number;
   weekly_event: string | null;
 };
 

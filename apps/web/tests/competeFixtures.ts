@@ -80,6 +80,7 @@ export const RECAP: Recap = {
   most_improved: MATEX,
   most_improved_pct: 18,
   bounty_target: MAXO,
+  bounty_points: 200,
   weekly_event: 'leg_day_x2',
 };
 

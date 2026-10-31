@@ -114,6 +114,28 @@ describe('Weekly recap', () => {
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('dialog', { name: 'Weekly recap' })).toBeNull();
   });
+
+  it('uses the bounty value from the API on the last slide', async () => {
+    api();
+    renderApp('/climb');
+    await userEvent.click(await screen.findByRole('button', { name: /Last week/ }));
+    const story = await screen.findByRole('dialog', { name: 'Weekly recap' });
+    for (let i = 0; i < 5; i++)
+      await userEvent.click(within(story).getByRole('button', { name: 'Next slide' }));
+    expect(story).toHaveTextContent('Plus a 200 pt bounty on Maxo.');
+  });
+
+  it('can be closed while the recap fails to load, and the app is usable again', async () => {
+    api({ 'GET /api/recap': [500, { detail: 'boom' }] });
+    renderApp('/climb');
+    await userEvent.click(await screen.findByRole('button', { name: /Last week/ }));
+    const story = await screen.findByRole('dialog', { name: 'Weekly recap' });
+    expect(await within(story).findByRole('alert')).toBeVisible();
+    expect(document.getElementById('root')).toHaveAttribute('inert');
+    await userEvent.click(within(story).getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog', { name: 'Weekly recap' })).toBeNull();
+    expect(document.getElementById('root')).not.toHaveAttribute('inert');
+  });
 });
 
 describe('You tab', () => {

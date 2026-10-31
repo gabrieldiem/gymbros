@@ -65,6 +65,7 @@ export type FeedPage = {
   items: FeedItem[];
   inactive: { member: Actor; days: number }[];
   next_before: string | null;
+  next_before_id: string | null;
 };
 
 export type Notification = {
@@ -88,18 +89,25 @@ export const feedKey = ['feed'] as const;
 export const inboxKey = ['notifications'] as const;
 export const hallOfFameKey = ['hall-of-fame'] as const;
 
-type FeedData = InfiniteData<FeedPage, string | null>;
+type Cursor = { before: string; id: string } | null;
+type FeedData = InfiniteData<FeedPage, Cursor>;
 
 /** The crew feed, newest first, with "load more" pages. Polled every 20 s. */
 export function useFeed() {
   return useInfiniteQuery({
     queryKey: feedKey,
     queryFn: ({ pageParam, signal }) =>
-      apiRequest<FeedPage>(pageParam ? `/feed?before=${encodeURIComponent(pageParam)}` : '/feed', {
-        signal,
-      }),
-    initialPageParam: null as string | null,
-    getNextPageParam: (last) => last.next_before,
+      apiRequest<FeedPage>(
+        pageParam
+          ? `/feed?before=${encodeURIComponent(pageParam.before)}&before_id=${pageParam.id}`
+          : '/feed',
+        { signal },
+      ),
+    initialPageParam: null as Cursor,
+    getNextPageParam: (last): Cursor =>
+      last.next_before && last.next_before_id
+        ? { before: last.next_before, id: last.next_before_id }
+        : null,
     refetchInterval: 20_000,
   });
 }

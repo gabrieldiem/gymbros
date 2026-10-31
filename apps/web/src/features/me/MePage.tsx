@@ -19,7 +19,6 @@ import { PrChart } from './PrChart';
 import { SettingsSheet } from './SettingsSheet';
 import { TonnageChart } from './TonnageChart';
 
-const CAMPS = 7;
 const signed = (v: number) => (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v);
 
 function Heatmap({ days }: { days: MeStats['heatmap'] }) {
@@ -39,18 +38,20 @@ function Heatmap({ days }: { days: MeStats['heatmap'] }) {
   );
 }
 
-function RankLadder({ points, step }: { points: number; step: number }) {
+function RankLadder({ climb }: { climb: MeStats['climb'] }) {
   const { t, n } = useI18n();
-  const here = Math.min(CAMPS - 1, Math.floor(points / step));
+  const camps = Math.round(climb.summit / climb.camp_step) + 1;
+  const here = climb.me.camp;
+  const next = climb.me.next_camp;
   return (
     <ol className={styles.ladder} reversed>
-      {Array.from({ length: CAMPS }, (_, i) => CAMPS - 1 - i).map((camp) => (
+      {Array.from({ length: camps }, (_, i) => camps - 1 - i).map((camp) => (
         <li
           key={camp}
           className={cx(
             camp <= here && styles.got,
             camp === here && styles.here,
-            camp === here + 1 && styles.next,
+            camp === next?.camp && styles.next,
           )}
         >
           <i aria-hidden="true" />
@@ -58,9 +59,9 @@ function RankLadder({ points, step }: { points: number; step: number }) {
           <span>
             {camp === here
               ? t('ladder_here')
-              : camp === here + 1
-                ? t('ladder_next', { n: n(camp * step - points) })
-                : t('pts_n', { n: n(camp * step) })}
+              : camp === next?.camp
+                ? t('ladder_next', { n: n(next.points_needed) })
+                : t('pts_n', { n: n(camp * climb.camp_step) })}
           </span>
         </li>
       ))}
@@ -193,7 +194,7 @@ export function MePage() {
         </section>
         <section aria-labelledby="ladder-title">
           <h2 id="ladder-title">{t('ladder_title')}</h2>
-          <RankLadder points={climb.me.points} step={climb.camp_step} />
+          <RankLadder climb={climb} />
         </section>
         <section aria-labelledby="history-title">
           <h2 id="history-title">{t('history_title')}</h2>

@@ -19,7 +19,8 @@
   height: 20px;
   padding: 0 5px;
   background: var(--red);
-  color: #fff;
+  /* iron on red is ~5.6:1; white was ~3.6:1, too low for 11px text */
+  color: var(--iron);
   font-size: 0.72rem;
   font-weight: 700;
   border-radius: var(--r-pill);

@@ -64,6 +64,7 @@ export const FEED: FeedPage = {
   items: [WORKOUT_POST, RANK_UP],
   inactive: [{ member: MATEX, days: 3 }],
   next_before: null,
+  next_before_id: null,
 };
 
 export const HOF: HallOfFame = {

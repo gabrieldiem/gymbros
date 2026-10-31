@@ -86,7 +86,10 @@ export function WorkoutLogger(props: Props) {
   };
 
   return (
-    <section aria-label={draft.name}>
+    <section aria-labelledby="logger-title">
+      <h1 id="logger-title" className="sr-only">
+        {draft.name || t('wk_default')}
+      </h1>
       <div className={styles.head}>
         <div className={styles.grow}>
           <input

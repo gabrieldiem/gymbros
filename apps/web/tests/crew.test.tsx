@@ -102,7 +102,9 @@ describe('Crew feed', () => {
   });
 
   it('explains an empty feed', async () => {
-    crewApi({ 'GET /api/feed': [200, { items: [], inactive: [], next_before: null }] });
+    crewApi({
+      'GET /api/feed': [200, { items: [], inactive: [], next_before: null, next_before_id: null }],
+    });
     renderApp('/crew');
     expect(await screen.findByText(/Finish a workout and it shows up for the crew/)).toBeVisible();
   });
