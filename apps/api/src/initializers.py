@@ -22,6 +22,9 @@ def init_logger(settings: Settings) -> Logger:
     root_logger.handlers.clear()
     root_logger.addHandler(handler)
 
+    # Alembic announces every autogenerate plugin at import time; WARNING+ still surfaces.
+    logging.getLogger("alembic.runtime.plugins").setLevel(logging.WARNING)
+
     logger = logging.getLogger("gymbros")
     logger.setLevel(settings.log_level)
     return logger

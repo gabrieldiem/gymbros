@@ -1,0 +1,49 @@
+# Pre-commit hooks. `make install` registers them; `make precommit` runs them on every file.
+# api: black (line length 100), pylint, mypy --check-untyped-defs (same as data-service)
+# web: eslint, prettier --check, tsc --noEmit
+repos:
+  - repo: https://github.com/psf/black
+    rev: 26.10.1
+    hooks:
+      - id: black
+        name: "Formatter (Black)"
+        language_version: python3.13
+        files: ^apps/api/
+        args: [--config, apps/api/pyproject.toml]
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: "Static Code Analysis (Pylint)"
+        entry: bash -c 'cd apps/api && poetry run pylint src'
+        language: system
+        files: ^apps/api/src/.*\.py$
+        pass_filenames: false
+
+      - id: mypy
+        name: "Static Type Checker (mypy)"
+        entry: bash -c 'cd apps/api && poetry run mypy src --check-untyped-defs'
+        language: system
+        files: ^apps/api/src/.*\.py$
+        pass_filenames: false
+
+      - id: eslint
+        name: "Linter (ESLint)"
+        entry: bash -c 'cd apps/web && npx eslint . --max-warnings 0'
+        language: system
+        files: ^apps/web/.*\.(ts|tsx|js)$
+        pass_filenames: false
+
+      - id: prettier
+        name: "Formatter (Prettier)"
+        entry: bash -c 'cd apps/web && npx prettier --check .'
+        language: system
+        files: ^apps/web/
+        pass_filenames: false
+
+      - id: tsc
+        name: "Type Checker (tsc)"
+        entry: bash -c 'cd apps/web && npx tsc --noEmit'
+        language: system
+        files: ^apps/web/.*\.(ts|tsx)$
+        pass_filenames: false
