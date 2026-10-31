@@ -1,0 +1,71 @@
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+}
+
+.count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background: var(--red);
+  /* iron on red is ~5.6:1; white was ~3.6:1, too low for 11px text */
+  color: var(--iron);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: var(--r-pill);
+}
+
+.inbox {
+  list-style: none;
+}
+
+.inbox button {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--steel);
+  text-align: left;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.unread button {
+  font-weight: 700;
+}
+
+.dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.time {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--smoke);
+}
+
+.empty {
+  color: var(--smoke);
+  padding: 8px 0;
+}

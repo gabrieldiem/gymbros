@@ -38,6 +38,7 @@ npm run e2e          # playwright test (needs the dev stack running)
 - Mobile first: design at 390 px wide, then scale up. A desktop width (≥960 px) gets a side rail instead of the bottom nav.
 - Nothing may overflow horizontally at 390 px. The e2e smoke test asserts `scrollWidth === 390`.
 - Touch targets are ≥44 px, focus is visible, and `prefers-reduced-motion` is respected.
-- Components stay small and presentational. Data fetching lives in feature hooks (`features/<tab>/use*.ts`).
+- Components stay small and presentational. Data fetching lives in the hooks in `src/api/`.
+- Every data screen uses `QueryState` (or `LoadingBlock` / `ErrorBlock`) so loading, empty and error states are consistent.
 - Don't recompute game rules in the client. Show what the API returns. Optimistic UI is fine for reactions and comments, never for points.
 - After any UI change, take a Playwright screenshot at 390×844 and look at it before committing.

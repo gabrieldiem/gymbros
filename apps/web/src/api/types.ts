@@ -17,6 +17,7 @@ export type Me = {
   initials: string;
   color: CrewColor;
   language: Language;
+  rest_seconds: number;
   crew: Crew | null;
 };
 
@@ -30,4 +31,6 @@ export type RegisterBody = {
 
 export type LoginBody = { email: string; password: string };
 
-export type UpdateMeBody = Partial<Pick<Me, 'display_name' | 'initials' | 'color' | 'language'>>;
+export type UpdateMeBody = Partial<
+  Pick<Me, 'display_name' | 'initials' | 'color' | 'language' | 'rest_seconds'>
+>;

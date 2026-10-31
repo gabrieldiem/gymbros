@@ -58,6 +58,7 @@ class AuthService:
             initials=derive_initials(registration.display_name),
             color=COLORS[0],
             language=registration.language,
+            rest_seconds=90,
         )
 
     async def log_in(self, email: str, password: str) -> LoggedIn:

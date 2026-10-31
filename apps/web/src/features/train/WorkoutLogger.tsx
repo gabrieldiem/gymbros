@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useMe } from '../../api/me';
 import type { Catalog, SetData, Week, Workout } from '../../api/train';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
@@ -60,6 +61,7 @@ export function WorkoutLogger(props: Props) {
   const elapsed = useElapsed(workout.started_at);
   const gain = usePointsGain(livePoints);
   const rest = useRestTimer();
+  const restSeconds = useMe().data?.rest_seconds;
   const [picking, setPicking] = useState(false);
   const [platesKg, setPlatesKg] = useState<number | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
@@ -84,7 +86,10 @@ export function WorkoutLogger(props: Props) {
   };
 
   return (
-    <section aria-label={draft.name}>
+    <section aria-labelledby="logger-title">
+      <h1 id="logger-title" className="sr-only">
+        {draft.name || t('wk_default')}
+      </h1>
       <div className={styles.head}>
         <div className={styles.grow}>
           <input
@@ -120,7 +125,7 @@ export function WorkoutLogger(props: Props) {
             entry={entry}
             onChange={(sets) => setSets(i, sets)}
             onRemove={() => removeExercise(i)}
-            onSetDone={() => rest.start()}
+            onSetDone={() => rest.start(restSeconds)}
             onPlates={setPlatesKg}
           />
         );

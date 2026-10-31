@@ -1,0 +1,72 @@
+.rope {
+  list-style: none;
+  position: relative;
+  margin-top: 6px;
+}
+
+.rope::before {
+  content: '';
+  position: absolute;
+  left: 41px;
+  top: 22px;
+  bottom: 22px;
+  width: 2px;
+  background: var(--steel);
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 40px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 10px 0;
+}
+
+.rk {
+  font-weight: 700;
+  color: var(--smoke);
+  text-align: right;
+}
+
+.first .rk {
+  color: var(--volt);
+}
+
+.avatar {
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--iron);
+  display: inline-flex;
+}
+
+.who b {
+  display: block;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.me .who b {
+  color: var(--volt);
+}
+
+.who > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--smoke);
+}
+
+.live {
+  color: var(--red-text);
+  font-weight: 600;
+}
+
+.p {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-align: right;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}

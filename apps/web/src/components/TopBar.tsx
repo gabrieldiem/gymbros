@@ -5,6 +5,7 @@ import { useI18n } from '../i18n/context';
 import { Avatar } from './Avatar';
 import { Brand } from './Brand';
 import { LanguageToggle } from './LanguageToggle';
+import { NotificationBell } from './NotificationBell';
 import styles from './TopBar.module.css';
 
 export function TopBar() {
@@ -15,8 +16,9 @@ export function TopBar() {
       <Brand className={styles.brand} />
       <div className={styles.actions}>
         <LanguageToggle />
+        {me && <NotificationBell />}
         {me && (
-          <Link to="/me" className={styles.me} aria-label={t('profile')}>
+          <Link to="/me" className={styles.me} aria-label={`${t('profile')}, ${me.initials}`}>
             <Avatar initials={me.initials} color={me.color} size={44} />
           </Link>
         )}

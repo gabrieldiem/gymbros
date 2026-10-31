@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { STATS } from './competeFixtures';
 import { CREW, makeMe, mockApi, renderApp, SIGNED_OUT } from './renderApp';
 
 async function fill(label: string, value: string) {
@@ -16,7 +17,7 @@ describe('Log in', () => {
     await fill('Email', 'gabi@example.com');
     await fill('Password', 'climbing-pw');
     await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 
   it('shows the API error in the current language', async () => {
@@ -60,7 +61,7 @@ describe('Register', () => {
     });
 
     await userEvent.click(screen.getByRole('button', { name: 'Let’s go' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
     expect(localStorage.getItem('gymbros.crewWelcome')).toBeNull();
   });
 
@@ -121,10 +122,12 @@ describe('Log out', () => {
   it('returns to the welcome screen', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
+      'GET /api/me/stats': [200, STATS],
       'POST /api/auth/logout': [204, null],
     });
     renderApp('/me');
-    await userEvent.click(await screen.findByRole('button', { name: 'Log out' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Log out' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),
     ).toBeVisible();

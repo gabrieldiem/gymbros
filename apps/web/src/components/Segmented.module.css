@@ -1,0 +1,21 @@
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--plate);
+  border-radius: var(--r-control);
+}
+
+.seg button {
+  min-height: var(--touch);
+  padding: 0 14px;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--smoke);
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--chalk);
+  color: var(--iron);
+}

@@ -25,6 +25,7 @@ class ProfileChanges:
     initials: str | None = None
     color: str | None = None
     language: str | None = None
+    rest_seconds: int | None = None
 
 
 class ProfileService:
@@ -49,5 +50,7 @@ class ProfileService:
             user.color = changes.color
         if changes.language is not None:
             user.language = changes.language
+        if changes.rest_seconds is not None:
+            user.rest_seconds = changes.rest_seconds
         await self._users.save(user)
         return await self.get(user)

@@ -55,3 +55,43 @@ class UnknownExercise(DomainError):
 
 class UnknownRoutine(DomainError):
     """Not a routine in the catalog."""
+
+
+class FeedItemNotFound(DomainError):
+    """No such feed item in the member's crew."""
+
+
+class OwnFeedItem(DomainError):
+    """Members can't react to their own posts."""
+
+
+class MemberNotFound(DomainError):
+    """No such member in the crew."""
+
+
+class CannotNudgeSelf(DomainError):
+    """Nudges are for other members."""
+
+
+class AlreadyNudged(DomainError):
+    """One nudge per member per day."""
+
+
+class CannotDuelSelf(DomainError):
+    """Duels are against someone else."""
+
+
+class DuelExists(DomainError):
+    """There's already an open duel between the two this week."""
+
+
+class DuelNotFound(DomainError):
+    """No such duel for this member."""
+
+
+class DuelNotPending(DomainError):
+    """The duel was already accepted, declined or settled."""
+
+
+class UnknownExerciseForHistory(DomainError):
+    """PR history is only for catalog lifts."""

@@ -27,5 +27,10 @@
   "session": {
     "cookie_name": "gymbros_session",
     "max_age_days": 30
+  },
+  "social": {
+    "inactive_days": 3,
+    "close_behind_points": 300,
+    "feed_page_size": 20
   }
 }

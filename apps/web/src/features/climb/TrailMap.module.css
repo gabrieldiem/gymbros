@@ -1,0 +1,141 @@
+.wrap {
+  position: relative;
+  margin: 0 -18px;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 88vh;
+  background: #0a0a0a;
+}
+
+.title {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  padding: 5px 11px;
+  background: rgba(8, 8, 8, 0.8);
+  border: 1px solid var(--steel);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.contour {
+  fill: none;
+  stroke: #f2f2ee;
+  stroke-opacity: 0.06;
+  stroke-width: 1;
+}
+
+.index {
+  stroke-opacity: 0.12;
+}
+
+.trail {
+  fill: none;
+  stroke: var(--chalk);
+  stroke-opacity: 0.4;
+  stroke-width: 2.6;
+  stroke-dasharray: 3 8;
+  stroke-linecap: round;
+}
+
+.reveal {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+}
+
+.revealing {
+  animation: reveal 1.2s ease-out both;
+}
+
+@keyframes reveal {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.trailYou {
+  fill: none;
+  stroke: var(--volt);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 1;
+}
+
+.campDot {
+  fill: var(--iron);
+  stroke: var(--chalk);
+  stroke-width: 2.5;
+}
+
+.campName {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  fill: var(--chalk);
+}
+
+.summitName {
+  font-size: 26px;
+  fill: var(--volt);
+}
+
+.campPts {
+  font-family: var(--body);
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--smoke);
+}
+
+.marker text {
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 14px;
+  fill: var(--iron);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.marker .tag {
+  font-size: 18px;
+  fill: var(--volt);
+}
+
+.halo {
+  fill: var(--volt);
+  fill-opacity: 0.2;
+}
+
+.me .body {
+  stroke: var(--iron);
+  stroke-width: 3;
+}
+
+.live {
+  fill: var(--red);
+  stroke: var(--iron);
+  stroke-width: 2.5;
+}
+
+@media (min-width: 960px) {
+  .wrap {
+    margin: 0;
+  }
+
+  .map {
+    border: 1px solid var(--steel);
+    border-radius: var(--r-card);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealing {
+    animation: none;
+  }
+}

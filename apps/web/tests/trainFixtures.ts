@@ -106,4 +106,5 @@ export const FINISHED: FinishResult = {
   prs: [{ exercise_id: 'bench', load_kg: 92.5, reps: 5 }],
   workouts_this_week: 2,
   weekly_target: 3,
+  climb: { points_before: 3880, points_after: 4093, camp_before: 2, camp_after: 2, passed: [] },
 };

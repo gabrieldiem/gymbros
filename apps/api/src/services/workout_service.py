@@ -6,6 +6,7 @@ from datetime import datetime
 
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.workout import Workout
+from services.activity_service import ActivityService
 from services.catalog import Catalog, Exercise
 from services.errors import (
     UnknownExercise,
@@ -35,6 +36,7 @@ class WorkoutService:
         catalog: Catalog,
         rules: ScoringRules,
         now: Callable[[], datetime],
+        activity: ActivityService | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts = workouts
@@ -42,6 +44,7 @@ class WorkoutService:
         self._catalog = catalog
         self._rules = rules
         self._now = now
+        self._activity = activity
 
     async def start(self, member: Member, routine_id: str | None, name: str | None) -> WorkoutView:
         """Start a workout from a routine (pre-filled to beat last time) or empty."""
@@ -57,7 +60,10 @@ class WorkoutService:
             started_at=self._now(),
             sets=to_rows(entries),
         )
-        return await self.view(member, await self._workouts.add(workout))
+        view = await self.view(member, await self._workouts.add(workout))
+        if self._activity is not None:
+            await self._activity.workout_started(member)
+        return view
 
     async def get_active(self, member: Member) -> WorkoutView | None:
         """The member's in-progress workout, if any."""

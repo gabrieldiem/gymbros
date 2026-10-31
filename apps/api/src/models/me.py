@@ -3,7 +3,7 @@
 import uuid
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from typing_extensions import Annotated
 
 from models.auth import DisplayName, InviteCode, Language
@@ -34,6 +34,7 @@ class MeResponse(BaseModel):
     initials: str
     color: Color
     language: Language
+    rest_seconds: int
     crew: CrewResponse | None
 
 
@@ -44,6 +45,7 @@ class UpdateMeRequest(BaseModel):
     initials: Initials | None = None
     color: Color | None = None
     language: Language | None = None
+    rest_seconds: int | None = Field(default=None, ge=30, le=300)
 
 
 class JoinCrewRequest(BaseModel):

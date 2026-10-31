@@ -53,3 +53,18 @@ class CrewRepository:
             .where(Membership.crew_id == crew_id)
         )
         return set(result.scalars())
+
+    async def members(self, crew_id: uuid.UUID) -> list[User]:
+        """Everyone in the crew."""
+        result = await self._session.execute(
+            select(User)
+            .join(Membership, Membership.user_id == User.id)
+            .where(Membership.crew_id == crew_id)
+            .order_by(User.display_name)
+        )
+        return list(result.scalars())
+
+    async def delete(self, crew: Crew) -> None:
+        """Remove a crew; memberships, workouts and point events cascade."""
+        await self._session.delete(crew)
+        await self._session.flush()

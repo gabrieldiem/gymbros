@@ -1,0 +1,9 @@
+{
+  "_comment": "Weekly quests (docs/PRODUCT.md). Reset Monday 00:00 crew time; each pays its bonus once per week. `metric` names an evaluator in services/quests.py.",
+  "quests": [
+    { "id": "legs2", "metric": "leg_workouts", "goal": 2, "bonus": 150 },
+    { "id": "ppl", "metric": "ppl_groups", "goal": 3, "bonus": 120 },
+    { "id": "tonnes", "metric": "volume_tonnes", "goal": 20, "bonus": 200 },
+    { "id": "cardio", "metric": "cardio_minutes", "goal": 60, "bonus": 100 }
+  ]
+}

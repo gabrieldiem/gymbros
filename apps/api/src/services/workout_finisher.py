@@ -9,12 +9,15 @@ from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.point_event import PointEvent
 from db.tables.workout import Workout
+from services.activity_service import ActivityService
+from services.bonus_service import BonusService
 from services.catalog import Catalog
+from services.climb_service import ClimbService
 from services.errors import WorkoutEmpty
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_service import score_workout
-from services.scoring_types import ScoreResult, ScoringRules
+from services.scoring_types import LineItem, ScoreResult, ScoringRules
 from services.training_rules import week_start
 from services.workout_mapping import to_workout_log
 from services.workout_service import WorkoutService
@@ -22,11 +25,14 @@ from services.workout_types import FinishedWorkout
 
 
 class WorkoutFinisher:
+    # The one place that ties finishing together, so it holds every collaborator.
+    # pylint: disable=too-many-instance-attributes
     """Turns an in-progress workout into points. Points are only ever computed here."""
 
     def __init__(
         self,
         workouts: WorkoutService,
+        climb: ClimbService,
         workout_rows: WorkoutRepository,
         context: ScoringContextBuilder,
         records: PersonalRecordRepository,
@@ -34,9 +40,12 @@ class WorkoutFinisher:
         catalog: Catalog,
         rules: ScoringRules,
         now: Callable[[], datetime],
+        activity: ActivityService | None = None,
+        bonus: BonusService | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts = workouts
+        self._climb = climb
         self._rows = workout_rows
         self._context = context
         self._records = records
@@ -44,6 +53,8 @@ class WorkoutFinisher:
         self._catalog = catalog
         self._rules = rules
         self._now = now
+        self._activity = activity
+        self._bonus = bonus
 
     async def finish(self, member: Member, workout_id: uuid.UUID) -> FinishedWorkout:
         """Score and close the workout. Needs at least one completed set."""
@@ -54,8 +65,24 @@ class WorkoutFinisher:
         score = score_workout(to_workout_log(workout, self._catalog), history, week, self._rules)
         if score.completed_sets == 0:
             raise WorkoutEmpty(str(workout_id))
+        before = await self._climb.totals(member)
         await self._close(member, workout, score, now)
-        return FinishedWorkout(workout, score, workouts_this_week=week.workouts_before + 1)
+        bonus: list[LineItem] = []
+        if self._bonus is not None:
+            bonus = await self._bonus.after_workout(member, workout, before)
+        after = await self._climb.totals(member)
+        finished = FinishedWorkout(
+            workout,
+            score,
+            workouts_this_week=week.workouts_before + 1,
+            climb=await self._climb.change(member, before, after),
+            bonus_items=tuple(bonus),
+        )
+        workout.points = finished.total
+        await self._rows.save(workout)
+        if self._activity is not None:
+            await self._activity.workout_finished(member, finished)
+        return finished
 
     async def _close(
         self, member: Member, workout: Workout, score: ScoreResult, now: datetime

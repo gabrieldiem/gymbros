@@ -1,0 +1,151 @@
+.story {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: calc(14px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+
+.bars {
+  display: flex;
+  gap: 4px;
+}
+
+.bars i {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--fg) 30%, transparent);
+  overflow: hidden;
+}
+
+.bars i b {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--fg);
+}
+
+.bars .done b {
+  width: 100%;
+}
+
+.bars .current b {
+  animation: fill 5.5s linear forwards;
+}
+
+@keyframes fill {
+  to {
+    width: 100%;
+  }
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+.top button {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  color: inherit;
+  font-size: 1.6rem;
+}
+
+.slide {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.kicker {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--fg) 14%, transparent);
+  font-weight: 700;
+}
+
+.huge {
+  font-family: var(--display);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: clamp(3.6rem, 18vw, 8rem);
+  line-height: 0.88;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.mid {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  line-height: 1.05;
+}
+
+.sub {
+  font-weight: 600;
+  max-width: 44ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.grid div {
+  padding: 12px;
+  border-radius: var(--r-control);
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+  font-weight: 600;
+}
+
+.grid b {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+
+.zones {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.zones button {
+  opacity: 0;
+}
+
+.cta {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bars .current b {
+    animation: none;
+    width: 50%;
+  }
+}

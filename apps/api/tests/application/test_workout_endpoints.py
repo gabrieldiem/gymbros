@@ -144,8 +144,9 @@ async def test_finish_scores_stores_point_events_and_closes_the_workout(client, 
     )
     assert response.status_code == 200
     body = response.json()
-    assert [i["key"] for i in body["line_items"]] == ["ln_show", "ln_sets", "ln_vol"]
-    assert body["total"] == 50 + 10 + 6
+    assert [i["key"] for i in body["line_items"]] == ["ln_show", "ln_sets", "ln_vol", "ln_badge"]
+    assert body["line_items"][-1]["vars"] == {"badge": "first"}
+    assert body["total"] == 50 + 10 + 6 + 50
     assert body["volume_kg"] == 600
     assert body["workouts_this_week"] == 1
     assert body["weekly_target"] == 3

@@ -5,6 +5,16 @@ from fastapi.responses import JSONResponse
 
 from services.errors import (
     AlreadyInCrew,
+    CannotDuelSelf,
+    DuelExists,
+    DuelNotFound,
+    DuelNotPending,
+    UnknownExerciseForHistory,
+    AlreadyNudged,
+    CannotNudgeSelf,
+    FeedItemNotFound,
+    MemberNotFound,
+    OwnFeedItem,
     EmailAlreadyRegistered,
     InvalidCredentials,
     InvalidTimeZone,
@@ -33,6 +43,16 @@ _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     WorkoutEmpty: (status.HTTP_409_CONFLICT, "workout_empty"),
     UnknownExercise: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_exercise"),
     UnknownRoutine: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_routine"),
+    FeedItemNotFound: (status.HTTP_404_NOT_FOUND, "feed_item_not_found"),
+    OwnFeedItem: (status.HTTP_409_CONFLICT, "own_feed_item"),
+    MemberNotFound: (status.HTTP_404_NOT_FOUND, "member_not_found"),
+    CannotNudgeSelf: (status.HTTP_422_UNPROCESSABLE_CONTENT, "cannot_nudge_self"),
+    AlreadyNudged: (status.HTTP_409_CONFLICT, "already_nudged"),
+    CannotDuelSelf: (status.HTTP_422_UNPROCESSABLE_CONTENT, "cannot_duel_self"),
+    DuelExists: (status.HTTP_409_CONFLICT, "duel_exists"),
+    DuelNotFound: (status.HTTP_404_NOT_FOUND, "duel_not_found"),
+    DuelNotPending: (status.HTTP_409_CONFLICT, "duel_not_pending"),
+    UnknownExerciseForHistory: (status.HTTP_404_NOT_FOUND, "unknown_exercise"),
 }
 
 

@@ -10,6 +10,7 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | ATUS Climb | The trail-map leaderboard. Also the name of the first tab | `climb` |
 | Camp | A rank checkpoint on the trail (Rookie … Unstoppable) | `rank` (index 0 to 6) |
 | Rope order | The ranked list of members under the map | `standings` |
+| Climb change | How a finished workout moved you on the all-time rope: points and camp before and after, who you passed | `climb` |
 | Workout | One logged gym session: name, start, end, exercises | `workout` |
 | Routine | A saved template of exercises (Push day, Pull day, Leg day, Cardio) | `routine` |
 | Exercise | A catalog movement with type, group and barbell flag | `exercise` |
@@ -34,7 +35,12 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Bounty | A bonus for passing the current all-time leader | `bounty` |
 | Weekly event | The week's twist (v1: Leg day x2) | `weekly_event` |
 | Badge | A one-time achievement with points | `badge` |
+| Stake | What the loser of a duel owes (protein shakes, racking plates…), stored as a key | `stake_key` |
+| Bonus | Points paid after a workout on top of its own score: quests, crew quest, bounty, badges | `bonus_items` |
 | Nudge | A poke at a member who hasn't trained in a few days | `nudge` |
+| Quick reply | A canned comment (Light weight 💪, Beast mode…) stored as a key and shown in each reader's language | `quick_key` |
+| Notification | An inbox entry (key + vars + link) about something that happened to you in the crew | `notification` |
+| Crew record | The crew's best: heaviest lifts, longest goal streak, biggest single session | `crew_record` |
 | Reaction | 👊 (`fist`) or 🔥 (`fire`) on a feed item | `reaction` |
 | Feed item | A workout, badge, rank-up or nudge event in the Crew tab | `feed_item` |
 | Recap | The story-style summary of last week | `recap` |

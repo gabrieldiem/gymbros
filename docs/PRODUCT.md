@@ -103,8 +103,8 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 
 - **Weekly quests** (reset Monday): Leg day twice (150), Push, pull and legs (120), Move 20 tonnes (200), Sixty cardio minutes (100).
 - **Crew quest:** the crew climbs 4,000 pts in a week → +200 each. Shown as a stacked bar per person.
-- **Duels:** a 1v1 until Sunday night, by points or by bench volume, with a stake ("Loser buys the protein shakes"). The winner gets 150.
-- **Bounty:** while active, passing the all-time leader pays 150.
+- **Duels:** a 1v1 until Sunday night, by points or by bench volume, with a stake ("Loser buys the protein shakes"). The opponent accepts or declines. The winner gets 150 once the week is over (paid into the new week); a tie pays nobody.
+- **Bounty:** every week the bounty is on the all-time leader; the first member to pass them that week takes 150 (then it's claimed until Monday). Checked after quests and the crew quest, before badges.
 - **Weekly event:** one twist per week. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). It is always on in v1 (`game.weekly_event` in settings.json).
 
 ## Badges (15)

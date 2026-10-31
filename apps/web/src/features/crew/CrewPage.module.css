@@ -1,0 +1,16 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.head h1 {
+  margin-bottom: 6px;
+}
+
+.sub {
+  color: var(--smoke);
+}

@@ -10,7 +10,7 @@ import {
   useWeek,
   type FinishResult,
 } from '../../api/train';
-import { LoadErrorScreen } from '../../components/StatusScreen';
+import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { FinishSheet } from './FinishSheet';
 import { RoutinePicker } from './RoutinePicker';
@@ -27,13 +27,16 @@ export function TrainPage() {
   const discard = useDiscardWorkout();
   const [result, setResult] = useState<FinishResult | null>(null);
 
-  if (catalog.isError || active.isError) {
+  if ((catalog.isError && !catalog.data) || (active.isError && active.data === undefined)) {
     return (
-      <LoadErrorScreen onRetry={() => void Promise.all([catalog.refetch(), active.refetch()])} />
+      <ErrorBlock
+        message="train_failed"
+        onRetry={() => void Promise.all([catalog.refetch(), active.refetch()])}
+      />
     );
   }
   if (!catalog.data || active.data === undefined) {
-    return <p role="status">{t('loading')}</p>;
+    return <LoadingBlock />;
   }
 
   const handleStart = (routineId: string | null) =>
@@ -79,7 +82,7 @@ export function TrainPage() {
         <FinishSheet
           result={result}
           exercises={catalog.data.exercises}
-          onClimb={() => navigate('/climb')}
+          onClimb={() => navigate('/climb', { state: { climb: result.climb } })}
           onClose={() => setResult(null)}
         />
       )}

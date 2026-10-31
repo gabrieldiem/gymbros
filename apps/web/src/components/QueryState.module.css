@@ -1,0 +1,41 @@
+.skeleton {
+  display: grid;
+  gap: 12px;
+  max-width: 700px;
+}
+
+.skeleton i {
+  display: block;
+  height: 72px;
+  border-radius: var(--r-card);
+  background: var(--plate);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton i:nth-child(2) {
+  height: 120px;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.error {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 18px;
+  max-width: 700px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+  color: var(--smoke);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton i {
+    animation: none;
+  }
+}

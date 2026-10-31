@@ -1,0 +1,294 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.head h1 {
+  margin-bottom: 6px;
+}
+
+.sub,
+.muted {
+  color: var(--smoke);
+}
+
+.panel {
+  padding: 20px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.crew {
+  margin-bottom: 28px;
+  max-width: 780px;
+}
+
+.crew h2 {
+  margin-bottom: 4px;
+}
+
+.stack {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+  margin: 18px 0 12px;
+  background: var(--iron);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.stack i {
+  display: block;
+  height: 100%;
+  background: var(--c);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  list-style: none;
+  font-size: var(--fs-small);
+  color: var(--smoke);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--c);
+}
+
+.cards {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  margin-bottom: 28px;
+  max-width: 980px;
+}
+
+.event {
+  background: var(--event-tint);
+  border-color: transparent;
+}
+
+.event h3 {
+  color: var(--event-text);
+}
+
+.bounty {
+  background: var(--red-tint);
+  border-color: transparent;
+}
+
+.bounty h3 {
+  color: var(--red-text);
+}
+
+.card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+
+.card p {
+  font-size: 0.92rem;
+  color: var(--smoke);
+}
+
+.card .cta {
+  margin-top: 14px;
+}
+
+.quest h3 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.bar {
+  height: 8px;
+  margin: 14px 0 10px;
+  background: var(--steel);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--c, var(--volt));
+  border-radius: var(--r-pill);
+  transition: width var(--dur) ease;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: var(--fs-small);
+}
+
+.meta b {
+  font-family: var(--display);
+  font-size: 1.15rem;
+}
+
+.done {
+  border-color: #3a3a2a;
+}
+
+.done .meta span {
+  color: var(--volt);
+}
+
+.sectionHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  max-width: 980px;
+}
+
+.duel {
+  display: grid;
+  gap: 10px;
+}
+
+.duelRow {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.duelRow .bar {
+  margin: 0;
+}
+
+.duelRow b {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  min-width: 70px;
+  text-align: right;
+}
+
+.status {
+  font-weight: 700;
+  font-size: var(--fs-small);
+}
+
+.lead {
+  color: var(--volt);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.badges {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  max-width: 980px;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  text-align: center;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.badge b {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.badge span {
+  font-size: 0.82rem;
+  color: var(--smoke);
+}
+
+.locked b {
+  color: var(--smoke);
+}
+
+.kv {
+  list-style: none;
+  margin: 18px 0;
+}
+
+.kv li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--steel);
+}
+
+.centered {
+  text-align: center;
+}
+
+.centered p {
+  margin: 0 auto;
+}
+
+.picker {
+  display: grid;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: var(--fs-small);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding: 0 14px 0 6px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-pill);
+  font-weight: 600;
+}
+
+.option[aria-pressed='true'] {
+  border-color: var(--volt);
+  color: var(--volt);
+}
+
+.stakeOption {
+  padding: 10px 14px;
+  border-radius: var(--r-control);
+  text-align: left;
+}

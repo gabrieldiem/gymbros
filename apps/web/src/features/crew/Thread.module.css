@@ -1,0 +1,75 @@
+.thread {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--steel);
+}
+
+.list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.list b {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.time {
+  color: var(--smoke);
+  font-size: 0.8rem;
+}
+
+.empty {
+  margin-bottom: 10px;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.quick {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+
+.quick button {
+  flex: none;
+  min-height: var(--touch);
+  padding: 0 12px;
+  background: var(--iron);
+  border-radius: var(--r-pill);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.reply {
+  display: flex;
+  gap: 8px;
+}
+
+.reply input {
+  flex: 1;
+  min-width: 0;
+  height: var(--touch);
+  padding: 0 14px;
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+  background: var(--iron);
+  font-size: 16px;
+}
+
+.reply input:focus {
+  outline: none;
+  border-color: var(--volt);
+}
