@@ -1,5 +1,6 @@
 """Data containers for the Crew tab."""
 
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -49,7 +50,7 @@ class FeedPage:
 
     entries: tuple[FeedEntry, ...]
     inactive: tuple[InactiveMember, ...] = ()
-    next_before: datetime | None = None
+    next_before: tuple[datetime, uuid.UUID] | None = None
 
 
 @dataclass(frozen=True, slots=True)

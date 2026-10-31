@@ -3,7 +3,7 @@
 import uuid
 from datetime import date
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +15,12 @@ class PointEventRepository:
 
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
+
+    async def lock(self, key: str) -> None:
+        """Serialize work on `key` until this transaction ends (Postgres advisory lock)."""
+        await self._session.execute(
+            text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"), {"key": key}
+        )
 
     async def add_all(self, events: list[PointEvent]) -> None:
         """Insert the events."""

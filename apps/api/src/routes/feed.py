@@ -25,13 +25,15 @@ router = APIRouter(prefix="/feed", tags=["Crew"])
 @router.get("", response_model=FeedResponse, responses=error_responses(401, 403))
 async def get_feed(
     before: datetime | None = Query(None),
+    before_id: uuid.UUID | None = Query(None),
     limit: int | None = Query(None, ge=1, le=50),
     member: Member = Depends(get_current_member),
     feed: FeedService = Depends(get_feed_service),
     settings: Settings = Depends(get_settings),
 ) -> FeedResponse:
     """Newest posts first. The first page also lists members to nudge."""
-    page = await feed.page(member, before, limit or settings.social_feed_page_size)
+    cursor = (before, before_id) if before is not None and before_id is not None else None
+    page = await feed.page(member, cursor, limit or settings.social_feed_page_size)
     return to_feed_response(page, member.user)
 
 

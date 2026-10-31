@@ -69,13 +69,13 @@ class WorkoutFinisher:
         await self._close(member, workout, score, now)
         bonus: list[LineItem] = []
         if self._bonus is not None:
-            bonus = await self._bonus.after_workout(member, workout, before, score.total)
-        total = score.total + sum(item.points for item in bonus)
+            bonus = await self._bonus.after_workout(member, workout, before)
+        after = await self._climb.totals(member)
         finished = FinishedWorkout(
             workout,
             score,
             workouts_this_week=week.workouts_before + 1,
-            climb=await self._climb.change(member, total, before),
+            climb=await self._climb.change(member, before, after),
             bonus_items=tuple(bonus),
         )
         workout.points = finished.total

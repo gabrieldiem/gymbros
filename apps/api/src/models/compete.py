@@ -125,6 +125,7 @@ class RecapResponse(BaseModel):
     most_improved: ActorModel | None
     most_improved_pct: int | None
     bounty_target: ActorModel | None
+    bounty_points: int
     weekly_event: str | None
 
 

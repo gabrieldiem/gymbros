@@ -86,15 +86,19 @@ class QuestService:
         )
         return [LineItem(CREW_QUEST_KEY, {}, self._crew_bonus)]
 
-    async def claim_bounty(
-        self, member: Member, before: dict[uuid.UUID, int], gained: int
-    ) -> list[LineItem]:
-        """Passing this week's bounty target (the all-time leader) pays the bounty once."""
+    async def claim_bounty(self, member: Member, before: dict[uuid.UUID, int]) -> list[LineItem]:
+        """Passing this week's bounty target (the all-time leader) pays the bounty once.
+
+        "Passing" compares the totals before the workout with the totals now (which already hold
+        this workout and any crew-quest bonus paid to everyone).
+        """
         bounty = await self.bounty(member, before)
         if bounty.target is None or bounty.target.id == member.user.id:
             return []
-        mine = before.get(member.user.id, 0)
-        if not mine < bounty.target_points < mine + gained:
+        now = await self._events.totals_by_user(member.crew.id)
+        target_id, me = bounty.target.id, member.user.id
+        was_behind = before.get(me, 0) < before.get(target_id, 0)
+        if not (was_behind and now.get(me, 0) > now.get(target_id, 0)):
             return []
         return [LineItem(BOUNTY_KEY, {"name": bounty.target.display_name}, self._bounty)]
 

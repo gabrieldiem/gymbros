@@ -30,16 +30,19 @@ class BonusService:
         self._now = now
 
     async def after_workout(
-        self, member: Member, workout: Workout, before: dict[uuid.UUID, int], gained: int
+        self, member: Member, workout: Workout, before: dict[uuid.UUID, int]
     ) -> list[LineItem]:
-        """Pay what this workout unlocked. `before` is everyone's all-time points beforehand."""
+        """Pay what this workout unlocked. `before` is everyone's all-time points beforehand.
+
+        The crew quest and the bounty are once per crew per week, so concurrent finishes in the
+        same crew are serialized with a transaction-scoped lock before anything is checked.
+        """
+        week = week_start(self._now(), member.crew.time_zone)
+        await self._events.lock(f"bonus:{member.crew.id}:{week.isoformat()}")
         paid: list[LineItem] = []
         paid += await self._store(member, workout, await self._quests.claim_quests(member))
         paid += await self._store(member, workout, await self._quests.claim_crew_quest(member, 0))
-        so_far = gained + sum(item.points for item in paid)
-        paid += await self._store(
-            member, workout, await self._quests.claim_bounty(member, before, so_far)
-        )
+        paid += await self._store(member, workout, await self._quests.claim_bounty(member, before))
         paid += await self._store(member, workout, await self._badges.check(member))
         return paid
 

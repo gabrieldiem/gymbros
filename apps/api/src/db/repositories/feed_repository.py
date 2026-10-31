@@ -4,7 +4,7 @@ import uuid
 from collections import defaultdict
 from datetime import datetime
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.comment import Comment
@@ -28,13 +28,15 @@ class FeedRepository:
         """The feed item, if any."""
         return await self._session.get(FeedItem, item_id)
 
-    async def page(self, crew_id: uuid.UUID, before: datetime | None, limit: int) -> list[FeedItem]:
-        """Newest items first, older than `before` when given."""
+    async def page(
+        self, crew_id: uuid.UUID, before: tuple[datetime, uuid.UUID] | None, limit: int
+    ) -> list[FeedItem]:
+        """Newest items first; after the (created_at, id) cursor when given (no ties skipped)."""
         query = select(FeedItem).where(FeedItem.crew_id == crew_id)
         if before is not None:
-            query = query.where(FeedItem.created_at < before)
+            query = query.where(tuple_(FeedItem.created_at, FeedItem.id) < before)
         result = await self._session.execute(
-            query.order_by(FeedItem.created_at.desc(), FeedItem.id).limit(limit)
+            query.order_by(FeedItem.created_at.desc(), FeedItem.id.desc()).limit(limit)
         )
         return list(result.scalars())
 

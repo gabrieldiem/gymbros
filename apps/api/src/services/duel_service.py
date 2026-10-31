@@ -3,7 +3,7 @@
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
@@ -102,14 +102,18 @@ class DuelService:
         return await self._view(duel, challenger, member.user)
 
     async def views(self, member: Member) -> list[DuelView]:
-        """This week's duels for the member (settling any that have ended first)."""
+        """This week's duels plus last week's results (settling any that have ended first)."""
         await self.settle_due(member)
         week = week_start(self._now(), member.crew.time_zone)
+        last_week = week - timedelta(weeks=1)
         users = {u.id: u for u in await self._crews.members(member.crew.id)}
+        duels = await self._duels.involving(member.user.id, [week, last_week])
         return [
             await self._view(d, users[d.challenger_id], users[d.opponent_id])
-            for d in await self._duels.involving(member.user.id, week)
-            if d.challenger_id in users and d.opponent_id in users
+            for d in duels
+            if d.challenger_id in users
+            and d.opponent_id in users
+            and (d.week_start == week or d.status == "settled")
         ]
 
     async def settle_due(self, member: Member) -> None:
@@ -121,8 +125,9 @@ class DuelService:
             winner = (
                 duel.challenger_id if mine > theirs else duel.opponent_id if theirs > mine else None
             )
-            duel.status, duel.winner_id, duel.settled_at = "settled", winner, self._now()
-            await self._duels.save(duel)
+            if not await self._duels.mark_settled(duel.id, winner, self._now()):
+                continue  # a concurrent request settled (and paid) it
+            duel.status, duel.winner_id = "settled", winner
             if winner is not None:
                 await self._pay(member, duel, winner, this_week)
 

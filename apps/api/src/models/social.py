@@ -67,6 +67,7 @@ class FeedResponse(BaseModel):
     items: list[FeedItemModel]
     inactive: list[InactiveModel]
     next_before: datetime | None
+    next_before_id: uuid.UUID | None
 
 
 class ReactRequest(BaseModel):

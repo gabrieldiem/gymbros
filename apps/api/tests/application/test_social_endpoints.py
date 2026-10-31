@@ -79,9 +79,8 @@ async def test_feed_pages_with_a_cursor(client, member):
     first = (await client.get("/api/feed", params={"limit": 2})).json()
     assert len(first["items"]) == 2
     assert first["next_before"] is not None
-    rest = (
-        await client.get("/api/feed", params={"limit": 2, "before": first["next_before"]})
-    ).json()
+    cursor = {"before": first["next_before"], "before_id": first["next_before_id"]}
+    rest = (await client.get("/api/feed", params={"limit": 2, **cursor})).json()
     assert len(rest["items"]) == 1
     assert rest["next_before"] is None
 
@@ -281,3 +280,27 @@ async def test_hall_of_fame_records(client, member, other_client):
 async def test_hall_of_fame_requires_a_crew(client, register):
     await register()
     assert (await client.get("/api/crew/hall-of-fame")).status_code == 403
+
+
+async def test_feed_pages_do_not_skip_items_with_the_same_timestamp(
+    client, member, crew, db_session
+):
+    from db.tables.feed_item import FeedItem
+
+    moment = datetime.now(UTC)
+    for _ in range(3):
+        db_session.add(
+            FeedItem(
+                crew_id=crew.id,
+                actor_id=uuid.UUID(member["id"]),
+                kind="rank_up",
+                vars={"camp": 1},
+                created_at=moment,
+            )
+        )
+    await db_session.flush()
+    first = (await client.get("/api/feed", params={"limit": 2})).json()
+    cursor = {"before": first["next_before"], "before_id": first["next_before_id"]}
+    rest = (await client.get("/api/feed", params={"limit": 2, **cursor})).json()
+    ids = [i["id"] for i in first["items"] + rest["items"]]
+    assert len(ids) == 3 == len(set(ids))

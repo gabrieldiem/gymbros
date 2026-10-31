@@ -1,9 +1,9 @@
 """SQL for duels."""
 
 import uuid
-from datetime import date
+from datetime import date, datetime
 
-from sqlalchemy import or_, select
+from sqlalchemy import or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.duel import Duel
@@ -30,12 +30,12 @@ class DuelRepository:
         await self._session.flush()
         return duel
 
-    async def involving(self, user_id: uuid.UUID, week_start: date) -> list[Duel]:
-        """The user's duels for a week, newest first."""
+    async def involving(self, user_id: uuid.UUID, weeks: list[date]) -> list[Duel]:
+        """The user's duels in these weeks, newest first."""
         result = await self._session.execute(
             select(Duel)
             .where(
-                Duel.week_start == week_start,
+                Duel.week_start.in_(weeks),
                 or_(Duel.challenger_id == user_id, Duel.opponent_id == user_id),
             )
             .order_by(Duel.created_at.desc())
@@ -55,6 +55,18 @@ class DuelRepository:
             )
         )
         return result.scalars().first()
+
+    async def mark_settled(
+        self, duel_id: uuid.UUID, winner_id: uuid.UUID | None, at: datetime
+    ) -> bool:
+        """Settle an active duel. False if another request settled it first (no double pay)."""
+        result = await self._session.execute(
+            update(Duel)
+            .where(Duel.id == duel_id, Duel.status == "active")
+            .values(status="settled", winner_id=winner_id, settled_at=at)
+            .returning(Duel.id)
+        )
+        return result.scalar_one_or_none() is not None
 
     async def due_for_settlement(self, crew_id: uuid.UUID, before_week: date) -> list[Duel]:
         """Accepted duels from weeks that have ended."""

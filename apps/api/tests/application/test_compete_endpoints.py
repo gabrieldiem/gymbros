@@ -194,7 +194,9 @@ async def test_an_ended_duel_pays_the_winner(client, member, other_client, crew,
         db_session, member["id"], crew.id, 300, datetime.now(UTC) - timedelta(weeks=1)
     )
     await give_points(db_session, maxo["id"], crew.id, 200, datetime.now(UTC) - timedelta(weeks=1))
-    await client.get("/api/duels")
+    [settled] = (await client.get("/api/duels")).json()
+    assert (settled["status"], settled["winner_id"]) == ("settled", member["id"])
+    await other_client.get("/api/duels")  # a second settlement pass pays nothing more
     [win] = await events_of(db_session, member["id"], "ln_duel")
     assert (win.points, win.vars) == (150, {"name": "Maxo"})
     assert (await events_of(db_session, maxo["id"], "ln_duel")) == []
@@ -228,6 +230,7 @@ async def test_recap_tells_last_weeks_story(client, member, other_client, crew, 
     assert recap["my_points"] == 300
     assert (recap["position_before"], recap["position_after"]) == (1, 2)
     assert recap["weekly_event"] == "leg_day_x2"
+    assert recap["bounty_points"] == 150
 
 
 # --- You tab -------------------------------------------------------------------------------
@@ -257,3 +260,16 @@ async def test_rest_timer_setting(client, member):
     assert (await client.get("/api/me")).json()["rest_seconds"] == 90
     assert (await client.patch("/api/me", json={"rest_seconds": 120})).json()["rest_seconds"] == 120
     assert (await client.patch("/api/me", json={"rest_seconds": 5})).status_code == 422
+
+
+async def test_a_crew_quest_paid_to_everyone_is_not_passing_anyone(
+    client, member, other_client, crew, db_session
+):
+    santi = await register_on(other_client, "santi@example.com", "IRONRIDGE")
+    # Santi leads by 140: more than this workout earns on its own (58 + First tracks 50).
+    await give_points(db_session, santi["id"], crew.id, 3990)
+    await give_points(db_session, member["id"], crew.id, 3850)
+    finished = await finish(client)  # completes the crew quest: both get +200
+    assert "ln_crew_quest" in keys(finished)
+    assert finished["climb"]["passed"] == []
+    assert "ln_bounty" not in keys(finished)

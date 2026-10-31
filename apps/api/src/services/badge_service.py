@@ -87,15 +87,12 @@ class BadgeService:
             for b in load_badges()
         )
 
-    async def check(self, member: Member, extra_points: int = 0) -> list[LineItem]:
-        """Unlock every badge newly reached; returns the line items (already stored)."""
+    async def check(self, member: Member) -> list[LineItem]:
+        """Unlock every badge newly reached (records it and posts to the feed).
+
+        Returns the line items; the caller stores them as point events.
+        """
         stats = await self.stats(member)
-        if extra_points:
-            stats = (
-                BadgeStats(**{**stats.__dict__, "total_points": stats.total_points + extra_points})
-                if hasattr(stats, "__dict__")
-                else stats
-            )
         unlocked = await self._badges.unlocked(member.user.id)
         items = []
         for badge in load_badges():

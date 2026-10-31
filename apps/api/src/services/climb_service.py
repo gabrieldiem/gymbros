@@ -92,11 +92,19 @@ class ClimbService:
             for index, user in enumerate(users)
         )
 
-    async def improvement(self, member: Member, now: datetime) -> Improvement:
+    async def crew_week_counts(self, member: Member, now: datetime) -> dict:
+        """Finished workouts per member and week for the last year (reusable across members)."""
+        this_week = week_start(now, member.crew.time_zone)
+        return await self._workouts.counts_by_user_and_week(member.crew.id, this_week - _HISTORY)
+
+    async def improvement(
+        self, member: Member, now: datetime, counts: dict | None = None
+    ) -> Improvement:
         """Strength, volume and workouts against the member's own past."""
         this_week = week_start(now, member.crew.time_zone)
         volume = await self._workouts.volume_by_week(member.user.id, this_week - _HISTORY)
-        counts = await self._workouts.counts_by_user_and_week(member.crew.id, this_week - _HISTORY)
+        if counts is None:
+            counts = await self.crew_week_counts(member, now)
         return Improvement(
             strength_pct=strength_change_pct(
                 await self._records.best_e1rm_by_exercise(member.user.id),
@@ -120,20 +128,30 @@ class ClimbService:
         return await self._events.totals_by_user(member.crew.id)
 
     async def change(
-        self, member: Member, gained: int, totals: dict[uuid.UUID, int] | None = None
+        self, member: Member, before: dict[uuid.UUID, int], after: dict[uuid.UUID, int]
     ) -> ClimbChange:
-        """The all-time move for `gained` new points, measured from `totals` (default: now)."""
-        totals = totals if totals is not None else await self.totals(member)
-        before = totals.get(member.user.id, 0)
-        after = before + gained
+        """How the member moved between two all-time snapshots (before and after a workout).
+
+        Passing is judged on both snapshots, so bonuses paid to everyone (the crew quest) don't
+        count as passing anyone.
+        """
+        me = member.user.id
         names = {u.id: u.display_name for u in await self._crews.members(member.crew.id)}
+        mine_before, mine_after = before.get(me, 0), after.get(me, 0)
         passed_ids = tuple(
             user_id
-            for user_id, points in sorted(totals.items(), key=lambda kv: -kv[1])
-            if user_id != member.user.id and before < points < after and user_id in names
+            for user_id in sorted(names, key=lambda uid: -before.get(uid, 0))
+            if user_id != me
+            and before.get(user_id, 0) > mine_before
+            and after.get(user_id, 0) < mine_after
         )
         passed = tuple(names[user_id] for user_id in passed_ids)
         scale = self._scales["all"]
         return ClimbChange(
-            before, after, rank_for(before, scale), rank_for(after, scale), passed, passed_ids
+            mine_before,
+            mine_after,
+            rank_for(mine_before, scale),
+            rank_for(mine_after, scale),
+            passed,
+            passed_ids,
         )

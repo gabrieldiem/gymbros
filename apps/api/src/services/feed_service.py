@@ -48,12 +48,15 @@ class FeedService:
         self._now = now
         self._badges = badges
 
-    async def page(self, member: Member, before: datetime | None, limit: int) -> FeedPage:
+    async def page(
+        self, member: Member, before: tuple[datetime, uuid.UUID] | None, limit: int
+    ) -> FeedPage:
         """Newest first. The first page also carries the nudge prompts."""
         items = await self._feed.page(member.crew.id, before, limit)
         entries = await self._entries(member, items)
         inactive = await self._inactive(member) if before is None else ()
-        next_before = items[-1].created_at if len(items) == limit else None
+        last = items[-1] if len(items) == limit else None
+        next_before = (last.created_at, last.id) if last else None
         return FeedPage(entries=entries, inactive=inactive, next_before=next_before)
 
     async def react(self, member: Member, item_id: uuid.UUID, kind: str) -> ReactionSummary:

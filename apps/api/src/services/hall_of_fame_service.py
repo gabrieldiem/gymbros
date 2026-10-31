@@ -45,14 +45,16 @@ class HallOfFameService:
     async def hall_of_fame(self, member: Member) -> HallOfFame:
         """Most improved top 3 and the crew's records."""
         return HallOfFame(
-            most_improved=await self._most_improved(member),
+            most_improved=await self.most_improved(member),
             records=await self._records_of(member),
         )
 
-    async def _most_improved(self, member: Member) -> tuple[ImprovedMember, ...]:
+    async def most_improved(self, member: Member) -> tuple[ImprovedMember, ...]:
+        """The top 3 by improvement against themselves (crew-wide counts fetched once)."""
         scored = []
+        counts = await self._climb.crew_week_counts(member, self._now())
         for user in await self._crews.members(member.crew.id):
-            imp = await self._climb.improvement(Member(user, member.crew), self._now())
+            imp = await self._climb.improvement(Member(user, member.crew), self._now(), counts)
             score = improvement_score(imp.strength_pct, imp.volume_pct)
             if score is not None:
                 scored.append(ImprovedMember(user=user, pct=score))

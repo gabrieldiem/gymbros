@@ -78,7 +78,8 @@ def to_feed_response(page: FeedPage, reader: User) -> FeedResponse:
     return FeedResponse(
         items=[_item(e, reader) for e in page.entries],
         inactive=[InactiveModel(member=to_actor(i.user), days=i.days) for i in page.inactive],
-        next_before=page.next_before,
+        next_before=page.next_before[0] if page.next_before else None,
+        next_before_id=page.next_before[1] if page.next_before else None,
     )
 
 

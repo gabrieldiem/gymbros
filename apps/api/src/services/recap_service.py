@@ -45,6 +45,7 @@ class Recap:
     my_best_pr: RecapPr | None
     most_improved: ImprovedMember | None
     bounty_target: User | None
+    bounty_points: int
     weekly_event: str | None
 
 
@@ -76,7 +77,8 @@ class RecapService:
         counts = await self._workouts.counts_by_user_and_week(crew.id, last_week)
         prs = await self._prs(crew.id, last_week, users)
         volume = await self._workouts.volume_by_week(me.id, last_week)
-        hof = await self._hall.hall_of_fame(member)
+        improved = await self._hall.most_improved(member)
+        bounty = await self._quests.bounty(member)
         return Recap(
             week_start=last_week,
             crew_total=sum(week_points.values()),
@@ -93,8 +95,9 @@ class RecapService:
                 await self._events.totals_before_week(crew.id, this_week), users, me.id
             ),
             my_best_pr=next((pr for pr in prs if pr.user.id == me.id), None),
-            most_improved=hof.most_improved[0] if hof.most_improved else None,
-            bounty_target=(await self._quests.bounty(member)).target,
+            most_improved=improved[0] if improved else None,
+            bounty_target=bounty.target,
+            bounty_points=bounty.points,
             weekly_event=self._weekly_event,
         )
 

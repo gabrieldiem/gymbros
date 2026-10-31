@@ -122,6 +122,7 @@ def to_recap(recap: Recap) -> RecapResponse:
         most_improved=to_actor(improved.user) if improved else None,
         most_improved_pct=improved.pct if improved else None,
         bounty_target=to_actor(recap.bounty_target) if recap.bounty_target else None,
+        bounty_points=recap.bounty_points,
         weekly_event=recap.weekly_event,
     )
 
