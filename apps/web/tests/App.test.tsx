@@ -8,7 +8,7 @@ describe('App shell (signed in)', () => {
   it('redirects / to ATUS Climb', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/');
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 
   it('shows the five tabs with Train in the middle', async () => {
@@ -99,7 +99,7 @@ describe('Route gates', () => {
   it('sends signed-in members away from the login screen', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/login');
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 });
 

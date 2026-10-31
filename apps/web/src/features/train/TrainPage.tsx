@@ -79,7 +79,7 @@ export function TrainPage() {
         <FinishSheet
           result={result}
           exercises={catalog.data.exercises}
-          onClimb={() => navigate('/climb')}
+          onClimb={() => navigate('/climb', { state: { climb: result.climb } })}
           onClose={() => setResult(null)}
         />
       )}

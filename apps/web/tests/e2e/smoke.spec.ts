@@ -68,7 +68,11 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page).toHaveURL(/\/climb$/);
   // Normalise the profile language, whatever an earlier run left behind.
   await page.getByRole('button', { name: 'EN' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Rope order' }).getByRole('listitem')).toHaveCount(
+    5,
+  );
+  await page.waitForTimeout(2800); // intro climb animation
   await expect(page.getByRole('status').filter({ hasText: 'Server online' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: 'Main' });
   for (const name of ['ATUS Climb', 'Crew', 'Train', 'Quests', 'You']) {
@@ -77,6 +81,10 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page.getByRole('link', { name: 'Your profile' })).toBeVisible();
   await expectNoSidewaysScroll(page);
   await shoot(page, 'climb-en', testInfo);
+  await page.screenshot({
+    path: `${SCREENS}/climb-full-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
 
   const profileSaved = page.waitForResponse(
     (r) => r.url().endsWith('/api/me') && r.request().method() === 'PATCH',

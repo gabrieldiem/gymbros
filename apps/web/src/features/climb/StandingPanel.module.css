@@ -1,0 +1,124 @@
+.panel {
+  padding: 22px;
+  background: var(--plate);
+  border: 1px solid #3a3a2a;
+  border-radius: var(--r-card);
+}
+
+.standing {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.rank {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 4.2rem;
+  line-height: 0.85;
+  color: var(--volt);
+}
+
+.rank sup {
+  font-size: 0.36em;
+  vertical-align: top;
+  margin-left: 2px;
+}
+
+.pts {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.camp {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  background: var(--steel);
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.goal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 14px;
+  background: var(--iron);
+  border-radius: var(--r-control);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.gaps {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.gaps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.peak {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--volt);
+  flex: none;
+}
+
+.vsTitle {
+  margin-top: 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.vs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 12px;
+  border-radius: var(--r-control);
+  overflow: hidden;
+}
+
+.vs div {
+  padding: 12px 10px;
+  background: var(--iron);
+  text-align: center;
+}
+
+.vs b {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.down {
+  color: var(--smoke);
+}
+
+.vs span {
+  font-size: 0.78rem;
+  color: var(--smoke);
+  font-weight: 600;
+}
+
+.note {
+  margin-top: 10px;
+  font-size: var(--fs-small);
+  color: var(--smoke);
+}

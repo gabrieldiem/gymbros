@@ -16,7 +16,7 @@ describe('Log in', () => {
     await fill('Email', 'gabi@example.com');
     await fill('Password', 'climbing-pw');
     await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 
   it('shows the API error in the current language', async () => {
@@ -60,7 +60,7 @@ describe('Register', () => {
     });
 
     await userEvent.click(screen.getByRole('button', { name: 'Let’s go' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
     expect(localStorage.getItem('gymbros.crewWelcome')).toBeNull();
   });
 

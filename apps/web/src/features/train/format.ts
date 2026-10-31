@@ -58,6 +58,7 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
     case 'ln_goal':
     case 'ln_over':
     case 'ln_better':
+    case 'ln_history':
       return t(key, vars);
     default:
       return t('ln_unknown');

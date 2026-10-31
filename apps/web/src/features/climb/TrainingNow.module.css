@@ -1,0 +1,62 @@
+.section {
+  margin-top: 26px;
+}
+
+.section h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 59, 31, 0);
+  }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 59, 31, 0.6);
+  }
+}
+
+.chips {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.chip small {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--smoke);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    animation: none;
+  }
+}

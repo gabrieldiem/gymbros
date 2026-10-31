@@ -1,0 +1,76 @@
+.hero {
+  padding: 10px 0 6px;
+}
+
+.hero h1 {
+  font-size: var(--fs-hero);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.hero h1 span {
+  display: block;
+}
+
+.hero h1 .volt {
+  color: var(--volt);
+}
+
+.hero > p {
+  margin-top: 10px;
+  font-size: 1.02rem;
+  color: var(--smoke);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  font-size: 0.88rem;
+  background: var(--event-tint);
+  color: var(--event-text);
+}
+
+.grid {
+  display: grid;
+  gap: 26px;
+  margin-top: 22px;
+}
+
+.grid > * {
+  min-width: 0;
+}
+
+@media (min-width: 1120px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(330px, 1fr);
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+.rope {
+  margin-top: 28px;
+}
+
+.error {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 22px;
+  color: var(--smoke);
+}

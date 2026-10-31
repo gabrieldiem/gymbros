@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { apiRequest } from './client';
+import type { ClimbChange } from './climb';
 import type { CrewColor } from './types';
 
 export type ExerciseType = 'w' | 'bw' | 'c';
@@ -75,6 +76,7 @@ export type FinishResult = {
   prs: { exercise_id: string; load_kg: number; reps: number }[];
   workouts_this_week: number;
   weekly_target: number;
+  climb: ClimbChange;
 };
 
 export type Week = { workouts: number; target: number; leg_event_active: boolean };
@@ -164,6 +166,7 @@ export function useFinishWorkout() {
     onSuccess: () => {
       queryClient.setQueryData(activeWorkoutKey, null);
       void queryClient.invalidateQueries({ queryKey: weekKey });
+      void queryClient.invalidateQueries({ queryKey: ['climb'] });
       void queryClient.invalidateQueries({ queryKey: trainingNowKey });
     },
   });

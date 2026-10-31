@@ -139,7 +139,7 @@ describe('Train: finishing', () => {
     expect(within(dialog).getByText('+100')).toBeVisible();
     expect(within(dialog).getByText(/213/)).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole('button', { name: 'See ATUS Climb' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 
   it('explains why an empty workout cannot be finished', async () => {
