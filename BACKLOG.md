@@ -57,14 +57,18 @@ Product or technical decisions that are still open. If one blocks work, pick the
 ## Tech debt
 
 - [ ] **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
-- [ ] **Prototype storage has no migrations** (docs, S): it bumps a localStorage key on every shape change. Irrelevant once the real app exists. _Added 2026-10-31_
 - [ ] **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
 - [ ] **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
 - [ ] **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. `make seed reset=1` now rebuilds the crew; run it before `make e2e` from the Makefile, or give e2e its own crew. _Added 2026-10-31_
 - [ ] **E2E logs real workouts** (web, S): `tests/e2e/train.spec.ts` finishes a workout for demo members Jose and Matex on every run, so their points grow in the dev database. Same fix as the seed item: an e2e-only crew reset before each run. _Added 2026-10-31_
 - [ ] **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
+- [ ] **Bonus lock has no concurrency test** (api, S): the advisory lock around crew-quest and bounty claims is exercised by every finish, but no test runs two finishes in parallel (the suite runs each test inside one rolled-back transaction). Add a test with two committed sessions. _Added 2026-10-31_
+- [ ] **E2E specs share demo members** (web, S): five demo members across five specs at two viewports means specs can see each other's side effects (an in-progress workout, unread notifications). The a11y spec now tolerates that, but each spec should own its member. _Added 2026-10-31_
+- [ ] **Precache size** (web, S): the service worker precaches ~815 KiB, mostly Barlow font weights. Trim unused weights or subset the fonts. _Added 2026-10-31_
 
 ## Done
 
 Move items here with the date and the commit or PR that closed them.
+
+- [x] **Prototype storage has no migrations**: irrelevant now that the app has Postgres and Alembic. Closed 2026-10-31 in 8750db0.
