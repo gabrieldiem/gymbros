@@ -8,8 +8,8 @@ The structure and conventions copy `TFI/apps/data-service`. When in doubt, do wh
 
 ```bash
 poetry install
-cd src && uvicorn main:app --host 0.0.0.0 --port 8080 --reload     # native dev (needs a running postgres)
-poetry run pytest -m "not skip" --cov=src --cov-report=html:reports/coverage
+cd src && uvicorn main:app --host 0.0.0.0 --port 8080 --reload     # native dev (needs a running postgres: `docker compose -f ../../docker-compose-dev.yaml up -d postgres`)
+poetry run pytest -m "not skip" --cov=src --cov-report=html:reports/coverage   # needs the same postgres; creates gymbros_test
 poetry run pytest tests/application/test_basic_endpoints.py::test_health_ok
 poetry run alembic upgrade head
 poetry run alembic revision --autogenerate -m "add sets table"

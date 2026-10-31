@@ -23,18 +23,22 @@ GYMBROS is a gym tracker for a crew of five friends (Gabi, Santi, Maxo, Jose, Ma
 ## Commands
 
 ```bash
-make install     # Poetry deps for apps/api + npm deps for apps/web
-make up          # Dev stack in Docker: postgres + api (hot reload) + web (Vite dev server)
+make install     # Poetry deps for apps/api + npm deps for apps/web + pre-commit hooks
+make up          # Dev stack in Docker: postgres + api (hot reload) + web (Vite dev server); creates .env on first run
 make down        # Stop dev and prod stacks
 make test        # API tests in Docker (reports in apps/api/reports/) + web unit tests
-make test-api    # API tests only
+make test-api    # API tests only (Docker, against the dev postgres; uses its own gymbros_test database)
 make test-web    # Web unit tests only (Vitest)
-make e2e         # Playwright smoke tests against the running dev stack
+make e2e         # Playwright smoke tests against the running dev stack (E2E_BASE_URL=http://localhost:8081 for prod)
 make precommit   # Pre-commit hooks: black, pylint, mypy (api); eslint, prettier, tsc (web)
-make prod        # Production build: api + web (React build served by nginx) + postgres
-make migrate     # Apply Alembic migrations
+make prod        # Production build: api + web (React build served by nginx on :8081) + postgres
+make local       # Run the api natively with --reload against the dev postgres
+make migrate     # Apply Alembic migrations (inside the dev api container)
 make migration m="add sets table"   # Autogenerate a new migration
+make clean       # Stop both stacks and delete their database volumes
 ```
+
+Ports: web dev 5173, api 8080 (`/docs` for OpenAPI), postgres 127.0.0.1:5432, prod web 8081. All configurable in `.env`.
 
 The `run-stack` skill describes how to start the stack and verify a change end to end.
 
@@ -93,11 +97,16 @@ gymbros/
 
 ## Architecture
 
-- **web** (nginx, port 80) serves the built React app and reverse-proxies `/api/*` to **api**. The browser only ever talks to one origin, so there's no CORS in production.
-- **api** (FastAPI on uvicorn, port 8080) owns all rules. Scoring, PR detection, goal weeks, ranks, quests, badges and bounties are computed server-side. The client never sends points.
-- **postgres** is the only data store. Weeks run Monday 00:00 to Sunday 23:59 in the crew's time zone.
+- **web** (nginx, port 80, published on 8081 by `make prod`) serves the built React app and reverse-proxies `/api/*` to **api**, keeping the `/api` prefix. The browser only ever talks to one origin, so there's no CORS in production. In dev, Vite on 5173 proxies `/api` the same way. nginx caches `/assets/*` (hashed) for a year and serves `index.html` with `no-cache`; unknown paths fall back to `index.html`.
+- **api** (FastAPI on uvicorn, port 8080) owns all rules. Scoring, PR detection, goal weeks, ranks, quests, badges and bounties are computed server-side. The client never sends points. `/` and `/health` (database ping, 503 when down) are served at the root for the container healthcheck and again under `/api` for the browser.
+- **postgres** 18 is the only data store, through async SQLAlchemy (asyncpg). Weeks run Monday 00:00 to Sunday 23:59 in the crew's time zone.
+- **Migrations** are Alembic (`apps/api/migrations`). The dev api runs them in its lifespan (`RUN_MIGRATIONS_ON_STARTUP=true`); the prod image runs `alembic upgrade head` once before starting the uvicorn workers.
+- **Config**: `apps/api/settings.json` holds game tuning (points, weekly target, rank step), env vars hold secrets and infrastructure (`.env.example` lists all of them). Any tuning key can be overridden from the environment as its flattened UPPERCASE name (`SCORING_PR=120`).
+- **Web shell**: React Router with the five tabs, a bottom nav below 960 px and a side rail above it, TanStack Query for server state (`/api/health` polled every 20 s), and typed EN/ES catalogs. The language is stored in `localStorage` for now.
+- **Tests**: API tests run offline (pytest-socket) against a real Postgres, each in a rolled-back transaction; the suite creates and migrates its own `gymbros_test` database. Web unit tests use Vitest + Testing Library; Playwright smoke tests run against a live stack at 390×844 and 1440×900.
+- **CI**: `test.yml` (gitleaks, api lint + tests with a Postgres service, web lint + tests + build) on every non-main push; `deploy.yml` (tests, Trivy scan of both images, Coolify webhook) on main.
 - Live updates use polling (TanStack Query `refetchInterval`) at first. SSE is in the backlog.
-- Auth uses email and password, a session in an httpOnly cookie, and an invite code to join a crew. One crew per user for now.
+- Auth will use email and password, a session in an httpOnly cookie, and an invite code to join a crew (Phase 1). One crew per user for now.
 
 Update this section as the system is built. It describes what exists, not what is planned.
 

@@ -14,6 +14,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Anti-cheat** (product, L): trust the crew, or require proof (photo/video for PRs, crew confirmation)? _Added 2026-10-31_
 - [ ] **Hosting** (infra, M): reuse the data-service Coolify setup (webhook deploy in `deploy.yml`), or something else? Domain? _Added 2026-10-31_
 - [ ] **Spanish slang** (i18n, S): Spanish rank names (Novato … Imparable) and other words the crew actually uses. _Added 2026-10-31_
+- [ ] **Production migrations** (infra, S): default chosen: the api image runs `alembic upgrade head` before starting the workers, so a deploy migrates itself. Alternative: a separate one-off migrate job in Coolify. _Added 2026-10-31_
 
 ## Later
 
@@ -30,6 +31,9 @@ Product or technical decisions that are still open. If one blocks work, pick the
 
 - [ ] **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
 - [ ] **Prototype storage has no migrations** (docs, S): it bumps a localStorage key on every shape change. Irrelevant once the real app exists. _Added 2026-10-31_
+- [ ] **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
+- [ ] **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
+- [ ] **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
 
 ## Done
 
