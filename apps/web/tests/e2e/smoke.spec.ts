@@ -75,8 +75,9 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await page.waitForTimeout(2800); // intro climb animation
   await expect(page.getByRole('status').filter({ hasText: 'Server online' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: 'Main' });
-  for (const name of ['ATUS Climb', 'Crew', 'Train', 'Quests', 'You']) {
-    await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
+  // Train's name also says "Training now" while a workout is in progress.
+  for (const name of [/^ATUS Climb$/, /^Crew$/, /^Train\b/, /^Quests$/, /^You$/]) {
+    await expect(nav.getByRole('link', { name })).toBeVisible();
   }
   await expect(page.getByRole('link', { name: /Your profile/ })).toBeVisible();
   await expectNoSidewaysScroll(page);
