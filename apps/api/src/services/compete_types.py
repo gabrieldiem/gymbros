@@ -48,6 +48,7 @@ class QuestBoard:
     crew_quest: CrewQuestView
     bounty: BountyView
     weekly_event: str | None
+    duel_points: int
 
 
 @dataclass(frozen=True, slots=True)

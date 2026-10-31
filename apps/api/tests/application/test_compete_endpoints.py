@@ -52,6 +52,7 @@ async def test_quest_board_starts_empty(client, member):
     assert board["crew_quest"]["goal"] == 4000
     assert board["crew_quest"]["total"] == 0
     assert board["weekly_event"] == "leg_day_x2"
+    assert board["duel_points"] == 150
     assert board["ends_at"] > board["week_start"]
 
 

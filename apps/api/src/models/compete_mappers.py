@@ -55,6 +55,7 @@ def to_quest_board(board: QuestBoard) -> QuestBoardResponse:
             claimed_by=to_actor(bounty.claimed_by) if bounty.claimed_by else None,
         ),
         weekly_event=board.weekly_event,
+        duel_points=board.duel_points,
     )
 
 

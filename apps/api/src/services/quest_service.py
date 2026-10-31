@@ -40,6 +40,7 @@ class QuestService:
         self._crew_goal = int(settings["crew_quest_goal"])
         self._crew_bonus = int(settings["crew_quest"])
         self._bounty = int(settings["bounty"])
+        self._duel_points = int(settings["duel_win"])
         self._weekly_event = str(settings["weekly_event"]) or None
         self._now = now
 
@@ -60,6 +61,7 @@ class QuestService:
             crew_quest=await self._crew_quest(member),
             bounty=await self.bounty(member),
             weekly_event=self._weekly_event,
+            duel_points=self._duel_points,
         )
 
     async def claim_quests(self, member: Member) -> list[LineItem]:

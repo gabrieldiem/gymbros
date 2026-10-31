@@ -288,6 +288,7 @@ def build_quest_service(session: AsyncSession) -> QuestService:
             "crew_quest_goal": settings.scoring_crew_quest_goal,
             "crew_quest": settings.scoring_crew_quest,
             "bounty": settings.scoring_bounty,
+            "duel_win": settings.scoring_duel_win,
             "weekly_event": settings.game_weekly_event,
         },
         utc_now,

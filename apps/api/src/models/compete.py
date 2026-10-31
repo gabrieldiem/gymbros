@@ -58,6 +58,7 @@ class QuestBoardResponse(BaseModel):
     crew_quest: CrewQuestModel
     bounty: BountyModel
     weekly_event: str | None
+    duel_points: int
 
 
 class BadgeModel(BaseModel):
