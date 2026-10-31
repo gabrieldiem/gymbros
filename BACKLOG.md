@@ -37,6 +37,9 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Rest timer length setting** (web, S): fixed at 90 s. Make it a user setting (Phase 5 settings). _Added 2026-10-31_
 - [ ] **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
 - [ ] **Prototype: first-time PR** (docs, S): the prototype awards 100 pts for the first log of an exercise; the app does not (see Decide). Note it if the prototype is kept. _Added 2026-10-31_
+- [ ] **Climber sheet** (web, M): tapping a marker or rope row in the prototype opens a profile sheet (head to head, last workout, best lift, gap, Start a duel, Nudge). Duels and nudges arrive in Phases 4–5; build the sheet then. _Added 2026-10-31_
+- [ ] **YOU tag can overlap a marker** (web, S): on the map, the "YOU" label above your marker can touch a neighbour nudged just above it (same as the prototype). Offset the tag away from neighbours. _Added 2026-10-31_
+- [ ] **Climb standings query cost** (api, S): `/api/climb` runs several aggregates per poll (every 20 s per open tab). Fine for 5 people; cache per crew for a few seconds if crews grow. _Added 2026-10-31_
 
 ## Tech debt
 
@@ -45,7 +48,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
 - [ ] **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
-- [ ] **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. Give e2e its own seeded crew or reset it before the run. _Added 2026-10-31_
+- [ ] **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. `make seed reset=1` now rebuilds the crew; run it before `make e2e` from the Makefile, or give e2e its own crew. _Added 2026-10-31_
 - [ ] **E2E logs real workouts** (web, S): `tests/e2e/train.spec.ts` finishes a workout for demo members Jose and Matex on every run, so their points grow in the dev database. Same fix as the seed item: an e2e-only crew reset before each run. _Added 2026-10-31_
 - [ ] **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
 

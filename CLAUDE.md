@@ -35,7 +35,7 @@ make prod        # Production build: api + web (React build served by nginx on :
 make local       # Run the api natively with --reload against the dev postgres
 make migrate     # Apply Alembic migrations (inside the dev api container)
 make migration m="add sets table"   # Autogenerate a new migration
-make seed        # Demo crew "Iron Ridge" (invite code IRONRIDGE, password climb-demo-2026) in the dev DB
+make seed        # Demo crew "Iron Ridge" with history (invite IRONRIDGE, password climb-demo-2026); reset=1 rebuilds it
 make crew name="ATUS" tz="America/Argentina/Buenos_Aires"   # Create a crew and print its invite code
 make clean       # Stop both stacks and delete their database volumes
 ```
@@ -112,6 +112,8 @@ gymbros/
 - **API errors** are `{"detail": {"code": "..."}}` with a machine code (`invalid_credentials`, `email_taken`, `invite_code_not_found`, `already_in_crew`, `not_authenticated`); domain exceptions are mapped in one handler (`routes/errors.py`). The web app turns codes into copy with `t()`.
 - **Train**: the exercise catalog and routines are a resource file (`apps/api/src/resources/catalog.json`), not tables. A workout is in progress while `finished_at` is null (one per user). The logger PUTs its whole state (`PUT /api/workouts/{id}`) through a debounced, serialized autosave queue (`features/train/autosaveQueue.ts`); every response carries `live_points`, the server's score if the workout were finished now. `POST /api/workouts/{id}/finish` runs `score_workout()` and stores one `point_events` row per line item (with the crew-local `week_start`), the workout's points and volume, and new PRs. Starting a routine pre-fills each exercise from its last finished session plus overload.
 - **Scoring**: `services/scoring_service.py` is pure: `(WorkoutLog, History, WeekState, ScoringRules) → ScoreResult`. `ScoringContextBuilder` reads history (stored PRs, previous routine volume) and the week state (workouts so far this crew-local week, goal streak) from the DB. Line items are i18n keys (`ln_show`, `ln_sets`, `ln_leg_event`, `ln_vol`, `ln_cardio`, `ln_pr`, `ln_goal`, `ln_streak`, `ln_over`, `ln_better`) with variables; the web renders them with `lineItemText()`.
+- **ATUS Climb**: `GET /api/climb?mode=all|week` sums `point_events` per member (all time, or the crew-local week) and returns the rope order with camps, pips, goal streaks, training now, your gaps, next camp and you vs 4 weeks ago (`services/climb_rules.py` is pure). Camps are `game.rank_step` apart (summit at step × 6); week mode scales the same 7 camps to `game.week_scale`. The finish response carries the climb change (points and camps before/after, who you passed). The web map (`features/climb/trail.ts`) samples the prototype's SVG path into an arc-length table, so marker placement is pure and testable; the reveal and markers animate unless reduced motion is on.
+- **Demo data**: `make seed` builds the demo crew with history planned by `services/demo_history.py` so standings reproduce the prototype's numbers (one `ln_history` point event per seeded workout). `make seed reset=1` rebuilds it.
 - **Web routing**: `Gate` components guard routes using `gateRedirect()`: signed-out users see `/welcome`, `/login`, `/register`; users without a crew see `/join`; members see the five tabs. `/hello` ("This is {crew}") shows once after joining. The UI language follows the profile and the top-bar toggle saves it with `PATCH /api/me`.
 
 Update this section as the system is built. It describes what exists, not what is planned.
