@@ -5,7 +5,7 @@ A gym tracker for a crew of friends. You log workouts, and every set, PR and goa
 - Try the prototype: open `docs/prototype/index.html` in a browser.
 - Product rules: [docs/PRODUCT.md](docs/PRODUCT.md)
 - Design system: [docs/DESIGN.md](docs/DESIGN.md)
-- Backlog and tech debt: [BACKLOG.md](BACKLOG.md)
+- Backlog and tech debt: the GYMBROS project in Plane (`GYM-N` items), mirrored in [BACKLOG.md](BACKLOG.md)
 - Working on the code (people and Claude): [CLAUDE.md](CLAUDE.md)
 
 Stack: FastAPI (Python 3.13) + Postgres in `apps/api`, React + TypeScript (Vite) served by nginx in `apps/web`, Docker Compose for dev and prod.

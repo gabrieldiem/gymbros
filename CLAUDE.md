@@ -6,16 +6,16 @@ GYMBROS is a gym tracker for a crew of five friends (Gabi, Santi, Maxo, Jose, Ma
 - Visual system: `docs/DESIGN.md`
 - Domain terms: `docs/GLOSSARY.md`. Use these names in code, API and UI.
 - Clickable reference prototype (single static file, the source of truth for UX and copy): `docs/prototype/index.html`
-- Later work and technical debt: `BACKLOG.md`
+- Later work and technical debt: the GYMBROS project in Plane (`GYM-N` items, via the `plane` MCP server), mirrored in `BACKLOG.md` as the local backup
 
 `apps/api/CLAUDE.md` and `apps/web/CLAUDE.md` hold the rules for each app. They load automatically when you work inside that folder.
 
 ## How to work
 
-1. **Plan, then build.** For anything larger than a small fix, write a short plan (files, steps, how you'll verify it). Then execute without waiting, unless a step needs a product decision that isn't in `docs/` or `BACKLOG.md`. In that case ask, or pick the safest default and log it under *Decide* in `BACKLOG.md`.
+1. **Plan, then build.** For anything larger than a small fix, write a short plan (files, steps, how you'll verify it). Then execute without waiting, unless a step needs a product decision that isn't in `docs/` or the backlog. In that case ask, or pick the safest default and log it as a `decide` item with the `backlog` skill.
 2. **Branch.** Never commit to `main`. Use one branch per feature or phase: `feat/<name>`, `fix/<name>`, `chore/<name>`.
 3. **Commit progressively.** Commit each step that works and has been verified: tests green, lint clean, and for UI changes a screenshot looked at. Keep commits small, in imperative mood, written in plain English ("Add set logging endpoint", "Port ATUS Climb map to React"). Don't batch a whole feature into one commit.
-4. **Stay in scope.** Only change code related to the task. Put anything else you notice (bugs, debt, ideas) in `BACKLOG.md` using the `backlog` skill. Don't fix it on the side.
+4. **Stay in scope.** Only change code related to the task. Put anything else you notice (bugs, debt, ideas) in the backlog (Plane, mirrored in `BACKLOG.md`) using the `backlog` skill. Don't fix it on the side.
 5. **After each step**, say what could break and which tests cover it.
 6. **Keep docs true.** When the architecture, commands or a product rule changes, update the matching `CLAUDE.md` or `docs/` file in the same commit.
 7. **Don't push, open PRs or deploy** unless asked.
@@ -50,7 +50,7 @@ The layout mirrors the team's `data-service` project (`TFI/apps/data-service`): 
 
 ```
 gymbros/
-├── CLAUDE.md  BACKLOG.md  README.md  Makefile
+├── CLAUDE.md  BACKLOG.md (mirror of the Plane backlog)  README.md  Makefile
 ├── docker-compose.yaml          # prod: postgres + api + web (nginx)
 ├── docker-compose-dev.yaml      # dev: postgres + api (--reload, ./src mounted) + web (vite)
 ├── .env.example                 # every env var, no secrets
@@ -128,7 +128,7 @@ Project skills live in `.claude/skills/`:
 
 | Skill | Use it when |
 |---|---|
-| `backlog` | You notice something out of scope, or the user says "pick something from the backlog" |
+| `backlog` | You notice something out of scope, the user says "pick something from the backlog", or they added items in Plane |
 | `run-stack` | Starting the app, checking a change end to end, taking UI screenshots |
 | `new-feature` | Adding a feature that spans DB → service → route → web → i18n |
 
