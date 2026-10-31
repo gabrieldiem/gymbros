@@ -147,6 +147,8 @@ class Settings:
             raise ValueError(f"Invalid APP_ENV={self.app_env!r}; expected one of {APP_ENVS}")
         if not self.postgres_password:
             raise ValueError("POSTGRES_PASSWORD is required")
+        if not self.session_secret:
+            raise ValueError("SESSION_SECRET is required")
         if self.app_env == "production" and len(self.session_secret) < 32:
             raise ValueError("SESSION_SECRET must be at least 32 characters in production")
         if self.game_weekly_target < 1 or self.game_rank_step < 1:

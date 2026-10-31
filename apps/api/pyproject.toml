@@ -18,6 +18,9 @@ sqlalchemy = { version = "^2.1.6", extras = ["asyncio"] }
 asyncpg = "^0.32.0"
 alembic = "^1.20.1"
 uvloop = "^0.23.0"
+argon2-cffi = ">=25.1.0,<26"
+email-validator = ">=2.3,<3"
+tzdata = ">=2025.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.2.0"

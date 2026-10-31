@@ -8,6 +8,9 @@ from fastapi import FastAPI
 from controller import general
 from db.migrate import run_migrations
 from dependencies import engine, logger, settings
+from routes import auth, crews, me
+from routes.errors import handle_domain_error
+from services.errors import DomainError
 
 
 @asynccontextmanager
@@ -32,3 +35,8 @@ app: FastAPI = FastAPI(
 # browser, which only ever reaches the API through the nginx (or Vite) `/api` proxy.
 app.include_router(general.router)
 app.include_router(general.router, prefix="/api", include_in_schema=False)
+app.add_exception_handler(DomainError, handle_domain_error)
+
+app.include_router(auth.router, prefix="/api")
+app.include_router(me.router, prefix="/api")
+app.include_router(crews.router, prefix="/api")
