@@ -36,6 +36,9 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Weekly event | The week's twist (v1: Leg day x2) | `weekly_event` |
 | Badge | A one-time achievement with points | `badge` |
 | Nudge | A poke at a member who hasn't trained in a few days | `nudge` |
+| Quick reply | A canned comment (Light weight 💪, Beast mode…) stored as a key and shown in each reader's language | `quick_key` |
+| Notification | An inbox entry (key + vars + link) about something that happened to you in the crew | `notification` |
+| Crew record | The crew's best: heaviest lifts, longest goal streak, biggest single session | `crew_record` |
 | Reaction | 👊 (`fist`) or 🔥 (`fire`) on a feed item | `reaction` |
 | Feed item | A workout, badge, rank-up or nudge event in the Crew tab | `feed_item` |
 | Recap | The story-style summary of last week | `recap` |
