@@ -8,18 +8,44 @@ import argparse
 import asyncio
 import sys
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from clock import utc_now
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.personal_record_repository import PersonalRecordRepository
+from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
+from db.repositories.workout_repository import WorkoutRepository
 from dependencies import password_hasher, session_factory, settings
 from services.crew_service import CrewService
-from services.demo_seed_service import DemoSeedService
+from services.demo_seed_service import DemoSeedService, SeedRepositories
 from services.errors import DomainError
 
 
-async def seed_demo() -> str:
-    """Create the demo crew and members; report what was created."""
+def build_demo_seed(session: AsyncSession) -> DemoSeedService:
+    """The demo seed wired to a session and the configured game settings."""
+    repos = SeedRepositories(
+        users=UserRepository(session),
+        crews=CrewRepository(session),
+        workouts=WorkoutRepository(session),
+        events=PointEventRepository(session),
+        records=PersonalRecordRepository(session),
+    )
+    return DemoSeedService(
+        repos,
+        password_hasher,
+        utc_now,
+        weekly_target=settings.game_weekly_target,
+        bodyweight_kg=settings.game_bodyweight_kg,
+    )
+
+
+async def seed_demo(reset: bool) -> str:
+    """Create the demo crew, members and history; report what was created."""
     async with session_factory() as session, session.begin():
-        service = DemoSeedService(UserRepository(session), CrewRepository(session), password_hasher)
+        service = build_demo_seed(session)
+        if reset:
+            await service.reset()
         result = await service.seed()
     created = ", ".join(result.created_members) or "nobody new"
     return f"Demo crew {result.crew.name!r} (invite code {result.crew.invite_code}): {created}"
@@ -35,7 +61,8 @@ async def create_crew(name: str, time_zone: str) -> str:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="cli.py", description="GYMBROS operator commands")
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("seed-demo", help="Create the five-person demo crew (not in production)")
+    seed = commands.add_parser("seed-demo", help="Create the demo crew with history (not in prod)")
+    seed.add_argument("--reset", action="store_true", help="Delete the demo crew first")
     create = commands.add_parser("create-crew", help="Create a crew and print its invite code")
     create.add_argument("name")
     create.add_argument("time_zone", help="IANA name, e.g. America/Argentina/Buenos_Aires")
@@ -50,7 +77,7 @@ def main(argv: list[str]) -> int:
         return 1
     try:
         if args.command == "seed-demo":
-            message = asyncio.run(seed_demo())
+            message = asyncio.run(seed_demo(args.reset))
         else:
             message = asyncio.run(create_crew(args.name, args.time_zone))
     except DomainError as error:

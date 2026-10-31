@@ -1,5 +1,5 @@
 {
-  "_comment": "The five-person demo crew from docs/prototype/index.html. Identity fields are seeded in Phase 1; `stats` are the prototype's numbers (all-time pts, this week's pts, goal streak, workouts logged, workouts this week, improvement %) that later phases rebuild as workout and point-event history.",
+  "_comment": "The five-person demo crew from docs/prototype/index.html. `stats` are the prototype's numbers (all-time pts, this week's pts, goal streak, workouts logged, workouts this week, improvement %); the seed rebuilds them as real workouts and point events (`history` sets the routine rotation and a strength multiplier).",
   "crew": {
     "name": "Iron Ridge",
     "time_zone": "America/Argentina/Buenos_Aires",
@@ -14,8 +14,26 @@
       "initials": "GA",
       "color": "volt",
       "language": "en",
-      "motto": { "en": "Here for the PRs and the banter", "es": "Aquí por los PRs y el pique" },
-      "stats": { "all": 3880, "week": 540, "streak": 3, "sessions": 64, "ws": 2, "imp": 11 }
+      "motto": {
+        "en": "Here for the PRs and the banter",
+        "es": "Aquí por los PRs y el pique"
+      },
+      "stats": {
+        "all": 3880,
+        "week": 540,
+        "streak": 3,
+        "sessions": 64,
+        "ws": 2,
+        "imp": 11
+      },
+      "history": {
+        "cycle": [
+          "push",
+          "pull",
+          "legs"
+        ],
+        "strength": 1.0
+      }
     },
     {
       "key": "maxo",
@@ -24,8 +42,27 @@
       "initials": "MX",
       "color": "red",
       "language": "es",
-      "motto": { "en": "Bench whisperer", "es": "El que le susurra al bench" },
-      "stats": { "all": 4310, "week": 620, "streak": 12, "sessions": 88, "ws": 3, "imp": 4 }
+      "motto": {
+        "en": "Bench whisperer",
+        "es": "El que le susurra al bench"
+      },
+      "stats": {
+        "all": 4310,
+        "week": 620,
+        "streak": 12,
+        "sessions": 88,
+        "ws": 3,
+        "imp": 4
+      },
+      "history": {
+        "cycle": [
+          "push",
+          "pull",
+          "push",
+          "legs"
+        ],
+        "strength": 1.15
+      }
     },
     {
       "key": "santi",
@@ -34,8 +71,27 @@
       "initials": "SA",
       "color": "cyan",
       "language": "es",
-      "motto": { "en": "Never skips leg day", "es": "Nunca se salta el leg day" },
-      "stats": { "all": 3725, "week": 705, "streak": 6, "sessions": 79, "ws": 3, "imp": 9 }
+      "motto": {
+        "en": "Never skips leg day",
+        "es": "Nunca se salta el leg day"
+      },
+      "stats": {
+        "all": 3725,
+        "week": 705,
+        "streak": 6,
+        "sessions": 79,
+        "ws": 3,
+        "imp": 9
+      },
+      "history": {
+        "cycle": [
+          "legs",
+          "push",
+          "legs",
+          "pull"
+        ],
+        "strength": 1.1
+      }
     },
     {
       "key": "jose",
@@ -44,8 +100,27 @@
       "initials": "JO",
       "color": "pink",
       "language": "es",
-      "motto": { "en": "Cardio counts too", "es": "El cardio también cuenta" },
-      "stats": { "all": 2950, "week": 310, "streak": 2, "sessions": 51, "ws": 2, "imp": 6 }
+      "motto": {
+        "en": "Cardio counts too",
+        "es": "El cardio también cuenta"
+      },
+      "stats": {
+        "all": 2950,
+        "week": 310,
+        "streak": 2,
+        "sessions": 51,
+        "ws": 2,
+        "imp": 6
+      },
+      "history": {
+        "cycle": [
+          "cardio",
+          "pull",
+          "cardio",
+          "legs"
+        ],
+        "strength": 0.95
+      }
     },
     {
       "key": "matex",
@@ -54,8 +129,27 @@
       "initials": "MT",
       "color": "violet",
       "language": "es",
-      "motto": { "en": "Small plates, big gains", "es": "Discos pequeños, ganancias grandes" },
-      "stats": { "all": 2210, "week": 480, "streak": 1, "sessions": 40, "ws": 1, "imp": 18 }
+      "motto": {
+        "en": "Small plates, big gains",
+        "es": "Discos pequeños, ganancias grandes"
+      },
+      "stats": {
+        "all": 2210,
+        "week": 480,
+        "streak": 1,
+        "sessions": 40,
+        "ws": 1,
+        "imp": 18
+      },
+      "history": {
+        "cycle": [
+          "pull",
+          "push",
+          "pull",
+          "legs"
+        ],
+        "strength": 0.85
+      }
     }
   ]
 }

@@ -60,9 +60,10 @@ migration:
 	@test -n "$(m)" || (echo 'usage: make migration m="add sets table"' && exit 1)
 	$(DEV) exec api alembic -c /alembic.ini revision --autogenerate -m "$(m)"
 
-# Create the five-person demo crew (invite code IRONRIDGE) in the dev database. Safe to re-run.
+# Create the five-person demo crew (invite code IRONRIDGE) with the prototype's history in the
+# dev database. Safe to re-run. `make seed reset=1` deletes the demo crew first.
 seed:
-	$(DEV) exec api python cli.py seed-demo
+	$(DEV) exec api python cli.py seed-demo $(if $(reset),--reset,)
 
 # make crew name="ATUS" tz="America/Argentina/Buenos_Aires" → prints the invite code
 crew:

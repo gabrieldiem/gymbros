@@ -27,7 +27,11 @@ class PersonalRecordRepository:
         return dict(result.all())
 
     async def store(
-        self, user_id: uuid.UUID, record: RecordSet, workout_id: uuid.UUID, at: datetime
+        self,
+        user_id: uuid.UUID,
+        record: RecordSet,
+        workout_id: uuid.UUID | None,
+        at: datetime,
     ) -> None:
         """Insert or replace the PR for this exercise."""
         values = {

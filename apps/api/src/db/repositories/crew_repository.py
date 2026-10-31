@@ -63,3 +63,8 @@ class CrewRepository:
             .order_by(User.display_name)
         )
         return list(result.scalars())
+
+    async def delete(self, crew: Crew) -> None:
+        """Remove a crew; memberships, workouts and point events cascade."""
+        await self._session.delete(crew)
+        await self._session.flush()

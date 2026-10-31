@@ -33,3 +33,8 @@ class UserRepository:
         """Flush pending changes to a loaded user."""
         await self._session.flush()
         return user
+
+    async def delete(self, user: User) -> None:
+        """Remove a user; their sessions, membership, workouts and points cascade."""
+        await self._session.delete(user)
+        await self._session.flush()
