@@ -429,6 +429,16 @@ export const en = {
   language_hint: 'English or Spanish.',
   seconds_n: '{n} s',
   stats_failed: 'Couldn’t load your stats.',
+  install_title: 'Install GYMBROS',
+  install_body: 'Add it to your home screen. It opens like an app and loads even on bad gym wifi.',
+  install_cta: 'Install',
+  install_later: 'Not now',
+  offline: 'You’re offline. Showing what was loaded last.',
+  load_failed_generic: 'Couldn’t load this. Check your connection.',
+  quests_failed: 'Couldn’t load this week’s quests.',
+  badges_failed: 'Couldn’t load your badges.',
+  hof_failed: 'Couldn’t load the hall of fame.',
+  train_failed: 'Couldn’t load your training.',
 };
 
 export type MessageKey = keyof typeof en;

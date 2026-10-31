@@ -432,4 +432,15 @@ export const es = {
   language_hint: 'Español o inglés.',
   seconds_n: '{n} s',
   stats_failed: 'No se pudieron cargar tus números.',
+  install_title: 'Instala GYMBROS',
+  install_body:
+    'Añádela a tu pantalla de inicio. Se abre como una app y carga aunque el wifi del gym sea malo.',
+  install_cta: 'Instalar',
+  install_later: 'Ahora no',
+  offline: 'Sin conexión. Mostrando lo último que se cargó.',
+  load_failed_generic: 'No se pudo cargar. Revisa tu conexión.',
+  quests_failed: 'No se pudieron cargar los retos de la semana.',
+  badges_failed: 'No se pudieron cargar tus insignias.',
+  hof_failed: 'No se pudo cargar el salón de la fama.',
+  train_failed: 'No se pudo cargar tu entreno.',
 } satisfies Messages;

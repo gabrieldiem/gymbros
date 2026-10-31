@@ -1,0 +1,24 @@
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: var(--plate);
+  border: 1px solid #3a3a2a;
+  border-radius: var(--r-card);
+}
+
+.text {
+  flex: 1 1 200px;
+}
+
+.text b {
+  display: block;
+}
+
+.text span {
+  font-size: var(--fs-small);
+  color: var(--smoke);
+}
