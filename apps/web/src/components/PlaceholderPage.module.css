@@ -1,0 +1,16 @@
+.page h1 {
+  margin-bottom: 8px;
+}
+
+.sub {
+  color: var(--smoke);
+}
+
+.card {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+  color: var(--smoke);
+}

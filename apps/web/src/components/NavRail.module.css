@@ -1,0 +1,126 @@
+/* Mobile: bottom nav with Train as a raised centre button. ≥960px: a 240px side rail. */
+.rail {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--rail);
+  border-top: 1px solid var(--steel);
+}
+
+.head {
+  display: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 58px;
+  min-height: var(--touch);
+  padding: 6px;
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: var(--smoke);
+  text-decoration: none;
+  border-radius: var(--r-control-sm);
+}
+
+.link[aria-current='page'] {
+  color: var(--volt);
+}
+
+.disc {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-top: -24px;
+  border-radius: 18px;
+  background: var(--volt);
+  color: var(--iron);
+  box-shadow: 0 0 0 6px var(--rail);
+}
+
+.train .label {
+  color: var(--chalk);
+}
+
+@media (min-width: 960px) {
+  .rail {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+    padding: 28px 16px;
+    border-top: 0;
+    border-right: 1px solid var(--steel);
+  }
+
+  .head {
+    display: block;
+    order: -2;
+    margin: 0 0 26px 4px;
+  }
+
+  .tagline {
+    margin: 4px 0 0 2px;
+    color: var(--smoke);
+    font-size: 0.9rem;
+  }
+
+  .link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 11px 12px;
+    font-size: 1rem;
+  }
+
+  .link[aria-current='page'] {
+    background: var(--plate);
+  }
+
+  .train {
+    order: -1;
+    margin-bottom: 18px;
+    background: var(--volt);
+    color: var(--iron);
+    border-radius: var(--r-control);
+  }
+
+  .train[aria-current='page'] {
+    background: var(--volt);
+    color: var(--iron);
+  }
+
+  .train .label {
+    color: var(--iron);
+  }
+
+  .disc {
+    width: auto;
+    height: auto;
+    margin: 0;
+    background: none;
+    color: inherit;
+    box-shadow: none;
+  }
+
+  .disc svg {
+    width: 22px;
+    height: 22px;
+  }
+}

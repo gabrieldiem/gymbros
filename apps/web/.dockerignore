@@ -1,0 +1,10 @@
+Dockerfile
+Dockerfile.dev
+.dockerignore
+node_modules
+dist
+dev-dist
+coverage
+test-results
+playwright-report
+.env

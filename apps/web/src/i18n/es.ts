@@ -1,0 +1,31 @@
+import type { Messages } from './en';
+
+/** Spanish copy. Gym terms stay in English (sets, reps, PR, push day); sentences are Spanish. */
+export const es = {
+  brand: 'GYMBROS',
+  tagline: 'Mejor que ayer.',
+  nav_main: 'Principal',
+  nav_climb: 'ATUS Climb',
+  nav_crew: 'Equipo',
+  nav_train: 'Entrenar',
+  nav_quests: 'Retos',
+  nav_you: 'Tú',
+  language: 'Idioma',
+  climb_title: 'ATUS Climb',
+  climb_sub: 'Cada rep te sube la montaña. No hay meta final, solo el próximo PR.',
+  crew_title: 'Equipo',
+  crew_sub: 'Lo último del equipo.',
+  train_title: 'A entrenar',
+  train_sub: 'Elige una rutina o empieza en vacío. Cada set te sube.',
+  quests_title: 'Retos',
+  quests_sub: 'Retos nuevos cada lunes. Complétalos para ganar puntos extra.',
+  me_title: 'Tú',
+  me_sub: 'Tus números, tus PR y todo lo que has avanzado.',
+  coming_soon: 'Esta pantalla está en camino.',
+  api_checking: 'Conectando con el servidor',
+  api_up: 'Servidor en línea',
+  api_down: 'Servidor sin conexión. Reintentando.',
+  not_found_title: 'Fuera del sendero',
+  not_found_body: 'Esta página no existe.',
+  not_found_cta: 'Volver a ATUS Climb',
+} satisfies Messages;

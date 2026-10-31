@@ -1,0 +1,21 @@
+.main {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: calc(10px + var(--safe-top)) 18px calc(var(--nav-h) + 64px + var(--safe-bottom));
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+@media (min-width: 960px) {
+  .app {
+    display: grid;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  }
+
+  .main {
+    padding: 26px 52px 64px;
+  }
+}
