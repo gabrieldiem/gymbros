@@ -1,0 +1,14 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: var(--color);
+  color: var(--iron);
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: calc(var(--size) * 0.36);
+  line-height: 1;
+}

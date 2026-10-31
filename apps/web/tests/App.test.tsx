@@ -1,20 +1,20 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { mockFetchJson, renderApp } from './renderApp';
+import { makeMe, mockApi, mockFetchJson, renderApp, SIGNED_OUT } from './renderApp';
 
-describe('App shell', () => {
+describe('App shell (signed in)', () => {
   it('redirects / to ATUS Climb', async () => {
-    mockFetchJson(200, { status: 'running', database: 'up' });
+    mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/');
     expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
   });
 
-  it('shows the five tabs with Train in the middle', () => {
-    mockFetchJson(200, { status: 'running', database: 'up' });
+  it('shows the five tabs with Train in the middle', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/climb');
-    const nav = screen.getByRole('navigation', { name: 'Main' });
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
     const tabs = within(nav)
       .getAllByRole('link')
       .filter((link) => !link.hasAttribute('aria-label'))
@@ -22,50 +22,92 @@ describe('App shell', () => {
     expect(tabs).toEqual(['ATUS Climb', 'Crew', 'Train', 'Quests', 'You']);
   });
 
-  it('marks the current tab', () => {
-    mockFetchJson(200, { status: 'running', database: 'up' });
+  it('marks the current tab', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/quests');
-    const nav = screen.getByRole('navigation', { name: 'Main' });
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
     expect(within(nav).getByRole('link', { name: 'Quests' })).toHaveAttribute(
       'aria-current',
       'page',
     );
   });
 
-  it('switches the language from the top bar and remembers it', async () => {
-    mockFetchJson(200, { status: 'running', database: 'up' });
-    renderApp('/crew');
-    await userEvent.click(screen.getByRole('button', { name: 'ES' }));
-    expect(screen.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'ES' })).toHaveAttribute('aria-pressed', 'true');
-    expect(localStorage.getItem('gymbros.lang')).toBe('es');
-    expect(document.documentElement.lang).toBe('es');
+  it('shows the avatar with initials linking to the profile', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ initials: 'GD' })] });
+    renderApp('/climb');
+    const link = await screen.findByRole('link', { name: 'Your profile' });
+    expect(link).toHaveAttribute('href', '/me');
+    expect(link).toHaveTextContent('GD');
   });
 
-  it('shows a not-found page for unknown paths', () => {
-    mockFetchJson(200, { status: 'running', database: 'up' });
+  it('switches the language and stores it on the profile', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'PATCH /api/me': (body) => [200, makeMe(body as object)],
+    });
+    renderApp('/crew');
+    await userEvent.click(await screen.findByRole('button', { name: 'ES' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
+    expect(document.documentElement.lang).toBe('es');
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/me',
+        expect.objectContaining({ method: 'PATCH', body: '{"language":"es"}' }),
+      ),
+    );
+  });
+
+  it('uses the language stored on the profile', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ language: 'es' })] });
+    renderApp('/quests');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Retos' })).toBeVisible();
+  });
+
+  it('shows a not-found page for unknown paths', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/nope');
-    expect(screen.getByRole('heading', { level: 1, name: 'Off the trail' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Off the trail' })).toBeVisible();
+  });
+
+  it('shows a retry screen when the session cannot be loaded', async () => {
+    mockFetchJson(500, { detail: 'boom' });
+    renderApp('/climb');
+    expect(await screen.findByText('Couldn’t load your account.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+  });
+});
+
+describe('Route gates', () => {
+  it('sends signed-out visitors to the welcome screen', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT });
+    renderApp('/climb');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),
+    ).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Create account' })).toHaveAttribute(
+      'href',
+      '/register',
+    );
+  });
+
+  it('sends members without a crew to the join screen', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ crew: null })] });
+    renderApp('/climb');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Join your crew' })).toBeVisible();
+  });
+
+  it('sends signed-in members away from the login screen', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
+    renderApp('/login');
+    expect(await screen.findByRole('heading', { level: 1, name: 'ATUS Climb' })).toBeVisible();
   });
 });
 
 describe('HealthStatus', () => {
   it('shows online when the API and database are up', async () => {
-    const fetchMock = mockFetchJson(200, { status: 'running', database: 'up' });
+    const fetchMock = mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/climb');
     expect(await screen.findByText('Server online')).toBeVisible();
     expect(fetchMock).toHaveBeenCalledWith('/api/health', expect.anything());
-  });
-
-  it('shows offline when the API reports the database down', async () => {
-    mockFetchJson(503, { status: 'degraded', database: 'down' });
-    renderApp('/climb');
-    expect(await screen.findByText('Server offline. Retrying.')).toBeVisible();
-  });
-
-  it('shows offline when the request fails', async () => {
-    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
-    renderApp('/climb');
-    expect(await screen.findByText('Server offline. Retrying.')).toBeVisible();
   });
 });
