@@ -122,3 +122,25 @@
   font-size: var(--fs-small);
   color: var(--smoke);
 }
+
+.recap {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px 16px;
+  text-align: left;
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.recap b {
+  display: block;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.recap span {
+  font-size: 0.88rem;
+  color: var(--smoke);
+}

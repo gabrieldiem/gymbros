@@ -13,6 +13,7 @@ type Props = {
   climb: Climb;
   myAvatar: { initials: string; color: Climb['standings'][0]['color'] };
   training: boolean;
+  onRecap: () => void;
 };
 
 const signed = (value: number) => (value > 0 ? '+' : value < 0 ? '−' : '±') + Math.abs(value);
@@ -33,7 +34,7 @@ function VsCell({ value, suffix, label }: { value: number | null; suffix: string
 }
 
 /** Your standing: position, points, camp, goal pips, gaps, next camp and you vs 4 weeks ago. */
-export function StandingPanel({ climb, myAvatar, training }: Props) {
+export function StandingPanel({ climb, myAvatar, training, onRecap }: Props) {
   const { t, n, lang } = useI18n();
   const { me, improvement } = climb;
   const [num, suffix] = ordinalParts(lang, me.position);
@@ -104,6 +105,10 @@ export function StandingPanel({ climb, myAvatar, training }: Props) {
         <VsCell value={improvement.workouts_change} suffix="" label={t('vs_workouts')} />
       </div>
       <p className={styles.note}>{t('vs_note')}</p>
+      <button type="button" className={styles.recap} onClick={onRecap}>
+        <b>{t('recap_title')}</b>
+        <span>{t('recap_sub')}</span>
+      </button>
     </section>
   );
 }

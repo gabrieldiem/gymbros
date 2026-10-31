@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { useClimb, type ClimbChange, type ClimbMode } from '../../api/climb';
 import { useMe } from '../../api/me';
 import { useActiveWorkout, useCatalog } from '../../api/train';
+import { RecapStories } from '../recap/RecapStories';
 import { Button } from '../../components/Button';
 import { Segmented } from '../../components/Segmented';
 import { useToast } from '../../components/toast';
@@ -39,7 +40,9 @@ export function ClimbPage() {
   const climb = useClimb(mode);
   const me = useMe().data;
   const training = Boolean(useActiveWorkout().data);
-  const legEvent = useCatalog().data?.weekly_event === 'leg_day_x2';
+  const catalog = useCatalog().data;
+  const legEvent = catalog?.weekly_event === 'leg_day_x2';
+  const [recapOpen, setRecapOpen] = useState(false);
   const change = (location.state as ClimbState)?.climb;
 
   const handleClimbDone = () => {
@@ -89,6 +92,7 @@ export function ClimbPage() {
                 climb={climb.data}
                 myAvatar={{ initials: me.initials, color: me.color }}
                 training={training}
+                onRecap={() => setRecapOpen(true)}
               />
             )}
             <TrainingNow myId={me?.id} />
@@ -106,6 +110,9 @@ export function ClimbPage() {
         </div>
       ) : (
         <p role="status">{t('loading')}</p>
+      )}
+      {recapOpen && (
+        <RecapStories exercises={catalog?.exercises ?? []} onClose={() => setRecapOpen(false)} />
       )}
     </>
   );

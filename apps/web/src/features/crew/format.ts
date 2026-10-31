@@ -30,6 +30,10 @@ export function notificationText(item: Notification, t: T): string {
     case 'n_goal':
     case 'n_comment':
     case 'n_nudge':
+    case 'n_duel_invite':
+    case 'n_duel_accepted':
+    case 'n_duel_declined':
+    case 'n_duel_won':
       return t(item.key, vars);
     default:
       return t('n_unknown');

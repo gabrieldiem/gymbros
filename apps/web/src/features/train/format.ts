@@ -59,7 +59,14 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
     case 'ln_over':
     case 'ln_better':
     case 'ln_history':
+    case 'ln_crew_quest':
+    case 'ln_bounty':
+    case 'ln_duel':
       return t(key, vars);
+    case 'ln_quest':
+      return t('ln_quest', { q: t(`quest_${String(vars.quest)}` as MessageKey) });
+    case 'ln_badge':
+      return t('ln_badge', { b: t(`badge_${String(vars.badge)}` as MessageKey) });
     default:
       return t('ln_unknown');
   }

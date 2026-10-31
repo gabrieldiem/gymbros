@@ -102,6 +102,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
 
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.getByRole('link', { name: 'Your profile' }).click();
+  await page.getByRole('button', { name: 'Settings' }).click();
   await page.getByRole('button', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/\/welcome$/);
   expect(errors).toEqual([]);

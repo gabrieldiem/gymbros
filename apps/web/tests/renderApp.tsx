@@ -64,6 +64,7 @@ export function makeMe(overrides: Partial<Me> = {}): Me {
     initials: 'GA',
     color: 'volt',
     language: 'en',
+    rest_seconds: 90,
     crew: CREW,
     ...overrides,
   };

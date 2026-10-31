@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { STATS } from './competeFixtures';
 import { CREW, makeMe, mockApi, renderApp, SIGNED_OUT } from './renderApp';
 
 async function fill(label: string, value: string) {
@@ -121,10 +122,12 @@ describe('Log out', () => {
   it('returns to the welcome screen', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
+      'GET /api/me/stats': [200, STATS],
       'POST /api/auth/logout': [204, null],
     });
     renderApp('/me');
-    await userEvent.click(await screen.findByRole('button', { name: 'Log out' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Log out' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),
     ).toBeVisible();
