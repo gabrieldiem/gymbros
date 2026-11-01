@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.notification import Notification
@@ -45,6 +45,14 @@ class NotificationRepository:
             update(Notification)
             .where(Notification.user_id == user_id, Notification.read_at.is_(None))
             .values(read_at=at)
+        )
+
+    async def delete_older_than(self, user_id: uuid.UUID, cutoff: datetime) -> None:
+        """Delete the user's notifications created before `cutoff`."""
+        await self._session.execute(
+            delete(Notification).where(
+                Notification.user_id == user_id, Notification.created_at < cutoff
+            )
         )
 
     async def sent_since(

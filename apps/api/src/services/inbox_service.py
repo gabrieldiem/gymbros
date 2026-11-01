@@ -1,7 +1,7 @@
 """The notifications inbox."""
 
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.user_repository import UserRepository
@@ -19,10 +19,12 @@ class InboxService:
         notifications: NotificationRepository,
         users: UserRepository,
         now: Callable[[], datetime],
+        keep_days: int,
     ) -> None:
         self._notifications = notifications
         self._users = users
         self._now = now
+        self._keep = timedelta(days=keep_days)
 
     async def inbox(self, user: User) -> Inbox:
         """The newest notifications with their actors, and the unread count."""
@@ -36,5 +38,7 @@ class InboxService:
         )
 
     async def mark_all_read(self, user: User) -> None:
-        """Everything in the inbox is read now."""
-        await self._notifications.mark_all_read(user.id, self._now())
+        """Everything in the inbox is read now, and notifications past `keep_days` are deleted."""
+        now = self._now()
+        await self._notifications.mark_all_read(user.id, now)
+        await self._notifications.delete_older_than(user.id, now - self._keep)

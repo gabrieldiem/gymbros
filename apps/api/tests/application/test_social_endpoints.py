@@ -4,6 +4,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from db.repositories.crew_repository import CrewRepository
+from db.tables.notification import Notification
 from db.tables.workout import Workout
 from services.crew_service import CrewService
 from services.training_rules import week_start
@@ -304,3 +305,25 @@ async def test_feed_pages_do_not_skip_items_with_the_same_timestamp(
     rest = (await client.get("/api/feed", params={"limit": 2, **cursor})).json()
     ids = [i["id"] for i in first["items"] + rest["items"]]
     assert len(ids) == 3 == len(set(ids))
+
+
+async def test_reading_the_inbox_prunes_notifications_older_than_60_days(
+    client, member, db_session
+):
+    now = datetime.now(UTC)
+    ages = {"n_old": 61, "n_recent": 59, "n_new": 0}
+    db_session.add_all(
+        [
+            Notification(
+                user_id=uuid.UUID(member["id"]),
+                key=key,
+                vars={},
+                link="/crew",
+                created_at=now - timedelta(days=days),
+            )
+            for key, days in ages.items()
+        ]
+    )
+    await db_session.flush()
+    assert (await client.post("/api/notifications/read")).status_code == 204
+    assert sorted(await keys(client)) == ["n_new", "n_recent"]

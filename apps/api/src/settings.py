@@ -63,6 +63,7 @@ class Settings:
     social_inactive_days: int = 3
     social_close_behind_points: int = 300
     social_feed_page_size: int = 20
+    social_notification_days: int = 60
 
     session_cookie_name: str = "gymbros_session"
     session_max_age_days: int = 30
@@ -161,6 +162,8 @@ class Settings:
             raise ValueError("game.weekly_target and game.rank_step must be positive")
         if self.scoring_volume_kg_per_point < 1:
             raise ValueError("scoring.volume_kg_per_point must be positive")
+        if self.social_notification_days < 1:
+            raise ValueError("social.notification_days must be positive")
 
     @property
     def database_url(self) -> str:

@@ -45,7 +45,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-34` **Reply notifications for commenters** (api, S): only the post's owner is notified of new comments; others in the thread aren't (the prototype's "replied to your comment"). _Added 2026-10-31_
 - [ ] `GYM-35` **Notification fan-out to the actor's camp-mates** (api, S): "someone close behind" uses a fixed 300 pt window (`social.close_behind_points`). Consider week mode too. _Added 2026-10-31_
 - [ ] `GYM-36` **Delete own comment / undo nudge** (product, S): neither exists. _Added 2026-10-31_
-- [ ] `GYM-37` **Old notifications cleanup** (api, S): notifications are never deleted; the inbox shows the newest 30. Prune after 60 days. _Added 2026-10-31_
 - [ ] `GYM-38` **Weekly recap notification** (api, S): "Your weekly recap is ready" isn't sent; the recap is a card on ATUS Climb. Send it on the first request after Monday 00:00. _Added 2026-10-31_
 - [ ] `GYM-39` **Duel settlement needs a visit** (api, S): duels settle when someone in the crew opens the Quests tab after the week. A small scheduled job would pay winners on Monday morning even if nobody opens it. _Added 2026-10-31_
 - [ ] `GYM-40` **Event and bounty sheets** (web, S): the prototype opens a sheet from the hero chips; the app shows them as cards on the Quests tab only. _Added 2026-10-31_
@@ -75,3 +74,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-48` **E2E logs real workouts**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-51` **E2E specs share demo members**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-25` **Expired session cleanup**: every login and sign-up deletes expired `auth_sessions` rows. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-37` **Old notifications cleanup**: marking the inbox read deletes your notifications older than `social.notification_days` (60). Closed 2026-10-31 on chore/backlog-tech-debt.

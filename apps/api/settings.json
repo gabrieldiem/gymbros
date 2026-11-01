@@ -31,6 +31,7 @@
   "social": {
     "inactive_days": 3,
     "close_behind_points": 300,
-    "feed_page_size": 20
+    "feed_page_size": 20,
+    "notification_days": 60
   }
 }
