@@ -34,7 +34,8 @@ class FakePortainer:
         self.status = ACTIVE
         self.message = ""
         self.containers_tag = OLD  # None once the containers are gone
-        self.fail_tags = set()
+        self.pull_fail_tags = set()  # fails before any container is replaced
+        self.up_fail_tags = set()  # fails after replacing them
         self.unhealthy_tags = set()
         self.updates = []
 
@@ -50,11 +51,15 @@ class FakePortainer:
             if not self.env.get(name)
         ]
         tag = self.env["IMAGE_TAG"]
-        if missing or tag in self.fail_tags:
+        if missing or tag in self.pull_fail_tags:
             self.status, self.message = FAILED, f"stack config file is invalid: {missing}"
             return
-        self.status, self.message = ACTIVE, ""
         self.containers_tag = tag
+        if tag in self.up_fail_tags:
+            self.unhealthy_tags.add(tag)
+            self.status, self.message = FAILED, "compose up operation failed"
+            return
+        self.status, self.message = ACTIVE, ""
 
     def containers(self):
         if self.containers_tag is None:
@@ -163,9 +168,30 @@ class DeployTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertEqual(portainer.updates, [])
 
-    def test_a_failed_deploy_restores_the_previous_tag_and_file(self):
+    def test_a_failure_before_replacing_leaves_the_running_version_alone(self):
+        """The image can't be pulled: a restore would only make Portainer run compose down."""
         portainer = FakePortainer({**STARTING_ENV, "GOOGLE_ID": "id"})
-        portainer.fail_tags = {NEW}
+        portainer.pull_fail_tags = {NEW}
+        result = self._deploy(portainer)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(portainer.containers_tag, OLD)
+        self.assertEqual(len(portainer.updates), 1)
+        self.assertIn("still running and healthy", result.stdout)
+
+    def test_the_next_deploy_after_a_failed_pull_goes_live(self):
+        portainer = FakePortainer({**STARTING_ENV, "GOOGLE_ID": "id"})
+        portainer.pull_fail_tags = {NEW}
+        self._deploy(portainer)
+        portainer.pull_fail_tags = set()
+        portainer.env["IMAGE_TAG"] = OLD
+        result = self._deploy(portainer)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertEqual(portainer.containers_tag, NEW)
+        self.assertIn("stop the containers before deploying", result.stdout)
+
+    def test_a_failure_after_replacing_restores_the_previous_tag_and_file(self):
+        portainer = FakePortainer({**STARTING_ENV, "GOOGLE_ID": "id"})
+        portainer.up_fail_tags = {NEW}
         result = self._deploy(portainer)
         self.assertEqual(result.returncode, 1)
         self.assertEqual(portainer.containers_tag, OLD)
@@ -184,7 +210,7 @@ class DeployTest(unittest.TestCase):
 
     def test_a_failed_restore_is_reported_as_a_possible_outage(self):
         portainer = FakePortainer({**STARTING_ENV, "GOOGLE_ID": "id"})
-        portainer.fail_tags = {NEW, OLD}
+        portainer.up_fail_tags = {NEW, OLD}
         result = self._deploy(portainer)
         self.assertEqual(result.returncode, 1)
         self.assertIn("the site may be down", result.stdout)
@@ -200,7 +226,7 @@ class DeployTest(unittest.TestCase):
 
     def test_a_first_deploy_has_nothing_to_restore(self):
         portainer = FakePortainer({"SECRET": "s3cret", "GOOGLE_ID": "id"})
-        portainer.fail_tags = {NEW}
+        portainer.up_fail_tags = {NEW}
         result = self._deploy(portainer)
         self.assertEqual(result.returncode, 1)
         self.assertIn("Nothing older to restore", result.stdout)

@@ -12,11 +12,14 @@
 # can't deploy, the containers don't come up healthy on the new tag, or the public health check
 # fails.
 #
-# A missing variable stops the deploy before anything changes. Any other failure restores what was
-# running: the previous stack file and the previous IMAGE_TAG, then checks they came back healthy.
-# The new file can't be used for that: whatever made it fail would fail the restore too, and
-# Portainer runs `compose down` first when it updates a stack in the error state (volumes are kept),
-# so a failed restore leaves the site down.
+# How a failure leaves the running version (Portainer validates, then pulls, then replaces):
+# - A missing variable stops the deploy before anything is sent.
+# - If Portainer fails before replacing containers, they keep running and are left alone. Restoring
+#   would hurt: Portainer runs `compose down` first when it updates a stack in the error state
+#   (volumes are kept). Portainer shows the stack as failed until the next deploy.
+# - If containers were replaced, it restores the previous stack file and IMAGE_TAG, then checks they
+#   came back healthy. The new file can't be used for that: whatever failed it could fail the
+#   restore too, and that leaves the site down.
 #
 # Tests: deploy/test_portainer_deploy.py
 set -euo pipefail
@@ -67,20 +70,28 @@ missing_variables() {
   done
 }
 
-# Wait until postgres, api and web are healthy, with api and web on tag $1. Prints what it saw.
+read_containers() {
+  api "${PORTAINER_URL}/api/endpoints/${PORTAINER_ENDPOINT_ID}/docker/containers/json?all=1" |
+    jq -r --arg p "$PROJECT" '.[] | select(.Labels["com.docker.compose.project"] == $p)
+      | "\(.Labels["com.docker.compose.service"])\t\(.Status)\t\(.Image)"'
+}
+
+# Whether report $2 shows postgres, api and web healthy, with api and web on tag $1.
+containers_ready() {
+  local line svc
+  for svc in "${SERVICES[@]}"; do
+    line=$(grep -P "^${svc}\t" <<<"$2" || true)
+    [[ "$line" == *"(healthy)"* ]] || return 1
+    if [ "$svc" != postgres ] && [[ "$line" != *":$1" ]]; then return 1; fi
+  done
+}
+
+# Wait until the containers are ready on tag $1. Prints what it saw.
 wait_for_containers() {
-  local attempt report ready line svc
+  local attempt report
   for attempt in $(seq 1 40); do
-    report=$(api "${PORTAINER_URL}/api/endpoints/${PORTAINER_ENDPOINT_ID}/docker/containers/json?all=1" |
-      jq -r --arg p "$PROJECT" '.[] | select(.Labels["com.docker.compose.project"] == $p)
-        | "\(.Labels["com.docker.compose.service"])\t\(.Status)\t\(.Image)"')
-    ready=true
-    for svc in "${SERVICES[@]}"; do
-      line=$(grep -P "^${svc}\t" <<<"$report" || true)
-      [[ "$line" == *"(healthy)"* ]] || ready=false
-      if [ "$svc" != postgres ] && [[ "$line" != *":$1" ]]; then ready=false; fi
-    done
-    if $ready; then
+    report=$(read_containers)
+    if containers_ready "$1" "$report"; then
       printf '   %s\n' "${report//$'\n'/$'\n   '}"
       return 0
     fi
@@ -88,6 +99,13 @@ wait_for_containers() {
   done
   printf '   %s\n' "${report//$'\n'/$'\n   '}"
   return 1
+}
+
+# Whether the failed deploy never replaced anything: the previous version still serves the site.
+previous_still_running() {
+  [ -n "$PREV_TAG" ] &&
+    containers_ready "$PREV_TAG" "$(read_containers)" &&
+    curl -fs --max-time 10 "$HEALTH_URL" | grep -q '"database":"up"'
 }
 
 # Wait until the public health check says the database is up. Prints its body; retries go to stderr.
@@ -127,6 +145,11 @@ restore_previous() {
 
 fail() {
   echo "❌ $1"
+  if previous_still_running; then
+    echo "✅ Nothing was replaced: ${PREV_TAG} is still running and healthy, so it was left alone."
+    echo "::warning::Portainer shows the stack as failed until the next deploy, and that deploy stops the containers first (a short outage). Don't press Update the stack until the cause is fixed: it would retry the failed version."
+    exit 1
+  fi
   restore_previous
   exit 1
 }
@@ -138,6 +161,9 @@ PREV_FILE=$(mktemp)
 trap 'rm -f "$PREV_FILE"' EXIT
 api "${STACK_URL}/file" | jq -j '.StackFileContent' >"$PREV_FILE"
 echo "   currently deployed: ${PREV_TAG:-none}"
+if [ "$(jq -r '.DeploymentStatus[-1].Status // empty' <<<"$STACK")" = 4 ]; then
+  echo "::warning::Portainer has this stack as failed, so it will stop the containers before deploying (a short outage)."
+fi
 
 missing=$(missing_variables)
 if [ -n "$missing" ]; then
