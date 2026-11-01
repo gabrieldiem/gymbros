@@ -38,6 +38,11 @@ HISTORY_KEY = "ln_history"
 FEED_WINDOW = timedelta(days=10)
 
 
+def load_demo_crew() -> dict[str, Any]:
+    """The demo crew, its members and their planned history (`resources/demo_crew.json`)."""
+    return json.loads(DEMO_CREW_PATH.read_text(encoding="utf-8"))
+
+
 @dataclass(frozen=True, slots=True)
 class SeedResult:
     """What the seed created. Existing rows are left untouched."""
@@ -77,7 +82,7 @@ class DemoSeedService:
         self._now = now
         self._weekly_target = weekly_target
         self._bodyweight_kg = bodyweight_kg
-        self._data = data or json.loads(DEMO_CREW_PATH.read_text(encoding="utf-8"))
+        self._data = data or load_demo_crew()
         self._badges: BadgeService | None = badges[0] if badges else None
         self._badge_rows: BadgeRepository | None = badges[1] if badges else None
 

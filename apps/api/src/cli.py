@@ -1,12 +1,14 @@
 """Operator commands. Run from the api's src directory (in the container: /app).
 
 python cli.py seed-demo                                   # the five-person demo crew
+python cli.py seed-e2e                                    # rebuild the e2e crews (one per viewport)
 python cli.py create-crew "ATUS" America/Argentina/Buenos_Aires
 """
 
 import argparse
 import asyncio
 import sys
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,12 +22,13 @@ from db.repositories.workout_repository import WorkoutRepository
 from db.repositories.badge_repository import BadgeRepository
 from dependencies import build_badge_service, password_hasher, session_factory, settings
 from services.crew_service import CrewService
-from services.demo_seed_service import DemoSeedService, SeedRepositories
+from services.demo_seed_service import DemoSeedService, SeedRepositories, load_demo_crew
+from services.e2e_crews import E2E_PROJECTS, e2e_crew
 from services.errors import DomainError
 
 
-def build_demo_seed(session: AsyncSession) -> DemoSeedService:
-    """The demo seed wired to a session and the configured game settings."""
+def build_demo_seed(session: AsyncSession, data: dict[str, Any] | None = None) -> DemoSeedService:
+    """The demo seed (or another crew built from `data`) wired to a session and the settings."""
     repos = SeedRepositories(
         users=UserRepository(session),
         crews=CrewRepository(session),
@@ -40,6 +43,7 @@ def build_demo_seed(session: AsyncSession) -> DemoSeedService:
         utc_now,
         weekly_target=settings.game_weekly_target,
         bodyweight_kg=settings.game_bodyweight_kg,
+        data=data,
         badges=(build_badge_service(session), BadgeRepository(session)),
     )
 
@@ -55,6 +59,17 @@ async def seed_demo(reset: bool) -> str:
     return f"Demo crew {result.crew.name!r} (invite code {result.crew.invite_code}): {created}"
 
 
+async def seed_e2e() -> str:
+    """Delete and rebuild one e2e crew per Playwright project, so every run starts clean."""
+    invites = []
+    async with session_factory() as session, session.begin():
+        for project in E2E_PROJECTS:
+            service = build_demo_seed(session, e2e_crew(load_demo_crew(), project))
+            await service.reset()
+            invites.append((await service.seed()).crew.invite_code)
+    return f"E2E crews rebuilt: {', '.join(invites)}"
+
+
 async def create_crew(name: str, time_zone: str) -> str:
     """Create a crew and print its invite code."""
     async with session_factory() as session, session.begin():
@@ -67,6 +82,7 @@ def _parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     seed = commands.add_parser("seed-demo", help="Create the demo crew with history (not in prod)")
     seed.add_argument("--reset", action="store_true", help="Delete the demo crew first")
+    commands.add_parser("seed-e2e", help="Rebuild the e2e crews from the demo data (not in prod)")
     create = commands.add_parser("create-crew", help="Create a crew and print its invite code")
     create.add_argument("name")
     create.add_argument("time_zone", help="IANA name, e.g. America/Argentina/Buenos_Aires")
@@ -76,12 +92,14 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str]) -> int:
     """Entry point. Returns the process exit code."""
     args = _parser().parse_args(argv)
-    if args.command == "seed-demo" and settings.app_env == "production":
+    if args.command in ("seed-demo", "seed-e2e") and settings.app_env == "production":
         print("Refusing to seed demo accounts in production.", file=sys.stderr)
         return 1
     try:
         if args.command == "seed-demo":
             message = asyncio.run(seed_demo(args.reset))
+        elif args.command == "seed-e2e":
+            message = asyncio.run(seed_e2e())
         else:
             message = asyncio.run(create_crew(args.name, args.time_zone))
     except DomainError as error:
