@@ -33,7 +33,9 @@ export default defineConfig({
       },
       workbox: {
         // The app shell only: API calls always go to the network.
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Fonts: only the latin subset (covers English and Spanish). The latin-ext and
+        // vietnamese files stay in the font CSS and load on demand via unicode-range.
+        globPatterns: ['**/*.{js,css,html,svg,png}', '**/*-latin-[0-9]*.woff2'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
