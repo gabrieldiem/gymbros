@@ -8,8 +8,6 @@ from main import app
 from db.repositories.crew_repository import CrewRepository
 from services.crew_service import CrewService
 
-PASSWORD = "climbing-pw"
-
 
 @pytest.fixture
 async def crew(db_session):
@@ -20,12 +18,12 @@ async def crew(db_session):
 
 @pytest.fixture
 def register(client):
-    """POST /api/auth/register with sensible defaults."""
+    """Sign up through the dev login, with sensible defaults."""
 
     async def _register(**overrides):
-        body = {"email": "gabi@example.com", "password": PASSWORD, "display_name": "Gabi"}
+        body = {"email": "gabi@example.com", "display_name": "Gabi"}
         body.update(overrides)
-        return await client.post("/api/auth/register", json=body)
+        return await client.post("/api/auth/dev-login", json=body)
 
     return _register
 
@@ -34,7 +32,7 @@ def register(client):
 async def member(register, crew):
     """Gabi, signed in on `client`, in the Iron Ridge crew."""
     response = await register(invite_code="IRONRIDGE")
-    assert response.status_code == 201
+    assert response.status_code == 200
     return response.json()
 
 
@@ -47,9 +45,9 @@ async def other_client(client):
 
 async def register_on(http_client, email: str, invite_code: str | None = None):
     """Register another user on a given client."""
-    body = {"email": email, "password": PASSWORD, "display_name": email.split("@")[0].title()}
+    body = {"email": email, "display_name": email.split("@")[0].title()}
     if invite_code:
         body["invite_code"] = invite_code
-    response = await http_client.post("/api/auth/register", json=body)
-    assert response.status_code == 201
+    response = await http_client.post("/api/auth/dev-login", json=body)
+    assert response.status_code == 200
     return response.json()

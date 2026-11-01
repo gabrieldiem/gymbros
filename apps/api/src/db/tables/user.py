@@ -16,7 +16,9 @@ class User(Base):  # pylint: disable=too-few-public-methods
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(254), unique=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # Unused since Google sign-in; a later migration drops it.
+    password_hash: Mapped[str | None] = mapped_column(String(255))
+    google_sub: Mapped[str | None] = mapped_column(String(255), unique=True)
     display_name: Mapped[str] = mapped_column(String(24))
     initials: Mapped[str] = mapped_column(String(2))
     color: Mapped[str] = mapped_column(String(16))

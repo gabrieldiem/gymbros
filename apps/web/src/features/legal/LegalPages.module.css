@@ -1,0 +1,24 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  line-height: 1.5;
+}
+
+.page section {
+  display: grid;
+  gap: 6px;
+}
+
+.updated {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.back {
+  display: inline-block;
+  min-height: var(--touch);
+  padding: 12px 0;
+  color: var(--chalk);
+  font-weight: 600;
+}

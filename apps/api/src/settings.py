@@ -34,6 +34,14 @@ class Settings:
     session_secret: str = ""
     cookie_secure: bool = False
     run_migrations_on_startup: bool = False
+    # Where browsers reach the app. Google redirects back here, so it never comes from a header.
+    public_url: str = "http://localhost:5173"
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    resend_api_key: str = ""
+    email_from: str = "GYMBROS <hola@contact.gabrieldiem.com>"
+    # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
+    dev_login_enabled: bool = False
 
     # --- Game tuning (settings.json, env overrides) ---
     game_weekly_target: int = 3
@@ -145,6 +153,12 @@ class Settings:
         self.run_migrations_on_startup = self._env_bool(
             "RUN_MIGRATIONS_ON_STARTUP", self.run_migrations_on_startup
         )
+        self.public_url = (os.getenv("PUBLIC_URL", "") or self.public_url).rstrip("/")
+        self.google_client_id = os.getenv("GOOGLE_CLIENT_ID", self.google_client_id)
+        self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET", self.google_client_secret)
+        self.resend_api_key = os.getenv("RESEND_API_KEY", self.resend_api_key)
+        self.email_from = os.getenv("EMAIL_FROM", "") or self.email_from
+        self.dev_login_enabled = self._env_bool("DEV_LOGIN_ENABLED", self.dev_login_enabled)
         for key in self._JSON_KEYS:
             setattr(self, key, self._env_override(key))
 
@@ -158,12 +172,19 @@ class Settings:
             raise ValueError("SESSION_SECRET is required")
         if self.app_env == "production" and len(self.session_secret) < 32:
             raise ValueError("SESSION_SECRET must be at least 32 characters in production")
+        if self.app_env == "production" and self.dev_login_enabled:
+            raise ValueError("DEV_LOGIN_ENABLED must not be set in production")
         if self.game_weekly_target < 1 or self.game_rank_step < 1:
             raise ValueError("game.weekly_target and game.rank_step must be positive")
         if self.scoring_volume_kg_per_point < 1:
             raise ValueError("scoring.volume_kg_per_point must be positive")
         if self.social_notification_days < 1:
             raise ValueError("social.notification_days must be positive")
+
+    @property
+    def google_enabled(self) -> bool:
+        """Whether Google sign-in has its client credentials."""
+        return bool(self.google_client_id and self.google_client_secret)
 
     @property
     def database_url(self) -> str:

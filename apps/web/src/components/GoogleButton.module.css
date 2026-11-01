@@ -1,0 +1,22 @@
+/* Colors from Google's sign-in branding guidelines (dark theme). */
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: var(--btn-h);
+  padding: 0 20px;
+  border: 1px solid #8e918f;
+  border-radius: var(--r-control);
+  background: #131314;
+  color: #e3e3e3;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.button:active {
+  transform: scale(0.98);
+}

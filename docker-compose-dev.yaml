@@ -9,6 +9,13 @@ name: gymbros-dev
 
 x-api-env: &api-env
   APP_ENV: ${APP_ENV:-development}
+  PUBLIC_URL: ${PUBLIC_URL:-http://localhost:5173}
+  # Email-only sign-in for demo and e2e accounts. Production refuses to start with it.
+  DEV_LOGIN_ENABLED: ${DEV_LOGIN_ENABLED:-true}
+  GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+  GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  EMAIL_FROM: ${EMAIL_FROM:-}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   POSTGRES_HOST: postgres
   POSTGRES_PORT: 5432

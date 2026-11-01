@@ -26,7 +26,6 @@ from services.catalog import load_catalog
 from services.crew_service import CrewService
 from services.member import Member
 from services.demo_history import MemberStats, PlannedWorkout, plan_history
-from services.password_hasher import PasswordHasher
 from services.scoring_types import RecordSet
 from services.training_rules import effective_load, estimated_1rm, week_start
 from services.workout_mapping import to_rows
@@ -69,7 +68,6 @@ class DemoSeedService:
     def __init__(
         self,
         repos: SeedRepositories,
-        hasher: PasswordHasher,
         now: Callable[[], datetime],
         weekly_target: int,
         bodyweight_kg: float,
@@ -78,7 +76,6 @@ class DemoSeedService:
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._repos = repos
-        self._hasher = hasher
         self._now = now
         self._weekly_target = weekly_target
         self._bodyweight_kg = bodyweight_kg
@@ -89,11 +86,10 @@ class DemoSeedService:
     async def seed(self) -> SeedResult:
         """Create the crew, then every member not already registered, with their history."""
         crew = await self._ensure_crew()
-        password_hash = await self._hasher.hash(self._data["password"])
         created = []
         for member in self._data["members"]:
             if await self._repos.users.get_by_email(member["email"]) is None:
-                user = await self._add_member(crew, member, password_hash)
+                user = await self._add_member(crew, member)
                 await self._add_history(crew, user, member)
                 await self._mark_earned_badges(crew, user)
                 created.append(member["key"])
@@ -128,10 +124,9 @@ class DemoSeedService:
         service = CrewService(self._repos.crews)
         return await service.create(spec["name"], spec["time_zone"], spec["invite_code"])
 
-    async def _add_member(self, crew: Crew, member: dict[str, Any], password_hash: str) -> User:
+    async def _add_member(self, crew: Crew, member: dict[str, Any]) -> User:
         user = User(
             email=member["email"],
-            password_hash=password_hash,
             display_name=member["display_name"],
             initials=member["initials"],
             color=member["color"],

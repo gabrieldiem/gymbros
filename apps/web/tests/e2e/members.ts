@@ -5,8 +5,6 @@ import { expect, type Page, type TestInfo } from '@playwright/test';
 // member. Within a project each spec logs in as its own member.
 export type MemberKey = 'gabi' | 'maxo' | 'santi' | 'jose' | 'matex';
 
-export const E2E_PASSWORD = 'climb-demo-2026';
-
 export function memberEmail(member: MemberKey, testInfo: TestInfo): string {
   return `${member}@${testInfo.project.name}.e2e.gymbros.app`;
 }
@@ -15,7 +13,6 @@ export function memberEmail(member: MemberKey, testInfo: TestInfo): string {
 export async function logIn(page: Page, member: MemberKey, testInfo: TestInfo) {
   await page.goto('/login');
   await page.getByLabel('Email').fill(memberEmail(member, testInfo));
-  await page.getByLabel('Password').fill(E2E_PASSWORD);
   await page.getByRole('button', { name: /Log in|Entrar/ }).click();
   await expect(page).toHaveURL(/\/climb$/);
 }

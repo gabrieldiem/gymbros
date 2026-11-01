@@ -27,14 +27,11 @@
   margin-top: 8px;
 }
 
-.switch {
-  text-align: center;
-}
-
-.switch a {
-  display: inline-block;
-  min-height: var(--touch);
-  padding: 12px 4px;
-  color: var(--chalk);
+.error {
+  padding: 12px 14px;
+  border-radius: var(--r-control);
+  background: var(--red-tint);
+  color: var(--red-text);
   font-weight: 600;
+  font-size: var(--fs-small);
 }

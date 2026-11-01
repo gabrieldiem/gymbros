@@ -25,7 +25,7 @@ routes/       → FastAPI routers. HTTP concerns only: parse, authorize, call a 
 services/     → Business logic. Scoring, PRs, goal weeks, ranks, quests, badges, bounty, duels
 models/       → Pydantic request/response models (the API contract)
 db/           → SQLAlchemy tables, async session, repositories (all SQL lives here)
-clients/      → External clients (email, push), added only when needed
+clients/      → External clients: Google OAuth, Resend email. Added only when needed
 controller/   → root and /health
 resources/    → seed data: exercise catalog, routines, badge and quest definitions
 ```

@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { markCrewWelcomePending } from '../features/auth/crewWelcome';
 import { apiRequest } from './client';
 import { meKey } from './me';
-import type { LoginBody, Me, RegisterBody } from './types';
+import type { AuthOptions, DevLoginBody, Me } from './types';
 
 /**
  * Every auth mutation answers with the new /api/me body; put it straight in the cache and let
@@ -20,16 +20,23 @@ function useMeMutation<TBody>(request: (body: TBody) => Promise<Me>, joinsCrew =
   });
 }
 
-export function useLogin() {
-  return useMeMutation((body: LoginBody) =>
-    apiRequest<Me>('/auth/login', { method: 'POST', body }),
-  );
+/** Which ways to sign in this server offers. They only change with a deploy. */
+export function useAuthOptions() {
+  return useQuery({
+    queryKey: ['auth', 'options'],
+    queryFn: ({ signal }) => apiRequest<AuthOptions>('/auth/options', { signal }),
+    staleTime: Infinity,
+  });
 }
 
-export function useRegister() {
-  return useMeMutation(
-    (body: RegisterBody) => apiRequest<Me>('/auth/register', { method: 'POST', body }),
-    true,
+/** Full-page navigation: the API redirects to Google and back, so this is not a fetch. */
+export function googleSignInUrl(language: string): string {
+  return `/api/auth/google/start?lang=${encodeURIComponent(language)}`;
+}
+
+export function useDevLogin() {
+  return useMeMutation((body: DevLoginBody) =>
+    apiRequest<Me>('/auth/dev-login', { method: 'POST', body }),
   );
 }
 

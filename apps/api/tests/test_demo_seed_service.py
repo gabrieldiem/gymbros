@@ -7,7 +7,6 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
 from services.demo_seed_service import DEMO_CREW_PATH, DemoSeedService
-from dependencies import password_hasher
 
 
 def _service(db_session) -> DemoSeedService:
@@ -29,12 +28,11 @@ async def test_seed_is_idempotent(db_session):
     assert second.created_members == ()
 
 
-async def test_seeded_members_can_log_in(db_session):
+async def test_seeded_members_have_no_password(db_session):
     await _service(db_session).seed()
-    data = json.loads(DEMO_CREW_PATH.read_text(encoding="utf-8"))
     user = await UserRepository(db_session).get_by_email("maxo@demo.gymbros.app")
     assert user is not None
-    assert await password_hasher.verify(user.password_hash, data["password"])
+    assert user.password_hash is None
 
 
 def test_demo_numbers_match_the_prototype():

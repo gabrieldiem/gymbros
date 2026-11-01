@@ -40,30 +40,77 @@ export const es = {
   w3_body: 'Duelos, recompensas, retos y mucho pique.',
   w_title: 'Esto es {crew}',
   w_cta: 'Vamos',
-  create_account: 'Crear cuenta',
-  have_account: 'Ya tengo cuenta',
-  no_account: '¿Eres nuevo? Crea una cuenta',
   login_title: 'Hola de nuevo',
   login_sub: 'Entra para seguir subiendo.',
+  continue_google: 'Continuar con Google',
+  err_google_failed: 'No se pudo entrar con Google. Prueba de nuevo.',
+  dev_login: 'Acceso de desarrollo',
+  dev_login_hint: 'Solo en desarrollo: cualquier email entra.',
+  legal_notice: 'Al entrar aceptas:',
+  legal_terms: 'Términos del servicio',
+  legal_privacy: 'Política de privacidad',
+  legal_updated: 'Última actualización: 1 de noviembre de 2026',
+  legal_back: 'Volver a GYMBROS',
+  privacy_intro:
+    'GYMBROS es un registro de entrenos para pequeños equipos de amigos, gestionado por Gabriel Diem. Esta página explica qué guarda y por qué.',
+  privacy_collect_h: 'Qué recogemos',
+  privacy_collect:
+    'De Google, al entrar: tu nombre, tu email y el ID de tu cuenta de Google. Nunca vemos tu contraseña de Google. De ti: tus entrenos, sets, pesos, comentarios, reacciones, duelos y ajustes. De la propia app: tus puntos, rangos, PR, insignias y notificaciones.',
+  privacy_google_h: 'Datos de usuario de Google',
+  privacy_google:
+    'Cuando entras con Google, GYMBROS accede a tu nombre, tu email y el ID de tu cuenta de Google, y a nada más de tu cuenta de Google. Los usamos solo para identificarte, crear tu cuenta, mostrar tu nombre a tu equipo y enviarte el email de bienvenida. Los guardamos en nuestra base de datos hasta que nos pidas borrar tu cuenta. Amazon Web Services aloja esa base de datos, y Resend recibe tu nombre y tu email para entregar ese email. No los compartimos con nadie más, aparte de mostrar tu nombre a tu equipo. No vendemos los datos de usuario de Google, ni los usamos para publicidad o para entrenar modelos de IA.',
+  privacy_use_h: 'Para qué lo usamos',
+  privacy_use:
+    'Solo para que GYMBROS funcione: para que entres, puntuar tus entrenos, mostrar la clasificación de tu equipo, enviarte notificaciones dentro de la app y un email de bienvenida. No hay anuncios ni herramientas de analítica, y no vendemos tus datos.',
+  privacy_who_h: 'Quién puede verlo',
+  privacy_who:
+    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, insignias, comentarios y reacciones. Tu email no se le muestra. Tres proveedores tratan datos para nosotros: Google (inicio de sesión), Resend (envío de emails) y Amazon Web Services (alojamiento, en Brasil). Solo compartimos algo más si la ley lo exige.',
+  privacy_cookies_h: 'Cookies y almacenamiento del navegador',
+  privacy_cookies:
+    'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma y algunas preferencias de la app. Nada se usa para rastrearte.',
+  privacy_keep_h: 'Cuánto tiempo lo guardamos',
+  privacy_keep:
+    'Tu cuenta y tus entrenos se guardan hasta que nos pidas borrarlos. Las notificaciones pueden eliminarse cuando cumplen 60 días, y las sesiones caducadas se eliminan con el tiempo.',
+  privacy_rights_h: 'Qué puedes hacer',
+  privacy_rights:
+    'Puedes cambiar tu nombre, color, idioma y tiempo de descanso en los ajustes de la app. Para obtener una copia de tus datos, corregirlos o borrar tu cuenta con todo su contenido, escribe a {email}.',
+  privacy_kids_h: 'Menores',
+  privacy_kids: 'GYMBROS no está pensado para menores de 13 años.',
+  privacy_changes_h: 'Cambios y contacto',
+  privacy_changes:
+    'Si esta política cambia, actualizaremos la fecha de arriba. ¿Dudas? Escribe a {email}.',
+  terms_intro:
+    'Estos términos se aplican cuando usas GYMBROS, un registro de entrenos gratuito para pequeños equipos de amigos, gestionado por Gabriel Diem.',
+  terms_service_h: 'El servicio',
+  terms_service:
+    'GYMBROS es gratis. Puede cambiar o dejar de funcionar en cualquier momento, así que no es un lugar seguro para guardar tu única copia de nada.',
+  terms_account_h: 'Tu cuenta',
+  terms_account:
+    'Entras con tu propia cuenta de Google y debes tener al menos 13 años. Eres responsable de lo que ocurra con tu cuenta.',
+  terms_safety_h: 'Entrena con cabeza',
+  terms_safety:
+    'GYMBROS no es consejo médico ni profesional, y los puntos nunca son motivo para seguir con dolor. Entrenas bajo tu propia responsabilidad. Consulta a un médico si tienes dudas y para si algo te duele.',
+  terms_fair_h: 'Juego limpio',
+  terms_fair:
+    'Registra lo que hiciste de verdad y trata bien a tu equipo. Las cuentas que hagan trampas, acosen a otros o abusen del servicio pueden eliminarse. Los puntos, rangos e insignias no tienen valor económico.',
+  terms_content_h: 'Tu contenido',
+  terms_content:
+    'Lo que registras y escribes sigue siendo tuyo. Permites que GYMBROS lo guarde y lo muestre a tu equipo para que la app funcione.',
+  terms_warranty_h: 'Sin garantías',
+  terms_warranty:
+    'GYMBROS se ofrece tal cual, sin garantía de que funcione siempre ni de que tus datos nunca se pierdan. En la medida en que la ley lo permita, no respondemos de los daños derivados de su uso.',
+  terms_changes_h: 'Cambios y contacto',
+  terms_changes:
+    'Si estos términos cambian, actualizaremos la fecha de arriba, y seguir usando GYMBROS significa que los aceptas. ¿Dudas? Escribe a {email}.',
   log_in: 'Entrar',
   logging_in: 'Entrando…',
   log_out: 'Salir',
-  register_title: 'Crea tu cuenta',
-  register_sub: 'Tus amigos verán tu nombre en ATUS Climb.',
-  creating_account: 'Creando cuenta…',
-  field_name: 'Nombre',
-  field_name_hint: 'Como te llama el equipo.',
   field_email: 'Email',
-  field_password: 'Contraseña',
-  field_password_hint: 'Mínimo 8 caracteres.',
   field_invite: 'Código de invitación',
-  field_invite_hint: 'Te lo pasa quien te invitó. Puedes añadirlo después.',
   join_title: 'Únete a tu equipo',
   join_sub: 'Escribe el código que te pasó un amigo.',
   join_cta: 'Unirme',
   joining: 'Uniéndote…',
-  err_invalid_credentials: 'El email y la contraseña no coinciden.',
-  err_email_taken: 'Ya hay una cuenta con ese email. Entra con ella.',
   err_invite_code_not_found: 'Ningún equipo tiene ese código. Revísalo con tu amigo.',
   err_already_in_crew: 'Ya estás en un equipo.',
   err_invalid_input: 'Algún campo no es válido. Revísalo y prueba de nuevo.',

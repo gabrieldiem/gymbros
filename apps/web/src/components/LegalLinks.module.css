@@ -1,0 +1,16 @@
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.links a {
+  display: inline-block;
+  min-height: var(--touch);
+  padding: 12px 0;
+  color: var(--chalk);
+  font-weight: 600;
+}

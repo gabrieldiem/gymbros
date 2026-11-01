@@ -3,8 +3,6 @@ import { ApiError } from './client';
 
 /** API error codes (`{"detail": {"code": ...}}`) and the copy each one shows. */
 const CODE_MESSAGES: Record<string, MessageKey> = {
-  invalid_credentials: 'err_invalid_credentials',
-  email_taken: 'err_email_taken',
   invite_code_not_found: 'err_invite_code_not_found',
   already_in_crew: 'err_already_in_crew',
   workout_empty: 'err_workout_empty',
