@@ -153,3 +153,45 @@ describe('Log out', () => {
     );
   });
 });
+
+describe('Legal pages', () => {
+  it.each([
+    ['/privacy', 'Privacy policy', 'What we collect'],
+    ['/terms', 'Terms of service', 'Train safely'],
+  ])('%s is public, with the contact address where it applies', async (path, title, section) => {
+    mockApi({ 'GET /api/me': SIGNED_OUT });
+    renderApp(path);
+    expect(await screen.findByRole('heading', { level: 1, name: title })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 2, name: section })).toBeVisible();
+    expect(document.body.textContent).toContain('hola@contact.gabrieldiem.com');
+    expect(document.body.textContent).not.toContain('{email}');
+  });
+
+  it('stays readable for a signed-in member', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
+    renderApp('/privacy');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
+  });
+
+  it('follows the chosen language', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT });
+    renderApp('/terms');
+    await userEvent.click(await screen.findByRole('button', { name: 'ES' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Términos del servicio' }),
+    ).toBeVisible();
+  });
+
+  it('is linked from the welcome and login screens', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/welcome');
+    expect(await screen.findByRole('link', { name: 'Privacy policy' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+    expect(screen.getByRole('link', { name: 'Terms of service' })).toHaveAttribute(
+      'href',
+      '/terms',
+    );
+  });
+});

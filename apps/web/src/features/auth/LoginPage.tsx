@@ -5,6 +5,7 @@ import { useAuthOptions, useDevLogin } from '../../api/auth';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { GoogleButton } from '../../components/GoogleButton';
+import { LegalLinks } from '../../components/LegalLinks';
 import { TextField } from '../../components/TextField';
 import { useI18n } from '../../i18n/context';
 import styles from './AuthPage.module.css';
@@ -55,6 +56,7 @@ export function LoginPage() {
       )}
       {options?.google !== false && <GoogleButton />}
       {options?.dev_login && <DevLoginForm />}
+      <LegalLinks />
     </section>
   );
 }

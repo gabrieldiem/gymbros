@@ -62,6 +62,30 @@ test('Google button: starts the sign-in in the chosen language', async ({ page }
   await shoot(page, 'login-google-error', testInfo);
 });
 
+test('legal pages: public, in Spanish, nothing overflows', async ({ page }, testInfo) => {
+  await page.goto('/welcome');
+  await page.getByRole('button', { name: 'ES', exact: true }).click();
+  await page.getByRole('link', { name: 'Política de privacidad' }).click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Política de privacidad' }),
+  ).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await page.screenshot({
+    path: `${SCREENS}/privacy-es-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  await page.goto('/terms');
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Términos del servicio' }),
+  ).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await page.screenshot({
+    path: `${SCREENS}/terms-es-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+});
+
 test('member: log in, see the tabs, language follows the profile, log out', async ({
   page,
 }, testInfo) => {

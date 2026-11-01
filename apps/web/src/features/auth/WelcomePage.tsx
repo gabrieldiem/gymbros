@@ -1,6 +1,7 @@
 import { useAuthOptions } from '../../api/auth';
 import { ButtonLink } from '../../components/Button';
 import { GoogleButton } from '../../components/GoogleButton';
+import { LegalLinks } from '../../components/LegalLinks';
 import { Logo } from '../../components/Logo';
 import { useI18n } from '../../i18n/context';
 import styles from './AuthPage.module.css';
@@ -25,6 +26,7 @@ export function WelcomePage() {
           </ButtonLink>
         )}
       </div>
+      <LegalLinks />
     </section>
   );
 }

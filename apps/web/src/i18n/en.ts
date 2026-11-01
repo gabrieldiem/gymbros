@@ -44,6 +44,59 @@ export const en = {
   err_google_failed: 'Couldn’t sign in with Google. Try again.',
   dev_login: 'Dev login',
   dev_login_hint: 'Development only: any email signs in.',
+  legal_notice: 'By signing in you accept:',
+  legal_terms: 'Terms of service',
+  legal_privacy: 'Privacy policy',
+  legal_updated: 'Last updated: 1 November 2026',
+  legal_back: 'Back to GYMBROS',
+  privacy_intro:
+    'GYMBROS is a gym tracker for small crews of friends, run by Gabriel Diem. This page explains what it stores and why.',
+  privacy_collect_h: 'What we collect',
+  privacy_collect:
+    'From Google, when you sign in: your name, email address and Google account ID. We never see your Google password. From you: your workouts, sets, weights, comments, reactions, duels and settings. From the app itself: your points, ranks, PRs, badges and notifications.',
+  privacy_use_h: 'How we use it',
+  privacy_use:
+    'Only to run GYMBROS: to sign you in, score your workouts, show your crew’s standings, send in-app notifications and send you a welcome email. There are no ads and no analytics tools, and we don’t sell your data.',
+  privacy_who_h: 'Who can see it',
+  privacy_who:
+    'Your crew sees your name, workouts, points, ranks, PRs, badges, comments and reactions. Your email address isn’t shown to them. Three providers handle data for us: Google (sign-in), Resend (sending email) and Amazon Web Services (hosting, in Brazil). We only share anything else if the law requires it.',
+  privacy_cookies_h: 'Cookies and browser storage',
+  privacy_cookies:
+    'We use one cookie to keep you signed in for up to 30 days and a second one for up to 10 minutes while you sign in. Your browser also stores your language and a few app preferences. Nothing is used for tracking.',
+  privacy_keep_h: 'How long we keep it',
+  privacy_keep:
+    'Your account and workouts stay until you ask us to delete them. Notifications can be removed once they are 60 days old, and expired sessions are removed over time.',
+  privacy_rights_h: 'Your choices',
+  privacy_rights:
+    'You can change your name, color, language and rest time in the app’s settings. To get a copy of your data, correct it or delete your account and everything in it, write to {email}.',
+  privacy_kids_h: 'Children',
+  privacy_kids: 'GYMBROS isn’t meant for anyone under 13.',
+  privacy_changes_h: 'Changes and contact',
+  privacy_changes:
+    'If this policy changes, we’ll update the date above. Questions? Write to {email}.',
+  terms_intro:
+    'These terms apply when you use GYMBROS, a free gym tracker for small crews of friends, run by Gabriel Diem.',
+  terms_service_h: 'The service',
+  terms_service:
+    'GYMBROS is free. It can change or stop at any time, so it isn’t a safe place to keep your only copy of anything.',
+  terms_account_h: 'Your account',
+  terms_account:
+    'You sign in with your own Google account and must be at least 13. You’re responsible for what happens under your account.',
+  terms_safety_h: 'Train safely',
+  terms_safety:
+    'GYMBROS isn’t medical or professional advice, and points are never a reason to push through pain. You train at your own risk. Check with a doctor if you’re unsure, and stop if something hurts.',
+  terms_fair_h: 'Fair play',
+  terms_fair:
+    'Log what you actually did and be decent to your crew. Accounts that cheat, harass others or abuse the service can be removed. Points, ranks and badges have no monetary value.',
+  terms_content_h: 'Your content',
+  terms_content:
+    'What you log and write stays yours. You let GYMBROS store it and show it to your crew so the app can work.',
+  terms_warranty_h: 'No warranty',
+  terms_warranty:
+    'GYMBROS is provided as is, without guarantees that it will always work or that your data will never be lost. As far as the law allows, we aren’t liable for damage that comes from using it.',
+  terms_changes_h: 'Changes and contact',
+  terms_changes:
+    'If these terms change, we’ll update the date above, and using GYMBROS after that means you accept them. Questions? Write to {email}.',
   log_in: 'Log in',
   logging_in: 'Logging in…',
   log_out: 'Log out',
