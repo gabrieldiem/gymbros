@@ -46,6 +46,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       SESSION_SECRET: ${SESSION_SECRET}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8081}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
       interval: 10s

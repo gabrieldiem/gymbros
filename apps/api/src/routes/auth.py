@@ -86,12 +86,12 @@ async def google_callback(  # pylint: disable=too-many-arguments,too-many-positi
     """Finish signing in and land on the app. The gates send members without a crew to /join."""
     try:
         identity, attempt = await _identify(google, cookie, code, state)
+        logged_in = await auth.sign_in_with_google(identity, attempt.language)
     except GoogleSignInFailed as error:
         logger.warning("Google sign-in failed: %s", error)
         failed = _redirect(settings, FAILED_PATH)
         clear_oauth_cookie(failed, settings)
         return failed
-    logged_in = await auth.sign_in_with_google(identity, attempt.language)
     # The browser follows this redirect at once: its session must already be stored.
     await session.commit()
     if logged_in.created:

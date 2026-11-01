@@ -34,13 +34,13 @@ make install            # optional: local deps for editors and the pre-commit ho
 ```bash
 make up                 # dev stack: web http://localhost:5173, api http://localhost:8080/docs
 make seed               # demo crew "Iron Ridge" with the prototype's history
-                        # log in as gabi@demo.gymbros.app / climb-demo-2026 (also maxo, santi, jose, matex)
+                        # dev login at /login with gabi@demo.gymbros.app, no password (also maxo, santi, jose, matex)
 make seed reset=1       # rebuild the demo crew from scratch
 make crew name="ATUS" tz="America/Argentina/Buenos_Aires"   # a real crew; prints its invite code
 make down               # stop everything
 ```
 
-A real crew: create it with `make crew`, share the invite code, and everyone signs up at `/register` with it.
+A real crew: create it with `make crew`, share the invite code, and everyone signs in with Google and enters it on the join screen.
 
 ## Test it
 
@@ -58,6 +58,6 @@ make precommit          # black, pylint, mypy, eslint, prettier, tsc
 make prod               # api + postgres + nginx serving the built web app on http://localhost:8081
 ```
 
-The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters) and `COOKIE_SECURE=true` behind HTTPS. Pushing to `main` runs `.github/workflows/deploy.yml`: tests, then both images are built, Trivy-scanned and pushed to the private registry, then the Portainer stack is updated to that commit and checked live at [gymbros.gabrieldiem.com](https://gymbros.gabrieldiem.com). Production env vars are edited in Portainer; `deploy/compose.edge.yaml` is the production stack and `redeploy.yml` redeploys or rolls back an existing image tag.
+The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters), `COOKIE_SECURE=true` behind HTTPS, and `PUBLIC_URL`. Pushing to `main` runs `.github/workflows/deploy.yml`: tests, then both images are built, Trivy-scanned and pushed to the private registry, then the Portainer stack is updated to that commit and checked live at [gymbros.gabrieldiem.com](https://gymbros.gabrieldiem.com). Production needs `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` (the deploy fails without them) and optionally `RESEND_API_KEY` and `EMAIL_FROM`; Google's authorized redirect URI is `https://gymbros.gabrieldiem.com/api/auth/google/callback`. Production env vars are edited in Portainer; `deploy/compose.edge.yaml` is the production stack and `redeploy.yml` redeploys or rolls back an existing image tag.
 
 See [CLAUDE.md](CLAUDE.md#commands) for every command and the architecture.

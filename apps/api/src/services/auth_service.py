@@ -8,7 +8,7 @@ from db.repositories.user_repository import UserRepository
 from db.tables.user import User
 from services.auth_types import DevLogin, LoggedIn
 from services.crew_service import CrewService
-from services.errors import NotAuthenticated
+from services.errors import GoogleSignInFailed, NotAuthenticated
 from services.google_identity import GoogleIdentity
 from services.profile_rules import COLORS, derive_initials
 from services.session_tokens import SessionTokens
@@ -43,6 +43,9 @@ class AuthService:
             return await self._start_session(user)
         user = await self._users.get_by_email(identity.email)
         if user is not None:
+            # A different Google account now owns this address: never hand it the old account.
+            if user.google_sub is not None:
+                raise GoogleSignInFailed("the email is linked to another Google account")
             user.google_sub = identity.sub
             return await self._start_session(await self._users.save(user))
         user = await self._add_user(identity.email, identity.display_name, language, identity.sub)

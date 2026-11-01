@@ -22,6 +22,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-12` **Who hears about a goal hit** (product, S): default chosen: the rest of the crew gets "X hit the weekly goal". The finisher already sees it on the finish screen. _Added 2026-10-31_
 - [ ] `GYM-13` **Bounty rules** (game, S): default chosen: the bounty is always on the all-time leader and pays the first member to pass them each week. The prototype only said "while a bounty is active". _Added 2026-10-31_
 - [ ] `GYM-14` **Badges earned by seeded history** (product, S): default chosen: demo members get the badges their seeded history earns, with no extra points, so the prototype's totals stay exact. _Added 2026-10-31_
+- [ ] `GYM-58` **Which emails should GYMBROS send** (product, S): default chosen: only a welcome email on first sign-up, through Resend. Weekly recap, nudges or "someone passed you" by email are possible next steps, but each needs an opt-out first. _Added 2026-11-01_
 
 ## Later
 
@@ -33,8 +34,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-20` **Custom routines and exercises** (product, M): v1 ships a fixed catalog and four routines. _Added 2026-10-31_
 - [ ] `GYM-21` **Hero height on mobile** (web, S): the headline fills the first screen and pushes the map below the fold. _Added 2026-10-31_
 - [ ] `GYM-22` **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
-- [ ] `GYM-23` **Login rate limiting** (api, S): `/api/auth/login` and `/register` have no throttle. Add a per-IP and per-email limit before the app is public. _Added 2026-10-31_
-- [ ] `GYM-24` **Password reset** (product, M): there is no email client, so a forgotten password needs an operator. Add reset by email or an operator CLI command. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user and no way to leave. Needed if someone joins the wrong crew. _Added 2026-10-31_
 - [ ] `GYM-27` **Show the current PR in the logger** (web, S): the prototype shows "PR 92.5 kg × 5" next to each exercise and in the picker. Needs a PRs endpoint (Phase 5 builds one for the profile). _Added 2026-10-31_
 - [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
@@ -51,6 +50,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-41` **Crew palette contrast** (design, S): the dataviz validator flags the crew colors on the dark surface (lightness band; pink/violet ΔE 7.0 for deutan vision). Charts that use them always add a legend with names; consider a darker violet step. _Added 2026-10-31_
 - [ ] `GYM-42` **Tonnage chart y-axis** (web, S): only this week's bar is labelled (the rest via tooltip and table). Add light y ticks if people ask for exact values at a glance. _Added 2026-10-31_
 - [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
+- [ ] `GYM-57` **Feed says "Tú desbloqueó" for your own badge** (i18n+web, S): your own badge post reads "Tú desbloqueó Mes de hierro." Needs a second-person key ("Desbloqueaste …", "You unlocked …"). _Added 2026-10-31_
 
 ## Tech debt
 
@@ -59,6 +59,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-45` **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
 - [ ] `GYM-49` **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
+- [ ] `GYM-59` **Drop users.password_hash** (api, S): nothing reads it since Google sign-in. It stays nullable for one release so the migration can be rolled back; drop it once Google sign-in has worked in production, as it still holds old argon2 hashes. _Added 2026-11-01_
 
 ## Done
 
@@ -75,3 +76,5 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-51` **E2E specs share demo members**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-25` **Expired session cleanup**: every login and sign-up deletes expired `auth_sessions` rows. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-37` **Old notifications cleanup**: marking the inbox read deletes your notifications older than `social.notification_days` (60). Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-23` **Login rate limiting**: no longer applies: the password endpoints are gone and Google handles credentials. Cancelled 2026-11-01 on feat/google-auth.
+- [x] `GYM-24` **Password reset**: no longer applies: there are no passwords to reset. Cancelled 2026-11-01 on feat/google-auth.

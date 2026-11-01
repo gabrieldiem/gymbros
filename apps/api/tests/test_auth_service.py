@@ -13,7 +13,7 @@ from dependencies import session_tokens
 from services.auth_service import AuthService
 from services.auth_types import DevLogin
 from services.crew_service import CrewService
-from services.errors import NotAuthenticated
+from services.errors import GoogleSignInFailed, NotAuthenticated
 from services.google_identity import GoogleIdentity
 
 GABI = GoogleIdentity("google-gabi", "gabi@example.com", "Gabi")
@@ -76,6 +76,14 @@ async def test_an_account_with_that_email_is_linked_once(auth):
     assert linked.created is False
     assert linked.user.id == existing.user.id
     assert linked.user.google_sub == "google-gabi"
+
+
+async def test_an_email_linked_to_another_google_account_is_refused(auth):
+    first = await auth.sign_in_with_google(GABI, "en")
+    reclaimed = GoogleIdentity("another-google-id", GABI.email, "Someone")
+    with pytest.raises(GoogleSignInFailed):
+        await auth.sign_in_with_google(reclaimed, "en")
+    assert first.user.google_sub == "google-gabi"
 
 
 async def test_the_dev_login_names_the_account_from_the_email(auth):
