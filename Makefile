@@ -11,8 +11,10 @@ API_TEST_IMAGE := gymbros-api-test
 .env:
 	cp .env.example .env
 
+# Poetry asks the system keyring for credentials, which hangs with no output in a headless
+# shell (no unlocked keyring). The api only pulls from public PyPI, so use the null backend.
 install:
-	cd apps/api && poetry install
+	cd apps/api && PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry install
 	cd apps/web && npm ci
 	pre-commit install
 

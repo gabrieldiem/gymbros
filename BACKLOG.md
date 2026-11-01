@@ -58,7 +58,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-43` **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
 - [ ] `GYM-44` **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] `GYM-45` **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
-- [ ] `GYM-46` **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
 - [ ] `GYM-47` **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. `make seed reset=1` now rebuilds the crew; run it before `make e2e` from the Makefile, or give e2e its own crew. _Added 2026-10-31_
 - [ ] `GYM-48` **E2E logs real workouts** (web, S): `tests/e2e/train.spec.ts` finishes a workout for demo members Jose and Matex on every run, so their points grow in the dev database. Same fix as the seed item: an e2e-only crew reset before each run. _Added 2026-10-31_
 - [ ] `GYM-49` **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
@@ -74,3 +73,4 @@ Move items here with the date and the commit or PR that closed them.
 
 - [x] `GYM-55` **Prototype storage has no migrations**: irrelevant now that the app has Postgres and Alembic. Closed 2026-10-31 in 8750db0.
 - [x] `GYM-28` **Rest timer length setting**: already built in Phase 5 (rest time in the You tab settings). Closed 2026-10-31 in 2b4477b.
+- [x] `GYM-46` **Poetry hangs on keyring in headless shells**: `make install` runs Poetry with the null keyring backend. Closed 2026-10-31 on chore/backlog-tech-debt.
