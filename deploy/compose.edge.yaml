@@ -1,0 +1,78 @@
+# GYMBROS in production: the Portainer stack "gymbros" on gd-edge-br (São Paulo).
+#
+# CI builds both images and pushes them to registry.gabrieldiem.com tagged with the commit SHA, then
+# deploy/portainer-deploy.sh sends this file to Portainer with IMAGE_TAG=<sha>. Caddy on the edge
+# serves https://gymbros.gabrieldiem.com and forwards to the web container (127.0.0.1:8090); web's
+# nginx proxies /api to the api service, as in docker-compose.yaml.
+#
+# Every ${VALUE} below is set in Portainer: Stacks → gymbros → Environment variables. Never put
+# values here. To pass a new variable to the api (e.g. a SCORING_PR tuning override), add it to the
+# api's environment list below as NAME: ${NAME} and set its value in Portainer.
+name: gymbros
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gymbros}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in Portainer}
+      POSTGRES_DB: ${POSTGRES_DB:-gymbros}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+      start_interval: 1s
+    mem_limit: 384m
+
+  api:
+    image: registry.gabrieldiem.com/gymbros-api:${IMAGE_TAG:?set IMAGE_TAG (a commit SHA) in Portainer}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-gymbros}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in Portainer}
+      POSTGRES_DB: ${POSTGRES_DB:-gymbros}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in Portainer}
+      COOKIE_SECURE: "true"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+      start_interval: 1s
+    mem_limit: 512m
+
+  web:
+    image: registry.gabrieldiem.com/gymbros-web:${IMAGE_TAG:?set IMAGE_TAG (a commit SHA) in Portainer}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8090:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    mem_limit: 128m
+
+volumes:
+  # A named volume (gymbros_pgdata on the edge), not a bind mount: Portainer forbids host bind mounts
+  # for the non-admin `ci` user that deploys. Stack updates keep it; only an explicit volume removal
+  # deletes the data.
+  pgdata:
