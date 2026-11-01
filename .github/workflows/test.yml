@@ -10,6 +10,14 @@ on:
   workflow_call:
 
 jobs:
+  deploy-script:
+    name: deploy script
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Test deploy and rollback against a fake Portainer
+        run: python3 deploy/test_portainer_deploy.py
+
   secret-leak-scan:
     name: secrets scan (gitleaks)
     runs-on: ubuntu-24.04
