@@ -13,9 +13,9 @@ const GOOGLE_ONLY = [200, { google: true, dev_login: false }] as const;
 const WITH_DEV_LOGIN = [200, { google: false, dev_login: true }] as const;
 
 describe('Signing in', () => {
-  it('offers Google on the welcome screen, in the current language', async () => {
+  it('offers Google on the landing page, in the current language', async () => {
     mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
-    renderApp('/welcome');
+    renderApp('/');
     const link = await screen.findByRole('link', { name: 'Continue with Google' });
     expect(link).toHaveAttribute('href', '/api/auth/google/start?lang=en');
     await userEvent.click(screen.getByRole('button', { name: 'ES' }));
@@ -23,7 +23,6 @@ describe('Signing in', () => {
       'href',
       '/api/auth/google/start?lang=es',
     );
-    expect(screen.queryByRole('link', { name: 'Dev login' })).toBeNull();
   });
 
   it('never asks for a password', async () => {
@@ -49,12 +48,14 @@ describe('Signing in', () => {
 
   it('hides the Google button when the server has no credentials', async () => {
     mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...WITH_DEV_LOGIN] });
-    renderApp('/welcome');
-    await screen.findByRole('link', { name: 'Dev login' });
-    expect(screen.queryByRole('link', { name: 'Continue with Google' })).toBeNull();
+    renderApp('/');
+    await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' });
+    await waitFor(() =>
+      expect(screen.queryByRole('link', { name: 'Continue with Google' })).toBeNull(),
+    );
   });
 
-  it('sends old register links to the welcome screen', async () => {
+  it('sends old register and welcome links to the landing page', async () => {
     mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
     renderApp('/register');
     expect(
@@ -182,9 +183,9 @@ describe('Legal pages', () => {
     ).toBeVisible();
   });
 
-  it('is linked from the welcome and login screens', async () => {
+  it('is linked from the landing and login screens', async () => {
     mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
-    renderApp('/welcome');
+    renderApp('/');
     expect(await screen.findByRole('link', { name: 'Privacy policy' })).toHaveAttribute(
       'href',
       '/privacy',

@@ -1,0 +1,134 @@
+/* Mobile first: headline and sign-in, then the map, the rope order and how it works. */
+.page {
+  width: 100%;
+  max-width: 1240px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: calc(10px + var(--safe-top)) 18px calc(10px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logIn {
+  min-height: var(--touch);
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.main {
+  flex: 1;
+  display: grid;
+  gap: 28px;
+}
+
+.main > * {
+  min-width: 0;
+}
+
+.intro {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.intro h1 {
+  font-size: var(--fs-hero);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 0.9;
+}
+
+.intro p {
+  max-width: 44ch;
+  font-size: 1.02rem;
+  color: var(--smoke);
+}
+
+.sample {
+  margin-top: 10px;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.how {
+  display: grid;
+  gap: 14px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 24px;
+  margin-top: 36px;
+  padding-top: 10px;
+  border-top: 1px solid var(--steel);
+}
+
+.repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  color: var(--chalk);
+  font-weight: 600;
+  font-size: var(--fs-small);
+}
+
+/* Wide: the map takes the right column at full height, and the text stacks beside it. */
+@media (min-width: 1120px) {
+  .page {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+
+  .main {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'intro map'
+      'rope map'
+      'how how';
+    grid-template-rows: auto 1fr auto;
+    column-gap: 56px;
+  }
+
+  .intro {
+    grid-area: intro;
+    padding-top: 24px;
+  }
+
+  .map {
+    grid-area: map;
+  }
+
+  .rope {
+    grid-area: rope;
+  }
+
+  .how {
+    grid-area: how;
+    margin-top: 12px;
+  }
+
+  .how ol {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+  }
+}

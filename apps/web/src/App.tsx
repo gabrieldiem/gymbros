@@ -6,11 +6,11 @@ import { Gate } from './features/auth/Gate';
 import { HelloPage } from './features/auth/HelloPage';
 import { JoinPage } from './features/auth/JoinPage';
 import { LoginPage } from './features/auth/LoginPage';
-import { WelcomePage } from './features/auth/WelcomePage';
 import { ClimbPage } from './features/climb/ClimbPage';
 import { CrewPage } from './features/crew/CrewPage';
 import { MePage } from './features/me/MePage';
 import { NotFoundPage } from './features/NotFoundPage';
+import { LandingPage } from './features/landing/LandingPage';
 import { PrivacyPage, TermsPage } from './features/legal/LegalPages';
 import { QuestsPage } from './features/quests/QuestsPage';
 import { TrainPage } from './features/train/TrainPage';
@@ -18,11 +18,12 @@ import { TrainPage } from './features/train/TrainPage';
 export function App() {
   return (
     <Routes>
+      <Route index element={<LandingPage />} />
+      <Route path="welcome" element={<Navigate to="/" replace />} />
+      <Route path="register" element={<Navigate to="/" replace />} />
       <Route element={<AuthLayout />}>
         <Route element={<Gate allow="guest" />}>
-          <Route path="welcome" element={<WelcomePage />} />
           <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<Navigate to="/welcome" replace />} />
         </Route>
         <Route path="privacy" element={<PrivacyPage />} />
         <Route path="terms" element={<TermsPage />} />
@@ -35,7 +36,6 @@ export function App() {
       </Route>
       <Route element={<Gate allow="member" />}>
         <Route element={<AppShell />}>
-          <Route index element={<Navigate to="/climb" replace />} />
           <Route path="climb" element={<ClimbPage />} />
           <Route path="crew" element={<CrewPage />} />
           <Route path="train" element={<TrainPage />} />

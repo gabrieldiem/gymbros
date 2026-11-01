@@ -14,3 +14,13 @@
   color: var(--chalk);
   font-weight: 600;
 }
+
+.links span {
+  flex-basis: 100%;
+}
+
+@media (min-width: 700px) {
+  .links span {
+    flex-basis: auto;
+  }
+}
