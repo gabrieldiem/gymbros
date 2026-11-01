@@ -54,6 +54,9 @@ export const en = {
   privacy_collect_h: 'What we collect',
   privacy_collect:
     'From Google, when you sign in: your name, email address and Google account ID. We never see your Google password. From you: your workouts, sets, weights, comments, reactions, duels and settings. From the app itself: your points, ranks, PRs, badges and notifications.',
+  privacy_google_h: 'Google user data',
+  privacy_google:
+    'When you sign in with Google, GYMBROS accesses your name, email address and Google account ID, and nothing else from your Google account. We use them only to identify you, create your account, show your name to your crew and send your welcome email. We store them in our database until you ask us to delete your account. Amazon Web Services hosts that database, and Resend receives your name and email address to deliver that email. We don’t share them with anyone else, apart from showing your name to your crew. We don’t sell Google user data, use it for advertising or use it to train AI models.',
   privacy_use_h: 'How we use it',
   privacy_use:
     'Only to run GYMBROS: to sign you in, score your workouts, show your crew’s standings, send in-app notifications and send you a welcome email. There are no ads and no analytics tools, and we don’t sell your data.',
