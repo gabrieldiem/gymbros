@@ -38,7 +38,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-25` **Expired session cleanup** (api, S): expired `auth_sessions` rows are ignored but never deleted. Delete them on login or in a periodic job. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user and no way to leave. Needed if someone joins the wrong crew. _Added 2026-10-31_
 - [ ] `GYM-27` **Show the current PR in the logger** (web, S): the prototype shows "PR 92.5 kg × 5" next to each exercise and in the picker. Needs a PRs endpoint (Phase 5 builds one for the profile). _Added 2026-10-31_
-- [ ] `GYM-28` **Rest timer length setting** (web, S): fixed at 90 s. Make it a user setting (Phase 5 settings). _Added 2026-10-31_
 - [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
 - [ ] `GYM-30` **Prototype: first-time PR** (docs, S): the prototype awards 100 pts for the first log of an exercise; the app does not (see Decide). Note it if the prototype is kept. _Added 2026-10-31_
 - [ ] `GYM-31` **Climber sheet** (web, M): tapping a marker or rope row in the prototype opens a profile sheet (head to head, last workout, best lift, gap, Start a duel, Nudge). Duels and nudges arrive in Phases 4–5; build the sheet then. _Added 2026-10-31_
@@ -74,3 +73,4 @@ Product or technical decisions that are still open. If one blocks work, pick the
 Move items here with the date and the commit or PR that closed them.
 
 - [x] `GYM-55` **Prototype storage has no migrations**: irrelevant now that the app has Postgres and Alembic. Closed 2026-10-31 in 8750db0.
+- [x] `GYM-28` **Rest timer length setting**: already built in Phase 5 (rest time in the You tab settings). Closed 2026-10-31 in 2b4477b.
