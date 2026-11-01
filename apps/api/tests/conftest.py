@@ -16,6 +16,12 @@ os.environ.setdefault("SESSION_SECRET", "test-session-secret-at-least-32-charact
 os.environ["APP_ENV"] = "test"
 os.environ["POSTGRES_DB"] = os.getenv("TEST_POSTGRES_DB", "gymbros_test")
 os.environ["RUN_MIGRATIONS_ON_STARTUP"] = "false"
+# Forced so a developer's .env can never make the suite talk to Google or send real email.
+os.environ["DEV_LOGIN_ENABLED"] = "true"
+os.environ["GOOGLE_CLIENT_ID"] = "test-client-id"
+os.environ["GOOGLE_CLIENT_SECRET"] = "test-client-secret"
+os.environ["RESEND_API_KEY"] = ""
+os.environ["PUBLIC_URL"] = "https://app.example.com"
 
 # pylint: disable=wrong-import-position,redefined-outer-name
 from typing import AsyncIterator  # noqa: E402

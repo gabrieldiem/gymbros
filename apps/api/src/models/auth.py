@@ -1,28 +1,26 @@
-"""Request models for sign-up and login."""
+"""Request and response models for signing in."""
 
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field, StringConstraints
+from pydantic import BaseModel, EmailStr, StringConstraints
 from typing_extensions import Annotated
 
 DisplayName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=24)]
-Password = Annotated[str, Field(min_length=8, max_length=128)]
 InviteCode = Annotated[str, StringConstraints(strip_whitespace=True, min_length=4, max_length=20)]
 Language = Literal["en", "es"]
 
 
-class RegisterRequest(BaseModel):
-    """Create an account. With an invite code, the new user joins that crew too."""
+class DevLoginRequest(BaseModel):
+    """Sign in by email alone (demo and e2e accounts; never available in production)."""
 
     email: EmailStr
-    password: Password
-    display_name: DisplayName
     language: Language = "en"
+    display_name: DisplayName | None = None
     invite_code: InviteCode | None = None
 
 
-class LoginRequest(BaseModel):
-    """Email and password."""
+class AuthOptionsResponse(BaseModel):
+    """Which ways to sign in this server offers."""
 
-    email: EmailStr
-    password: Annotated[str, Field(min_length=1, max_length=128)]
+    google: bool
+    dev_login: bool

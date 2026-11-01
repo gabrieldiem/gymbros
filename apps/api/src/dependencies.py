@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from clients.google_oauth_client import GoogleOAuthClient
+from clients.resend_client import ResendEmailClient
 from clock import utc_now
 from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
@@ -43,13 +45,14 @@ from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.notifier import Notifier
 from services.nudge_service import NudgeService
-from services.password_hasher import Argon2PasswordHasher
+from services.google_identity import GoogleSignIn
 from services.profile_service import ProfileService
 from services.quest_service import QuestService
 from services.recap_service import RecapService
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
+from services.welcome_email import EmailSender
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
 from services.workout_service import WorkoutService
@@ -61,7 +64,6 @@ engine: AsyncEngine = create_async_engine(settings.database_url, pool_pre_ping=T
 session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
     engine, expire_on_commit=False
 )
-password_hasher = Argon2PasswordHasher()
 session_tokens = SessionTokens(settings.session_secret)
 
 
@@ -102,11 +104,27 @@ def build_auth_service(session: AsyncSession) -> AuthService:
         users=UserRepository(session),
         sessions=SessionRepository(session),
         crews=CrewService(CrewRepository(session)),
-        hasher=password_hasher,
         tokens=session_tokens,
         session_ttl=timedelta(days=settings.session_max_age_days),
         now=utc_now,
     )
+
+
+def get_google_sign_in() -> GoogleSignIn | None:
+    """FastAPI dependency provider for the Google client; None until it has credentials."""
+    if not settings.google_enabled:
+        return None
+    return GoogleOAuthClient(
+        settings.google_client_id,
+        settings.google_client_secret,
+        f"{settings.public_url}/api/auth/google/callback",
+        utc_now,
+    )
+
+
+def get_email_sender() -> EmailSender:
+    """FastAPI dependency provider for sending email."""
+    return ResendEmailClient(settings.resend_api_key, settings.email_from, logger)
 
 
 def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:

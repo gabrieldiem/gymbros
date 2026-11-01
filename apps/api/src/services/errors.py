@@ -5,16 +5,12 @@ class DomainError(Exception):
     """Base class for every expected business-rule failure."""
 
 
-class InvalidCredentials(DomainError):
-    """Email and password don't match an account."""
+class GoogleSignInFailed(DomainError):
+    """The Google sign-in couldn't be completed. The message is for the log, never the user."""
 
 
 class NotAuthenticated(DomainError):
     """No valid session."""
-
-
-class EmailAlreadyRegistered(DomainError):
-    """An account with this email exists."""
 
 
 class InviteCodeNotFound(DomainError):

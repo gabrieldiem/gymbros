@@ -43,7 +43,6 @@ class Racers:
 def _user(tag: str, name: str) -> User:
     return User(
         email=f"{name.lower()}-{tag}@lock.test",
-        password_hash="x",
         display_name=name,
         initials=name[:2].upper(),
         color="teal",

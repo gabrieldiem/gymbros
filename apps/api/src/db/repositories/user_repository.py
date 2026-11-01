@@ -23,6 +23,11 @@ class UserRepository:
         result = await self._session.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 
+    async def get_by_google_sub(self, google_sub: str) -> User | None:
+        """The account linked to this Google id, if any."""
+        result = await self._session.execute(select(User).where(User.google_sub == google_sub))
+        return result.scalar_one_or_none()
+
     async def add(self, user: User) -> User:
         """Insert a user and flush so its id is assigned."""
         self._session.add(user)

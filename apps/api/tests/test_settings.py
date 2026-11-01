@@ -59,3 +59,24 @@ def test_production_requires_long_session_secret(monkeypatch):
 def test_database_url_escapes_credentials(monkeypatch):
     monkeypatch.setenv("POSTGRES_PASSWORD", "p@ss/word")
     assert ":p%40ss%2Fword@" in Settings().database_url
+
+
+def test_production_refuses_the_dev_login(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("SESSION_SECRET", "x" * 32)
+    monkeypatch.setenv("DEV_LOGIN_ENABLED", "true")
+    with pytest.raises(ValueError, match="DEV_LOGIN_ENABLED"):
+        Settings()
+
+
+def test_google_needs_both_credentials(monkeypatch):
+    monkeypatch.setenv("GOOGLE_CLIENT_ID", "id")
+    monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "")
+    assert Settings().google_enabled is False
+    monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "secret")
+    assert Settings().google_enabled is True
+
+
+def test_public_url_loses_its_trailing_slash(monkeypatch):
+    monkeypatch.setenv("PUBLIC_URL", "https://app.example.com/")
+    assert Settings().public_url == "https://app.example.com"
