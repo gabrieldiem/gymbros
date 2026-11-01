@@ -63,11 +63,29 @@ jobs:
           docker push "${IMAGE}:${GITHUB_SHA}"
           docker push "${IMAGE}:latest"
 
+  # Start the real production stack file with these images on a throwaway database, before production
+  # is touched. A red job here means the running version was never affected.
+  smoke:
+    needs: images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: prod # holds REGISTRY_CI_PASSWORD
+    steps:
+      - uses: actions/checkout@v7
+      - name: Log in to registry.gabrieldiem.com
+        uses: docker/login-action@v4
+        with:
+          registry: registry.gabrieldiem.com
+          username: ci
+          password: ${{ secrets.REGISTRY_CI_PASSWORD }}
+      - name: Start the stack and check it
+        run: deploy/smoke-test.sh "${GITHUB_SHA}"
+
   # Point the Portainer stack on gd-edge-br at the new images and wait until they are live: the job is
   # green only when both containers run this commit, are healthy, and /api/health reports the
   # database up. Env vars are managed in Portainer (Stacks → gymbros), not here.
   deploy:
-    needs: [test, images]
+    needs: [test, images, smoke]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment:

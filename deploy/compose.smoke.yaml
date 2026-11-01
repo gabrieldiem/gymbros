@@ -1,0 +1,7 @@
+# Applied on top of compose.edge.yaml by smoke-test.sh: the database lives in memory, so every run
+# starts empty and leaves nothing behind.
+volumes:
+  pgdata:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs

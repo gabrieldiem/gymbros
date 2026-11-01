@@ -3,6 +3,7 @@
 python cli.py seed-demo                                   # the five-person demo crew
 python cli.py seed-e2e                                    # rebuild the e2e crews (one per viewport)
 python cli.py create-crew "ATUS" America/Argentina/Buenos_Aires
+python cli.py migrate                                     # what the production image runs on start
 """
 
 import argparse
@@ -19,6 +20,7 @@ from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
+from db.migrate import run_migrations
 from db.repositories.badge_repository import BadgeRepository
 from dependencies import build_badge_service, session_factory, settings
 from services.crew_service import CrewService
@@ -82,6 +84,7 @@ def _parser() -> argparse.ArgumentParser:
     seed = commands.add_parser("seed-demo", help="Create the demo crew with history (not in prod)")
     seed.add_argument("--reset", action="store_true", help="Delete the demo crew first")
     commands.add_parser("seed-e2e", help="Rebuild the e2e crews from the demo data (not in prod)")
+    commands.add_parser("migrate", help="Upgrade the database, unless it is already ahead")
     create = commands.add_parser("create-crew", help="Create a crew and print its invite code")
     create.add_argument("name")
     create.add_argument("time_zone", help="IANA name, e.g. America/Argentina/Buenos_Aires")
@@ -91,6 +94,9 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str]) -> int:
     """Entry point. Returns the process exit code."""
     args = _parser().parse_args(argv)
+    if args.command == "migrate":
+        run_migrations()
+        return 0
     if args.command in ("seed-demo", "seed-e2e") and settings.app_env == "production":
         print("Refusing to seed demo accounts in production.", file=sys.stderr)
         return 1

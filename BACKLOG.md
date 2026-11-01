@@ -51,6 +51,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-42` **Tonnage chart y-axis** (web, S): only this week's bar is labelled (the rest via tooltip and table). Add light y ticks if people ask for exact values at a glance. _Added 2026-10-31_
 - [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
 - [ ] `GYM-57` **Feed says "Tú desbloqueó" for your own badge** (i18n+web, S): your own badge post reads "Tú desbloqueó Mes de hierro." Needs a second-person key ("Desbloqueaste …", "You unlocked …"). _Added 2026-10-31_
+- [ ] `GYM-60` **Blue/green deploys with no downtime** (infra, M): a version that passes the smoke test but fails in production causes an outage until the previous one is restored, up to a few minutes. Start the new version beside the old one and switch Caddy only once it is healthy. Needs room on the box for both. _Added 2026-11-01_
 
 ## Tech debt
 
