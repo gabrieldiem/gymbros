@@ -9,90 +9,104 @@ async function fill(label: string, value: string) {
   await userEvent.type(screen.getByLabelText(label), value);
 }
 
-describe('Log in', () => {
-  it('signs in and lands on ATUS Climb', async () => {
-    mockApi({ 'GET /api/me': SIGNED_OUT, 'POST /api/auth/login': [200, makeMe()] });
-    renderApp('/login');
-    await screen.findByRole('heading', { name: 'Welcome back' });
-    await fill('Email', 'gabi@example.com');
-    await fill('Password', 'climbing-pw');
-    await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
-    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
+const GOOGLE_ONLY = [200, { google: true, dev_login: false }] as const;
+const WITH_DEV_LOGIN = [200, { google: false, dev_login: true }] as const;
+
+describe('Signing in', () => {
+  it('offers Google on the welcome screen, in the current language', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/welcome');
+    const link = await screen.findByRole('link', { name: 'Continue with Google' });
+    expect(link).toHaveAttribute('href', '/api/auth/google/start?lang=en');
+    await userEvent.click(screen.getByRole('button', { name: 'ES' }));
+    expect(await screen.findByRole('link', { name: 'Continuar con Google' })).toHaveAttribute(
+      'href',
+      '/api/auth/google/start?lang=es',
+    );
+    expect(screen.queryByRole('link', { name: 'Dev login' })).toBeNull();
   });
 
-  it('shows the API error in the current language', async () => {
-    mockApi({
-      'GET /api/me': SIGNED_OUT,
-      'POST /api/auth/login': [401, { detail: { code: 'invalid_credentials' } }],
-    });
+  it('never asks for a password', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...WITH_DEV_LOGIN] });
     renderApp('/login');
-    await userEvent.click(await screen.findByRole('button', { name: 'ES' }));
-    await fill('Email', 'gabi@example.com');
-    await fill('Contraseña', 'wrong-pass');
-    await userEvent.click(screen.getByRole('button', { name: 'Entrar' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'El email y la contraseña no coinciden.',
-    );
+    await screen.findByLabelText('Email');
+    expect(screen.queryByLabelText('Password')).toBeNull();
+  });
+
+  it('explains when Google sign-in failed', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/login?auth_error=google');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Couldn’t sign in with Google');
+    expect(screen.getByRole('link', { name: 'Continue with Google' })).toBeVisible();
+  });
+
+  it('shows no error on a normal visit', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/login');
+    await screen.findByRole('link', { name: 'Continue with Google' });
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('hides the Google button when the server has no credentials', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...WITH_DEV_LOGIN] });
+    renderApp('/welcome');
+    await screen.findByRole('link', { name: 'Dev login' });
+    expect(screen.queryByRole('link', { name: 'Continue with Google' })).toBeNull();
+  });
+
+  it('sends old register links to the welcome screen', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/register');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),
+    ).toBeVisible();
   });
 });
 
-describe('Register', () => {
-  it('with an invite code: creates the account, then shows the crew welcome once', async () => {
+describe('Dev login', () => {
+  it('is hidden unless the server offers it', async () => {
+    mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
+    renderApp('/login');
+    await screen.findByRole('link', { name: 'Continue with Google' });
+    expect(screen.queryByLabelText('Email')).toBeNull();
+  });
+
+  it('signs in with an email and lands on ATUS Climb', async () => {
     const fetchMock = mockApi({
       'GET /api/me': SIGNED_OUT,
-      'POST /api/auth/register': [201, makeMe()],
+      'GET /api/auth/options': [...WITH_DEV_LOGIN],
+      'POST /api/auth/dev-login': [200, makeMe()],
     });
-    renderApp('/register');
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await fill('Name', 'Gabi');
+    renderApp('/login');
+    await screen.findByLabelText('Email');
     await fill('Email', 'gabi@example.com');
-    await fill('Password', 'climbing-pw');
-    await fill('Invite code', 'ironridge');
-    await userEvent.click(screen.getByRole('button', { name: 'Create account' }));
-
-    expect(await screen.findByRole('heading', { name: 'This is Iron Ridge' })).toBeVisible();
-    const call = fetchMock.mock.calls.find(([url]) => url === '/api/auth/register');
+    await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
+    const call = fetchMock.mock.calls.find(([url]) => url === '/api/auth/dev-login');
     expect(JSON.parse(String(call?.[1]?.body))).toEqual({
-      display_name: 'Gabi',
       email: 'gabi@example.com',
-      password: 'climbing-pw',
       language: 'en',
-      invite_code: 'ironridge',
     });
+  });
 
+  it('without a crew: goes to the join screen, then the crew welcome once', async () => {
+    mockApi({
+      'GET /api/me': SIGNED_OUT,
+      'GET /api/auth/options': [...WITH_DEV_LOGIN],
+      'POST /api/auth/dev-login': [200, makeMe({ crew: null })],
+      'POST /api/crews/join': [200, makeMe()],
+    });
+    renderApp('/login');
+    await screen.findByLabelText('Email');
+    await fill('Email', 'gabi@example.com');
+    await userEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    await screen.findByRole('heading', { name: 'Join your crew' });
+    await fill('Invite code', 'IRONRIDGE');
+    await userEvent.click(screen.getByRole('button', { name: 'Join crew' }));
+    expect(await screen.findByRole('heading', { name: 'This is Iron Ridge' })).toBeVisible();
     await userEvent.click(screen.getByRole('button', { name: 'Let’s go' }));
     expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
     expect(localStorage.getItem('gymbros.crewWelcome')).toBeNull();
-  });
-
-  it('without an invite code: goes to the join screen', async () => {
-    const fetchMock = mockApi({
-      'GET /api/me': SIGNED_OUT,
-      'POST /api/auth/register': [201, makeMe({ crew: null })],
-    });
-    renderApp('/register');
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await fill('Name', 'Gabi');
-    await fill('Email', 'gabi@example.com');
-    await fill('Password', 'climbing-pw');
-    await userEvent.click(screen.getByRole('button', { name: 'Create account' }));
-    expect(await screen.findByRole('heading', { name: 'Join your crew' })).toBeVisible();
-    const call = fetchMock.mock.calls.find(([url]) => url === '/api/auth/register');
-    expect(JSON.parse(String(call?.[1]?.body))).not.toHaveProperty('invite_code');
-  });
-
-  it('explains a taken email', async () => {
-    mockApi({
-      'GET /api/me': SIGNED_OUT,
-      'POST /api/auth/register': [409, { detail: { code: 'email_taken' } }],
-    });
-    renderApp('/register');
-    await screen.findByRole('heading', { name: 'Create your account' });
-    await fill('Name', 'Gabi');
-    await fill('Email', 'gabi@example.com');
-    await fill('Password', 'climbing-pw');
-    await userEvent.click(screen.getByRole('button', { name: 'Create account' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('already an account');
   });
 });
 

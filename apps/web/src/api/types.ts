@@ -21,15 +21,9 @@ export type Me = {
   crew: Crew | null;
 };
 
-export type RegisterBody = {
-  email: string;
-  password: string;
-  display_name: string;
-  language: Language;
-  invite_code?: string;
-};
+export type AuthOptions = { google: boolean; dev_login: boolean };
 
-export type LoginBody = { email: string; password: string };
+export type DevLoginBody = { email: string; language: Language };
 
 export type UpdateMeBody = Partial<
   Pick<Me, 'display_name' | 'initials' | 'color' | 'language' | 'rest_seconds'>

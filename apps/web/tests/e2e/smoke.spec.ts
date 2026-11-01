@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { E2E_PASSWORD, memberEmail } from './members';
+import { memberEmail } from './members';
 
 // Needs `make up`; run through `make e2e`, which rebuilds the e2e crews first.
 const SCREENS = 'test-results/screens';
@@ -25,9 +25,7 @@ async function shoot(page: Page, name: string, testInfo: TestInfo) {
   await page.screenshot({ path: `${SCREENS}/${name}-${testInfo.project.name}.png` });
 }
 
-test('signed out: welcome, register and login screens in both languages', async ({
-  page,
-}, testInfo) => {
+test('signed out: welcome and login screens in both languages', async ({ page }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto('/climb');
   await expect(page).toHaveURL(/\/welcome$/);
@@ -38,16 +36,30 @@ test('signed out: welcome, register and login screens in both languages', async 
   await expectNoSidewaysScroll(page);
   await shoot(page, 'welcome-en', testInfo);
 
-  await page.getByRole('link', { name: 'Create account' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Create your account' })).toBeVisible();
-  await expectNoSidewaysScroll(page);
-  await shoot(page, 'register-en', testInfo);
-
   await page.getByRole('button', { name: 'ES', exact: true }).click();
-  await page.getByRole('link', { name: 'Ya tengo cuenta' }).click();
+  await page.getByRole('link', { name: 'Acceso de desarrollo' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Hola de nuevo' })).toBeVisible();
   await shoot(page, 'login-es', testInfo);
   expect(errors).toEqual([]);
+});
+
+test('Google button: starts the sign-in in the chosen language', async ({ page }, testInfo) => {
+  // The dev stack has no Google credentials unless they're in .env, so the server's answer is faked.
+  await page.route('**/api/auth/options', (route) =>
+    route.fulfill({ json: { google: true, dev_login: false } }),
+  );
+  await page.goto('/welcome');
+  await page.getByRole('button', { name: 'ES', exact: true }).click();
+  const button = page.getByRole('link', { name: 'Continuar con Google' });
+  await expect(button).toHaveAttribute('href', '/api/auth/google/start?lang=es');
+  const box = await button.boundingBox();
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+  await expectNoSidewaysScroll(page);
+  await shoot(page, 'welcome-google-es', testInfo);
+
+  await page.goto('/login?auth_error=google');
+  await expect(page.getByRole('alert')).toContainText('Google');
+  await shoot(page, 'login-google-error', testInfo);
 });
 
 test('member: log in, see the tabs, language follows the profile, log out', async ({
@@ -57,7 +69,6 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await page.goto('/login');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
-  await page.getByLabel('Password').fill(E2E_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
   await expect(page).toHaveURL(/\/climb$/);

@@ -17,7 +17,7 @@ async function audit(page: Page, name: string) {
 }
 
 test('signed-out screens', async ({ page }) => {
-  for (const path of ['/welcome', '/login', '/register']) {
+  for (const path of ['/welcome', '/login', '/login?auth_error=google']) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await audit(page, path);

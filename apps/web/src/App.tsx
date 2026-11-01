@@ -6,7 +6,6 @@ import { Gate } from './features/auth/Gate';
 import { HelloPage } from './features/auth/HelloPage';
 import { JoinPage } from './features/auth/JoinPage';
 import { LoginPage } from './features/auth/LoginPage';
-import { RegisterPage } from './features/auth/RegisterPage';
 import { WelcomePage } from './features/auth/WelcomePage';
 import { ClimbPage } from './features/climb/ClimbPage';
 import { CrewPage } from './features/crew/CrewPage';
@@ -22,7 +21,7 @@ export function App() {
         <Route element={<Gate allow="guest" />}>
           <Route path="welcome" element={<WelcomePage />} />
           <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
+          <Route path="register" element={<Navigate to="/welcome" replace />} />
         </Route>
         <Route element={<Gate allow="join" />}>
           <Route path="join" element={<JoinPage />} />
