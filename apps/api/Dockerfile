@@ -54,6 +54,6 @@ ENV WEB_CONCURRENCY=${WEB_CONCURRENCY}
 # - host=0.0.0.0 : bind to all network interfaces (needed in containers)
 # - port=8080    : matches EXPOSE above
 # - workers      : WEB_CONCURRENCY env var
-CMD ["sh", "-c", "alembic -c /alembic.ini upgrade head && exec uvicorn main:app --host=0.0.0.0 --port=8080 --workers=${WEB_CONCURRENCY} --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "python cli.py migrate && exec uvicorn main:app --host=0.0.0.0 --port=8080 --workers=${WEB_CONCURRENCY} --proxy-headers --forwarded-allow-ips='*'"]
 
 HEALTHCHECK --interval=10s --timeout=10s --retries=5 CMD python -c 'import urllib.request; urllib.request.urlopen("http://localhost:8080/health", timeout=5)'

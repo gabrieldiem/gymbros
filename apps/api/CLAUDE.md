@@ -41,6 +41,13 @@ resources/    → seed data: exercise catalog, routines, badge and quest definit
 - Line items carry an i18n key plus variables, not prose. The web app renders them in the user's language. The same goes for feed events and notifications.
 - Points are computed and stored when a workout is finished: `workouts.points` plus `point_events` rows. Standings are a sum over `point_events`, never a counter that gets edited.
 
+## Migrations must survive a rollback
+
+A failed deploy restores the previous image against a database the new image may already have migrated. On start, an image that finds a revision it doesn't know logs a warning and runs anyway (`db/migrate.py`), so **the previous version has to keep working on the new schema**:
+
+- Add first, remove later: new columns are nullable or have a server default. Drop or rename a column only in a release after the code stopped using it.
+- A migration that can't follow this needs a plan first: tell the user, because a failed deploy can't roll back from it.
+
 ## Engineering rules (from data-service)
 
 ### FastAPI
