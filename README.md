@@ -58,6 +58,6 @@ make precommit          # black, pylint, mypy, eslint, prettier, tsc
 make prod               # api + postgres + nginx serving the built web app on http://localhost:8081
 ```
 
-The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters) and `COOKIE_SECURE=true` behind HTTPS. Pushing to `main` runs `.github/workflows/deploy.yml`: tests and a Trivy scan of both images. Its `deploy` job is a placeholder until a hosting target is chosen.
+The api container runs `alembic upgrade head` before starting its workers. In production set `SESSION_SECRET` (32+ characters) and `COOKIE_SECURE=true` behind HTTPS. Pushing to `main` runs `.github/workflows/deploy.yml`: tests, then both images are built, Trivy-scanned and pushed to the private registry, then the Portainer stack is updated to that commit and checked live at [gymbros.gabrieldiem.com](https://gymbros.gabrieldiem.com). Production env vars are edited in Portainer; `deploy/compose.edge.yaml` is the production stack and `redeploy.yml` redeploys or rolls back an existing image tag.
 
 See [CLAUDE.md](CLAUDE.md#commands) for every command and the architecture.

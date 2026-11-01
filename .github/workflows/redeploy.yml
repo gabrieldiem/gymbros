@@ -1,0 +1,33 @@
+name: Redeploy
+
+# Manual: Actions → Redeploy → Run workflow. Deploys an image tag that is already in the registry,
+# without building: use the SHA of a previous deploy to roll back, or the current one to apply env
+# vars changed in Portainer. (Portainer's own "Update the stack" button does the same for env changes.)
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag to deploy (a commit SHA from a previous deploy)"
+        required: true
+
+concurrency:
+  group: Deploy-refs/heads/main
+  cancel-in-progress: false
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: prod
+      url: https://gymbros.gabrieldiem.com
+    steps:
+      - uses: actions/checkout@v7
+      - name: Deploy to gd-edge-br via Portainer
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }} # via env, never inlined into the script
+          PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+          PORTAINER_STACK_ID: ${{ vars.PORTAINER_STACK_ID }}
+          PORTAINER_ENDPOINT_ID: ${{ vars.PORTAINER_ENDPOINT_ID }}
+          PORTAINER_API_KEY: ${{ secrets.PORTAINER_API_KEY }}
+        run: deploy/portainer-deploy.sh "${IMAGE_TAG}"
