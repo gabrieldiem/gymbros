@@ -87,6 +87,8 @@ class AuthService:
         return user
 
     async def _start_session(self, user: User) -> LoggedIn:
+        # Logins are rare and the table is small, so this is where expired rows get cleaned up.
+        await self._sessions.delete_expired(self._now())
         token = self._tokens.new_token()
         expires_at = self._now() + self._session_ttl
         await self._sessions.add(self._tokens.hash(token), user.id, expires_at)

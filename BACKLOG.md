@@ -35,7 +35,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-22` **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
 - [ ] `GYM-23` **Login rate limiting** (api, S): `/api/auth/login` and `/register` have no throttle. Add a per-IP and per-email limit before the app is public. _Added 2026-10-31_
 - [ ] `GYM-24` **Password reset** (product, M): there is no email client, so a forgotten password needs an operator. Add reset by email or an operator CLI command. _Added 2026-10-31_
-- [ ] `GYM-25` **Expired session cleanup** (api, S): expired `auth_sessions` rows are ignored but never deleted. Delete them on login or in a periodic job. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user and no way to leave. Needed if someone joins the wrong crew. _Added 2026-10-31_
 - [ ] `GYM-27` **Show the current PR in the logger** (web, S): the prototype shows "PR 92.5 kg × 5" next to each exercise and in the picker. Needs a PRs endpoint (Phase 5 builds one for the profile). _Added 2026-10-31_
 - [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
@@ -75,3 +74,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-47` **E2E depends on the demo seed**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-48` **E2E logs real workouts**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-51` **E2E specs share demo members**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-25` **Expired session cleanup**: every login and sign-up deletes expired `auth_sessions` rows. Closed 2026-10-31 on chore/backlog-tech-debt.
