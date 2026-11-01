@@ -34,3 +34,7 @@ class SessionRepository:
     async def delete(self, token_hash: str) -> None:
         """End a session. Unknown hashes are ignored."""
         await self._session.execute(delete(AuthSession).where(AuthSession.token_hash == token_hash))
+
+    async def delete_expired(self, now: datetime) -> None:
+        """Delete every session that has expired (they are already ignored by lookups)."""
+        await self._session.execute(delete(AuthSession).where(AuthSession.expires_at <= now))

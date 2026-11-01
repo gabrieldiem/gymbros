@@ -256,7 +256,12 @@ def get_nudge_service(session: AsyncSession = Depends(get_session)) -> NudgeServ
 
 def get_inbox_service(session: AsyncSession = Depends(get_session)) -> InboxService:
     """FastAPI dependency provider for InboxService."""
-    return InboxService(NotificationRepository(session), UserRepository(session), utc_now)
+    return InboxService(
+        NotificationRepository(session),
+        UserRepository(session),
+        utc_now,
+        keep_days=settings.social_notification_days,
+    )
 
 
 def get_hall_of_fame_service(

@@ -1,13 +1,8 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { E2E_PASSWORD, memberEmail } from './members';
 
-// Needs the dev stack and the demo crew: `make up` then `make seed`.
+// Needs `make up`; run through `make e2e`, which rebuilds the e2e crews first.
 const SCREENS = 'test-results/screens';
-const DEMO_PASSWORD = 'climb-demo-2026';
-// One demo member per project, so parallel projects never change the same profile.
-const USERS: Record<string, string> = {
-  mobile: 'gabi@demo.gymbros.app',
-  desktop: 'santi@demo.gymbros.app',
-};
 
 function collectErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -61,8 +56,8 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   const errors = collectErrors(page);
   await page.goto('/login');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByLabel('Email').fill(USERS[testInfo.project.name] ?? '');
-  await page.getByLabel('Password').fill(DEMO_PASSWORD);
+  await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
+  await page.getByLabel('Password').fill(E2E_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
   await expect(page).toHaveURL(/\/climb$/);

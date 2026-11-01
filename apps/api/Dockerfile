@@ -9,8 +9,11 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 
 # Install Poetry; the project deps go into /app/.venv so the runner copies them
-# without Poetry and its own dependencies
-RUN pip install --no-cache-dir "poetry==2.3.2" && poetry config virtualenvs.in-project true
+# without Poetry and its own dependencies. The venv gets no pip: nothing installs at runtime,
+# and pip's vendored copies (urllib3, msgpack, setuptools) only add scanner findings.
+RUN pip install --no-cache-dir "poetry==2.3.2" \
+    && poetry config virtualenvs.in-project true \
+    && poetry config virtualenvs.options.no-pip true
 
 # Re-generate lock file if it is outdated, then install all dependencies (except dev/test deps)
 RUN (poetry check --lock || poetry lock) && poetry install --without dev --no-root --no-ansi --no-cache
@@ -22,8 +25,9 @@ FROM python:3.13-slim-trixie AS runner
 
 WORKDIR /app
 
-# Run as an unprivileged user
-RUN useradd --system --uid 10001 --no-create-home gymbros
+# Run as an unprivileged user. The base image's pip is removed for the same reason as above.
+RUN python -m pip uninstall --yes --no-cache-dir pip \
+    && useradd --system --uid 10001 --no-create-home gymbros
 
 # Copy only the project's virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv

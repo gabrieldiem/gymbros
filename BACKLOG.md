@@ -35,10 +35,8 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-22` **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
 - [ ] `GYM-23` **Login rate limiting** (api, S): `/api/auth/login` and `/register` have no throttle. Add a per-IP and per-email limit before the app is public. _Added 2026-10-31_
 - [ ] `GYM-24` **Password reset** (product, M): there is no email client, so a forgotten password needs an operator. Add reset by email or an operator CLI command. _Added 2026-10-31_
-- [ ] `GYM-25` **Expired session cleanup** (api, S): expired `auth_sessions` rows are ignored but never deleted. Delete them on login or in a periodic job. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user and no way to leave. Needed if someone joins the wrong crew. _Added 2026-10-31_
 - [ ] `GYM-27` **Show the current PR in the logger** (web, S): the prototype shows "PR 92.5 kg × 5" next to each exercise and in the picker. Needs a PRs endpoint (Phase 5 builds one for the profile). _Added 2026-10-31_
-- [ ] `GYM-28` **Rest timer length setting** (web, S): fixed at 90 s. Make it a user setting (Phase 5 settings). _Added 2026-10-31_
 - [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
 - [ ] `GYM-30` **Prototype: first-time PR** (docs, S): the prototype awards 100 pts for the first log of an exercise; the app does not (see Decide). Note it if the prototype is kept. _Added 2026-10-31_
 - [ ] `GYM-31` **Climber sheet** (web, M): tapping a marker or rope row in the prototype opens a profile sheet (head to head, last workout, best lift, gap, Start a duel, Nudge). Duels and nudges arrive in Phases 4–5; build the sheet then. _Added 2026-10-31_
@@ -47,30 +45,33 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-34` **Reply notifications for commenters** (api, S): only the post's owner is notified of new comments; others in the thread aren't (the prototype's "replied to your comment"). _Added 2026-10-31_
 - [ ] `GYM-35` **Notification fan-out to the actor's camp-mates** (api, S): "someone close behind" uses a fixed 300 pt window (`social.close_behind_points`). Consider week mode too. _Added 2026-10-31_
 - [ ] `GYM-36` **Delete own comment / undo nudge** (product, S): neither exists. _Added 2026-10-31_
-- [ ] `GYM-37` **Old notifications cleanup** (api, S): notifications are never deleted; the inbox shows the newest 30. Prune after 60 days. _Added 2026-10-31_
 - [ ] `GYM-38` **Weekly recap notification** (api, S): "Your weekly recap is ready" isn't sent; the recap is a card on ATUS Climb. Send it on the first request after Monday 00:00. _Added 2026-10-31_
 - [ ] `GYM-39` **Duel settlement needs a visit** (api, S): duels settle when someone in the crew opens the Quests tab after the week. A small scheduled job would pay winners on Monday morning even if nobody opens it. _Added 2026-10-31_
 - [ ] `GYM-40` **Event and bounty sheets** (web, S): the prototype opens a sheet from the hero chips; the app shows them as cards on the Quests tab only. _Added 2026-10-31_
 - [ ] `GYM-41` **Crew palette contrast** (design, S): the dataviz validator flags the crew colors on the dark surface (lightness band; pink/violet ΔE 7.0 for deutan vision). Charts that use them always add a legend with names; consider a darker violet step. _Added 2026-10-31_
 - [ ] `GYM-42` **Tonnage chart y-axis** (web, S): only this week's bar is labelled (the rest via tooltip and table). Add light y ticks if people ask for exact values at a glance. _Added 2026-10-31_
+- [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
 
 ## Tech debt
 
 - [ ] `GYM-43` **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
 - [ ] `GYM-44` **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] `GYM-45` **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
-- [ ] `GYM-46` **Poetry hangs on keyring in headless shells** (infra, S): `poetry install` stalled with no output until run with `PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring`. Consider setting it in the Makefile `install` target. _Added 2026-10-31_
-- [ ] `GYM-47` **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. `make seed reset=1` now rebuilds the crew; run it before `make e2e` from the Makefile, or give e2e its own crew. _Added 2026-10-31_
-- [ ] `GYM-48` **E2E logs real workouts** (web, S): `tests/e2e/train.spec.ts` finishes a workout for demo members Jose and Matex on every run, so their points grow in the dev database. Same fix as the seed item: an e2e-only crew reset before each run. _Added 2026-10-31_
 - [ ] `GYM-49` **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
-- [ ] `GYM-50` **Bonus lock has no concurrency test** (api, S): the advisory lock around crew-quest and bounty claims is exercised by every finish, but no test runs two finishes in parallel (the suite runs each test inside one rolled-back transaction). Add a test with two committed sessions. _Added 2026-10-31_
-- [ ] `GYM-51` **E2E specs share demo members** (web, S): five demo members across five specs at two viewports means specs can see each other's side effects (an in-progress workout, unread notifications). The a11y spec now tolerates that, but each spec should own its member. _Added 2026-10-31_
-- [ ] `GYM-52` **Precache size** (web, S): the service worker precaches ~815 KiB, mostly Barlow font weights. Trim unused weights or subset the fonts. _Added 2026-10-31_
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
-- [ ] `GYM-54` **pip-vendored HIGHs in the api image** (infra, S): Trivy reports msgpack 1.1.2, urllib3 2.7.0 and setuptools 70.3.0 as HIGH. They are copies vendored inside `pip` (base image and the venv), which the app never runs; they don't fail the deploy (CRITICAL only). Build the runtime venv without pip, or wait for a python:3.13-slim image with a newer pip. _Added 2026-10-31_
 
 ## Done
 
 Move items here with the date and the commit or PR that closed them.
 
 - [x] `GYM-55` **Prototype storage has no migrations**: irrelevant now that the app has Postgres and Alembic. Closed 2026-10-31 in 8750db0.
+- [x] `GYM-28` **Rest timer length setting**: already built in Phase 5 (rest time in the You tab settings). Closed 2026-10-31 in 2b4477b.
+- [x] `GYM-46` **Poetry hangs on keyring in headless shells**: `make install` runs Poetry with the null keyring backend. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-50` **Bonus lock has no concurrency test**: `tests/test_bonus_lock.py` races two committed finishes; the second waits on the lock and the crew quest pays once. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-52` **Precache size**: the service worker precaches only the latin font subset (815 → 662 KiB, 35 → 21 entries). Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-54` **pip-vendored HIGHs in the api image**: the runtime image has no pip (venv built with `no-pip`, base pip uninstalled); Trivy HIGHs 49 → 44, all Debian base. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-47` **E2E depends on the demo seed**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-48` **E2E logs real workouts**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-51` **E2E specs share demo members**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-25` **Expired session cleanup**: every login and sign-up deletes expired `auth_sessions` rows. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-37` **Old notifications cleanup**: marking the inbox read deletes your notifications older than `social.notification_days` (60). Closed 2026-10-31 on chore/backlog-tech-debt.

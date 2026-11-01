@@ -1,27 +1,15 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { logIn } from './members';
 
-// Needs `make up` and `make seed`. Logs a real workout for a demo member.
-const DEMO_PASSWORD = 'climb-demo-2026';
-const USERS: Record<string, string> = {
-  mobile: 'jose@demo.gymbros.app',
-  desktop: 'matex@demo.gymbros.app',
-};
+// Run through `make e2e`. Logs a real workout for Jose in this project's e2e crew, which
+// `make e2e` rebuilds before every run.
 const SCREENS = 'test-results/screens';
-
-async function logIn(page: Page, email: string) {
-  await page.goto('/login');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(DEMO_PASSWORD);
-  await page.getByRole('button', { name: 'Log in' }).click();
-  await expect(page).toHaveURL(/\/climb$/);
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
-}
 
 test('log a Push day and finish it', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await logIn(page, USERS[testInfo.project.name] ?? '');
+  await logIn(page, 'jose', testInfo);
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/train');
 
   // Leftover from an earlier failed run: throw it away.

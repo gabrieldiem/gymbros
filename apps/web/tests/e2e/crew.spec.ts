@@ -1,11 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { E2E_PASSWORD, memberEmail } from './members';
 
-// Needs `make up` and `make seed` (the seed posts the last 10 days of workouts).
-const DEMO_PASSWORD = 'climb-demo-2026';
-const USERS: Record<string, string> = {
-  mobile: 'santi@demo.gymbros.app',
-  desktop: 'gabi@demo.gymbros.app',
-};
+// Run through `make e2e` (the e2e crews are seeded with the last 10 days of workouts).
 const SCREENS = 'test-results/screens';
 
 test('crew feed, a reaction, hall of fame and the inbox', async ({ page }, testInfo) => {
@@ -13,8 +9,8 @@ test('crew feed, a reaction, hall of fame and the inbox', async ({ page }, testI
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/login');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByLabel('Email').fill(USERS[testInfo.project.name] ?? '');
-  await page.getByLabel('Password').fill(DEMO_PASSWORD);
+  await page.getByLabel('Email').fill(memberEmail('santi', testInfo));
+  await page.getByLabel('Password').fill(E2E_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/climb$/);
   await page.getByRole('button', { name: 'EN', exact: true }).click();

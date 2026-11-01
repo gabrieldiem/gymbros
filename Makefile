@@ -11,8 +11,10 @@ API_TEST_IMAGE := gymbros-api-test
 .env:
 	cp .env.example .env
 
+# Poetry asks the system keyring for credentials, which hangs with no output in a headless
+# shell (no unlocked keyring). The api only pulls from public PyPI, so use the null backend.
 install:
-	cd apps/api && poetry install
+	cd apps/api && PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring poetry install
 	cd apps/web && npm ci
 	pre-commit install
 
@@ -46,7 +48,10 @@ test-web:
 	cd apps/web && npm run test
 
 # Playwright smoke tests against the running dev stack (`make up` in another terminal).
+# Rebuilds the e2e crews (E2E Mobile / E2E Desktop, copies of the demo crew) in the dev database
+# first, so every run starts clean and never touches the demo crew. Needs `make up`.
 e2e:
+	$(DEV) exec api python cli.py seed-e2e
 	cd apps/web && npm run e2e
 
 precommit:

@@ -3,6 +3,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from sqlalchemy import func, select
 
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.session_repository import SessionRepository
@@ -11,6 +12,7 @@ from dependencies import password_hasher, session_tokens
 from services.auth_service import AuthService
 from services.auth_types import Registration
 from services.crew_service import CrewService
+from db.tables.auth_session import AuthSession
 from services.errors import InvalidCredentials, NotAuthenticated
 
 
@@ -61,6 +63,29 @@ async def test_session_expires_after_its_ttl(auth, clock):
     clock.now += timedelta(days=30, seconds=1)
     with pytest.raises(NotAuthenticated):
         await auth.authenticate(logged_in.token)
+
+
+async def _session_rows(db_session) -> int:
+    return int(
+        (await db_session.execute(select(func.count()).select_from(AuthSession))).scalar_one()
+    )
+
+
+async def test_logging_in_deletes_expired_sessions(auth, clock, db_session):
+    await auth.register(_registration())
+    await auth.register(_registration(email="maxo@example.com", display_name="Maxo"))
+    clock.now += timedelta(days=30, seconds=1)  # both sessions are now expired
+    assert await _session_rows(db_session) == 2
+    await auth.log_in("gabi@example.com", "climbing-pw")
+    assert await _session_rows(db_session) == 1  # only the new one
+
+
+async def test_logging_in_keeps_live_sessions(auth, clock, db_session):
+    first = await auth.register(_registration())
+    clock.now += timedelta(days=29)
+    await auth.log_in("gabi@example.com", "climbing-pw")
+    assert await _session_rows(db_session) == 2
+    assert (await auth.authenticate(first.token)).email == "gabi@example.com"
 
 
 async def test_log_out_ends_the_session(auth):
