@@ -50,7 +50,7 @@ make e2e                # Playwright against the running dev stack: smoke, Train
 make precommit          # black, pylint, mypy, eslint, prettier, tsc
 ```
 
-`make e2e` logs in as demo members and finishes real workouts, so run `make seed reset=1` first for clean numbers.
+`make e2e` first rebuilds two e2e crews (E2E Mobile and E2E Desktop, copies of the demo crew with `@mobile.e2e.gymbros.app` / `@desktop.e2e.gymbros.app` emails), so its logins and workouts never touch the demo crew and every run starts from the same numbers.
 
 ## Production
 

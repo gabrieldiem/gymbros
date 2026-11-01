@@ -59,10 +59,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-43` **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
 - [ ] `GYM-44` **Node 22.22+ for latest web deps** (web, S): React Router 8 and jsdom 30 need Node ≥22.22. The local machine runs 22.17, so the web app pins React Router 7.18 and jsdom 29. Upgrade Node, then bump both. _Added 2026-10-31_
 - [ ] `GYM-45` **ESLint toolchain audit warning** (web, S): `npm audit` reports a moderate minimatch advisory inside ESLint/typescript-eslint (dev-only, not shipped). Clear it when upstream releases a fix. _Added 2026-10-31_
-- [ ] `GYM-47` **E2E depends on the demo seed** (web, S): the Playwright smoke logs in as demo members and toggles their language, so it needs `make seed` and touches the dev database. `make seed reset=1` now rebuilds the crew; run it before `make e2e` from the Makefile, or give e2e its own crew. _Added 2026-10-31_
-- [ ] `GYM-48` **E2E logs real workouts** (web, S): `tests/e2e/train.spec.ts` finishes a workout for demo members Jose and Matex on every run, so their points grow in the dev database. Same fix as the seed item: an e2e-only crew reset before each run. _Added 2026-10-31_
 - [ ] `GYM-49` **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
-- [ ] `GYM-51` **E2E specs share demo members** (web, S): five demo members across five specs at two viewports means specs can see each other's side effects (an in-progress workout, unread notifications). The a11y spec now tolerates that, but each spec should own its member. _Added 2026-10-31_
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
 
 ## Done
@@ -75,3 +72,6 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-50` **Bonus lock has no concurrency test**: `tests/test_bonus_lock.py` races two committed finishes; the second waits on the lock and the crew quest pays once. Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-52` **Precache size**: the service worker precaches only the latin font subset (815 → 662 KiB, 35 → 21 entries). Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-54` **pip-vendored HIGHs in the api image**: the runtime image has no pip (venv built with `no-pip`, base pip uninstalled); Trivy HIGHs 49 → 44, all Debian base. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-47` **E2E depends on the demo seed**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-48` **E2E logs real workouts**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
+- [x] `GYM-51` **E2E specs share demo members**: `make e2e` rebuilds one e2e crew per viewport (`cli.py seed-e2e`) and each spec logs in as its own member. Closed 2026-10-31 on chore/backlog-tech-debt.
