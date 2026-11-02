@@ -74,6 +74,23 @@ export function useAdminMembers(search: string) {
   });
 }
 
+export type AdminFeedback = {
+  id: string;
+  kind: 'idea' | 'bug' | 'other';
+  body: string;
+  created_at: string;
+  handled: boolean;
+  display_name: string;
+  email: string;
+};
+
+export function useAdminFeedback() {
+  return useQuery({
+    queryKey: [...adminKey, 'feedback'],
+    queryFn: ({ signal }) => apiRequest<AdminFeedback[]>('/admin/feedback', { signal }),
+  });
+}
+
 export function useAdminActions() {
   return useQuery({
     queryKey: [...adminKey, 'actions'],
@@ -97,6 +114,15 @@ export type CrewChanges = {
   invite_max_uses?: number | null;
   invite_expires_at?: string | null;
 };
+
+export function useSetFeedbackHandled() {
+  return useAdminMutation(({ id, handled }: { id: string; handled: boolean }) =>
+    apiRequest<{ handled: boolean }>(`/admin/feedback/${id}`, {
+      method: 'PATCH',
+      body: { handled },
+    }),
+  );
+}
 
 export function useCreateCrew() {
   return useAdminMutation((body: CrewChanges) =>

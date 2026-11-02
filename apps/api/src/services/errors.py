@@ -29,6 +29,14 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class FeedbackNotFound(DomainError):
+    """No such message."""
+
+
+class TooMuchFeedback(DomainError):
+    """There's a daily limit to how many messages a member can send."""
+
+
 class WorkoutPhotoNotFound(DomainError):
     """No such photo, or not one you can see."""
 

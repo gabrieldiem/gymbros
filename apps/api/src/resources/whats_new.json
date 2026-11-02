@@ -1,5 +1,7 @@
 {
   "entries": [
+    { "id": "export", "date": "2026-11-02", "link": "/me" },
+    { "id": "feedback", "date": "2026-11-02", "link": "/me" },
     { "id": "photos", "date": "2026-11-02", "link": "/train" },
     { "id": "profile", "date": "2026-11-02", "link": "/me" },
     { "id": "gyms", "date": "2026-11-02", "link": "/train" },

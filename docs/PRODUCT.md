@@ -206,7 +206,9 @@ An invite code can have a maximum number of uses and an expiry. A code that's us
 The avatar opens a menu with your profile, Edit profile, settings, inviting friends and log out. Edit profile is also a button on the You tab.
 
 - **Edit profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
-- **Settings:** your gyms, language and rest time, and deleting your account and everything in it by typing your email.
+- **Settings:** your gyms, language and rest time, downloading your data, and deleting your account and everything in it by typing your email.
+- **Your data:** Download my data gives you a JSON file with every finished session (its sets as logged, gym, day and what it paid), your PRs and your gyms. Photos appear as links, which need you signed in.
+- **Send feedback:** in the menu, an idea, a bug or anything else, up to 10 a day. Admins read it in the backoffice and it goes when the account goes.
 
 ## Backoffice
 
@@ -215,6 +217,7 @@ The avatar opens a menu with your profile, Edit profile, settings, inviting frie
 - **Overview:** accounts, crews, workouts, and the last 7 days.
 - **Crews:** create, rename, change the time zone. Set a custom invite code (4 to 12 letters and digits), maximum uses and an expiry, or replace the code with a random one. A new code stops the old one working and starts counting from zero; members stay. Email someone the invite link: they join when they open it and sign in. If the email can't be sent, the link is offered to copy.
 - **Accounts:** search, adjust points with a reason (±5,000, counted like any other points; the member gets a notification with the amount and the reason), remove from a crew (history stays), delete.
+- **Feedback:** what members sent, newest first, with who sent it, to mark as handled.
 - **Log:** every change, with who made it. It stores ids, so a deleted account leaves no personal data behind.
 
 ## Not in v1

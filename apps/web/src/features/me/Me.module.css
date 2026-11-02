@@ -548,3 +548,44 @@
   opacity: 0;
   cursor: pointer;
 }
+
+.feedbackBody {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.feedbackBody textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--chalk);
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+  resize: vertical;
+}
+
+.feedbackBody textarea:focus {
+  outline: none;
+  border-color: var(--volt);
+}
+
+.download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch);
+  margin-top: 10px;
+  padding: 0 16px;
+  font-weight: 600;
+  color: var(--chalk);
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+}
+
+.download:hover {
+  border-color: var(--chalk);
+}

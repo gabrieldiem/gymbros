@@ -9,6 +9,40 @@ const openMenu = async () => {
   return screen.findByRole('menu');
 };
 
+describe('Feedback', () => {
+  it('sends what you wrote, and thanks you', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'POST /api/feedback': [201, null],
+    });
+    renderApp('/climb');
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Send feedback' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Send feedback' }));
+    expect(sheet.getByRole('button', { name: 'Send' })).toBeDisabled();
+    await userEvent.click(sheet.getByRole('button', { name: 'Bug' }));
+    await userEvent.type(sheet.getByLabelText('What’s on your mind?'), 'The map is slow');
+    await userEvent.click(sheet.getByRole('button', { name: 'Send' }));
+    expect(await screen.findByText('Thanks. We got it.')).toBeVisible();
+    const call = fetchMock.mock.calls.find(([url]) => url === '/api/feedback');
+    expect(JSON.parse(String(call?.[1]?.body))).toEqual({ kind: 'bug', body: 'The map is slow' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+});
+
+describe('Your data', () => {
+  it('can be downloaded from settings', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
+    renderApp('/climb');
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Settings' }));
+    const link = sheet.getByRole('link', { name: 'Download my data' });
+    expect(link).toHaveAttribute('href', '/api/me/export');
+    expect(link).toHaveAttribute('download');
+  });
+});
+
 describe('Your gyms in settings', () => {
   const openSettings = async () => {
     const menu = within(await openMenu());
@@ -61,6 +95,7 @@ describe('Profile menu', () => {
       'Points',
       'What’s new',
       'Settings',
+      'Send feedback',
       'Invite friends',
       'Log out',
     ]);

@@ -115,6 +115,15 @@ class WorkoutRepository:
         )
         return {week: count for week, count in result.all() if week is not None}
 
+    async def finished_by_user(self, user_id: uuid.UUID) -> list[Workout]:
+        """All the user's finished workouts with their sets, oldest first."""
+        result = await self._session.execute(
+            select(Workout)
+            .where(Workout.user_id == user_id, Workout.finished_at.is_not(None))
+            .order_by(Workout.finished_at, Workout.id)
+        )
+        return list(result.scalars())
+
     async def photo_versions(self, workout_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
         """Which of these workouts have a photo, and its version."""
         if not workout_ids:

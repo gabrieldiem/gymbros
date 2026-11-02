@@ -18,6 +18,7 @@ from routes import (
     crew,
     crews,
     feed,
+    feedback,
     gyms,
     me,
     notifications,
@@ -55,6 +56,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
+app.include_router(feedback.router, prefix="/api")
 app.include_router(avatars.router, prefix="/api")
 app.include_router(whats_new.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")

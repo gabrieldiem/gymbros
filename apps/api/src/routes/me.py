@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request, Response, status
 
 from db.tables.user import User
 from dependencies import (
+    get_export_service,
     get_avatar_service,
     get_current_member,
     get_current_user,
@@ -16,11 +17,15 @@ from dependencies import (
 from models.compete import LiftPoint, MeStatsResponse, WorkoutDetailResponse
 from models.compete_mappers import to_me_stats, to_workout_detail
 from models.errors import error_responses
+from models.export import ExportResponse
+from models.export_mappers import to_export_response
 from models.mappers import to_me_response
 from models.me import DeleteAccountRequest, MeResponse, UpdateMeRequest
 from routes.session_cookie import clear_session_cookie
 from routes.uploads import read_upload
 from services.avatar_service import AvatarService
+from services.catalog import load_catalog
+from services.export_service import ExportService
 from services.images import MAX_AVATAR_BYTES
 from services.me_stats_service import MeStatsService
 from services.member import Member
@@ -70,6 +75,19 @@ async def get_my_stats(
 ) -> MeStatsResponse:
     """The You tab: totals, heatmap, weekly tonnage, PRs and recent workouts."""
     return to_me_stats(await stats.stats(member))
+
+
+@router.get("/export", response_model=ExportResponse, responses=error_responses(401))
+async def export_my_training(
+    response: Response,
+    user: User = Depends(get_current_user),
+    exports: ExportService = Depends(get_export_service),
+) -> ExportResponse:
+    """All your training as a JSON file: every session, its sets, what it paid, your PRs."""
+    export = await exports.export(user)
+    filename = f"gymbros-export-{export.exported_at.date().isoformat()}.json"
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return to_export_response(export, load_catalog())
 
 
 @router.put("/avatar", response_model=MeResponse, responses=error_responses(401, 413, 415))

@@ -214,3 +214,35 @@
   color: var(--red-text);
   font-weight: 600;
 }
+
+.feedback {
+  list-style: none;
+}
+
+.feedback li {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--steel);
+}
+
+.feedback p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.feedback small {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.feedback a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.handled b,
+.handled p {
+  color: var(--smoke);
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import { useLogout } from '../api/auth';
 import { useMe } from '../api/me';
+import { FeedbackSheet } from '../features/me/FeedbackSheet';
 import { ProfileSheet } from '../features/me/ProfileSheet';
 import { SettingsSheet } from '../features/me/SettingsSheet';
 import { useI18n } from '../i18n/context';
@@ -21,6 +22,7 @@ export function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
@@ -133,6 +135,17 @@ export function ProfileMenu() {
           >
             {t('settings')}
           </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => {
+              setOpen(false);
+              setFeedbackOpen(true);
+            }}
+          >
+            {t('feedback_title')}
+          </button>
           {shareInvite && (
             <button
               type="button"
@@ -169,6 +182,7 @@ export function ProfileMenu() {
       )}
       {settingsOpen && <SettingsSheet onClose={() => setSettingsOpen(false)} />}
       {editing && <ProfileSheet onClose={() => setEditing(false)} />}
+      {feedbackOpen && <FeedbackSheet onClose={() => setFeedbackOpen(false)} />}
     </div>
   );
 }

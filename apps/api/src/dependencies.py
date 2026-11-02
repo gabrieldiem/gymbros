@@ -21,6 +21,7 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.avatar_repository import AvatarRepository
+from db.repositories.feedback_repository import FeedbackRepository
 from db.repositories.gym_repository import GymRepository
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
@@ -47,6 +48,8 @@ from services.errors import NotInCrew
 from services.feed_service import FeedService
 from services.hall_of_fame_service import HallOfFameService
 from services.avatar_service import AvatarService
+from services.export_service import ExportService
+from services.feedback_service import FeedbackService
 from services.gym_service import GymService
 from services.inbox_service import InboxService
 from services.me_stats_service import MeStatsService
@@ -120,6 +123,25 @@ def get_avatar_service(session: AsyncSession = DB_SESSION) -> AvatarService:
 def get_workout_photo_service(session: AsyncSession = DB_SESSION) -> WorkoutPhotoService:
     """FastAPI dependency provider for WorkoutPhotoService."""
     return WorkoutPhotoService(WorkoutPhotoRepository(session), WorkoutRepository(session), utc_now)
+
+
+def get_feedback_service(session: AsyncSession = DB_SESSION) -> FeedbackService:
+    """FastAPI dependency provider for FeedbackService."""
+    return FeedbackService(FeedbackRepository(session), AdminRepository(session), utc_now)
+
+
+def get_export_service(session: AsyncSession = DB_SESSION) -> ExportService:
+    """FastAPI dependency provider for ExportService."""
+    return ExportService(
+        (
+            WorkoutRepository(session),
+            PointEventRepository(session),
+            PersonalRecordRepository(session),
+            GymRepository(session),
+            CrewRepository(session),
+        ),
+        utc_now,
+    )
 
 
 def get_gym_service(session: AsyncSession = DB_SESSION) -> GymService:

@@ -73,6 +73,13 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
             }))}
           />
         </div>
+        <div>
+          <h3>{t('export_title')}</h3>
+          <p>{t('export_hint')}</p>
+          <a className={styles.download} href="/api/me/export" download>
+            {t('export_download')}
+          </a>
+        </div>
         <Button variant="ghost" wide onClick={() => logout.mutate()} disabled={logout.isPending}>
           {t('log_out')}
         </Button>

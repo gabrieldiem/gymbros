@@ -21,6 +21,8 @@ ENDPOINTS = [
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000/crew"),
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000"),
     ("GET", "/api/admin/actions"),
+    ("GET", "/api/admin/feedback"),
+    ("PATCH", "/api/admin/feedback/00000000-0000-0000-0000-000000000000"),
     ("POST", "/api/admin/crews/00000000-0000-0000-0000-000000000000/invites"),
 ]
 

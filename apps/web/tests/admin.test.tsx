@@ -368,3 +368,49 @@ describe('Invite codes in the backoffice', () => {
     expect(await dialog.findByRole('alert')).toHaveTextContent('in another crew');
   });
 });
+
+describe('Backoffice: feedback', () => {
+  const ITEM = {
+    id: 'f1',
+    kind: 'bug',
+    body: 'The map is slow',
+    created_at: new Date().toISOString(),
+    handled: false,
+    display_name: 'Maxo',
+    email: 'maxo@example.com',
+  };
+
+  it('shows what members sent and marks it as handled', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe({ is_admin: true })],
+      'GET /api/admin/overview': [200, OVERVIEW],
+      'GET /api/admin/feedback': [200, [ITEM]],
+      'PATCH /api/admin/feedback/f1': [200, { handled: true }],
+    });
+    renderApp('/admin');
+    await userEvent.click(await screen.findByRole('button', { name: 'Feedback' }));
+    expect(await screen.findByText('The map is slow')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'maxo@example.com' })).toHaveAttribute(
+      'href',
+      'mailto:maxo@example.com',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Mark as handled' }));
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(
+        ([url, init]) => url === '/api/admin/feedback/f1' && init?.method === 'PATCH',
+      );
+      expect(JSON.parse(String(call?.[1]?.body))).toEqual({ handled: true });
+    });
+  });
+
+  it('says so when there is nothing yet', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe({ is_admin: true })],
+      'GET /api/admin/overview': [200, OVERVIEW],
+      'GET /api/admin/feedback': [200, []],
+    });
+    renderApp('/admin');
+    await userEvent.click(await screen.findByRole('button', { name: 'Feedback' }));
+    expect(await screen.findByText(/What members send from the app/)).toBeVisible();
+  });
+});

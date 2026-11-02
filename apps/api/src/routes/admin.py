@@ -4,8 +4,9 @@ import uuid
 
 from fastapi import APIRouter, Depends, status
 
+from db.tables.feedback import Feedback
 from db.tables.user import User
-from dependencies import get_admin_service, get_current_admin, get_settings
+from dependencies import get_admin_service, get_feedback_service, get_current_admin, get_settings
 from models.avatar import avatar_url
 from models.admin import (
     AdjustPointsRequest,
@@ -19,8 +20,10 @@ from models.admin import (
     UpdateCrewRequest,
 )
 from models.errors import error_responses
+from models.feedback import FeedbackItem, SetHandledRequest, SetHandledResponse
 from services.admin_service import AdminService
 from services.admin_types import CrewRow, MemberRow
+from services.feedback_service import FeedbackService
 from settings import Settings
 
 router = APIRouter(
@@ -192,6 +195,40 @@ async def delete_account(
 ) -> None:
     """Delete an account and everything in it. This can't be undone."""
     await admin.delete_account(user, user_id)
+
+
+def _feedback_item(feedback: Feedback, user: User) -> FeedbackItem:
+    return FeedbackItem(
+        id=feedback.id,
+        kind=feedback.kind,  # type: ignore[arg-type]
+        body=feedback.body,
+        created_at=feedback.created_at,
+        handled=feedback.handled_at is not None,
+        display_name=user.display_name,
+        email=user.email,
+    )
+
+
+@router.get("/feedback", response_model=list[FeedbackItem])
+async def feedback_inbox(
+    feedback: FeedbackService = Depends(get_feedback_service),
+) -> list[FeedbackItem]:
+    """What members have sent, newest first."""
+    return [_feedback_item(item, user) for item, user in await feedback.inbox()]
+
+
+@router.patch(
+    "/feedback/{feedback_id}", response_model=SetHandledResponse, responses=error_responses(404)
+)
+async def set_feedback_handled(
+    feedback_id: uuid.UUID,
+    body: SetHandledRequest,
+    admin: User = Depends(get_current_admin),
+    feedback: FeedbackService = Depends(get_feedback_service),
+) -> SetHandledResponse:
+    """Mark a message as dealt with, or not any more."""
+    item = await feedback.set_handled(admin, feedback_id, body.handled)
+    return SetHandledResponse(handled=item.handled_at is not None)
 
 
 @router.get("/actions", response_model=list[AdminActionResponse])
