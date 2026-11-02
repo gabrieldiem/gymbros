@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from './client';
 import type { CrewColor } from './types';
+import { liveInterval } from './liveInterval';
 
 export type ClimbMode = 'all' | 'week';
 
@@ -9,6 +10,7 @@ export type Standing = {
   user_id: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   points: number;
   position: number;
@@ -22,6 +24,7 @@ export type Standing = {
 export type Neighbour = {
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   gap: number;
   training_now: boolean;
@@ -61,7 +64,7 @@ export function useClimb(mode: ClimbMode) {
   return useQuery({
     queryKey: climbKey(mode),
     queryFn: ({ signal }) => apiRequest<Climb>(`/climb?mode=${mode}`, { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
     placeholderData: keepPreviousData,
   });
 }

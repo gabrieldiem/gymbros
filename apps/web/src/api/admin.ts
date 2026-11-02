@@ -31,6 +31,7 @@ export type AdminMember = {
   email: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   crew_name: string | null;
   points: number;
@@ -73,6 +74,43 @@ export function useAdminMembers(search: string) {
   });
 }
 
+export type AdminFeedback = {
+  id: string;
+  kind: 'idea' | 'bug' | 'other';
+  body: string;
+  created_at: string;
+  handled: boolean;
+  display_name: string;
+  email: string;
+};
+
+export function useAdminFeedback() {
+  return useQuery({
+    queryKey: [...adminKey, 'feedback'],
+    queryFn: ({ signal }) => apiRequest<AdminFeedback[]>('/admin/feedback', { signal }),
+  });
+}
+
+export type EmailSettings = {
+  welcome_enabled: boolean;
+  digest_enabled: boolean;
+  digest_hour: number;
+  configured: boolean;
+  sender: string;
+  digests_sent_this_week: number;
+};
+
+export type EmailAudience = { crew_id?: string; email?: string };
+
+export type EmailMessageBody = EmailAudience & { subject: string; body: string; dry_run?: boolean };
+
+export function useEmailSettings() {
+  return useQuery({
+    queryKey: [...adminKey, 'email'],
+    queryFn: ({ signal }) => apiRequest<EmailSettings>('/admin/email', { signal }),
+  });
+}
+
 export function useAdminActions() {
   return useQuery({
     queryKey: [...adminKey, 'actions'],
@@ -96,6 +134,37 @@ export type CrewChanges = {
   invite_max_uses?: number | null;
   invite_expires_at?: string | null;
 };
+
+export function useSetFeedbackHandled() {
+  return useAdminMutation(({ id, handled }: { id: string; handled: boolean }) =>
+    apiRequest<{ handled: boolean }>(`/admin/feedback/${id}`, {
+      method: 'PATCH',
+      body: { handled },
+    }),
+  );
+}
+
+export function useUpdateEmailSettings() {
+  return useAdminMutation(
+    (body: Partial<Pick<EmailSettings, 'welcome_enabled' | 'digest_enabled' | 'digest_hour'>>) =>
+      apiRequest<EmailSettings>('/admin/email', { method: 'PATCH', body }),
+  );
+}
+
+export function useSendEmailMessage() {
+  return useAdminMutation((body: EmailMessageBody) =>
+    apiRequest<{ recipients: number; sent: number }>('/admin/email/message', {
+      method: 'POST',
+      body,
+    }),
+  );
+}
+
+export function useTestDigest() {
+  return useAdminMutation(() =>
+    apiRequest<{ sent: boolean }>('/admin/email/test-digest', { method: 'POST' }),
+  );
+}
 
 export function useCreateCrew() {
   return useAdminMutation((body: CrewChanges) =>

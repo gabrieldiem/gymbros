@@ -44,9 +44,80 @@
   transform: rotate(-90deg);
 }
 
+.start {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + 16px + var(--safe-bottom));
+  z-index: 25;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  padding: 0 16px;
+  color: var(--volt);
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--plate);
+  border: 1px solid var(--volt);
+  border-radius: var(--r-pill);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.start:hover {
+  background: var(--volt-tint);
+}
+
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  color: var(--iron);
+  background: var(--volt);
+  pointer-events: none;
+  animation: rest-flash 1.8s ease-out both;
+}
+
+.flash b {
+  font-family: var(--display);
+  font-size: clamp(3rem, 16vw, 7rem);
+  line-height: 1;
+  text-align: center;
+}
+
+@keyframes rest-flash {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  45%,
+  80% {
+    opacity: 1;
+  }
+  28%,
+  62% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation: none;
+  }
+}
+
 @media (min-width: 960px) {
-  .rest {
+  /* Right of the exercise cards, which stop at 740 px. */
+  .rest,
+  .start {
+    right: 32px;
     bottom: 24px;
-    left: calc(50% + var(--rail-w) / 2);
+    left: auto;
+    transform: none;
   }
 }

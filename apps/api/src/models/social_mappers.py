@@ -1,6 +1,8 @@
 """Crew tab domain objects → API models."""
 
 from db.tables.user import User
+from models.avatar import avatar_url
+from models.photos import photo_url
 from models.social import (
     ActorModel,
     CommentModel,
@@ -31,6 +33,7 @@ def to_actor(user: User) -> ActorModel:
             "user_id": user.id,
             "display_name": user.display_name,
             "initials": user.initials,
+            "avatar_url": avatar_url(user),
             "color": user.color,
         }
     )
@@ -67,6 +70,7 @@ def _item(entry: FeedEntry, reader: User) -> FeedItemModel:
         actor=to_actor(entry.actor),
         created_at=item.created_at,
         vars=item.vars,
+        photo_url=photo_url(item.workout_id, entry.photo_version) if item.workout_id else None,
         reactions=to_reactions(entry.reactions),
         comments=[to_comment(c) for c in entry.comments],
         is_mine=item.actor_id == reader.id,

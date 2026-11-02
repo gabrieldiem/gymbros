@@ -32,6 +32,7 @@ RULES = ScoringRules(
     goal_streak_max=100,
     over_target=50,
     better_than_last_time=25,
+    stretching=25,
     weekly_target=3,
     bodyweight_kg=80,
 )
@@ -419,3 +420,63 @@ def test_point_values_come_from_the_rules_not_the_code():
     result = items(score(workout(lift("curl", (30, 10))), rules=doubled))
     assert result["ln_show"][1] == 100
     assert result["ln_sets"][1] == 10
+
+
+def test_leg_day_x2_pays_every_leg_exercise_in_any_workout():
+    week = replace(FIRST_OF_WEEK, leg_event_active=True)
+    # No routine at all, and a lunge among presses: what counts is the exercise.
+    result = score(workout(lift("lunge", (20, 10), (20, 10)), lift("bench", (60, 5))), week=week)
+    assert items(result)["ln_leg_event"] == ({"n": 2}, 10)
+    for exercise_id in ("squat", "rdl", "legpress", "legcurl"):
+        one = score(workout(lift(exercise_id, (40, 5))), week=week)
+        assert items(one)["ln_leg_event"] == ({"n": 1}, 5)
+
+
+# --- Stretching ----------------------------------------------------------------------------
+
+
+def stretching(minutes: int = 5, done: bool = True) -> LoggedExercise:
+    exercise = CATALOG.exercise("stretch")
+    assert exercise is not None
+    return LoggedExercise(exercise=exercise, sets=(LoggedSet(minutes=minutes, done=done),))
+
+
+BENCH = lift("bench", (60, 5))
+
+
+def test_stretching_pays_fixed_points_whatever_the_minutes():
+    for minutes in (5, 10, 60):
+        result = score(workout(stretching(minutes), BENCH))
+        assert items(result)["ln_stretch"] == ({}, RULES.stretching)
+
+
+def test_stretching_isnt_a_set_or_cardio():
+    result = score(workout(stretching(10), BENCH))
+    assert result.completed_sets == 1
+    assert result.cardio_minutes == 0
+    assert "ln_cardio" not in items(result)
+
+
+def test_stretching_alone_pays_only_the_fixed_points():
+    result = score(workout(stretching(10)))
+    assert [item.key for item in result.line_items] == ["ln_stretch"]
+    assert result.total == RULES.stretching
+    assert result.completed_sets == 0
+
+
+def test_stretching_alone_doesnt_pay_the_weekly_goal():
+    week = WeekState(workouts_before=2, previous_goal_streak=3, leg_event_active=False)
+    result = score(workout(stretching()), week=week)
+    assert [item.key for item in result.line_items] == ["ln_stretch"]
+
+
+def test_an_unchecked_stretch_pays_nothing():
+    assert score(workout(stretching(done=False))).total == 0
+
+
+def test_stretching_pays_once_a_day():
+    history = replace(NO_HISTORY, stretched_that_day=True)
+    assert score(workout(stretching()), history).total == 0
+    mixed = score(workout(stretching(), BENCH), history)
+    assert "ln_stretch" not in items(mixed)
+    assert "ln_show" in items(mixed)

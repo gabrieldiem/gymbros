@@ -29,6 +29,58 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class NothingToDigest(DomainError):
+    """The crew did nothing last week, so there's no digest to show."""
+
+
+class FeedbackNotFound(DomainError):
+    """No such message."""
+
+
+class TooMuchFeedback(DomainError):
+    """There's a daily limit to how many messages a member can send."""
+
+
+class WorkoutPhotoNotFound(DomainError):
+    """No such photo, or not one you can see."""
+
+
+class InvalidAvatarText(DomainError):
+    """A profile picture can be up to two characters, and they have to be visible."""
+
+
+class AvatarNotFound(DomainError):
+    """No such picture, or not one you can see."""
+
+
+class ImageTooLarge(DomainError):
+    """The upload is bigger than this kind of image may be."""
+
+
+class ImageNotSupported(DomainError):
+    """The upload isn't a JPEG, PNG or WebP picture."""
+
+
+class GymNotFound(DomainError):
+    """No such gym of yours."""
+
+
+class GymNameTaken(DomainError):
+    """You already have a gym with this name."""
+
+
+class TooManyGyms(DomainError):
+    """There's a limit to how many gyms a member can have."""
+
+
+class StretchingAlreadyLogged(DomainError):
+    """Stretching pays once a day, and this session has nothing else in it."""
+
+
+class WorkoutDateOutOfRange(DomainError):
+    """A past workout has to be for one of the last few days, not today or further back."""
+
+
 class NotAuthenticated(DomainError):
     """No valid session."""
 

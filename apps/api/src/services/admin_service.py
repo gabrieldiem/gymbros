@@ -35,6 +35,7 @@ from services.profile_rules import (
 )
 from services.training_rules import week_start
 from services.welcome_email import EmailSender
+from services.notifier import Notifier
 
 ADJUSTMENT_KEY = "ln_admin"
 _RECENT = timedelta(days=7)
@@ -50,11 +51,13 @@ class AdminService:
         now: Callable[[], datetime],
         email: EmailSender,
         public_url: str,
+        notifier: Notifier,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._admin, self._users, self._crews, self._events = repos
         self._email = email
         self._public_url = public_url
+        self._notifier = notifier
         self._crew_service = CrewService(self._crews)
         self._now = now
 
@@ -188,6 +191,13 @@ class AdminService:
         await self._events.add_all([event])
         await self._audit(
             admin, "points_adjusted", user.id, {"points": points, "reason": reason.strip()}
+        )
+        await self._notifier.send(
+            [user.id],
+            None,
+            "n_points_adjusted",
+            {"points": points, "reason": reason.strip()},
+            "/me",
         )
 
     async def remove_from_crew(self, admin: User, user_id: uuid.UUID) -> None:

@@ -52,6 +52,7 @@ class AdminMemberResponse(BaseModel):
     email: str
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
     crew_name: str | None
     points: int

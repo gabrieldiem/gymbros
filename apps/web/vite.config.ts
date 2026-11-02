@@ -28,8 +28,9 @@ export default defineConfig({
     react(),
     staticLegalPages(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      // A new version waits for the member: see src/pwa/registerServiceWorker.ts.
+      registerType: 'prompt',
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'GYMBROS',

@@ -16,6 +16,8 @@ import { LandingPage } from './features/landing/LandingPage';
 import { PrivacyPage, TermsPage } from './features/legal/LegalPages';
 import { QuestsPage } from './features/quests/QuestsPage';
 import { TrainPage } from './features/train/TrainPage';
+import { WhatsNewPage } from './features/whatsnew/WhatsNewPage';
+import { UnsubscribePage } from './features/legal/UnsubscribePage';
 
 export function App() {
   return (
@@ -33,6 +35,7 @@ export function App() {
         </Route>
         <Route path="privacy" element={<PrivacyPage />} />
         <Route path="terms" element={<TermsPage />} />
+        <Route path="unsubscribe" element={<UnsubscribePage />} />
         <Route element={<Gate allow="join" />}>
           <Route path="join" element={<JoinPage />} />
         </Route>
@@ -49,6 +52,7 @@ export function App() {
           <Route path="quests/achievements" element={<QuestsPage />} />
           <Route path="quests/points" element={<QuestsPage />} />
           <Route path="me" element={<MePage />} />
+          <Route path="whats-new" element={<WhatsNewPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>

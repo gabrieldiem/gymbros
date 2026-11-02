@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Exercise } from '../src/api/train';
 import { searchExercises } from '../src/features/train/exerciseSearch';
+import { barOf, disksOf, loadOf, repeatSource, withBar } from '../src/features/train/barbell';
 import { formatElapsed, formatPrevious, lineItemText } from '../src/features/train/format';
 import { countPlates, platesPerSide } from '../src/features/train/plates';
 import { formatNumber, translate } from '../src/i18n/translate';
@@ -109,7 +110,7 @@ describe('formatPrevious', () => {
     done: true,
   });
   it('shows load × reps, bodyweight and cardio', () => {
-    expect(formatPrevious(ex(0), set(102.5, 5), es.n)).toBe('102,5 × 5');
+    expect(formatPrevious(ex(0), set(102.5, 5), es.n)).toBe('82,5 × 5');
     expect(formatPrevious(ex(2), set(0, 10), en.n)).toBe('BW × 10');
     expect(formatPrevious(ex(2), set(10, 6), en.n)).toBe('+10 × 6');
     expect(formatPrevious(ex(3), set(null, null, 25, 4.2), en.n)).toBe('25 min, 4.2 km');
@@ -142,7 +143,7 @@ describe('lineItemText', () => {
         es.t,
         es.n,
       ),
-    ).toBe('Nuevo PR: Back squat 137,5 kg × 5');
+    ).toBe('Nuevo PR: Back squat 117,5 kg + barra × 5');
     expect(
       lineItemText(
         item('ln_pr', { exercise_id: 'pullup', load_kg: 10, reps: 6 }),
@@ -161,5 +162,47 @@ describe('lineItemText', () => {
       'Better than last time (+8%)',
     );
     expect(lineItemText(item('ln_future_thing'), EXERCISES, en.t, en.n)).toBe('Bonus');
+  });
+});
+
+describe('barbell weight', () => {
+  const row = (load_kg: number | null, reps: number | null, bar_kg?: number) => ({
+    load_kg,
+    reps,
+    minutes: null,
+    km: null,
+    done: false,
+    bar_kg: bar_kg ?? null,
+  });
+
+  it('splits the whole weight into disks and bar', () => {
+    expect(disksOf(60, 20)).toBe(40);
+    expect(loadOf(40, 20)).toBe(60);
+    expect(disksOf(10, 20)).toBe(0);
+  });
+
+  it('uses the bar on the sets, else the standard one', () => {
+    expect(barOf([row(null, null), row(55, 5, 15)])).toBe(15);
+    expect(barOf([row(60, 5)])).toBe(20);
+  });
+
+  it('keeps the disks on another bar', () => {
+    expect(withBar([row(60, 5, 20), row(null, null)], 15)).toEqual([
+      row(55, 5, 15),
+      row(null, null, 15),
+    ]);
+  });
+
+  it('repeats the set above, else that set last time, else nothing', () => {
+    const above = row(60, 5);
+    const last = row(50, 8);
+    expect(repeatSource([above, row(null, null)], [last, last], 1)).toBe(above);
+    expect(repeatSource([row(null, null), row(null, null)], [last, last], 1)).toBe(last);
+    expect(repeatSource([row(null, null)], [last], 0)).toBe(last);
+    expect(repeatSource([row(null, null)], [], 0)).toBeUndefined();
+  });
+
+  it('ignores an empty set from last time', () => {
+    expect(repeatSource([row(null, null)], [row(null, null)], 0)).toBeUndefined();
   });
 });

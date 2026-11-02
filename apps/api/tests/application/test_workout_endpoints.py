@@ -1,10 +1,17 @@
 """The Train flow over HTTP: start, log, live points, finish, overload, PRs, week, discard."""
 
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import func, select
+
+from clock import utc_now
 
 from db.tables.personal_record import PersonalRecord
 from db.tables.point_event import PointEvent
 from tests.application.conftest import register_on
+
+ZONE = ZoneInfo("America/Argentina/Buenos_Aires")
 
 
 def done(load_kg, reps):
@@ -38,8 +45,16 @@ async def test_catalog_lists_exercises_routines_and_points(client, member):
     response = await client.get("/api/catalog")
     assert response.status_code == 200
     body = response.json()
-    assert len(body["exercises"]) == 20
-    assert [r["id"] for r in body["routines"]] == ["push", "pull", "legs", "cardio", "run", "swim"]
+    assert len(body["exercises"]) == 21
+    assert [r["id"] for r in body["routines"]] == [
+        "push",
+        "pull",
+        "legs",
+        "cardio",
+        "run",
+        "swim",
+        "stretch",
+    ]
     assert body["points"]["showed_up"] == 50
     assert body["weekly_event"] == "leg_day_x2"
 
@@ -104,6 +119,7 @@ async def test_saving_sets_returns_live_points(client, member):
     active = (await client.get("/api/workouts/active")).json()
     assert active["exercises"][0]["sets"][0] == {
         "load_kg": 60.0,
+        "bar_kg": None,
         "reps": 5,
         "minutes": None,
         "km": None,
@@ -222,7 +238,7 @@ async def test_beating_last_time_pays_pr_and_better_than_last_time(client, membe
     }
     assert keys["ln_better"]["vars"] == {"pct": 2}
     assert body["vs_last_pct"] == 2
-    assert body["prs"] == [{"exercise_id": "squat", "load_kg": 102.5, "reps": 5}]
+    assert body["prs"] == [{"exercise_id": "squat", "load_kg": 102.5, "reps": 5, "bar_kg": None}]
 
 
 async def test_third_workout_of_the_week_pays_the_weekly_goal_and_streak(client, member):
@@ -235,11 +251,8 @@ async def test_third_workout_of_the_week_pays_the_weekly_goal_and_streak(client,
     assert keys["ln_goal"] == ({"n": 3}, 150)
     assert keys["ln_streak"] == ({"weeks": 1}, 20)
     assert body["workouts_this_week"] == 3
-    assert (await client.get("/api/workouts/week")).json() == {
-        "workouts": 3,
-        "target": 3,
-        "leg_event_active": True,
-    }
+    week = (await client.get("/api/workouts/week")).json()
+    assert (week["workouts"], week["target"], week["leg_event_active"]) == (3, 3, True)
 
 
 # --- Discard and training now --------------------------------------------------------------
@@ -279,3 +292,39 @@ async def test_training_now_is_scoped_to_the_crew(client, member, other_client, 
     await register_on(other_client, "stranger@example.com", "OTHERCREW")
     await start(other_client, "push")
     assert (await client.get("/api/crew/training-now")).json() == []
+
+
+# --- Disks and bar -------------------------------------------------------------------------
+
+
+async def test_the_bar_is_kept_and_scoring_reads_the_whole_weight(client, member):
+    bench = {
+        "exercise_id": "bench",
+        "sets": [{"load_kg": 60, "bar_kg": 15, "reps": 5, "done": True}],
+    }
+    body = (await log_and_finish(client, "push", [bench])).json()
+    # 60 × 5 = 300 kg: the bar is inside load_kg and doesn't change what it pays.
+    assert body["volume_kg"] == 300
+    stats = (await client.get("/api/me/stats")).json()
+    assert stats["prs"][0]["load_kg"] == 60
+    assert stats["prs"][0]["bar_kg"] == 15
+
+
+async def test_the_next_session_keeps_your_bar_with_the_overload(client, member):
+    bench = {
+        "exercise_id": "bench",
+        "sets": [{"load_kg": 60, "bar_kg": 15, "reps": 5, "done": True}],
+    }
+    await log_and_finish(client, "push", [bench])
+    started = (await start(client, "push")).json()
+    first = started["exercises"][0]
+    assert first["sets"][0]["load_kg"] == 62.5
+    assert first["sets"][0]["bar_kg"] == 15
+    assert first["previous_sets"][0]["bar_kg"] == 15
+
+
+async def test_the_week_says_when_the_timed_event_ends(client, member):
+    body = (await client.get("/api/workouts/week")).json()
+    ends = datetime.fromisoformat(body["event_ends_at"]).astimezone(ZONE)
+    assert (ends.weekday(), ends.hour, ends.minute) == (0, 0, 0)
+    assert timedelta(0) < ends - utc_now() <= timedelta(days=7)

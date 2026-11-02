@@ -10,6 +10,7 @@ from db.tables.feed_item import FeedItem
 from db.tables.workout import Workout
 from services.member import Member
 from services.notifier import Notifier
+from services.training_rules import week_start
 from services.workout_mapping import to_entries
 from services.workout_types import FinishedWorkout
 
@@ -18,13 +19,19 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
     """The snapshot shown on a feed card: stats, PRs and every completed set."""
     score = finished.score if finished else None
     duration = 0
-    if workout.finished_at is not None:
+    if workout.finished_at is not None and workout.performed_on is None:
         duration = max(1, round((workout.finished_at - workout.started_at).total_seconds() / 60))
     exercises = [
         {
             "exercise_id": entry.exercise_id,
             "sets": [
-                {"load_kg": s.load_kg, "reps": s.reps, "minutes": s.minutes, "km": s.km}
+                {
+                    "load_kg": s.load_kg,
+                    "bar_kg": s.bar_kg,
+                    "reps": s.reps,
+                    "minutes": s.minutes,
+                    "km": s.km,
+                }
                 for s in entry.sets
                 if s.done
             ],
@@ -33,6 +40,8 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
     ]
     return {
         "name": workout.name,
+        "gym": workout.gym_name,
+        "performed_on": workout.performed_on.isoformat() if workout.performed_on else None,
         "routine_id": workout.routine_id,
         "duration_min": duration,
         "sets": score.completed_sets if score else sum(len(e["sets"]) for e in exercises),
@@ -41,7 +50,7 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
         "points": workout.points or 0,
         "vs_last_pct": score.vs_last_pct if score else None,
         "prs": [
-            {"exercise_id": r.exercise_id, "load_kg": r.load_kg, "reps": r.reps}
+            {"exercise_id": r.exercise_id, "load_kg": r.load_kg, "bar_kg": r.bar_kg, "reps": r.reps}
             for r in (score.records if score else ())
             if r.is_improvement
         ],
@@ -79,7 +88,8 @@ class ActivityService:
             await self._post(member, "rank_up", {"camp": climb.camp_after}, None)
         name = {"name": me.display_name}
         await self._notifier.send(climb.passed_ids, me.id, "n_passed", name, "/climb")
-        if finished.workouts_this_week == self._weekly_target:
+        this_week = week_start(self._now(), member.crew.time_zone)
+        if finished.workouts_this_week == self._weekly_target and workout.week_start == this_week:
             crew = [u.id for u in await self._crews.members(member.crew.id)]
             goal = {**name, "n": self._weekly_target}
             await self._notifier.send(crew, me.id, "n_goal", goal, "/climb")

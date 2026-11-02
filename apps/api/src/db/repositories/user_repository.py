@@ -2,7 +2,7 @@
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.user import User
@@ -38,6 +38,16 @@ class UserRepository:
         """Flush pending changes to a loaded user."""
         await self._session.flush()
         return user
+
+    async def claim_whats_new(self, user_id: uuid.UUID, seen: str | None, newest: str) -> bool:
+        """Move the account from `seen` to `newest`. Only one of two open tabs gets True."""
+        result = await self._session.execute(
+            update(User)
+            .where(User.id == user_id, User.whats_new_seen.is_not_distinct_from(seen))
+            .values(whats_new_seen=newest)
+            .returning(User.id)
+        )
+        return result.first() is not None
 
     async def delete(self, user: User) -> None:
         """Remove a user; their sessions, membership, workouts and points cascade."""

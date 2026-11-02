@@ -53,6 +53,9 @@ script=$(curl -s --max-time 10 "$BASE/" | grep -oE '/assets/[^"]+\.js' | head -1
 check "script is compressed behind Caddy" 'Content-Encoding: gzip' -D - -o /dev/null \
   -H 'Accept-Encoding: gzip' -H 'Via: 1.1 Caddy' "$BASE$script"
 check "privacy policy without JavaScript" 'Google user data' "$BASE/privacy"
+check "privacy policy covers data protection" 'How we protect your data' "$BASE/privacy"
+check "privacy policy has the Limited Use statement" 'Limited Use requirements' "$BASE/privacy"
+check "robots.txt is a real file" 'User-agent' "$BASE/robots.txt"
 check "terms without JavaScript" 'Train safely' "$BASE/terms"
 check "public rules list what the game pays" '"swim_km_factor":4' "$BASE/api/rules"
 check "Google sign-in offered, dev login off" '"google":true,"dev_login":false' "$BASE/api/auth/options"

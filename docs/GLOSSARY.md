@@ -11,7 +11,11 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Camp | A rank checkpoint on the trail (Rookie … Unstoppable) | `rank` (index 0 to 6) |
 | Rope order | The ranked list of members under the map | `standings` |
 | Climb change | How a finished workout moved you on the all-time rope: points and camp before and after, who you passed | `climb` |
+| What's new | The list of shipped features, and the one quiet notification that announces them | `whats_new` |
 | Workout | One logged gym session: name, start, end, exercises | `workout` |
+| Disks | The total weight of the plates on a barbell, which is what the logger shows. Disks + bar is the load that scoring reads | `load_kg` − `bar_kg` |
+| Gym | A named place a member trains, one of them their default. Shown to the crew | `gym` |
+| Past workout | A workout logged later for one of the last 7 days. It counts on that day | `workout.performed_on` |
 | Routine | A saved template of exercises (Push day, Pull day, Leg day, Cardio) | `routine` |
 | Exercise | A catalog movement with type, group and barbell flag | `exercise` |
 | Set | One entry inside a workout exercise: load + reps, or minutes + km; done or not | `set` |

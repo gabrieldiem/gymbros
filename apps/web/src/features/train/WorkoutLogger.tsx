@@ -7,13 +7,17 @@ import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import { ExerciseCard } from './ExerciseCard';
 import { ExercisePicker } from './ExercisePicker';
 import { formatElapsed } from './format';
+import { GymSelect } from './GymSelect';
 import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
-import { useRestTimer } from './useRestTimer';
-import { useWorkoutDraft } from './useWorkoutDraft';
+import { StretchCard } from './StretchCard';
+import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
+import { useWorkoutDraft, type Draft } from './useWorkoutDraft';
+import { WorkoutPhoto } from './WorkoutPhoto';
 import styles from './WorkoutLogger.module.css';
 
 type Props = {
@@ -23,7 +27,7 @@ type Props = {
   finishing: boolean;
   finishError: unknown;
   discarding: boolean;
-  onFinish: (flush: () => Promise<void>) => void;
+  onFinish: (flush: () => Promise<void>, draft: Draft) => void;
   onDiscard: () => void;
 };
 
@@ -57,16 +61,21 @@ function nthText(t: ReturnType<typeof useI18n>['t'], week: Week | undefined): st
 
 export function WorkoutLogger(props: Props) {
   const { workout, catalog, week, finishing, finishError, discarding, onFinish, onDiscard } = props;
-  const { t, n } = useI18n();
+  const { t, n, lang } = useI18n();
+  const past = workout.performed_on;
   const { draft, update, livePoints, status, flush } = useWorkoutDraft(workout);
   const elapsed = useElapsed(workout.started_at);
   const gain = usePointsGain(livePoints);
   const rest = useRestTimer();
   const restSeconds = useMe().data?.rest_seconds;
   const [picking, setPicking] = useState(false);
-  const [platesKg, setPlatesKg] = useState<number | null>(null);
+  const [plates, setPlates] = useState<{ disks: number; bar: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const exerciseById = (id: string) => catalog.exercises.find((e) => e.id === id);
+  const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
+  const stretchOnly =
+    draft.exercises.length > 0 &&
+    draft.exercises.every((e) => exerciseById(e.exercise_id)?.type === 's');
 
   const setSets = (index: number, sets: SetData[]) =>
     update((d) => ({
@@ -76,9 +85,16 @@ export function WorkoutLogger(props: Props) {
   const removeExercise = (index: number) =>
     update((d) => ({ ...d, exercises: d.exercises.filter((_, i) => i !== index) }));
   const addExercise = (id: string) => {
-    const cardio = exerciseById(id)?.type === 'c';
-    const empty: SetData = { load_kg: null, reps: null, minutes: null, km: null, done: false };
-    const sets = Array.from({ length: cardio ? 1 : 3 }, () => ({ ...empty }));
+    const exercise = exerciseById(id);
+    const single = exercise?.type === 'c' || exercise?.type === 's';
+    const empty: SetData = {
+      load_kg: null,
+      reps: null,
+      minutes: exercise?.default_minutes ?? null,
+      km: null,
+      done: false,
+    };
+    const sets = Array.from({ length: single ? 1 : 3 }, () => ({ ...empty }));
     update((d) => ({
       ...d,
       exercises: [...d.exercises, { exercise_id: id, sets, previous_sets: [] }],
@@ -101,9 +117,16 @@ export function WorkoutLogger(props: Props) {
             onChange={(e) => update((d) => ({ ...d, name: e.target.value }))}
           />
           <span className={styles.meta}>
-            <span role="timer">{elapsed}</span>
-            {nthText(t, week)}
+            {past ? (
+              t('past_for', { day: formatDay(lang, past) })
+            ) : (
+              <>
+                <span role="timer">{elapsed}</span>
+                {stretchOnly ? `, ${t('stretch_only')}` : nthText(t, week)}
+              </>
+            )}
           </span>
+          <GymSelect value={draft.gym} onChange={(gym) => update((d) => ({ ...d, gym }))} />
         </div>
         <div className={styles.live} aria-live="polite">
           {gain.gain > 0 && (
@@ -111,16 +134,34 @@ export function WorkoutLogger(props: Props) {
               +{n(gain.gain)}
             </span>
           )}
-          <b data-testid="live-points">
-            <CountUp value={livePoints} format={n} durationMs={500} />
-          </b>
-          <span>{t('pts_so_far')}</span>
+          {workout.local ? (
+            <span className={styles.localPoints}>{t('offline_points')}</span>
+          ) : (
+            <>
+              <b data-testid="live-points">
+                <CountUp value={livePoints} format={n} durationMs={500} />
+              </b>
+              <span>{t('pts_so_far')}</span>
+            </>
+          )}
         </div>
       </div>
 
       {draft.exercises.map((entry, i) => {
         const exercise = exerciseById(entry.exercise_id);
         if (!exercise) return null;
+        const firstSet = entry.sets[0];
+        if (exercise.type === 's' && firstSet) {
+          return (
+            <StretchCard
+              key={`${entry.exercise_id}-${i}`}
+              exercise={exercise}
+              set={firstSet}
+              onChange={(set) => setSets(i, [set])}
+              onRemove={() => removeExercise(i)}
+            />
+          );
+        }
         return (
           <ExerciseCard
             key={`${entry.exercise_id}-${i}`}
@@ -128,8 +169,9 @@ export function WorkoutLogger(props: Props) {
             entry={entry}
             onChange={(sets) => setSets(i, sets)}
             onRemove={() => removeExercise(i)}
-            onSetDone={() => rest.start(restSeconds)}
-            onPlates={setPlatesKg}
+            past={past !== null}
+            legBonus={legEvent && exercise.group === 'Legs'}
+            onPlates={(disks, bar) => setPlates({ disks, bar })}
           />
         );
       })}
@@ -138,12 +180,14 @@ export function WorkoutLogger(props: Props) {
         + {t('add_ex')}
       </Button>
 
+      {!workout.local && <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />}
+
       <p className={styles.status} role="status">
         {status === 'saving' ? t('saving') : status === 'error' ? t('save_failed') : ''}
       </p>
       <FormError error={finishError} />
       <div className={styles.actions}>
-        <Button onClick={() => onFinish(flush)} disabled={finishing}>
+        <Button onClick={() => onFinish(flush, draft)} disabled={finishing}>
           {finishing ? t('finishing') : t('finish')}
         </Button>
         <Button variant="quiet" onClick={() => setConfirmDiscard(true)}>
@@ -151,16 +195,30 @@ export function WorkoutLogger(props: Props) {
         </Button>
       </div>
 
-      <RestTimer rest={rest.rest} leftMs={rest.leftMs} onAdjust={rest.adjust} onSkip={rest.skip} />
+      {!past && !stretchOnly && (
+        <RestTimer
+          rest={rest.rest}
+          leftMs={rest.leftMs}
+          defaultSeconds={restSeconds ?? DEFAULT_REST_S}
+          onStart={() => rest.start(restSeconds)}
+          onAdjust={rest.adjust}
+          onSkip={rest.skip}
+        />
+      )}
       {picking && (
         <ExercisePicker
           exercises={catalog.exercises}
+          legBonus={legEvent}
           onPick={addExercise}
           onClose={() => setPicking(false)}
         />
       )}
-      {platesKg !== null && (
-        <PlateCalculator initialKg={platesKg} onClose={() => setPlatesKg(null)} />
+      {plates && (
+        <PlateCalculator
+          initialDisks={plates.disks}
+          barKg={plates.bar}
+          onClose={() => setPlates(null)}
+        />
       )}
       {confirmDiscard && (
         <Sheet title={t('discard_q')} onClose={() => setConfirmDiscard(false)}>

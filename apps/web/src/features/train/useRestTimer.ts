@@ -4,7 +4,7 @@ export const DEFAULT_REST_S = 90;
 
 export type Rest = { endsAt: number; totalMs: number } | null;
 
-/** A rest countdown started when a set is checked. Ticks 4× a second while running. */
+/** A rest countdown you start yourself. Ticks 4× a second while running. */
 export function useRestTimer(now: () => number = Date.now) {
   const [rest, setRest] = useState<Rest>(null);
   const [tick, setTick] = useState(now());

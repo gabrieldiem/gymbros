@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from './client';
+import { liveInterval } from './liveInterval';
 
 export type Health = { status: 'running' | 'degraded'; database: 'up' | 'down' };
 
@@ -15,7 +16,7 @@ export function useHealth() {
   return useQuery({
     queryKey: healthKey,
     queryFn: ({ signal }) => fetchHealth(signal),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
     retry: false,
   });
 }

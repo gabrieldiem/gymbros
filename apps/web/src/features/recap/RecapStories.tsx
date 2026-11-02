@@ -7,19 +7,13 @@ import type { Exercise } from '../../api/train';
 import { ButtonLink } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
+import { inkOn, memberColorHex } from '../../components/memberColor';
 import { useI18n } from '../../i18n/context';
 import { ordinal } from '../../i18n/ordinal';
 import { formatLift } from '../train/format';
 import styles from './RecapStories.module.css';
 
 const SLIDE_MS = 5500;
-const CREW_HEX = {
-  volt: '#FFE600',
-  red: '#FF3B1F',
-  cyan: '#00D1FF',
-  pink: '#FF4FD8',
-  violet: '#B48CFF',
-};
 const reducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -54,8 +48,8 @@ function useSlides(recap: Recap, exercises: Exercise[], onClose: () => void): Sl
   ];
   if (recap.biggest_climber) {
     slides.push({
-      bg: CREW_HEX[recap.biggest_climber.color],
-      fg: '#0D0D0D',
+      bg: memberColorHex(recap.biggest_climber.color),
+      fg: inkOn(recap.biggest_climber.color),
       body: (
         <>
           <p className={styles.kicker}>{t('r_climber_kicker')}</p>

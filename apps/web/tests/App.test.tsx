@@ -138,6 +138,7 @@ describe('Quests sections', () => {
         goal_streak_max: 100,
         over_target: 50,
         better_than_last_time: 25,
+        stretching: 25,
         weekly_target: 3,
         bodyweight_kg: 80,
       },

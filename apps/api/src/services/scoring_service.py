@@ -5,7 +5,7 @@ the rule in docs/PRODUCT.md. Point values come from ScoringRules (settings.json)
 """
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from services.scoring_types import (
     History,
@@ -50,6 +50,7 @@ class _Tally:
     cardio_km: float
     effort_km: float
     bests: tuple[RecordSet, ...]
+    stretched: bool
 
 
 def score_workout(
@@ -57,8 +58,9 @@ def score_workout(
 ) -> ScoreResult:
     """Score a finished (or in-progress, for the live preview) workout."""
     tally = _tally(log, rules)
+    stretch = _stretch_items(tally, history, rules)
     if tally.completed_sets == 0:
-        return ScoreResult((), 0, 0.0, 0, 0, None, ())
+        return ScoreResult(stretch, sum(item.points for item in stretch), 0.0, 0, 0, None, ())
     records = _records(tally.bests, history)
     vs_last = _vs_last_pct(tally, history, log, rules)
     items = (
@@ -66,6 +68,7 @@ def score_workout(
         + _pr_items(records, log, rules)
         + _week_items(week, rules)
         + _better_items(vs_last, rules)
+        + stretch
     )
     return ScoreResult(
         line_items=items,
@@ -83,8 +86,12 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
     sets = legs = minutes = 0
     volume = km = effort = 0.0
     bests: list[RecordSet] = []
+    stretched = False
     for logged in log.exercises:
         done = [s for s in logged.sets if is_completed(logged.exercise, s)]
+        if logged.exercise.is_stretch:
+            stretched = stretched or bool(done)
+            continue
         sets += len(done)
         legs += len(done) if logged.exercise.group == "Legs" else 0
         if logged.exercise.is_cardio:
@@ -97,7 +104,7 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
             best = _best_set(logged, done, rules)
         if best is not None:
             bests.append(best)
-    return _Tally(sets, legs, volume, minutes, km, effort, tuple(bests))
+    return _Tally(sets, legs, volume, minutes, km, effort, tuple(bests), stretched)
 
 
 def _set_volume(logged: LoggedExercise, logged_set: LoggedSet, rules: ScoringRules) -> float:
@@ -114,7 +121,12 @@ def _best_set(
         e1rm = estimated_1rm(load, logged_set.reps or 0)
         if best is None or e1rm > best.e1rm:
             best = RecordSet(
-                logged.exercise.id, logged_set.load_kg or 0.0, logged_set.reps or 0, e1rm, False
+                logged.exercise.id,
+                logged_set.load_kg or 0.0,
+                logged_set.reps or 0,
+                e1rm,
+                False,
+                logged_set.bar_kg,
             )
     return best
 
@@ -140,7 +152,7 @@ def _records(bests: tuple[RecordSet, ...], history: History) -> tuple[RecordSet,
         if stored is None:
             records.append(best)
         elif best.e1rm > stored + _PR_EPSILON:
-            records.append(RecordSet(best.exercise_id, best.load_kg, best.reps, best.e1rm, True))
+            records.append(replace(best, is_improvement=True))
     return tuple(records)
 
 
@@ -206,6 +218,8 @@ def _pr_items(
                 "load_kg": _number(record.load_kg),
                 "reps": record.reps,
             }
+            if record.bar_kg is not None:
+                variables["bar_kg"] = _number(record.bar_kg)
             items.append(LineItem("ln_pr", variables, rules.pr))
     return tuple(items)
 
@@ -222,6 +236,12 @@ def _week_items(week: WeekState, rules: ScoringRules) -> tuple[LineItem, ...]:
         LineItem("ln_goal", {"n": rules.weekly_target}, rules.weekly_goal),
         LineItem("ln_streak", {"weeks": streak}, streak_points),
     )
+
+
+def _stretch_items(tally: _Tally, history: History, rules: ScoringRules) -> tuple[LineItem, ...]:
+    if not tally.stretched or history.stretched_that_day:
+        return ()
+    return (LineItem("ln_stretch", {}, rules.stretching),)
 
 
 def _better_items(vs_last_pct: int | None, rules: ScoringRules) -> tuple[LineItem, ...]:

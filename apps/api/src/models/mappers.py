@@ -1,5 +1,6 @@
 """Domain objects → API models."""
 
+from models.avatar import avatar_url
 from models.me import CrewResponse, MeResponse
 from services.profile_service import Profile
 
@@ -14,9 +15,11 @@ def to_me_response(profile: Profile) -> MeResponse:
             "email": user.email,
             "display_name": user.display_name,
             "initials": user.initials,
+            "avatar_url": avatar_url(user),
             "color": user.color,
             "language": user.language,
             "rest_seconds": user.rest_seconds,
+            "email_updates": user.email_updates,
             "crew": crew,
             "is_admin": profile.is_admin,
         }

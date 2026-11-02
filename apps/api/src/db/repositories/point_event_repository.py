@@ -22,6 +22,22 @@ class PointEventRepository:
             text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"), {"key": key}
         )
 
+    async def for_workouts(self, workout_ids: list[uuid.UUID]) -> list[PointEvent]:
+        """What these workouts paid, in the order it was paid."""
+        if not workout_ids:
+            return []
+        result = await self._session.execute(
+            select(PointEvent).where(PointEvent.workout_id.in_(workout_ids)).order_by(PointEvent.id)
+        )
+        return list(result.scalars())
+
+    async def for_workout(self, workout_id: uuid.UUID) -> list[PointEvent]:
+        """What a workout paid, in the order it was paid."""
+        result = await self._session.execute(
+            select(PointEvent).where(PointEvent.workout_id == workout_id).order_by(PointEvent.id)
+        )
+        return list(result.scalars())
+
     async def add_all(self, events: list[PointEvent]) -> None:
         """Insert the events."""
         self._session.add_all(events)

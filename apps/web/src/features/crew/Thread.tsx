@@ -27,7 +27,12 @@ export function Thread({ itemId, comments }: { itemId: string; comments: Comment
         <ul className={styles.list}>
           {comments.map((c) => (
             <li key={c.id}>
-              <Avatar initials={c.author.initials} color={c.author.color} size={28} />
+              <Avatar
+                initials={c.author.initials}
+                color={c.author.color}
+                image={c.author.avatar_url}
+                size={28}
+              />
               <span>
                 <b>{c.author.display_name}</b>
                 {c.quick_key ? t(c.quick_key) : c.body}{' '}

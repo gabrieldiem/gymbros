@@ -5,8 +5,8 @@ from services.catalog import load_catalog
 
 def test_catalog_has_the_eighteen_v1_exercises():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 20
-    assert len({ex.id for ex in catalog.exercises}) == 20
+    assert len(catalog.exercises) == 21
+    assert len({ex.id for ex in catalog.exercises}) == 21
 
 
 def test_every_routine_uses_known_exercises():
@@ -18,6 +18,7 @@ def test_every_routine_uses_known_exercises():
         "Cardio",
         "Run",
         "Swim",
+        "Stretching",
     ]
     for routine in catalog.routines:
         assert all(catalog.exercise(ex_id) for ex_id in routine.exercise_ids)

@@ -18,3 +18,6 @@ export const TABS: readonly Tab[] = [
   { to: '/quests', icon: 'flag', label: 'nav_quests' },
   { to: '/me', icon: 'bars', label: 'nav_you' },
 ];
+
+/** From this width the dock becomes a side rail (NavRail.module.css). */
+export const DESKTOP_RAIL = '(min-width: 960px)';

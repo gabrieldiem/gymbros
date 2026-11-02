@@ -2,7 +2,9 @@
 
 from dataclasses import asdict
 
+from models.avatar import avatar_url
 from models.climb_mappers import to_climb_change
+from models.photos import photo_url
 from models.workouts import (
     ExerciseOutput,
     FinishResponse,
@@ -10,11 +12,12 @@ from models.workouts import (
     PersonalRecordModel,
     SetModel,
     TrainingNowItem,
+    WorkoutTemplate,
     WorkoutResponse,
 )
 from services.training_now_service import ActiveWorkout
 from services.training_rules import LoggedSet
-from services.workout_types import FinishedWorkout, WorkoutView
+from services.workout_types import FinishedWorkout, WorkoutTemplateView, WorkoutView
 
 
 def _set(logged: LoggedSet) -> SetModel:
@@ -28,6 +31,9 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         id=workout.id,
         name=workout.name,
         routine_id=workout.routine_id,
+        performed_on=workout.performed_on,
+        gym=workout.gym_name,
+        photo_url=photo_url(workout.id, workout.photo_version),
         started_at=workout.started_at,
         exercises=[
             ExerciseOutput(
@@ -41,6 +47,22 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
     )
 
 
+def to_workout_template(template: WorkoutTemplateView) -> WorkoutTemplate:
+    """A routine as it would start now."""
+    return WorkoutTemplate(
+        routine_id=template.routine_id,
+        name=template.name,
+        exercises=[
+            ExerciseOutput(
+                exercise_id=e.exercise_id,
+                sets=[_set(s) for s in e.sets],
+                previous_sets=[_set(s) for s in e.previous_sets],
+            )
+            for e in template.exercises
+        ],
+    )
+
+
 def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishResponse:
     """The finish screen body."""
     workout, score = finished.workout, finished.score
@@ -48,6 +70,7 @@ def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishR
     return FinishResponse(
         workout_id=workout.id,
         name=workout.name,
+        performed_on=workout.performed_on,
         started_at=workout.started_at,
         finished_at=workout.finished_at,
         total=finished.total,
@@ -60,7 +83,9 @@ def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishR
         completed_sets=score.completed_sets,
         vs_last_pct=score.vs_last_pct,
         prs=[
-            PersonalRecordModel(exercise_id=r.exercise_id, load_kg=r.load_kg, reps=r.reps)
+            PersonalRecordModel(
+                exercise_id=r.exercise_id, load_kg=r.load_kg, reps=r.reps, bar_kg=r.bar_kg
+            )
             for r in score.records
             if r.is_improvement
         ],
@@ -77,8 +102,10 @@ def to_training_now_item(active: ActiveWorkout) -> TrainingNowItem:
             "user_id": active.user.id,
             "display_name": active.user.display_name,
             "initials": active.user.initials,
+            "avatar_url": avatar_url(active.user),
             "color": active.user.color,
             "workout_name": active.workout.name,
+            "gym": active.workout.gym_name,
             "routine_id": active.workout.routine_id,
             "started_at": active.workout.started_at,
             "current_exercise_id": active.current_exercise_id,

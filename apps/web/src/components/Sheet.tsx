@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import styles from './Sheet.module.css';
+import { useKeyboardFit } from './useKeyboardFit';
 
 type Props = {
   title: string;
@@ -52,6 +53,7 @@ export function Sheet({ title, onClose, children, hideTitle }: Props) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
   const scrim = useRef<HTMLDivElement>(null);
+  useKeyboardFit(panel);
 
   useEffect(() => {
     const panelElement = panel.current;

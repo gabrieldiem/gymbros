@@ -23,7 +23,7 @@ export function RopeOrder({ standings, target }: { standings: Standing[]; target
           >
             <span className={styles.rk}>{s.position}</span>
             <span className={styles.avatar}>
-              <Avatar initials={s.initials} color={s.color} size={40} />
+              <Avatar initials={s.initials} color={s.color} image={s.avatar_url} size={40} />
             </span>
             <span className={styles.who}>
               <b>{s.is_me ? `${s.display_name} (${t('you')})` : s.display_name}</b>

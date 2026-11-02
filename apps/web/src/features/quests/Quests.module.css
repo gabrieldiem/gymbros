@@ -78,15 +78,6 @@
   max-width: 980px;
 }
 
-.event {
-  background: var(--event-tint);
-  border-color: transparent;
-}
-
-.event h3 {
-  color: var(--event-text);
-}
-
 .bounty {
   background: var(--red-tint);
   border-color: transparent;

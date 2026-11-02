@@ -20,6 +20,7 @@ class ActorModel(BaseModel):
     user_id: uuid.UUID
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
 
 
@@ -49,6 +50,7 @@ class FeedItemModel(BaseModel):
     actor: ActorModel
     created_at: datetime
     vars: dict[str, Any]
+    photo_url: str | None = None
     reactions: ReactionsModel
     comments: list[CommentModel]
     is_mine: bool

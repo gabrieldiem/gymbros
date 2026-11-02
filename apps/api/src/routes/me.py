@@ -1,21 +1,32 @@
 """The signed-in user's profile."""
 
-from fastapi import APIRouter, Depends, Response, status
+import uuid
+
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from db.tables.user import User
 from dependencies import (
+    get_export_service,
+    get_avatar_service,
     get_current_member,
     get_current_user,
     get_me_stats_service,
     get_profile_service,
     get_settings,
 )
-from models.compete import LiftPoint, MeStatsResponse
-from models.compete_mappers import to_me_stats
+from models.compete import LiftPoint, MeStatsResponse, WorkoutDetailResponse
+from models.compete_mappers import to_me_stats, to_workout_detail
 from models.errors import error_responses
+from models.export import ExportResponse
+from models.export_mappers import to_export_response
 from models.mappers import to_me_response
 from models.me import DeleteAccountRequest, MeResponse, UpdateMeRequest
 from routes.session_cookie import clear_session_cookie
+from routes.uploads import read_upload
+from services.avatar_service import AvatarService
+from services.catalog import load_catalog
+from services.export_service import ExportService
+from services.images import MAX_AVATAR_BYTES
 from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.profile_service import ProfileChanges, ProfileService
@@ -64,6 +75,56 @@ async def get_my_stats(
 ) -> MeStatsResponse:
     """The You tab: totals, heatmap, weekly tonnage, PRs and recent workouts."""
     return to_me_stats(await stats.stats(member))
+
+
+@router.get("/export", response_model=ExportResponse, responses=error_responses(401))
+async def export_my_training(
+    response: Response,
+    user: User = Depends(get_current_user),
+    exports: ExportService = Depends(get_export_service),
+) -> ExportResponse:
+    """All your training as a JSON file: every session, its sets, what it paid, your PRs."""
+    export = await exports.export(user)
+    filename = f"gymbros-export-{export.exported_at.date().isoformat()}.json"
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return to_export_response(export, load_catalog())
+
+
+@router.put("/avatar", response_model=MeResponse, responses=error_responses(401, 413, 415))
+async def upload_avatar(
+    request: Request,
+    user: User = Depends(get_current_user),
+    avatars: AvatarService = Depends(get_avatar_service),
+    profiles: ProfileService = Depends(get_profile_service),
+) -> MeResponse:
+    """Replace your profile picture. The body is the image itself."""
+    await avatars.upload(user, await read_upload(request, MAX_AVATAR_BYTES))
+    return to_me_response(await profiles.get(user))
+
+
+@router.delete("/avatar", response_model=MeResponse, responses=error_responses(401))
+async def remove_avatar(
+    user: User = Depends(get_current_user),
+    avatars: AvatarService = Depends(get_avatar_service),
+    profiles: ProfileService = Depends(get_profile_service),
+) -> MeResponse:
+    """Remove your profile picture, back to your characters."""
+    await avatars.remove(user)
+    return to_me_response(await profiles.get(user))
+
+
+@router.get(
+    "/workouts/{workout_id}",
+    response_model=WorkoutDetailResponse,
+    responses=error_responses(401, 403, 404),
+)
+async def get_workout_detail(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    stats: MeStatsService = Depends(get_me_stats_service),
+) -> WorkoutDetailResponse:
+    """One of your finished workouts: what you did and what it paid."""
+    return to_workout_detail(await stats.workout_detail(member, workout_id))
 
 
 @router.get(

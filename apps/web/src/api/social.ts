@@ -8,8 +8,15 @@ import {
 
 import { apiRequest } from './client';
 import type { CrewColor } from './types';
+import { liveInterval } from './liveInterval';
 
-export type Actor = { user_id: string; display_name: string; initials: string; color: CrewColor };
+export type Actor = {
+  user_id: string;
+  display_name: string;
+  initials: string;
+  avatar_url?: string | null;
+  color: CrewColor;
+};
 export type ReactionKind = 'fist' | 'fire';
 export type Reactions = { fist: number; fire: number; mine: ReactionKind[] };
 export type QuickReply = 'q_light' | 'q_beast' | 'q_form' | 'q_six' | 'q_spot' | 'q_respect';
@@ -32,6 +39,7 @@ export type Comment = {
 
 export type PostedSet = {
   load_kg: number | null;
+  bar_kg?: number | null;
   reps: number | null;
   minutes: number | null;
   km: number | null;
@@ -39,6 +47,9 @@ export type PostedSet = {
 
 export type WorkoutPostVars = {
   name: string;
+  gym?: string | null;
+  /** The past day this was logged for. Missing on posts from before past workouts existed. */
+  performed_on?: string | null;
   routine_id: string | null;
   duration_min: number;
   sets: number;
@@ -46,7 +57,7 @@ export type WorkoutPostVars = {
   cardio_minutes: number;
   points: number;
   vs_last_pct: number | null;
-  prs: { exercise_id: string; load_kg: number; reps: number }[];
+  prs: { exercise_id: string; load_kg: number; reps: number; bar_kg?: number | null }[];
   exercises: { exercise_id: string; sets: PostedSet[] }[];
 };
 
@@ -56,6 +67,7 @@ export type FeedItem = {
   actor: Actor;
   created_at: string;
   vars: Record<string, unknown>;
+  photo_url?: string | null;
   reactions: Reactions;
   comments: Comment[];
   is_mine: boolean;
@@ -108,7 +120,7 @@ export function useFeed() {
       last.next_before && last.next_before_id
         ? { before: last.next_before, id: last.next_before_id }
         : null,
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 
@@ -184,7 +196,7 @@ export function useInbox(enabled = true) {
   return useQuery({
     queryKey: inboxKey,
     queryFn: ({ signal }) => apiRequest<Inbox>('/notifications', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
     enabled,
   });
 }

@@ -79,7 +79,7 @@ class FeedService:
     async def comment(
         self, member: Member, item_id: uuid.UUID, body: str | None, quick_key: str | None
     ) -> CommentView:
-        """Add a comment (text or a quick reply); the item's owner is notified."""
+        """Add a comment (text or a quick reply); the owner and others in the thread are told."""
         item = await self._item_in_crew(member, item_id)
         comment = await self._feed.add_comment(
             Comment(
@@ -96,6 +96,11 @@ class FeedService:
             "n_comment",
             {"name": member.user.display_name, "item": item.kind},
             "/crew",
+        )
+        thread = await self._feed.comments([item.id])
+        others = {c.user_id for c in thread.get(item.id, [])} - {item.actor_id}
+        await self._notifier.send(
+            others, member.user.id, "n_reply", {"name": member.user.display_name}, "/crew"
         )
         await self._check_badges(member)
         return CommentView(comment=comment, author=member.user)
@@ -119,6 +124,9 @@ class FeedService:
             c.user_id for thread in comments.values() for c in thread
         }
         users = await self._users.get_many(authors)
+        photos = await self._workouts.photo_versions(
+            [item.workout_id for item in items if item.workout_id]
+        )
         return tuple(
             FeedEntry(
                 item=item,
@@ -127,6 +135,7 @@ class FeedService:
                     [r for r in reactions if r.feed_item_id == item.id], member.user.id
                 ),
                 comments=tuple(CommentView(c, users[c.user_id]) for c in comments.get(item.id, [])),
+                photo_version=photos.get(item.workout_id) if item.workout_id else None,
             )
             for item in items
             if item.actor_id in users

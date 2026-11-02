@@ -9,6 +9,7 @@
   --smoke: #8e8e8a; /* secondary text, labels */
   --volt: #ffe600; /* you, primary buttons, active nav, earned pips */
   --red: #ff3b1f; /* PRs, passed you, alerts, over-target pips, live dot */
+  --green: #34d97b; /* the server is up. Nothing else */
 
   /* tints: the color at 12-14% alpha with a lighter text tone */
   --volt-tint: rgba(255, 230, 0, 0.14);

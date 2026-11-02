@@ -1,5 +1,6 @@
 """The You tab: lifetime stats, heatmap, weekly tonnage, PRs (with history) and recent workouts."""
 
+import uuid
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -8,16 +9,20 @@ from zoneinfo import ZoneInfo
 
 from db.repositories.badge_repository import BadgeRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
+from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.repositories.workout_stats_repository import WorkoutStatsRepository
 from db.tables.personal_record import PersonalRecord
+from db.tables.point_event import PointEvent
 from db.tables.workout import Workout
 from services.catalog import Catalog
 from services.climb_service import ClimbService
 from services.climb_types import ClimbView
-from services.errors import UnknownExerciseForHistory
+from services.errors import UnknownExerciseForHistory, WorkoutNotFound
 from services.member import Member
-from services.training_rules import estimated_1rm, week_start
+from services.training_rules import estimated_1rm, is_completed, week_start
+from services.workout_mapping import to_workout_log
+from services.workout_types import ExerciseEntry
 
 HEATMAP_DAYS = 84
 TONNAGE_WEEKS = 8
@@ -47,6 +52,16 @@ class MeStats:
     history: tuple[HistoryEntry, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class WorkoutDetail:
+    """One finished workout: what was completed and what it paid."""
+
+    workout: Workout
+    sets: int
+    exercises: tuple[ExerciseEntry, ...]
+    line_items: tuple[PointEvent, ...]
+
+
 class MeStatsService:
     """Builds the You tab and per-lift PR history."""
 
@@ -58,11 +73,35 @@ class MeStatsService:
         ],
         catalog: Catalog,
         now: Callable[[], datetime],
+        events: PointEventRepository,
     ) -> None:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self._events = events
         self._climb = climb
         self._workouts, self._stats, self._records, self._badges = repos
         self._catalog = catalog
         self._now = now
+
+    async def workout_detail(self, member: Member, workout_id: uuid.UUID) -> WorkoutDetail:
+        """One of the member's own finished workouts."""
+        workout = await self._workouts.get(workout_id)
+        if workout is None or workout.user_id != member.user.id or workout.finished_at is None:
+            raise WorkoutNotFound(str(workout_id))
+        log = to_workout_log(workout, self._catalog)
+        exercises = tuple(
+            ExerciseEntry(
+                logged.exercise.id,
+                tuple(s for s in logged.sets if is_completed(logged.exercise, s)),
+            )
+            for logged in log.exercises
+        )
+        done = tuple(entry for entry in exercises if entry.sets)
+        return WorkoutDetail(
+            workout=workout,
+            sets=sum(len(entry.sets) for entry in done),
+            exercises=done,
+            line_items=tuple(await self._events.for_workout(workout.id)),
+        )
 
     async def stats(self, member: Member) -> MeStats:
         """The member's profile."""

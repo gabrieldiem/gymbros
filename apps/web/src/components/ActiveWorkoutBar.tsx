@@ -12,7 +12,7 @@ export function ActiveWorkoutBar() {
   if (!workout || pathname === '/train') return null;
   return (
     <Link to="/train" className={styles.bar}>
-      <span className={styles.pulse} aria-hidden="true" />
+      {!workout.performed_on && <span className={styles.pulse} aria-hidden="true" />}
       <span className={styles.grow}>
         <b>{workout.name}</b>
         <span>

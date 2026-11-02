@@ -19,7 +19,12 @@ export function EventRow({ item }: { item: FeedItem }) {
         });
   return (
     <li className={styles.event}>
-      <Avatar initials={item.actor.initials} color={item.actor.color} size={38} />
+      <Avatar
+        initials={item.actor.initials}
+        color={item.actor.color}
+        image={item.actor.avatar_url}
+        size={38}
+      />
       <p>
         {!item.is_mine && <b>{item.actor.display_name}</b>} {text}{' '}
         <span className={styles.muted}>{timeAgo(lang, item.created_at)}</span>

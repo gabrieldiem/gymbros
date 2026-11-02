@@ -34,7 +34,7 @@ describe('Quests tab', () => {
     const crew = await screen.findByRole('region', { name: 'Crew climbs 4,000 pts this week' });
     expect(crew).toHaveTextContent('1,345 pts to go.');
     expect(within(crew).getByText(/Maxo 620/)).toBeVisible();
-    expect(screen.getByText('This week: Leg day x2')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Leg day x2' })).toBeVisible();
     expect(screen.getByText(/Maxo leads with 4,310 pts/)).toBeVisible();
     const legs = screen.getByRole('progressbar', { name: 'Leg day, twice' });
     expect(legs).toHaveAttribute('aria-valuenow', '1');
@@ -99,6 +99,50 @@ describe('Quests tab', () => {
   });
 });
 
+describe('Workout details', () => {
+  it('opens from your history with what you did and what it paid', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/catalog': [200, CATALOG],
+      'GET /api/me/stats': [200, STATS],
+      'GET /api/me/workouts/w1': [
+        200,
+        {
+          id: 'w1',
+          name: 'Leg day',
+          gym: 'Smart Fit',
+          photo_url: '/api/workouts/w1/photo?v=1',
+          performed_on: null,
+          finished_at: '2026-10-30T18:00:00Z',
+          duration_min: 52,
+          points: 175,
+          sets: 1,
+          volume_kg: 300,
+          exercises: [
+            {
+              exercise_id: 'squat',
+              sets: [{ load_kg: 60, bar_kg: 20, reps: 5, minutes: null, km: null }],
+            },
+          ],
+          line_items: [
+            { key: 'ln_show', vars: {}, points: 50 },
+            { key: 'ln_sets', vars: { n: 1 }, points: 125 },
+          ],
+        },
+      ],
+    });
+    renderApp('/me');
+    await userEvent.click(await screen.findByRole('button', { name: /^Leg day/ }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Leg day' }));
+    expect(await sheet.findByText('40+bar×5')).toBeVisible();
+    expect(sheet.getByText('At Smart Fit')).toBeVisible();
+    expect(sheet.getByRole('img', { name: 'Your gym photo' })).toBeVisible();
+    expect(sheet.getByText('52 min')).toBeVisible();
+    expect(sheet.getByText('Showed up')).toBeVisible();
+    expect(sheet.getByText('+175')).toBeVisible();
+  });
+});
+
 describe('Weekly recap', () => {
   it('opens from ATUS Climb and steps through the slides', async () => {
     api();
@@ -111,7 +155,7 @@ describe('Weekly recap', () => {
     expect(story).toHaveTextContent('+812 pts, 5 workouts');
     await userEvent.click(within(story).getByRole('button', { name: 'Next slide' }));
     expect(story).toHaveTextContent('110 kg');
-    expect(story).toHaveTextContent('Maxo, Bench press 110 kg × 3');
+    expect(story).toHaveTextContent('Maxo, Bench press 90 kg + bar × 3');
     await userEvent.click(within(story).getByRole('button', { name: 'Next slide' }));
     expect(story).toHaveTextContent('4 / 3');
     expect(story).toHaveTextContent('From 3rd to 2nd on the rope.');

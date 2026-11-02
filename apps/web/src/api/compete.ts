@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Climb } from './climb';
 import { apiRequest } from './client';
-import type { Actor } from './social';
+import type { Actor, PostedSet } from './social';
+import type { LineItem } from './train';
+import { liveInterval } from './liveInterval';
 
 export type QuestId = 'legs2' | 'ppl' | 'tonnes' | 'distance' | 'cardio';
 export type Quest = {
@@ -91,7 +93,14 @@ export type MeStats = {
   badges_unlocked: number;
   heatmap: { day: string; workouts: number }[];
   weekly_volume: { week_start: string; volume_kg: number }[];
-  prs: { exercise_id: string; load_kg: number; reps: number; e1rm: number; achieved_at: string }[];
+  prs: {
+    exercise_id: string;
+    load_kg: number;
+    bar_kg?: number | null;
+    reps: number;
+    e1rm: number;
+    achieved_at: string;
+  }[];
   history: {
     id: string;
     name: string;
@@ -101,6 +110,21 @@ export type MeStats = {
     sets: number;
     volume_kg: number;
   }[];
+};
+
+export type WorkoutDetail = {
+  id: string;
+  name: string;
+  gym: string | null;
+  photo_url: string | null;
+  performed_on: string | null;
+  finished_at: string;
+  duration_min: number;
+  points: number;
+  sets: number;
+  volume_kg: number;
+  exercises: { exercise_id: string; sets: PostedSet[] }[];
+  line_items: LineItem[];
 };
 
 export type LiftPoint = { week_start: string; e1rm: number };
@@ -113,7 +137,7 @@ export function useQuests() {
   return useQuery({
     queryKey: questsKey,
     queryFn: ({ signal }) => apiRequest<QuestBoard>('/quests', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 
@@ -128,7 +152,7 @@ export function useDuels() {
   return useQuery({
     queryKey: duelsKey,
     queryFn: ({ signal }) => apiRequest<Duel[]>('/duels', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 
@@ -162,6 +186,14 @@ export function useMyStats() {
   return useQuery({
     queryKey: ['me', 'stats'],
     queryFn: ({ signal }) => apiRequest<MeStats>('/me/stats', { signal }),
+  });
+}
+
+export function useWorkoutDetail(workoutId: string) {
+  return useQuery({
+    queryKey: ['me', 'workouts', workoutId],
+    queryFn: ({ signal }) => apiRequest<WorkoutDetail>(`/me/workouts/${workoutId}`, { signal }),
+    staleTime: Infinity, // A finished workout doesn't change.
   });
 }
 

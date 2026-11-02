@@ -17,10 +17,10 @@ class WorkoutStatsRepository:
         self._session = session
 
     async def finished_times(self, user_id: uuid.UUID) -> list[datetime]:
-        """When each of the user's workouts finished."""
+        """When each of the user's workouts finished. Stretching alone isn't a workout."""
         result = await self._session.execute(
             select(Workout.finished_at).where(
-                Workout.user_id == user_id, Workout.finished_at.is_not(None)
+                Workout.user_id == user_id, Workout.week_start.is_not(None)
             )
         )
         return [moment for moment in result.scalars() if moment is not None]

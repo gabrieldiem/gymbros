@@ -9,13 +9,16 @@ export type LegalContent = { title: MessageKey; intro: MessageKey; sections: Sec
 export const PRIVACY_PAGE: LegalContent = {
   title: 'legal_privacy',
   intro: 'privacy_intro',
+  // In the order of Google's privacy policy requirements for OAuth verification.
   sections: [
-    { heading: 'privacy_collect_h', body: 'privacy_collect' },
     { heading: 'privacy_google_h', body: 'privacy_google' },
+    { heading: 'privacy_collect_h', body: 'privacy_collect' },
     { heading: 'privacy_use_h', body: 'privacy_use' },
     { heading: 'privacy_who_h', body: 'privacy_who' },
-    { heading: 'privacy_cookies_h', body: 'privacy_cookies' },
+    { heading: 'privacy_protect_h', body: 'privacy_protect' },
     { heading: 'privacy_keep_h', body: 'privacy_keep' },
+    { heading: 'privacy_limited_h', body: 'privacy_limited' },
+    { heading: 'privacy_cookies_h', body: 'privacy_cookies' },
     { heading: 'privacy_rights_h', body: 'privacy_rights' },
     { heading: 'privacy_kids_h', body: 'privacy_kids' },
     { heading: 'privacy_changes_h', body: 'privacy_changes' },

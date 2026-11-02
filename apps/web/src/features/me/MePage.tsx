@@ -4,6 +4,7 @@ import { useMyStats, type MeStats } from '../../api/compete';
 import { useMe } from '../../api/me';
 import { useCatalog } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
+import { Button } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { Pips } from '../../components/Pips';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
@@ -13,6 +14,8 @@ import type { MessageKey } from '../../i18n/en';
 import { ordinal } from '../../i18n/ordinal';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
+import { ProfileSheet } from './ProfileSheet';
+import { WorkoutDetailSheet } from './WorkoutDetailSheet';
 import { heatLevel } from './charts';
 import styles from './Me.module.css';
 import { PrChart } from './PrChart';
@@ -75,6 +78,8 @@ export function MePage() {
   const stats = useMyStats();
   const exercises = useCatalog().data?.exercises ?? [];
   const [settings, setSettings] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [openWorkout, setOpenWorkout] = useState<{ id: string; name: string } | null>(null);
   const [chart, setChart] = useState<string | null>(null);
   const data = stats.data;
   if (!me || !data) {
@@ -100,7 +105,7 @@ export function MePage() {
   return (
     <section aria-labelledby="page-title">
       <div className={styles.head}>
-        <Avatar initials={me.initials} color={me.color} size={88} />
+        <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={88} />
         <div className={styles.grow}>
           <h1 id="page-title">{me.display_name}</h1>
           <p className={styles.muted}>
@@ -112,6 +117,9 @@ export function MePage() {
             {t('pips_label', { n: climb.me.workouts_this_week, target: climb.weekly_target })}
           </p>
         </div>
+        <Button variant="ghost" className={styles.editProfile} onClick={() => setEditing(true)}>
+          {t('profile_edit')}
+        </Button>
         <button
           type="button"
           className={styles.gear}
@@ -180,7 +188,14 @@ export function MePage() {
           {data.prs.length === 0 && <p className={styles.muted}>{t('prs_empty')}</p>}
           <ul className={`${styles.prs} stagger`}>
             {data.prs.slice(0, 8).map((pr) => {
-              const best = formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n);
+              const best = formatLift(
+                exercise(pr.exercise_id),
+                pr.load_kg,
+                pr.reps,
+                t,
+                n,
+                pr.bar_kg,
+              );
               const name = exercise(pr.exercise_id)?.name ?? pr.exercise_id;
               // Cardio records have no e1RM and no lift chart.
               if (exercise(pr.exercise_id)?.type === 'c') {
@@ -215,14 +230,16 @@ export function MePage() {
           <ul className={`${styles.history} stagger`}>
             {data.history.map((h) => (
               <li key={h.id}>
-                <span>
-                  {h.name}
-                  <small>
-                    {timeAgo(lang, h.finished_at)} ·{' '}
-                    {t('history_row', { sets: h.sets, kg: n(h.volume_kg), min: h.duration_min })}
-                  </small>
-                </span>
-                <b>+{n(h.points)}</b>
+                <button type="button" onClick={() => setOpenWorkout({ id: h.id, name: h.name })}>
+                  <span>
+                    {h.name}
+                    <small>
+                      {timeAgo(lang, h.finished_at)} ·{' '}
+                      {t('history_row', { sets: h.sets, kg: n(h.volume_kg), min: h.duration_min })}
+                    </small>
+                  </span>
+                  <b>+{n(h.points)}</b>
+                </button>
               </li>
             ))}
           </ul>
@@ -230,6 +247,14 @@ export function MePage() {
       </div>
 
       {settings && <SettingsSheet onClose={() => setSettings(false)} />}
+      {editing && <ProfileSheet onClose={() => setEditing(false)} />}
+      {openWorkout && (
+        <WorkoutDetailSheet
+          workoutId={openWorkout.id}
+          title={openWorkout.name}
+          onClose={() => setOpenWorkout(null)}
+        />
+      )}
       {chart && (
         <Sheet title={exercise(chart)?.name ?? chart} onClose={() => setChart(null)}>
           <p className={styles.muted}>{t('pr_chart_sub')}</p>

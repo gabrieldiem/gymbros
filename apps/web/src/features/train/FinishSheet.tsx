@@ -6,6 +6,7 @@ import { cx } from '../../components/cx';
 import { Confetti } from '../../components/Confetti';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import styles from './FinishSheet.module.css';
 import { lineItemText } from './format';
 
@@ -45,7 +46,7 @@ const CELEBRATED = ['ln_pr', 'ln_pr_distance', 'ln_goal', 'ln_badge', 'ln_bounty
 
 /** The reward moment: every line item from the API and the total. */
 export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
-  const { t, n } = useI18n();
+  const { t, n, lang } = useI18n();
   const shown = useCountUp(result.total, 300 + result.line_items.length * 100);
   const vs = result.vs_last_pct;
   const vsText =
@@ -64,10 +65,12 @@ export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
       {celebrate && <Confetti />}
       <div className={styles.summary}>
         <p className={styles.done}>
-          {t('sum_done', {
-            name: result.name,
-            n: minutesBetween(result.started_at, result.finished_at),
-          })}
+          {result.performed_on
+            ? t('sum_done_past', { name: result.name, day: formatDay(lang, result.performed_on) })
+            : t('sum_done', {
+                name: result.name,
+                n: minutesBetween(result.started_at, result.finished_at),
+              })}
         </p>
         <div className={styles.big} aria-hidden="true">
           {n(shown)}

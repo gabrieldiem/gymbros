@@ -2,10 +2,15 @@
 
 from db.tables.admin_action import AdminAction
 from db.tables.auth_session import AuthSession
+from db.tables.avatar import Avatar
 from db.tables.comment import Comment
 from db.tables.crew import Crew
+from db.tables.digest_send import DigestSend
 from db.tables.duel import Duel
+from db.tables.email_settings import EmailSettings
 from db.tables.feed_item import FeedItem
+from db.tables.feedback import Feedback
+from db.tables.gym import Gym
 from db.tables.membership import Membership
 from db.tables.notification import Notification
 from db.tables.personal_record import PersonalRecord
@@ -14,15 +19,21 @@ from db.tables.reaction import Reaction
 from db.tables.user import User
 from db.tables.user_badge import UserBadge
 from db.tables.workout import Workout
+from db.tables.workout_photo import WorkoutPhoto
 from db.tables.workout_set import WorkoutSet
 
 __all__ = [
     "AdminAction",
     "AuthSession",
+    "Avatar",
     "Comment",
     "Crew",
+    "DigestSend",
     "Duel",
+    "EmailSettings",
     "FeedItem",
+    "Feedback",
+    "Gym",
     "Membership",
     "Notification",
     "PersonalRecord",
@@ -31,5 +42,6 @@ __all__ = [
     "User",
     "UserBadge",
     "Workout",
+    "WorkoutPhoto",
     "WorkoutSet",
 ]

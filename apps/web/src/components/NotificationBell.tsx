@@ -70,7 +70,12 @@ export function NotificationBell() {
                 <li key={item.id} className={cx(!item.read && styles.unread)}>
                   <button type="button" onClick={() => handleGo(item)}>
                     {item.actor && (
-                      <Avatar initials={item.actor.initials} color={item.actor.color} size={36} />
+                      <Avatar
+                        initials={item.actor.initials}
+                        color={item.actor.color}
+                        image={item.actor.avatar_url}
+                        size={36}
+                      />
                     )}
                     <p>
                       {!item.read && <span className={styles.dot} aria-hidden="true" />}

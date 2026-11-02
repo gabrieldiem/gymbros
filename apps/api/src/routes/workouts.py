@@ -2,34 +2,46 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from clock import utc_now
 from dependencies import (
     get_current_member,
+    get_gym_service,
     get_scoring_context,
     get_settings,
     get_workout_finisher,
+    get_workout_photo_service,
     get_workout_service,
 )
 from models.errors import error_responses
-from models.workout_mappers import to_finish_response, to_workout_response
+from models.photos import PhotoResponse, photo_url
+from models.workout_mappers import to_finish_response, to_workout_response, to_workout_template
 from models.workouts import (
     FinishResponse,
+    PastDayModel,
     SaveWorkoutRequest,
+    SyncWorkoutRequest,
+    WorkoutTemplate,
     StartWorkoutRequest,
     WeekResponse,
     WorkoutResponse,
 )
+from routes.uploads import read_upload
+from services.gym_service import GymService
+from services.images import MAX_PHOTO_BYTES
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
-from services.training_rules import LoggedSet
+from services.training_rules import LoggedSet, week_end
 from services.workout_finisher import WorkoutFinisher
+from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
-from services.workout_types import ExerciseEntry
+from services.workout_types import ExerciseEntry, LoggedOffline
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
+
+_A_YEAR = 365 * 24 * 3600
 
 
 @router.post(
@@ -42,9 +54,12 @@ async def start_workout(
     body: StartWorkoutRequest,
     member: Member = Depends(get_current_member),
     workouts: WorkoutService = Depends(get_workout_service),
+    gyms: GymService = Depends(get_gym_service),
 ) -> WorkoutResponse:
-    """Start a workout from a routine (pre-filled to beat last time) or empty."""
-    return to_workout_response(await workouts.start(member, body.routine_id, body.name))
+    """Start a workout from a routine (pre-filled to beat last time) or empty, or log a past day."""
+    gym = body.gym if "gym" in body.model_fields_set else await gyms.default_name(member.user.id)
+    view = await workouts.start(member, body.routine_id, body.name, body.performed_on, gym)
+    return to_workout_response(view)
 
 
 @router.get("/active", response_model=WorkoutResponse | None, responses=error_responses(401, 403))
@@ -61,15 +76,30 @@ async def get_active_workout(
 async def get_week(
     member: Member = Depends(get_current_member),
     context: ScoringContextBuilder = Depends(get_scoring_context),
+    workouts: WorkoutService = Depends(get_workout_service),
     settings: Settings = Depends(get_settings),
 ) -> WeekResponse:
     """Workouts finished this crew-local week against the weekly target."""
-    week = await context.week(member, utc_now())
+    now = utc_now()
+    week = await context.week(member, now)
     return WeekResponse(
         workouts=week.workouts_before,
         target=settings.game_weekly_target,
         leg_event_active=week.leg_event_active,
+        event_ends_at=week_end(now, member.crew.time_zone) if week.leg_event_active else None,
+        past_days=[
+            PastDayModel(day=p.day, workouts=p.workouts) for p in await workouts.past_days(member)
+        ],
     )
+
+
+@router.get("/templates", response_model=list[WorkoutTemplate], responses=error_responses(401, 403))
+async def get_templates(
+    member: Member = Depends(get_current_member),
+    workouts: WorkoutService = Depends(get_workout_service),
+) -> list[WorkoutTemplate]:
+    """Every routine as it would start now, so a phone can start one with no signal."""
+    return [to_workout_template(t) for t in await workouts.templates(member)]
 
 
 @router.put(
@@ -86,7 +116,10 @@ async def save_workout(
         ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
         for e in body.exercises
     )
-    return to_workout_response(await workouts.save(member, workout_id, body.name, entries))
+    change_gym = "gym" in body.model_fields_set
+    return to_workout_response(
+        await workouts.save(member, workout_id, body.name, entries, change_gym, body.gym)
+    )
 
 
 @router.delete(
@@ -101,6 +134,84 @@ async def discard_workout(
 ) -> None:
     """Throw away an in-progress workout."""
     await workouts.discard(member, workout_id)
+
+
+@router.put(
+    "/{workout_id}/photo",
+    response_model=PhotoResponse,
+    responses=error_responses(401, 403, 404, 413, 415),
+)
+async def upload_photo(
+    workout_id: uuid.UUID,
+    request: Request,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> PhotoResponse:
+    """Add or replace the photo of your workout. The body is the image itself."""
+    data = await read_upload(request, MAX_PHOTO_BYTES)
+    workout = await photos.upload(member, workout_id, data)
+    return PhotoResponse(photo_url=photo_url(workout.id, workout.photo_version))
+
+
+@router.delete(
+    "/{workout_id}/photo", response_model=PhotoResponse, responses=error_responses(401, 403, 404)
+)
+async def remove_photo(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> PhotoResponse:
+    """Remove the photo of your workout."""
+    workout = await photos.remove(member, workout_id)
+    return PhotoResponse(photo_url=photo_url(workout.id, workout.photo_version))
+
+
+@router.get("/{workout_id}/photo", responses=error_responses(401, 403, 404))
+async def get_photo(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> Response:
+    """A workout's photo, for its crew. Its URL changes with each upload, so it caches for good."""
+    photo = await photos.view(member, workout_id)
+    return Response(
+        content=photo.image,
+        media_type=photo.content_type,
+        headers={
+            "Cache-Control": f"private, max-age={_A_YEAR}, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; sandbox",
+        },
+    )
+
+
+@router.post(
+    "/{workout_id}/sync",
+    response_model=FinishResponse,
+    responses=error_responses(401, 403, 404, 409, 422),
+)
+async def sync_workout(
+    workout_id: uuid.UUID,
+    body: SyncWorkoutRequest,
+    member: Member = Depends(get_current_member),
+    finisher: WorkoutFinisher = Depends(get_workout_finisher),
+    settings: Settings = Depends(get_settings),
+) -> FinishResponse:
+    """A whole workout logged with no signal. Sending it twice is safe: the second is a 409."""
+    logged = LoggedOffline(
+        workout_id=workout_id,
+        routine_id=body.routine_id,
+        name=body.name,
+        gym=body.gym,
+        performed_on=body.performed_on,
+        started_at=body.started_at,
+        finished_at=body.finished_at,
+        entries=tuple(
+            ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+            for e in body.exercises
+        ),
+    )
+    return to_finish_response(await finisher.sync(member, logged), settings.game_weekly_target)
 
 
 @router.post(

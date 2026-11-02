@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.membership import Membership
+from db.tables.point_event import PointEvent
 from db.tables.user import User
 from db.tables.workout import Workout
 from db.tables.workout_set import WorkoutSet
@@ -49,9 +50,12 @@ class WorkoutRepository:
         await self._session.flush()
 
     async def last_sets(
-        self, user_id: uuid.UUID, exercise_ids: list[str]
+        self, user_id: uuid.UUID, exercise_ids: list[str], before: datetime | None = None
     ) -> dict[str, list[WorkoutSet]]:
-        """Per exercise, the sets from the user's most recent finished workout that had it."""
+        """Per exercise, the sets from the user's most recent finished workout that had it.
+
+        With `before`, the most recent one finished before then.
+        """
         latest = (
             select(WorkoutSet.exercise_id, WorkoutSet.workout_id)
             .join(Workout, Workout.id == WorkoutSet.workout_id)
@@ -59,6 +63,7 @@ class WorkoutRepository:
                 Workout.user_id == user_id,
                 Workout.finished_at.is_not(None),
                 WorkoutSet.exercise_id.in_(exercise_ids),
+                *([Workout.finished_at < before] if before else []),
             )
             .ext(distinct_on(WorkoutSet.exercise_id))
             .order_by(WorkoutSet.exercise_id, Workout.finished_at.desc())
@@ -77,15 +82,19 @@ class WorkoutRepository:
         return dict(by_exercise)
 
     async def previous_routine_work(
-        self, user_id: uuid.UUID, routine_id: str
+        self, user_id: uuid.UUID, routine_id: str, before: datetime | None = None
     ) -> tuple[float | None, float]:
-        """(volume, effort km) of the user's last finished workout of this routine."""
+        """(volume, effort km) of the user's last finished workout of this routine.
+
+        With `before`, the last one finished before then.
+        """
         result = await self._session.execute(
             select(Workout.volume_kg, Workout.effort_km)
             .where(
                 Workout.user_id == user_id,
                 Workout.routine_id == routine_id,
                 Workout.finished_at.is_not(None),
+                *([Workout.finished_at < before] if before else []),
             )
             .order_by(Workout.finished_at.desc())
             .limit(1)
@@ -106,8 +115,52 @@ class WorkoutRepository:
         )
         return {week: count for week, count in result.all() if week is not None}
 
+    async def finished_by_user(self, user_id: uuid.UUID) -> list[Workout]:
+        """All the user's finished workouts with their sets, oldest first."""
+        result = await self._session.execute(
+            select(Workout)
+            .where(Workout.user_id == user_id, Workout.finished_at.is_not(None))
+            .order_by(Workout.finished_at, Workout.id)
+        )
+        return list(result.scalars())
+
+    async def photo_versions(self, workout_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
+        """Which of these workouts have a photo, and its version."""
+        if not workout_ids:
+            return {}
+        result = await self._session.execute(
+            select(Workout.id, Workout.photo_version).where(
+                Workout.id.in_(workout_ids), Workout.photo_version.is_not(None)
+            )
+        )
+        return {workout_id: version for workout_id, version in result.all() if version is not None}
+
+    async def stretched_between(self, user_id: uuid.UUID, start: datetime, end: datetime) -> bool:
+        """Whether a workout that counts as finished in this window paid for stretching."""
+        found = await self._session.scalar(
+            select(func.count())
+            .select_from(PointEvent)
+            .join(Workout, Workout.id == PointEvent.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at >= start,
+                Workout.finished_at < end,
+                PointEvent.key == "ln_stretch",
+            )
+        )
+        return bool(found)
+
+    async def finished_since(self, user_id: uuid.UUID, since: datetime) -> list[datetime]:
+        """When the user's workouts from `since` on count as finished."""
+        result = await self._session.execute(
+            select(Workout.finished_at).where(
+                Workout.user_id == user_id, Workout.finished_at >= since
+            )
+        )
+        return [moment for moment in result.scalars() if moment is not None]
+
     async def active_in_crew(self, crew_id: uuid.UUID) -> list[tuple[Workout, User]]:
-        """In-progress workouts of the crew's members, oldest first."""
+        """Crew members training right now, oldest first. Logging a past day isn't training."""
         result = await self._session.execute(
             select(Workout, User)
             .join(User, User.id == Workout.user_id)
@@ -115,7 +168,7 @@ class WorkoutRepository:
                 Membership,
                 and_(Membership.user_id == User.id, Membership.crew_id == crew_id),
             )
-            .where(Workout.finished_at.is_(None))
+            .where(Workout.finished_at.is_(None), Workout.performed_on.is_(None))
             .order_by(Workout.started_at)
         )
         return [(row[0], row[1]) for row in result.all()]
@@ -173,7 +226,7 @@ class WorkoutRepository:
         """When each member of the crew last finished a workout."""
         result = await self._session.execute(
             select(Workout.user_id, func.max(Workout.finished_at))
-            .where(Workout.crew_id == crew_id, Workout.finished_at.is_not(None))
+            .where(Workout.crew_id == crew_id, Workout.week_start.is_not(None))
             .group_by(Workout.user_id)
         )
         return {user_id: last for user_id, last in result.all() if last is not None}

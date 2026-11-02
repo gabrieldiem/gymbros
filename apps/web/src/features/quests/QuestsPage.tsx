@@ -7,6 +7,7 @@ import { useRules } from '../../api/rules';
 import { Button, ButtonLink } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { ErrorBlock, LoadingBlock, QueryState } from '../../components/QueryState';
+import { TimedEventCard } from '../../components/TimedEvent';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
 import { PointsList, SportsCompare } from '../landing/LandingSections';
@@ -39,17 +40,13 @@ function QuestsView() {
       <CrewQuest crew={board.crew_quest} />
       <div className={`${styles.cards} stagger`}>
         {board.weekly_event === 'leg_day_x2' && (
-          <article className={cx(styles.panel, styles.card, styles.event)}>
-            <h3>{t('event_title', { w: t('leg_event_name') })}</h3>
-            <p>
-              {t('weather_desc')} {t('weather_more')}
-            </p>
+          <TimedEventCard endsAt={board.ends_at}>
             <div className={styles.cta}>
               <ButtonLink to="/train" variant="ghost">
                 {t('weather_cta')}
               </ButtonLink>
             </div>
-          </article>
+          </TimedEventCard>
         )}
         <article className={cx(styles.panel, styles.card, styles.bounty)}>
           {bounty.claimed_by ? (

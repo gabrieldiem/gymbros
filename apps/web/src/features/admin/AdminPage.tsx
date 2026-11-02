@@ -4,8 +4,10 @@ import { Link } from 'react-router';
 import {
   useAdminActions,
   useAdminCrews,
+  useAdminFeedback,
   useAdminMembers,
   useAdminOverview,
+  useSetFeedbackHandled,
   type AdminCrew,
   type AdminMember,
 } from '../../api/admin';
@@ -25,8 +27,9 @@ import { timeAgo } from '../../i18n/timeAgo';
 import { useProfileLanguage } from '../../i18n/useLanguage';
 import styles from './Admin.module.css';
 import { CrewSheet, MemberSheet } from './AdminSheets';
+import { EmailTab } from './EmailTab';
 
-type View = 'overview' | 'crews' | 'members' | 'log';
+type View = 'overview' | 'crews' | 'members' | 'email' | 'feedback' | 'log';
 
 function Overview() {
   const { t, n } = useI18n();
@@ -136,7 +139,12 @@ function Members() {
               {members.map((member) => (
                 <li key={member.id}>
                   <button type="button" className={styles.row} onClick={() => setOpen(member)}>
-                    <Avatar initials={member.initials} color={member.color} size={40} />
+                    <Avatar
+                      initials={member.initials}
+                      color={member.color}
+                      image={member.avatar_url}
+                      size={40}
+                    />
                     <span className={styles.rowMain}>
                       <b>
                         {member.display_name}
@@ -164,6 +172,41 @@ function Members() {
       </QueryState>
       {open && <MemberSheet member={open} onClose={() => setOpen(null)} />}
     </>
+  );
+}
+
+function Feedback() {
+  const { t, lang } = useI18n();
+  const query = useAdminFeedback();
+  const setHandled = useSetFeedbackHandled();
+  return (
+    <QueryState query={query} failed="admin_failed">
+      {(items) =>
+        items.length === 0 ? (
+          <p className={styles.muted}>{t('admin_feedback_empty')}</p>
+        ) : (
+          <ul className={`${styles.feedback} stagger`}>
+            {items.map((item) => (
+              <li key={item.id} className={item.handled ? styles.handled : undefined}>
+                <b>{t(`feedback_${item.kind}`)}</b>
+                <p>{item.body}</p>
+                <small>
+                  {item.display_name}, <a href={`mailto:${item.email}`}>{item.email}</a>,{' '}
+                  {timeAgo(lang, item.created_at)}
+                </small>
+                <Button
+                  variant="quiet"
+                  disabled={setHandled.isPending}
+                  onClick={() => setHandled.mutate({ id: item.id, handled: !item.handled })}
+                >
+                  {t(item.handled ? 'admin_feedback_reopen' : 'admin_feedback_done')}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </QueryState>
   );
 }
 
@@ -238,6 +281,8 @@ export function AdminPage() {
               { value: 'overview', label: t('admin_view_overview') },
               { value: 'crews', label: t('admin_crews') },
               { value: 'members', label: t('admin_users') },
+              { value: 'email', label: t('admin_view_email') },
+              { value: 'feedback', label: t('admin_view_feedback') },
               { value: 'log', label: t('admin_view_log') },
             ]}
           />
@@ -246,6 +291,8 @@ export function AdminPage() {
           {view === 'overview' && <Overview />}
           {view === 'crews' && <Crews />}
           {view === 'members' && <Members />}
+          {view === 'email' && <EmailTab />}
+          {view === 'feedback' && <Feedback />}
           {view === 'log' && <Log />}
         </div>
       </main>

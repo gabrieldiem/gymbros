@@ -27,6 +27,7 @@ function Podium({ improved }: { improved: Hof['most_improved'] }) {
             aria-label={`${i + 1}`}
           >
             <Avatar
+              image={entry.member.avatar_url}
               initials={entry.member.initials}
               color={entry.member.color}
               size={i === 0 ? 60 : 46}
@@ -99,6 +100,7 @@ export function HallOfFame({ exercises }: { exercises: Exercise[] }) {
                   </b>
                   <span className={styles.holder}>
                     <Avatar
+                      image={record.holder.avatar_url}
                       initials={record.holder.initials}
                       color={record.holder.color}
                       size={24}

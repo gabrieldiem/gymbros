@@ -139,3 +139,7 @@
     animation: none;
   }
 }
+
+.picture {
+  clip-path: circle(50%);
+}

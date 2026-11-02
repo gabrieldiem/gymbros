@@ -1,0 +1,18 @@
+.gym {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.gym select {
+  max-width: 200px;
+  min-height: 36px;
+  padding: 0 6px;
+  color: var(--chalk);
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}

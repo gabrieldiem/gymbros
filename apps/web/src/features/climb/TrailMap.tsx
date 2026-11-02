@@ -1,24 +1,17 @@
 import { useMemo } from 'react';
 
 import type { Standing } from '../../api/climb';
-import type { CrewColor } from '../../api/types';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
 import { buildContours, buildTrail, markerOffsets, TRAIL_D, VIEW_H, VIEW_W } from './trail';
 import styles from './TrailMap.module.css';
 import { useClimbAnimation } from './useClimbAnimation';
+import { inkOn, memberColorHex } from '../../components/memberColor';
 
 const TRAIL = buildTrail();
 const CONTOURS = buildContours();
 const CAMPS = 7;
-const COLORS: Record<CrewColor, string> = {
-  volt: '#FFE600',
-  red: '#FF3B1F',
-  cyan: '#00D1FF',
-  pink: '#FF4FD8',
-  violet: '#B48CFF',
-};
 
 type Props = {
   standings: Standing[];
@@ -172,8 +165,20 @@ export function TrailMap({ standings, summit, campStep, climbFrom, onClimbDone }
                 transform={`translate(${(p.x + nrm.x * o).toFixed(1)} ${(p.y + nrm.y * o).toFixed(1)})`}
               >
                 {s.is_me && <circle className={styles.halo} r="27" />}
-                <circle className={styles.body} r="17" fill={COLORS[s.color]} />
-                <text>{s.initials}</text>
+                <circle className={styles.body} r="17" fill={memberColorHex(s.color)} />
+                {s.avatar_url ? (
+                  <image
+                    className={styles.picture}
+                    href={s.avatar_url}
+                    x="-17"
+                    y="-17"
+                    width="34"
+                    height="34"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                ) : (
+                  <text fill={inkOn(s.color)}>{s.initials}</text>
+                )}
                 {s.training_now && <circle className={styles.live} cx="13" cy="-13" r="6" />}
                 {s.is_me && (
                   <text className={styles.tag} y="-35">

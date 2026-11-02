@@ -32,6 +32,7 @@ class History:
     personal_records: Mapping[str, float]
     previous_routine_volume_kg: float | None
     previous_routine_effort_km: float = 0.0
+    stretched_that_day: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,6 +61,7 @@ class ScoringRules:
     goal_streak_max: int
     over_target: int
     better_than_last_time: int
+    stretching: int
     weekly_target: int
     bodyweight_kg: float
 
@@ -79,6 +81,7 @@ class ScoringRules:
             goal_streak_max=settings.scoring_goal_streak_max,
             over_target=settings.scoring_over_target,
             better_than_last_time=settings.scoring_better_than_last_time,
+            stretching=settings.scoring_stretching,
             weekly_target=settings.game_weekly_target,
             bodyweight_kg=settings.game_bodyweight_kg,
         )
@@ -102,6 +105,7 @@ class RecordSet:
     reps: int
     e1rm: float
     is_improvement: bool
+    bar_kg: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

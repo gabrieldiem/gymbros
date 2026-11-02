@@ -50,9 +50,9 @@
 
 .row {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 78px 66px 48px;
+  grid-template-columns: 34px minmax(0, 1fr) 72px 60px 46px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 5px 0;
 }
 
@@ -68,18 +68,44 @@
   text-align: center;
 }
 
+/* The set number is also how you remove the row: 46 px tall, and the gap counts towards its width. */
 .n {
-  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
   color: var(--smoke);
-  text-align: center;
+  line-height: 1.1;
+}
+
+.n b {
+  font-weight: 700;
+}
+
+.n i {
+  font-style: normal;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.n:hover:not(:disabled) {
+  color: var(--chalk);
 }
 
 .prev {
+  height: 46px;
+  min-width: 0;
   font-size: 0.85rem;
   color: var(--smoke);
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.prev:hover:not(:disabled) {
+  color: var(--chalk);
 }
 
 .input {
@@ -161,4 +187,103 @@
 
 .check:hover {
   border-color: var(--smoke);
+}
+
+.title {
+  flex: 1 1 55%;
+  min-width: 0;
+}
+
+.record {
+  display: block;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}
+
+.bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--smoke);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.bar select {
+  min-height: 36px;
+  padding: 0 6px;
+  color: var(--chalk);
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}
+
+.barDetail {
+  max-width: none;
+  margin: -2px 0 4px;
+  color: var(--smoke);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.meta:empty {
+  display: none;
+}
+
+.meta .bar {
+  margin-left: auto;
+}
+
+.stretch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.choices {
+  display: flex;
+  gap: 6px;
+}
+
+.choices button {
+  min-width: 72px;
+  height: 46px;
+  color: var(--smoke);
+  font-weight: 600;
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}
+
+.choices button[aria-pressed='true'] {
+  color: var(--chalk);
+  border-color: var(--chalk);
+}
+
+.stretch .check {
+  width: 46px;
+  flex: none;
+}
+
+.bonus {
+  margin-left: 8px;
+  padding: 1px 8px;
+  color: var(--event-text);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+  background: var(--event-tint);
+  border-radius: var(--r-pill);
 }

@@ -1,0 +1,18 @@
+{
+  "entries": [
+    { "id": "weekly-email", "date": "2026-11-02", "link": "/privacy" },
+    { "id": "offline", "date": "2026-11-02", "link": "/train" },
+    { "id": "export", "date": "2026-11-02", "link": "/me" },
+    { "id": "feedback", "date": "2026-11-02", "link": "/me" },
+    { "id": "photos", "date": "2026-11-02", "link": "/train" },
+    { "id": "profile", "date": "2026-11-02", "link": "/me" },
+    { "id": "gyms", "date": "2026-11-02", "link": "/train" },
+    { "id": "rest-timer", "date": "2026-11-02", "link": "/train" },
+    { "id": "stretching", "date": "2026-11-02", "link": "/train" },
+    { "id": "workout-details", "date": "2026-11-02", "link": "/me" },
+    { "id": "faster-sets", "date": "2026-11-02", "link": "/train" },
+    { "id": "past-workouts", "date": "2026-11-02", "link": "/train" },
+    { "id": "achievements-menu", "date": "2026-11-02", "link": "/quests/achievements" },
+    { "id": "runs-and-swims", "date": "2026-11-02", "link": "/quests/points" }
+  ]
+}

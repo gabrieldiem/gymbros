@@ -368,3 +368,132 @@ describe('Invite codes in the backoffice', () => {
     expect(await dialog.findByRole('alert')).toHaveTextContent('in another crew');
   });
 });
+
+describe('Backoffice: feedback', () => {
+  const ITEM = {
+    id: 'f1',
+    kind: 'bug',
+    body: 'The map is slow',
+    created_at: new Date().toISOString(),
+    handled: false,
+    display_name: 'Maxo',
+    email: 'maxo@example.com',
+  };
+
+  it('shows what members sent and marks it as handled', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe({ is_admin: true })],
+      'GET /api/admin/overview': [200, OVERVIEW],
+      'GET /api/admin/feedback': [200, [ITEM]],
+      'PATCH /api/admin/feedback/f1': [200, { handled: true }],
+    });
+    renderApp('/admin');
+    await userEvent.click(await screen.findByRole('button', { name: 'Feedback' }));
+    expect(await screen.findByText('The map is slow')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'maxo@example.com' })).toHaveAttribute(
+      'href',
+      'mailto:maxo@example.com',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Mark as handled' }));
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(
+        ([url, init]) => url === '/api/admin/feedback/f1' && init?.method === 'PATCH',
+      );
+      expect(JSON.parse(String(call?.[1]?.body))).toEqual({ handled: true });
+    });
+  });
+
+  it('says so when there is nothing yet', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe({ is_admin: true })],
+      'GET /api/admin/overview': [200, OVERVIEW],
+      'GET /api/admin/feedback': [200, []],
+    });
+    renderApp('/admin');
+    await userEvent.click(await screen.findByRole('button', { name: 'Feedback' }));
+    expect(await screen.findByText(/What members send from the app/)).toBeVisible();
+  });
+});
+
+describe('Backoffice: email', () => {
+  const SETTINGS = {
+    welcome_enabled: true,
+    digest_enabled: false,
+    digest_hour: 9,
+    configured: true,
+    sender: 'GYMBROS <hola@example.com>',
+    digests_sent_this_week: 0,
+  };
+  const bodies = (fetchMock: ReturnType<typeof mockApi>, url: string) =>
+    fetchMock.mock.calls
+      .filter(([u, init]) => u === url && init?.method !== undefined && init.method !== 'GET')
+      .map(([, init]) => JSON.parse(String(init?.body)) as unknown);
+  const openEmail = async (routes: Parameters<typeof mockApi>[0] = {}) => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, ADMIN],
+      'GET /api/admin/overview': [200, OVERVIEW],
+      'GET /api/admin/crews': [200, [CREW_ROW]],
+      'GET /api/admin/email': [200, SETTINGS],
+      ...routes,
+    });
+    renderApp('/admin');
+    await userEvent.click(await screen.findByRole('button', { name: 'Email' }));
+    await screen.findByRole('heading', { name: 'Automatic emails' });
+    return fetchMock;
+  };
+
+  it('turns on the digest, which starts off', async () => {
+    const fetchMock = await openEmail({
+      'PATCH /api/admin/email': [200, { ...SETTINGS, digest_enabled: true }],
+    });
+    const digest = screen.getByRole('checkbox', { name: 'Weekly digest on Monday morning' });
+    expect(digest).not.toBeChecked();
+    await userEvent.click(digest);
+    await waitFor(() =>
+      expect(bodies(fetchMock, '/api/admin/email')).toEqual([{ digest_enabled: true }]),
+    );
+  });
+
+  it('says plainly when email can’t go out at all', async () => {
+    await openEmail({ 'GET /api/admin/email': [200, { ...SETTINGS, configured: false }] });
+    expect(screen.getByText(/RESEND_API_KEY isn’t set/)).toBeVisible();
+  });
+
+  it('asks before sending, saying how many it reaches', async () => {
+    const fetchMock = await openEmail({
+      'POST /api/admin/email/message': (body) =>
+        (body as { dry_run?: boolean }).dry_run
+          ? [200, { recipients: 5, sent: 0 }]
+          : [200, { recipients: 5, sent: 5 }],
+    });
+    await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
+    await userEvent.type(screen.getByLabelText('Message'), 'See you Monday');
+    await userEvent.click(screen.getByRole('button', { name: 'Review' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Send to 5' }));
+    expect(await screen.findByText('Sent to 5 of 5.')).toBeVisible();
+    expect(bodies(fetchMock, '/api/admin/email/message')).toEqual([
+      { subject: 'Gym closed', body: 'See you Monday', dry_run: true },
+      { subject: 'Gym closed', body: 'See you Monday' },
+    ]);
+  });
+
+  it('counts again if the message changes after reviewing', async () => {
+    await openEmail({ 'POST /api/admin/email/message': [200, { recipients: 5, sent: 0 }] });
+    await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
+    await userEvent.type(screen.getByLabelText('Message'), 'See you');
+    await userEvent.click(screen.getByRole('button', { name: 'Review' }));
+    await screen.findByRole('button', { name: 'Send to 5' });
+    await userEvent.selectOptions(screen.getByLabelText('To'), 'One person');
+    expect(screen.queryByRole('button', { name: 'Send to 5' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Review' })).toBeDisabled();
+  });
+
+  it('can’t send to nobody', async () => {
+    await openEmail({ 'POST /api/admin/email/message': [200, { recipients: 0, sent: 0 }] });
+    await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
+    await userEvent.type(screen.getByLabelText('Message'), 'See you');
+    await userEvent.click(screen.getByRole('button', { name: 'Review' }));
+    expect(await screen.findByText('Nobody would get this.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Send to 0' })).toBeDisabled();
+  });
+});

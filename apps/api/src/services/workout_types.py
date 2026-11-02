@@ -1,6 +1,8 @@
 """Data containers for the workout services."""
 
+import uuid
 from dataclasses import dataclass
+from datetime import date, datetime
 
 from db.tables.workout import Workout
 from services.climb_types import ClimbChange
@@ -32,6 +34,38 @@ class WorkoutView:
     workout: Workout
     exercises: tuple[ExerciseView, ...]
     live: ScoreResult
+
+
+@dataclass(frozen=True, slots=True)
+class LoggedOffline:
+    # pylint: disable=too-many-instance-attributes
+    """A whole workout logged with no signal, as it stood when it was finished."""
+
+    workout_id: uuid.UUID
+    routine_id: str | None
+    name: str
+    gym: str | None
+    performed_on: date | None
+    started_at: datetime
+    finished_at: datetime
+    entries: tuple[ExerciseEntry, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class WorkoutTemplateView:
+    """A routine as it would start now."""
+
+    routine_id: str
+    name: str
+    exercises: tuple[ExerciseView, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PastDay:
+    """A day a forgotten workout can be logged for, with what's already logged on it."""
+
+    day: date
+    workouts: int
 
 
 @dataclass(frozen=True, slots=True)

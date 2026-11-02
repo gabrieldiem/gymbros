@@ -5,6 +5,7 @@ import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
 import styles from './Feed.module.css';
@@ -24,7 +25,12 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
   return (
     <li className={cx(styles.post, item.is_mine && styles.mine)}>
       <div className={styles.top}>
-        <Avatar initials={item.actor.initials} color={item.actor.color} size={42} />
+        <Avatar
+          initials={item.actor.initials}
+          color={item.actor.color}
+          image={item.actor.avatar_url}
+          size={42}
+        />
         <div className={styles.who}>
           <b>{item.is_mine ? t('you') : item.actor.display_name}</b>
           <span>{timeAgo(lang, item.created_at)}</span>
@@ -32,9 +38,22 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         <span className={styles.pts}>+{n(v.points)}</span>
       </div>
       <h3>{v.name}</h3>
+      {item.photo_url && (
+        <img
+          className={styles.photo}
+          src={item.photo_url}
+          alt={t('photo_of', { name: item.is_mine ? t('you') : item.actor.display_name })}
+          loading="lazy"
+        />
+      )}
       <div className={styles.chips}>
-        <span>{t('min_n', { n: v.duration_min })}</span>
-        <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>
+        {v.gym && <span>{t('at_gym', { gym: v.gym })}</span>}
+        <span>
+          {v.performed_on
+            ? t('past_for', { day: formatDay(lang, v.performed_on) })
+            : t('min_n', { n: v.duration_min })}
+        </span>
+        {v.sets > 0 && <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>}
         {v.volume_kg > 0 && <span>{t('kg_n', { n: n(v.volume_kg) })}</span>}
         {v.cardio_minutes > 0 && <span>{t('cardio_min', { n: v.cardio_minutes })}</span>}
         {v.vs_last_pct !== null && v.vs_last_pct > 0 && (
@@ -45,7 +64,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         <p key={pr.exercise_id} className={styles.pr}>
           ★{' '}
           {t('new_pr', {
-            x: `${exercise(pr.exercise_id)?.name ?? pr.exercise_id} ${formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n)}`,
+            x: `${exercise(pr.exercise_id)?.name ?? pr.exercise_id} ${formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n, pr.bar_kg)}`,
           })}
         </p>
       ))}
@@ -56,7 +75,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
             <li key={e.exercise_id}>
               <span>{exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
               <span>
-                {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n)).join(', ')}
+                {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n, t)).join(', ')}
               </span>
             </li>
           ))}

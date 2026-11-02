@@ -10,10 +10,10 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--keyboard, 0px);
   z-index: 41;
   max-height: 90vh;
-  max-height: 90dvh;
+  max-height: min(90dvh, calc(var(--viewport-h, 100dvh) - 16px));
   overflow: auto;
   overscroll-behavior: contain;
   padding: 12px 22px calc(28px + var(--safe-bottom));

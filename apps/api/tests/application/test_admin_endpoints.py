@@ -21,6 +21,8 @@ ENDPOINTS = [
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000/crew"),
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000"),
     ("GET", "/api/admin/actions"),
+    ("GET", "/api/admin/feedback"),
+    ("PATCH", "/api/admin/feedback/00000000-0000-0000-0000-000000000000"),
     ("POST", "/api/admin/crews/00000000-0000-0000-0000-000000000000/invites"),
 ]
 
@@ -499,3 +501,15 @@ async def test_a_crew_name_cannot_inject_html_into_the_email(client, admin, outb
     )
     assert "<img" not in outbox.sent[0].html
     assert "&lt;img" in outbox.sent[0].html
+
+
+async def test_an_adjustment_tells_the_member_and_why(client, other_client, admin, maxo):
+    await client.post(
+        f"/api/admin/members/{maxo['id']}/points", json={"points": -40, "reason": "Logged twice"}
+    )
+    item = (await other_client.get("/api/notifications")).json()["items"][0]
+    assert item["key"] == "n_points_adjusted"
+    assert item["vars"] == {"points": -40, "reason": "Logged twice"}
+    assert item["link"] == "/me"
+    # An admin acts for the crew, not as a person in it.
+    assert item["actor"] is None

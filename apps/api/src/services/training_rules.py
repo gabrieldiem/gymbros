@@ -1,7 +1,7 @@
 """Pure training rules shared by scoring, pre-fill and history: e1RM, load, overload, weeks."""
 
 from dataclasses import dataclass, replace
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from services.catalog import Exercise
@@ -23,13 +23,15 @@ class LoggedSet:
     minutes: int | None = None
     km: float | None = None
     done: bool = False
+    # The bar inside load_kg, for showing disks + bar. Scoring only reads load_kg.
+    bar_kg: float | None = None
 
 
 def is_completed(exercise: Exercise, logged: LoggedSet) -> bool:
     """Checked off and not empty (reps for lifts, minutes for cardio)."""
     if not logged.done:
         return False
-    if exercise.is_cardio:
+    if exercise.is_cardio or exercise.is_stretch:
         return (logged.minutes or 0) > 0
     return (logged.reps or 0) > 0
 
@@ -64,11 +66,16 @@ def endurance_score(exercise: Exercise, logged: LoggedSet) -> float | None:
 
 
 def overload(exercise: Exercise, last: LoggedSet) -> LoggedSet:
-    """The pre-filled set for next time: +2.5 kg on barbell lifts, else +1 rep; cardio +1 min."""
+    """The pre-filled set for next time: +2.5 kg on barbell lifts, else +1 rep; cardio +1 min.
+
+    Stretching pays the same however long it is, so there's nothing to beat.
+    """
+    if exercise.is_stretch:
+        return LoggedSet(minutes=last.minutes)
     if exercise.is_cardio:
         return LoggedSet(minutes=(last.minutes or 0) + 1, km=last.km)
     if exercise.barbell and last.load_kg is not None:
-        return LoggedSet(load_kg=last.load_kg + BARBELL_STEP_KG, reps=last.reps)
+        return LoggedSet(load_kg=last.load_kg + BARBELL_STEP_KG, reps=last.reps, bar_kg=last.bar_kg)
     return replace(last, reps=(last.reps or 0) + 1, done=False, minutes=None, km=None)
 
 
@@ -76,6 +83,29 @@ def week_start(moment: datetime, time_zone: str) -> date:
     """The Monday of the crew-local week that contains `moment` (must be timezone-aware)."""
     local = moment.astimezone(ZoneInfo(time_zone)).date()
     return local - timedelta(days=local.weekday())
+
+
+def local_noon(day: date, time_zone: str) -> datetime:
+    """When a past workout counts as done: the day is all we ask for, and noon stays clear of
+    the dawn and night badges."""
+    return datetime.combine(day, time(12, 0), ZoneInfo(time_zone))
+
+
+def performed_at(performed_on: date | None, time_zone: str, now: datetime) -> datetime:
+    """When a workout counts as done: its past day, or now for one happening now."""
+    return local_noon(performed_on, time_zone) if performed_on else now
+
+
+def past_days(now: datetime, time_zone: str, days: int) -> tuple[date, ...]:
+    """The days a forgotten workout can be logged for, newest first. Today isn't one of them."""
+    today = now.astimezone(ZoneInfo(time_zone)).date()
+    return tuple(today - timedelta(days=back) for back in range(1, days + 1))
+
+
+def week_end(moment: datetime, time_zone: str) -> datetime:
+    """When the crew-local week that contains `moment` ends: the next Monday at 00:00."""
+    monday = week_start(moment, time_zone) + timedelta(days=7)
+    return datetime.combine(monday, time(0, 0), ZoneInfo(time_zone))
 
 
 def goal_streak_before(this_week: date, workouts_by_week: dict[date, int], target: int) -> int:

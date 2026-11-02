@@ -14,7 +14,7 @@
 }
 
 .up .dot {
-  background: var(--chalk);
+  background: var(--green);
 }
 
 .down .dot {

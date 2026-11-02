@@ -39,6 +39,7 @@ class PersonalRecordRepository:
             "user_id": user_id,
             "exercise_id": record.exercise_id,
             "load_kg": record.load_kg,
+            "bar_kg": record.bar_kg,
             "reps": record.reps,
             "e1rm": record.e1rm,
             "workout_id": workout_id,

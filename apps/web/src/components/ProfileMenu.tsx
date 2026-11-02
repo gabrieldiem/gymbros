@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 
 import { useLogout } from '../api/auth';
 import { useMe } from '../api/me';
+import { FeedbackSheet } from '../features/me/FeedbackSheet';
+import { ProfileSheet } from '../features/me/ProfileSheet';
 import { SettingsSheet } from '../features/me/SettingsSheet';
 import { useI18n } from '../i18n/context';
 import { Avatar } from './Avatar';
@@ -19,6 +21,8 @@ export function ProfileMenu() {
   const shareInvite = useShareInvite();
   const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
@@ -71,12 +75,12 @@ export function ProfileMenu() {
         aria-label={`${t('profile')}, ${me.initials}`}
         onClick={() => setOpen((value) => !value)}
       >
-        <Avatar initials={me.initials} color={me.color} size={44} />
+        <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={44} />
       </button>
       {open && (
         <div ref={menu} className={styles.menu} role="menu" aria-label={t('profile')}>
           <div className={styles.who}>
-            <Avatar initials={me.initials} color={me.color} size={40} />
+            <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={40} />
             <span>
               <b>{me.display_name}</b>
               <small>{me.email}</small>
@@ -85,6 +89,17 @@ export function ProfileMenu() {
           <Link to="/me" role="menuitem" className={styles.item} onClick={() => setOpen(false)}>
             {t('menu_profile')}
           </Link>
+          <button
+            type="button"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => {
+              setOpen(false);
+              setEditing(true);
+            }}
+          >
+            {t('profile_edit')}
+          </button>
           <Link
             to="/quests/achievements"
             role="menuitem"
@@ -101,6 +116,14 @@ export function ProfileMenu() {
           >
             {t('nav_points')}
           </Link>
+          <Link
+            to="/whats-new"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => setOpen(false)}
+          >
+            {t('whats_new')}
+          </Link>
           <button
             type="button"
             role="menuitem"
@@ -111,6 +134,17 @@ export function ProfileMenu() {
             }}
           >
             {t('settings')}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => {
+              setOpen(false);
+              setFeedbackOpen(true);
+            }}
+          >
+            {t('feedback_title')}
           </button>
           {shareInvite && (
             <button
@@ -147,6 +181,8 @@ export function ProfileMenu() {
         </div>
       )}
       {settingsOpen && <SettingsSheet onClose={() => setSettingsOpen(false)} />}
+      {editing && <ProfileSheet onClose={() => setEditing(false)} />}
+      {feedbackOpen && <FeedbackSheet onClose={() => setFeedbackOpen(false)} />}
     </div>
   );
 }

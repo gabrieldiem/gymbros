@@ -8,7 +8,7 @@ from typing import Literal
 
 CATALOG_PATH = Path(__file__).resolve().parent.parent / "resources" / "catalog.json"
 
-ExerciseType = Literal["w", "bw", "c"]
+ExerciseType = Literal["w", "bw", "c", "s"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,11 +24,18 @@ class Exercise:
     aliases_es: tuple[str, ...]
     # Cardio only: how many km of an easy reference run one km of this is worth (a swim km is 4).
     km_factor: float = 1.0
+    # Stretching only: the minutes it starts with.
+    default_minutes: int | None = None
 
     @property
     def is_cardio(self) -> bool:
         """Cardio entries are minutes + km instead of load × reps."""
         return self.type == "c"
+
+    @property
+    def is_stretch(self) -> bool:
+        """Stretching entries are minutes for fixed points, not sets."""
+        return self.type == "s"
 
 
 @dataclass(frozen=True, slots=True)

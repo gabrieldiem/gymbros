@@ -6,12 +6,18 @@ import { useI18n } from '../../i18n/context';
 import styles from './ExercisePicker.module.css';
 import { searchExercises } from './exerciseSearch';
 
-type Props = { exercises: Exercise[]; onPick: (id: string) => void; onClose: () => void };
+type Props = {
+  exercises: Exercise[];
+  onPick: (id: string) => void;
+  onClose: () => void;
+  /** A timed event pays extra for leg exercises. */
+  legBonus?: boolean;
+};
 
-const GROUPS: MuscleGroup[] = ['Chest', 'Legs', 'Back', 'Shoulders', 'Arms', 'Cardio'];
+const GROUPS: MuscleGroup[] = ['Chest', 'Legs', 'Back', 'Shoulders', 'Arms', 'Cardio', 'Mobility'];
 
 /** Search the catalog by English name or Spanish alias ("sentadilla" finds Back squat). */
-export function ExercisePicker({ exercises, onPick, onClose }: Props) {
+export function ExercisePicker({ exercises, legBonus = false, onPick, onClose }: Props) {
   const { t } = useI18n();
   const [query, setQuery] = useState('');
   const matches = searchExercises(exercises, query);
@@ -24,7 +30,11 @@ export function ExercisePicker({ exercises, onPick, onClose }: Props) {
         placeholder={t('search_ex')}
         aria-label={t('search_ex')}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          // The best matches are at the top, right under the search box.
+          e.target.closest('[role="dialog"]')?.scrollTo?.({ top: 0 });
+        }}
       />
       {matches.length === 0 && <p className={styles.empty}>{t('no_match')}</p>}
       {GROUPS.map((group) => {
@@ -41,6 +51,9 @@ export function ExercisePicker({ exercises, onPick, onClose }: Props) {
                 onClick={() => onPick(exercise.id)}
               >
                 {exercise.name}
+                {legBonus && exercise.group === 'Legs' && (
+                  <span className={styles.bonus}>{t('leg_bonus')}</span>
+                )}
               </button>
             ))}
           </section>

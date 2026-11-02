@@ -156,7 +156,7 @@ describe('Log out', () => {
 
 describe('Legal pages', () => {
   it.each([
-    ['/privacy', 'Privacy policy', 'What we collect'],
+    ['/privacy', 'Privacy policy', 'How we protect your data'],
     ['/terms', 'Terms of service', 'Train safely'],
   ])('%s is public, with the contact address where it applies', async (path, title, section) => {
     mockApi({ 'GET /api/me': SIGNED_OUT });

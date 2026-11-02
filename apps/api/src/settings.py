@@ -39,6 +39,8 @@ class Settings:
     google_client_id: str = ""
     google_client_secret: str = ""
     resend_api_key: str = ""
+    # Whether this server looks for weekly digests to send. Off only for tests and one-off runs.
+    email_scheduler_enabled: bool = True
     email_from: str = "GYMBROS <hola@contact.gabrieldiem.com>"
     # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
     dev_login_enabled: bool = False
@@ -47,6 +49,8 @@ class Settings:
 
     # --- Game tuning (settings.json, env overrides) ---
     game_weekly_target: int = 3
+    # How many days back a forgotten workout can be logged.
+    game_past_workout_days: int = 7
     game_rank_step: int = 1500
     game_rank_count: int = 7
     game_week_scale: int = 1500
@@ -66,6 +70,7 @@ class Settings:
     scoring_goal_streak_max: int = 100
     scoring_over_target: int = 50
     scoring_better_than_last_time: int = 25
+    scoring_stretching: int = 25
     scoring_crew_quest: int = 200
     scoring_crew_quest_goal: int = 4000
     scoring_bounty: int = 150
@@ -160,6 +165,9 @@ class Settings:
         self.google_client_id = os.getenv("GOOGLE_CLIENT_ID", self.google_client_id)
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET", self.google_client_secret)
         self.resend_api_key = os.getenv("RESEND_API_KEY", self.resend_api_key)
+        self.email_scheduler_enabled = (
+            os.getenv("EMAIL_SCHEDULER_ENABLED", "true").lower() != "false"
+        )
         self.email_from = os.getenv("EMAIL_FROM", "") or self.email_from
         self.dev_login_enabled = self._env_bool("DEV_LOGIN_ENABLED", self.dev_login_enabled)
         self.admin_emails = frozenset(
@@ -184,6 +192,8 @@ class Settings:
             raise ValueError("DEV_LOGIN_ENABLED must not be set in production")
         if self.game_weekly_target < 1 or self.game_rank_step < 1:
             raise ValueError("game.weekly_target and game.rank_step must be positive")
+        if self.game_past_workout_days < 0:
+            raise ValueError("game.past_workout_days can't be negative")
         if self.scoring_volume_kg_per_point < 1:
             raise ValueError("scoring.volume_kg_per_point must be positive")
         if self.social_notification_days < 1:
