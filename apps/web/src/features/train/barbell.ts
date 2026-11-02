@@ -30,19 +30,51 @@ export function withBar(sets: SetData[], barKg: number): SetData[] {
 const hasValues = (set: SetData | undefined): set is SetData =>
   Boolean(set && (set.load_kg || set.reps || set.minutes || set.km));
 
-/** What "repeat" copies into a row: the set above it, else that set last time. */
+/**
+ * A set counts once it has reps (minutes for cardio and stretching). There's no box to tick, so
+ * the numbers a routine loads are only suggestions, shown greyed out, until you log them.
+ */
+export const isLogged = (exercise: Exercise, set: SetData) =>
+  exercise.type === 'c' || exercise.type === 's' ? Boolean(set.minutes) : Boolean(set.reps);
+
+/** Loaded for you and not touched yet: shown as a hint, and worth nothing. */
+export const isSuggestion = (set: SetData) => !set.done && !set.started && hasValues(set);
+
+/** A number typed into a row. The row's other suggested number comes along with it. */
+export function editSet(
+  exercise: Exercise,
+  set: SetData,
+  field: keyof SetData,
+  value: number | null,
+  barKg: number,
+): SetData {
+  const next: SetData =
+    exercise.barbell && field === 'load_kg'
+      ? { ...set, load_kg: value === null ? null : loadOf(value, barKg), bar_kg: barKg }
+      : { ...set, [field]: value };
+  // Reps with nothing on the bar: that's the empty bar.
+  if (exercise.barbell && next.reps && next.load_kg === null && field === 'reps') {
+    next.load_kg = barKg;
+    next.bar_kg = barKg;
+  }
+  return { ...next, started: true, done: isLogged(exercise, next) };
+}
+
+/** What the repeat button logs in a row: its own suggestion, else the set above, else last time. */
 export function repeatSource(
   sets: SetData[],
   previous: SetData[],
   index: number,
 ): SetData | undefined {
+  const own = sets[index];
+  if (own && isSuggestion(own)) return own;
   const above = sets[index - 1];
-  if (hasValues(above)) return above;
+  if (above?.done && hasValues(above)) return above;
   const last = previous[index];
   return hasValues(last) ? last : undefined;
 }
 
-/** `row` with the values of `source`, on the card's bar. Whether it's checked doesn't change. */
+/** `row` logged with the values of `source`, on the card's bar. */
 export function repeated(
   exercise: Exercise,
   row: SetData,
@@ -53,12 +85,21 @@ export function repeated(
     exercise.barbell && source.load_kg !== null
       ? loadOf(disksOf(source.load_kg, source.bar_kg ?? DEFAULT_BAR_KG), barKg)
       : source.load_kg;
-  return {
+  const next: SetData = {
     ...row,
     load_kg: load,
     bar_kg: exercise.barbell ? barKg : null,
     reps: source.reps,
     minutes: source.minutes,
     km: source.km,
+    started: true,
   };
+  return { ...next, done: isLogged(exercise, next) };
 }
+
+/** What the server takes: `started` only matters on this screen. */
+export const forServer = (sets: SetData[]): SetData[] =>
+  sets.map((set) => {
+    const { load_kg, reps, minutes, km, done, bar_kg } = set;
+    return { load_kg, reps, minutes, km, done, ...(bar_kg === undefined ? {} : { bar_kg }) };
+  });

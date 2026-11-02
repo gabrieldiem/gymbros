@@ -476,7 +476,6 @@ export const en = {
   past_today: 'Log today instead',
   sum_done_past: '{name} logged for {day}',
   err_workout_date_out_of_range: 'You can log a past workout up to a week back.',
-  complete_set: 'Complete set {n}',
   set_field: '{name}, set {n}, {field}',
   add_set: 'Add set',
   saving: 'Saving…',

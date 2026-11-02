@@ -67,6 +67,8 @@ export type SetData = {
   done: boolean;
   /** The bar inside `load_kg`, on a barbell lift. */
   bar_kg?: number | null;
+  /** On this screen only: someone has typed in this row, so its numbers aren't suggestions. */
+  started?: boolean;
 };
 
 export type WorkoutExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };

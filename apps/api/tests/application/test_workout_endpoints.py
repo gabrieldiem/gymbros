@@ -328,3 +328,29 @@ async def test_the_week_says_when_the_timed_event_ends(client, member):
     ends = datetime.fromisoformat(body["event_ends_at"]).astimezone(ZONE)
     assert (ends.weekday(), ends.hour, ends.minute) == (0, 0, 0)
     assert timedelta(0) < ends - utc_now() <= timedelta(days=7)
+
+
+# --- Last time -----------------------------------------------------------------------------
+
+
+async def test_skipping_an_exercise_keeps_what_you_last_did_on_it(client, member):
+    ohp = {"exercise_id": "ohp", "sets": [done(40, 8), done(40, 8)]}
+    await log_and_finish(client, "push", [ohp])
+    # The next Push day has Overhead press listed, loaded and never logged.
+    skipped = {"exercise_id": "ohp", "sets": [{"load_kg": 42.5, "reps": 8, "done": False}]}
+    bench = {"exercise_id": "bench", "sets": [done(60, 5)]}
+    await log_and_finish(client, "push", [bench, skipped])
+    started = (await start(client, "push")).json()
+    by_id = {e["exercise_id"]: e for e in started["exercises"]}
+    assert [s["load_kg"] for s in by_id["ohp"]["previous_sets"]] == [40, 40]
+    assert [s["load_kg"] for s in by_id["ohp"]["sets"]] == [42.5, 42.5]
+
+
+async def test_only_what_was_completed_counts_as_last_time(client, member):
+    sets = [done(60, 5), {"load_kg": 60, "reps": 5, "done": False}]
+    await log_and_finish(client, "push", [{"exercise_id": "bench", "sets": sets}])
+    started = (await start(client, "push")).json()
+    by_id = {e["exercise_id"]: e for e in started["exercises"]}
+    assert len(by_id["bench"]["previous_sets"]) == 1
+    assert len(by_id["bench"]["sets"]) == 1
+    assert by_id["ohp"]["previous_sets"] == []

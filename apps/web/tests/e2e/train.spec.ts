@@ -32,7 +32,6 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
   const reps = bench.getByLabel('Bench press, set 1, reps');
   if (!(await load.inputValue())) await load.fill('60');
   if (!(await reps.inputValue())) await reps.fill('5');
-  await bench.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await expect(page.getByRole('timer', { name: 'Rest' })).toHaveCount(0);
   await page.getByRole('button', { name: /^Rest \d/ }).click();
@@ -61,7 +60,6 @@ test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
   await expect(swim).toBeVisible();
   await swim.getByLabel('Pool swim, set 1, min').fill('40');
   await swim.getByLabel('Pool swim, set 1, km').fill('1.5');
-  await swim.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await page.getByRole('button', { name: 'Finish workout' }).click();
   const summary = page.getByRole('dialog');
@@ -91,7 +89,6 @@ test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
   const run = page.getByRole('article', { name: 'Outdoor run' });
   await run.getByLabel('Outdoor run, set 1, min').fill('30');
   await run.getByLabel('Outdoor run, set 1, km').fill('5');
-  await run.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await expect(page.getByRole('timer')).toHaveCount(0);
   await expect(page.getByText(/^For /)).toBeVisible();
@@ -117,7 +114,6 @@ test('stretching alone pays fixed points and leaves the week alone', async ({ pa
   await page.getByRole('button', { name: /^Stretching/ }).click();
   const card = page.getByRole('article', { name: 'Stretching' });
   await card.getByRole('button', { name: '10 min' }).click();
-  await card.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).toHaveText('25', { timeout: 5000 });
   await page.waitForTimeout(600);
   await page.screenshot({ path: `${SCREENS}/stretch-${testInfo.project.name}.png` });
@@ -135,7 +131,6 @@ test('add a gym photo and your crew sees it on the post', async ({ page }, testI
   await page.getByRole('button', { name: /^Run/ }).click();
   const run = page.getByRole('article', { name: 'Outdoor run' });
   await run.getByLabel('Outdoor run, set 1, min').fill('20');
-  await run.getByRole('button', { name: 'Complete set 1' }).click();
 
   // A large picture: the app has to shrink it below the server's limit.
   const png = await page.evaluate(() => {
@@ -188,7 +183,6 @@ test('a whole workout with no signal sends itself when the signal is back', asyn
   await expect(page.getByText('Points when there’s signal')).toBeVisible();
   await expect(page.getByText(/^No signal\. Keep logging/)).toBeVisible();
   await treadmill.getByLabel('Treadmill run, set 1, min').fill('25');
-  await treadmill.getByRole('button', { name: 'Complete set 1' }).click();
   await page.waitForTimeout(700); // the save to the phone is debounced
   await page.screenshot({ path: `${SCREENS}/offline-logger-${testInfo.project.name}.png` });
   await page.getByRole('button', { name: 'Finish workout' }).click();

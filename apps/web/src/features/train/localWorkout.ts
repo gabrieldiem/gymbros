@@ -1,4 +1,5 @@
 import type { Catalog, SetData, StartBody, Workout, WorkoutTemplate } from '../../api/train';
+import { forServer } from './barbell';
 import type { QueuedWorkout, StoredDraft } from './offlineStore';
 
 const EMPTY_SET: SetData = { load_kg: null, reps: null, minutes: null, km: null, done: false };
@@ -51,7 +52,10 @@ export function toQueued(workout: Workout, draft: StoredDraft, finishedAt: Date)
     performed_on: workout.performed_on,
     started_at: workout.started_at,
     finished_at: finishedAt.toISOString(),
-    exercises: draft.exercises.map(({ exercise_id, sets }) => ({ exercise_id, sets })),
+    exercises: draft.exercises.map(({ exercise_id, sets }) => ({
+      exercise_id,
+      sets: forServer(sets),
+    })),
   };
 }
 

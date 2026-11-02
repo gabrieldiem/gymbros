@@ -15,9 +15,14 @@ type Props = {
 /** Stretching pays fixed points, so there's only how long, and whether you did it. */
 export function StretchCard({ exercise, set, onChange, onRemove }: Props) {
   const { t } = useI18n();
-  const toggle = () => {
+  const choose = (minutes: number) => {
     navigator.vibrate?.(10);
-    onChange({ ...set, done: !set.done });
+    // The one you already chose, again: you didn't stretch after all.
+    onChange(
+      set.done && set.minutes === minutes
+        ? { ...set, done: false }
+        : { ...set, minutes, done: true },
+    );
   };
   return (
     <article className={styles.card} aria-label={exercise.name}>
@@ -43,34 +48,13 @@ export function StretchCard({ exercise, set, onChange, onRemove }: Props) {
             <button
               key={minutes}
               type="button"
-              aria-pressed={set.minutes === minutes}
-              onClick={() => onChange({ ...set, minutes })}
+              aria-pressed={set.done && set.minutes === minutes}
+              onClick={() => choose(minutes)}
             >
               {t('stretch_for', { n: minutes })}
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          className={styles.check}
-          aria-pressed={set.done}
-          aria-label={t('complete_set', { n: 1 })}
-          onClick={toggle}
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m5 12.5 4.5 4.5L19 7.5" />
-          </svg>
-        </button>
       </div>
     </article>
   );

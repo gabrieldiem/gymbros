@@ -484,7 +484,6 @@ export const es = {
   past_today: 'Registrar hoy',
   sum_done_past: '{name} registrado del {day}',
   err_workout_date_out_of_range: 'Puedes registrar un entreno pasado hasta una semana atrás.',
-  complete_set: 'Completar set {n}',
   set_field: '{name}, set {n}, {field}',
   add_set: 'Añadir set',
   saving: 'Guardando…',
