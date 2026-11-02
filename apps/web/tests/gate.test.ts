@@ -9,6 +9,12 @@ const noCrew = makeMe({ crew: null });
 describe('gateRedirect', () => {
   it.each<[Allow, ReturnType<typeof makeMe> | null, boolean, string | null]>([
     ['guest', null, false, null],
+    ['guest', makeMe({ is_admin: true, crew: null }), false, '/admin'],
+    ['guest', makeMe({ is_admin: true }), false, '/climb'],
+    ['member', makeMe({ is_admin: true, crew: null }), false, '/admin'],
+    ['hello', makeMe({ is_admin: true, crew: null }), false, '/admin'],
+    ['member', makeMe({ is_admin: true }), false, null],
+    ['join', makeMe({ is_admin: true, crew: null }), false, null],
     ['admin', null, false, '/'],
     ['admin', member, false, '/climb'],
     ['admin', makeMe({ is_admin: true }), false, null],

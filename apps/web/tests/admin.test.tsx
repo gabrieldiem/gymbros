@@ -62,6 +62,41 @@ describe('Backoffice access', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
   });
 
+  it('takes an admin without a crew to the backoffice, not the invite screen', async () => {
+    mockApi({ ...ROUTES, 'GET /api/me': [200, makeMe({ is_admin: true, crew: null })] });
+    renderApp('/climb');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+    expect(screen.queryByLabelText('Invite code')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Join a crew' })).toHaveAttribute('href', '/join');
+    expect(screen.getByRole('button', { name: 'Log out' })).toBeVisible();
+  });
+
+  it('lands there from the landing page too', async () => {
+    mockApi({ ...ROUTES, 'GET /api/me': [200, makeMe({ is_admin: true, crew: null })] });
+    renderApp('/');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  });
+
+  it('lets that admin still open the join screen, with a way back', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ is_admin: true, crew: null })] });
+    renderApp('/join');
+    expect(await screen.findByLabelText('Invite code')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Backoffice' })).toHaveAttribute('href', '/admin');
+  });
+
+  it('still asks a regular member without a crew for a code', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ crew: null })] });
+    renderApp('/climb');
+    expect(await screen.findByLabelText('Invite code')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Backoffice' })).toBeNull();
+  });
+
+  it('keeps the way back to the app for an admin in a crew', async () => {
+    mockApi(ROUTES);
+    renderApp('/admin');
+    expect(await screen.findByRole('link', { name: 'Back to the app' })).toBeVisible();
+  });
+
   it('is only in the profile menu for admins', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
     const { unmount } = renderApp('/climb');
