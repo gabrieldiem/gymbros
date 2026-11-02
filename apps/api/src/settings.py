@@ -39,6 +39,8 @@ class Settings:
     google_client_id: str = ""
     google_client_secret: str = ""
     resend_api_key: str = ""
+    # Whether this server looks for weekly digests to send. Off only for tests and one-off runs.
+    email_scheduler_enabled: bool = True
     email_from: str = "GYMBROS <hola@contact.gabrieldiem.com>"
     # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
     dev_login_enabled: bool = False
@@ -163,6 +165,9 @@ class Settings:
         self.google_client_id = os.getenv("GOOGLE_CLIENT_ID", self.google_client_id)
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET", self.google_client_secret)
         self.resend_api_key = os.getenv("RESEND_API_KEY", self.resend_api_key)
+        self.email_scheduler_enabled = (
+            os.getenv("EMAIL_SCHEDULER_ENABLED", "true").lower() != "false"
+        )
         self.email_from = os.getenv("EMAIL_FROM", "") or self.email_from
         self.dev_login_enabled = self._env_bool("DEV_LOGIN_ENABLED", self.dev_login_enabled)
         self.admin_emails = frozenset(

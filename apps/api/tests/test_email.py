@@ -2,6 +2,7 @@
 
 import json
 import logging
+from dataclasses import replace
 
 import httpx
 
@@ -78,3 +79,47 @@ async def test_a_network_error_is_logged_and_never_raises(caplog):
 
     await _client(handler).send(MESSAGE)
     assert "Sending email failed" in caplog.text
+
+
+async def test_many_go_out_as_batches_each_to_one_person():
+    requests = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(json.loads(request.content))
+        return httpx.Response(200, json={"data": []})
+
+    messages = [welcome_email(f"m{i}@example.com", "Gabi", "en", "https://x") for i in range(205)]
+    assert await _client(handler).send_many(messages) == 205
+    assert [len(batch) for batch in requests] == [100, 100, 5]
+    assert all(len(item["to"]) == 1 for batch in requests for item in batch)
+
+
+async def test_a_failed_batch_doesnt_count(caplog):
+    calls = []
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        return httpx.Response(500 if len(calls) == 1 else 200, json={})
+
+    messages = [welcome_email("a@b.co", "Gabi", "en", "https://x") for _ in range(150)]
+    assert await _client(handler).send_many(messages) == 50
+    assert "Sending email failed" in caplog.text
+
+
+async def test_without_a_key_none_of_many_go_out():
+    def handler(_request: httpx.Request) -> httpx.Response:
+        raise AssertionError("no request expected")
+
+    assert await _client(handler, api_key="").send_many([MESSAGE]) == 0
+
+
+async def test_headers_are_sent_when_a_message_has_them():
+    bodies = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        bodies.append(json.loads(request.content))
+        return httpx.Response(200, json={})
+
+    message = replace(MESSAGE, headers=(("List-Unsubscribe", "<https://x/stop>"),))
+    await _client(handler).send(message)
+    assert bodies[0]["headers"] == {"List-Unsubscribe": "<https://x/stop>"}

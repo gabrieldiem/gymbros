@@ -91,6 +91,26 @@ export function useAdminFeedback() {
   });
 }
 
+export type EmailSettings = {
+  welcome_enabled: boolean;
+  digest_enabled: boolean;
+  digest_hour: number;
+  configured: boolean;
+  sender: string;
+  digests_sent_this_week: number;
+};
+
+export type EmailAudience = { crew_id?: string; email?: string };
+
+export type EmailMessageBody = EmailAudience & { subject: string; body: string; dry_run?: boolean };
+
+export function useEmailSettings() {
+  return useQuery({
+    queryKey: [...adminKey, 'email'],
+    queryFn: ({ signal }) => apiRequest<EmailSettings>('/admin/email', { signal }),
+  });
+}
+
 export function useAdminActions() {
   return useQuery({
     queryKey: [...adminKey, 'actions'],
@@ -121,6 +141,28 @@ export function useSetFeedbackHandled() {
       method: 'PATCH',
       body: { handled },
     }),
+  );
+}
+
+export function useUpdateEmailSettings() {
+  return useAdminMutation(
+    (body: Partial<Pick<EmailSettings, 'welcome_enabled' | 'digest_enabled' | 'digest_hour'>>) =>
+      apiRequest<EmailSettings>('/admin/email', { method: 'PATCH', body }),
+  );
+}
+
+export function useSendEmailMessage() {
+  return useAdminMutation((body: EmailMessageBody) =>
+    apiRequest<{ recipients: number; sent: number }>('/admin/email/message', {
+      method: 'POST',
+      body,
+    }),
+  );
+}
+
+export function useTestDigest() {
+  return useAdminMutation(() =>
+    apiRequest<{ sent: boolean }>('/admin/email/test-digest', { method: 'POST' }),
   );
 }
 

@@ -29,6 +29,10 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class NothingToDigest(DomainError):
+    """The crew did nothing last week, so there's no digest to show."""
+
+
 class FeedbackNotFound(DomainError):
     """No such message."""
 

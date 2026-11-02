@@ -209,6 +209,15 @@ A crew's invite link (`/invite/<code>`) shows the crew's name and size before si
 
 An invite code can have a maximum number of uses and an expiry. A code that's used up or expired stops working and says why. People who already joined stay.
 
+## Email
+
+Sent through Resend. Nothing goes out without `RESEND_API_KEY` on the server, and the backoffice says so.
+
+- **Welcome email:** when someone signs up with Google. It can be turned off in the backoffice.
+- **Weekly digest:** on Monday morning, from an hour chosen in the backoffice, in each crew's time zone: your week, the crew's total, the biggest climber and the heaviest PR, in your language. **It starts off** until an admin turns it on. A crew with no points last week gets nothing. Each member gets it once a week, however many servers are looking. If sending fails, it tries again on the next look that Monday.
+- **Messages from admins:** the backoffice can write to everyone, one crew or one person, in plain text. It shows how many people a message reaches before sending, and the log keeps the subject, not who got it or what it said.
+- **Stopping them:** the digest and messages from admins can be turned off in settings or from the link in each email, without signing in. Mail apps can offer one-click unsubscribe. People who stopped them are skipped. The welcome email and invites aren't affected.
+
 ## Privacy policy
 
 `/privacy` follows Google's OAuth verification requirements (support.google.com/cloud/answer/13806988): what Google data is accessed, how it's used, who it's shared with, how it's protected, retention and deletion, and a Limited Use statement. It's plain HTML, linked from the home page and from settings. Everything it says has to be true of the code: when data handling changes, change the policy and tell members in the app before the change applies.
@@ -230,6 +239,7 @@ The avatar opens a menu with your profile, Edit profile, settings, inviting frie
 - **Crews:** create, rename, change the time zone. Set a custom invite code (4 to 12 letters and digits), maximum uses and an expiry, or replace the code with a random one. A new code stops the old one working and starts counting from zero; members stay. Email someone the invite link: they join when they open it and sign in. If the email can't be sent, the link is offered to copy.
 - **Accounts:** search, adjust points with a reason (±5,000, counted like any other points; the member gets a notification with the amount and the reason), remove from a crew (history stays), delete.
 - **Feedback:** what members sent, newest first, with who sent it, to mark as handled.
+- **Email:** the welcome email and weekly digest on or off, the digest's hour, a test digest to yourself, and a box to write to members.
 - **Log:** every change, with who made it. It stores ids, so a deleted account leaves no personal data behind.
 
 ## Not in v1

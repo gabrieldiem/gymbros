@@ -29,6 +29,7 @@ class ProfileChanges:
     color: str | None = None
     language: str | None = None
     rest_seconds: int | None = None
+    email_updates: bool | None = None
 
 
 class ProfileService:
@@ -73,5 +74,7 @@ class ProfileService:
             user.language = changes.language
         if changes.rest_seconds is not None:
             user.rest_seconds = changes.rest_seconds
+        if changes.email_updates is not None:
+            user.email_updates = changes.email_updates
         await self._users.save(user)
         return await self.get(user)

@@ -20,6 +20,7 @@ export type Me = {
   color: CrewColor;
   language: Language;
   rest_seconds: number;
+  email_updates?: boolean;
   crew: Crew | null;
   is_admin?: boolean;
 };
@@ -31,5 +32,5 @@ export type AuthOptions = { google: boolean; dev_login: boolean };
 export type DevLoginBody = { email: string; language: Language };
 
 export type UpdateMeBody = Partial<
-  Pick<Me, 'display_name' | 'initials' | 'color' | 'language' | 'rest_seconds'>
+  Pick<Me, 'display_name' | 'initials' | 'color' | 'language' | 'rest_seconds' | 'email_updates'>
 >;

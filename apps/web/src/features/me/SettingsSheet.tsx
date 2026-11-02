@@ -97,6 +97,17 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
         </div>
         <LowDataSwitch />
         <div>
+          <h3>{t('email_updates_title')}</h3>
+          <label className={styles.switch}>
+            <input
+              type="checkbox"
+              checked={me?.email_updates ?? true}
+              onChange={(e) => updateMe.mutate({ email_updates: e.target.checked })}
+            />
+            <span>{t('email_updates_hint')}</span>
+          </label>
+        </div>
+        <div>
           <h3>{t('export_title')}</h3>
           <p>{t('export_hint')}</p>
           <a className={styles.download} href="/api/me/export" download>

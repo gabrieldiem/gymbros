@@ -1,10 +1,12 @@
 """Dependency injection module: module-level singletons plus `Depends` providers."""
 
+import asyncio
 from datetime import timedelta
 from logging import Logger
 from typing import AsyncIterator
 
 from fastapi import Depends, Request
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -21,6 +23,7 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.avatar_repository import AvatarRepository
+from db.repositories.email_repository import EmailRepository
 from db.repositories.feedback_repository import FeedbackRepository
 from db.repositories.gym_repository import GymRepository
 from db.repositories.notification_repository import NotificationRepository
@@ -48,6 +51,7 @@ from services.errors import NotInCrew
 from services.feed_service import FeedService
 from services.hall_of_fame_service import HallOfFameService
 from services.avatar_service import AvatarService
+from services.email_service import EmailLinks, EmailService
 from services.export_service import ExportService
 from services.feedback_service import FeedbackService
 from services.gym_service import GymService
@@ -100,6 +104,8 @@ async def get_session() -> AsyncIterator[AsyncSession]:
             await session.rollback()
             raise
 
+
+DIGEST_CHECK_SECONDS = 600
 
 # scope="function" commits before the response goes out. With the default the commit comes after
 # it: a client could read stale data right away, and a failed commit would still have said 200.
@@ -463,6 +469,46 @@ def get_recap_service(session: AsyncSession = DB_SESSION) -> RecapService:
         (settings.game_weekly_target, settings.game_weekly_event or None),
         utc_now,
     )
+
+
+def build_email_service(session: AsyncSession, sender: EmailSender) -> EmailService:
+    """EmailService wired to a session. Also used by the digest loop."""
+    return EmailService(
+        (
+            EmailRepository(session),
+            CrewRepository(session),
+            UserRepository(session),
+            PointEventRepository(session),
+            AdminRepository(session),
+        ),
+        get_recap_service(session),
+        sender,
+        EmailLinks(settings.public_url, settings.session_secret),
+        utc_now,
+        logger,
+    )
+
+
+def get_email_service(
+    session: AsyncSession = DB_SESSION, sender: EmailSender = Depends(get_email_sender)
+) -> EmailService:
+    """FastAPI dependency provider for EmailService."""
+    return build_email_service(session, sender)
+
+
+async def run_digest_loop() -> None:
+    """Look for weekly digests to send every few minutes, for as long as the server runs. Whether
+    any are due is the service's call; a failed look mustn't stop the next one."""
+    while True:
+        try:
+            async with session_factory() as session:
+                sent = await build_email_service(session, get_email_sender()).send_due_digests()
+                await session.commit()
+            if sent:
+                logger.info("Sent %d weekly digests", sent)
+        except (SQLAlchemyError, OSError) as error:
+            logger.warning("Looking for weekly digests failed: %s", type(error).__name__)
+        await asyncio.sleep(DIGEST_CHECK_SECONDS)
 
 
 def get_me_stats_service(session: AsyncSession = DB_SESSION) -> MeStatsService:

@@ -19,6 +19,7 @@ const CODE_MESSAGES: Record<string, MessageKey> = {
   invite_code_not_found: 'err_invite_code_not_found',
   already_in_crew: 'err_already_in_crew',
   workout_empty: 'err_workout_empty',
+  nothing_to_digest: 'err_nothing_to_digest',
   too_much_feedback: 'err_too_much_feedback',
   feedback_not_found: 'err_feedback_not_found',
   invalid_avatar_text: 'err_invalid_avatar_text',

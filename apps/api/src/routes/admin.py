@@ -6,7 +6,14 @@ from fastapi import APIRouter, Depends, status
 
 from db.tables.feedback import Feedback
 from db.tables.user import User
-from dependencies import get_admin_service, get_feedback_service, get_current_admin, get_settings
+from dependencies import (
+    get_admin_service,
+    get_email_service,
+    get_feedback_service,
+    get_current_admin,
+    get_current_member,
+    get_settings,
+)
 from models.avatar import avatar_url
 from models.admin import (
     AdjustPointsRequest,
@@ -19,11 +26,20 @@ from models.admin import (
     SendInviteRequest,
     UpdateCrewRequest,
 )
+from models.email import (
+    EmailSettingsResponse,
+    MessageResultResponse,
+    SendMessageRequest,
+    TestDigestResponse,
+    UpdateEmailSettingsRequest,
+)
 from models.errors import error_responses
 from models.feedback import FeedbackItem, SetHandledRequest, SetHandledResponse
 from services.admin_service import AdminService
 from services.admin_types import CrewRow, MemberRow
+from services.email_service import Audience, EmailService
 from services.feedback_service import FeedbackService
+from services.member import Member
 from settings import Settings
 
 router = APIRouter(
@@ -195,6 +211,66 @@ async def delete_account(
 ) -> None:
     """Delete an account and everything in it. This can't be undone."""
     await admin.delete_account(user, user_id)
+
+
+async def _email_settings(email: EmailService, app: Settings) -> EmailSettingsResponse:
+    decided = await email.settings()
+    return EmailSettingsResponse(
+        welcome_enabled=decided.welcome_enabled,
+        digest_enabled=decided.digest_enabled,
+        digest_hour=decided.digest_hour,
+        configured=bool(app.resend_api_key),
+        sender=app.email_from,
+        digests_sent_this_week=await email.digests_sent_this_week(),
+    )
+
+
+@router.get("/email", response_model=EmailSettingsResponse)
+async def email_settings(
+    email: EmailService = Depends(get_email_service),
+    app_settings: Settings = Depends(get_settings),
+) -> EmailSettingsResponse:
+    """Email settings, and whether email can go out at all."""
+    return await _email_settings(email, app_settings)
+
+
+@router.patch("/email", response_model=EmailSettingsResponse, responses=error_responses(422))
+async def update_email_settings(
+    body: UpdateEmailSettingsRequest,
+    admin: User = Depends(get_current_admin),
+    email: EmailService = Depends(get_email_service),
+    app_settings: Settings = Depends(get_settings),
+) -> EmailSettingsResponse:
+    """Turn the welcome email and weekly digest on or off, and choose the digest's hour."""
+    await email.update_settings(admin, body.welcome_enabled, body.digest_enabled, body.digest_hour)
+    return await _email_settings(email, app_settings)
+
+
+@router.post(
+    "/email/message", response_model=MessageResultResponse, responses=error_responses(404, 422)
+)
+async def send_message(
+    body: SendMessageRequest,
+    admin: User = Depends(get_current_admin),
+    email: EmailService = Depends(get_email_service),
+) -> MessageResultResponse:
+    """Write to everyone, one crew or one person. `dry_run` only counts who it would reach."""
+    audience = Audience(crew_id=body.crew_id, email=body.email)
+    if body.dry_run:
+        return MessageResultResponse(recipients=await email.audience_size(audience), sent=0)
+    recipients, sent = await email.send_message(admin, audience, body.subject, body.body)
+    return MessageResultResponse(recipients=recipients, sent=sent)
+
+
+@router.post(
+    "/email/test-digest", response_model=TestDigestResponse, responses=error_responses(409)
+)
+async def send_test_digest(
+    member: Member = Depends(get_current_member),
+    email: EmailService = Depends(get_email_service),
+) -> TestDigestResponse:
+    """Send yourself this week's digest, to see how it looks."""
+    return TestDigestResponse(sent=await email.send_test_digest(member))
 
 
 def _feedback_item(feedback: Feedback, user: User) -> FeedbackItem:

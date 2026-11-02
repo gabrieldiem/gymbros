@@ -207,31 +207,31 @@ export const es = {
     'GYMBROS (gymbros.gabrieldiem.com) es un registro de entrenos para pequeños equipos de amigos, gestionado por Gabriel Diem. Esta política explica a qué datos accede, cómo los usa, guarda, comparte y protege, y cómo puedes borrarlos.',
   privacy_google_h: 'Datos de usuario de Google a los que accedemos',
   privacy_google:
-    'Cuando entras con Google, GYMBROS solo pide tu perfil básico y tu email (los permisos openid, email y profile). De ahí guardamos tu nombre, tu email y el ID de tu cuenta de Google. No guardamos tu foto de perfil, nunca vemos tu contraseña de Google y no tenemos acceso a tu Gmail, Drive, Contactos, Calendario ni a nada más de tu cuenta de Google.',
+    'Cuando entras con Google, GYMBROS solo pide tu perfil básico y tu email (los permisos openid, email y profile). De ahí guardamos tu nombre, tu email y el ID de tu cuenta de Google. No guardamos tu foto de perfil de Google, nunca vemos tu contraseña de Google y no tenemos acceso a tu Gmail, Drive, Contactos, Calendario ni a nada más de tu cuenta de Google.',
   privacy_collect_h: 'Otros datos que guardamos',
   privacy_collect:
-    'Lo que añades: tus entrenos, sets, pesos, tiempos, distancias, comentarios, reacciones, duelos y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
+    'Lo que añades, si decides hacerlo: tus entrenos, sets, pesos, tiempos, distancias, los nombres de tus gimnasios, una foto de un entreno, una foto de perfil, comentarios, reacciones, duelos, los comentarios que nos envías y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
   privacy_use_h: 'Cómo usamos tus datos',
   privacy_use:
-    'Solo para ofrecer y mejorar las funciones de GYMBROS. El ID de tu cuenta de Google y tu email te identifican en la misma cuenta cada vez. Tu nombre se muestra a tu equipo en la clasificación, el muro y las notificaciones. Tu email también se usa para enviarte el email de bienvenida. Tus entrenos se usan para puntuarlos, clasificar a tu equipo, mostrar tu progreso y publicarlos en el muro de tu equipo. No hay anuncios ni herramientas de analítica.',
+    'Solo para ofrecer y mejorar las funciones de GYMBROS. El ID de tu cuenta de Google y tu email te identifican en la misma cuenta cada vez. Tu nombre se muestra a tu equipo en la clasificación, el muro y las notificaciones. Tu email también se usa para enviarte el email de bienvenida y, salvo que los desactives en ajustes o con el enlace de cada uno, un resumen semanal de tu semana y mensajes de quienes llevan GYMBROS. Tus entrenos se usan para puntuarlos, clasificar a tu equipo, mostrar tu progreso y publicarlos en el muro de tu equipo. Los comentarios que envías se leen para mejorar la app. No hay anuncios ni herramientas de analítica.',
   privacy_who_h: 'Con quién los compartimos',
   privacy_who:
-    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluido tu email. Tres proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), Resend (recibe tu nombre y tu email para entregar los emails) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
+    'Tu equipo ve tu nombre, foto, entrenos, gimnasios, fotos de entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluidos tu email, tu foto de perfil y los comentarios que envías. Tres proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), Resend (recibe tu nombre, tu email y el contenido de cada email, que puede incluir los nombres y números semanales de tu equipo, para entregarlo) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
   privacy_protect_h: 'Cómo protegemos tus datos',
   privacy_protect:
-    'Todo el tráfico de GYMBROS va cifrado con HTTPS. La base de datos no es accesible desde internet: solo puede conectarse el propio servidor de la app. La cookie que mantiene tu sesión no puede leerse desde scripts y solo se envía por HTTPS, y el servidor guarda solo un hash con clave, no su valor. GYMBROS no te pide contraseña. Solo los administradores indicados en la configuración del servidor pueden abrir el área de administración, y cada cambio que hacen queda en un registro.',
+    'Todo el tráfico de GYMBROS va cifrado con HTTPS. La base de datos no es accesible desde internet: solo puede conectarse el propio servidor de la app. La cookie que mantiene tu sesión no puede leerse desde scripts y solo se envía por HTTPS, y el servidor guarda solo un hash con clave, no su valor. GYMBROS no te pide contraseña. Las fotos que subes se reducen primero en tu dispositivo, lo que elimina sus metadatos, como dónde se tomaron, y solo pueden abrirlas los miembros de tu equipo con sesión iniciada. Solo los administradores indicados en la configuración del servidor pueden abrir el área de administración, y cada cambio que hacen queda en un registro.',
   privacy_keep_h: 'Cuánto tiempo los guardamos y cómo borrarlos',
   privacy_keep:
-    'Guardamos tu cuenta y tus entrenos hasta que los borres. Para borrarlo todo, abre Ajustes y elige Borrar cuenta: tu cuenta, entrenos, puntos, publicaciones, comentarios y reacciones se eliminan de nuestra base de datos en el momento, incluidos tus datos de Google. También puedes pedirnos que lo hagamos escribiendo a {email}. Lo que puede quedar: tu nombre en notificaciones de otros miembros y en sus registros de recompensas o duelos que te mencionen, los registros del servidor hasta que se borren, los registros de entrega de Resend según su política, y una entrada en el registro de administración que solo contiene un ID interno. Las sesiones caducan a los 30 días. Las notificaciones antiguas se eliminan a los 60 días, la próxima vez que su dueño las abra.',
+    'Guardamos tu cuenta y tus entrenos hasta que los borres. Para borrarlo todo, abre Ajustes y elige Borrar cuenta: tu cuenta, entrenos, fotos, gimnasios, puntos, publicaciones, comentarios, reacciones y los comentarios que nos enviaste se eliminan de nuestra base de datos en el momento, incluidos tus datos de Google. También puedes pedirnos que lo hagamos escribiendo a {email}. Lo que puede quedar: tu nombre en notificaciones de otros miembros y en sus registros de recompensas o duelos que te mencionen, los registros del servidor hasta que se borren, los registros de entrega de Resend según su política, y una entrada en el registro de administración que solo contiene un ID interno. Las sesiones caducan a los 30 días. Las notificaciones antiguas se eliminan a los 60 días, la próxima vez que su dueño las abra.',
   privacy_limited_h: 'Uso limitado',
   privacy_limited:
     'El uso y la transferencia por parte de GYMBROS de la información recibida de las API de Google se ajustan a la Política de datos de usuario de los servicios de API de Google (https://developers.google.com/terms/api-services-user-data-policy), incluidos los requisitos de uso limitado. Usamos los datos de usuario de Google solo para ofrecer y mejorar las funciones descritas aquí. No los usamos ni transferimos para publicidad, no los vendemos, no los usamos para evaluar la solvencia y no los usamos para desarrollar, mejorar o entrenar modelos de IA o de aprendizaje automático.',
   privacy_cookies_h: 'Cookies y almacenamiento del navegador',
   privacy_cookies:
-    'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma, un código de invitación mientras lo usas y algunas preferencias de la app. Nada se usa para rastrearte.',
+    'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma, un código de invitación mientras lo usas y algunas preferencias de la app. Para que la app funcione sin señal, también guarda una copia de tu perfil, la clasificación de tu equipo y cualquier entreno aún sin enviar, hasta una semana. Al salir se borra. Nada se usa para rastrearte.',
   privacy_rights_h: 'Qué puedes hacer',
   privacy_rights:
-    'Puedes cambiar tu nombre, color, idioma y tiempo de descanso en los ajustes de la app. Para obtener una copia de tus datos o corregirlos, escribe a {email}.',
+    'Puedes cambiar tu nombre, foto, color, gimnasios, idioma, tiempo de descanso y emails en la app, y descargar todo tu entrenamiento en un archivo desde Ajustes. Para corregir cualquier otra cosa, escribe a {email}.',
   privacy_kids_h: 'Menores',
   privacy_kids: 'GYMBROS no está pensado para menores de 13 años.',
   privacy_changes_h: 'Cambios y contacto',
@@ -336,6 +336,43 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  email_updates_title: 'Emails',
+  email_updates_hint: 'El resumen semanal y los mensajes de quienes llevan GYMBROS.',
+  unsubscribe_title: '¿No recibir más estos emails?',
+  unsubscribe_hint:
+    'No recibirás el resumen semanal ni los mensajes de quienes llevan GYMBROS. Puedes volver a activarlos en ajustes.',
+  unsubscribe_cta: 'No recibirlos',
+  unsubscribe_done: 'Listo. Ya no recibirás estos emails.',
+  unsubscribe_failed: 'Ese enlace no funcionó. Puedes desactivarlos en ajustes.',
+  err_nothing_to_digest:
+    'Tu equipo no hizo nada la semana pasada, así que no hay resumen que mostrar.',
+  admin_view_email: 'Email',
+  admin_email_settings: 'Emails automáticos',
+  admin_email_from: 'Se envía desde {sender}.',
+  admin_email_not_configured:
+    'RESEND_API_KEY no está configurada en el servidor, así que no sale ningún email.',
+  admin_email_welcome: 'Email de bienvenida al registrarse',
+  admin_email_digest: 'Resumen semanal el lunes por la mañana',
+  admin_email_hour: 'El lunes a las, en la hora de cada equipo',
+  admin_email_sent_count: 'Resúmenes enviados últimamente: {n}.',
+  admin_email_test: 'Enviarme un resumen de prueba',
+  admin_email_test_sent: 'Enviado. Mira tu bandeja de entrada.',
+  admin_email_test_failed: 'No se pudo enviar.',
+  admin_email_compose: 'Escribir a los miembros',
+  admin_email_compose_hint:
+    'Texto sin formato. Cada email tiene un enlace para dejar de recibirlos, y se omite a quienes lo usaron.',
+  admin_email_to: 'Para',
+  admin_email_everyone: 'Todos',
+  admin_email_person: 'Una persona',
+  admin_email_address: 'Su email',
+  admin_email_subject: 'Asunto',
+  admin_email_body: 'Mensaje',
+  admin_email_review: 'Revisar',
+  admin_email_send: 'Enviar a {n}',
+  admin_email_nobody: 'Nadie lo recibiría.',
+  admin_email_result: 'Enviado a {sent} de {n}.',
+  admin_action_email_settings: 'Ajustes de email cambiados',
+  admin_action_email_sent: 'Email enviado a los miembros',
   offline_title: 'Conexión',
   offline_logging: 'Sin señal. Sigue registrando: tu entreno se guarda en este teléfono.',
   offline_waiting_1: 'Hay 1 entreno esperando para enviarse. Se envía solo cuando hay señal.',
@@ -611,6 +648,9 @@ export const es = {
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_weekly_email_title: 'Tu semana en tu bandeja de entrada',
+  wn_weekly_email_body:
+    'Los lunes por la mañana GYMBROS puede enviarte cómo fue tu semana. Puedes desactivarlo en ajustes, y nuestra política de privacidad ahora lo cubre, junto con fotos, gimnasios y el uso sin conexión.',
   wn_offline_title: 'Registra sin señal',
   wn_offline_body:
     'La app abre y registra sin señal, incluso un entreno entero. Se guarda en tu teléfono y se envía solo cuando vuelves.',

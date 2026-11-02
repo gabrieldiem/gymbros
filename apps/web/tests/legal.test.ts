@@ -35,6 +35,12 @@ describe('static legal pages', () => {
     ['no AI training', 'develop, improve or train AI or machine learning models'],
     ['who runs the app', 'run by Gabriel Diem'],
     ['server logs', 'including your IP address'],
+    ['workout photos and gyms', 'the names of your gyms, a photo of a workout'],
+    ['what a picture loses', 'removes their metadata'],
+    ['the weekly digest and how to stop it', 'a weekly digest of your week'],
+    ['what Resend receives', 'what’s in each email'],
+    ['what stays on the phone', 'So the app works with no signal'],
+    ['the download', 'download all your training'],
   ])('discloses %s', (_what, text) => {
     expect(PRIVACY).toContain(text);
   });

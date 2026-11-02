@@ -1,5 +1,6 @@
 """The email a new member gets. Copy lives here because it never reaches the web app's catalogs."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from html import escape
 from typing import Protocol
@@ -13,6 +14,7 @@ class EmailMessage:
     subject: str
     html: str
     text: str
+    headers: tuple[tuple[str, str], ...] = ()
 
 
 class EmailSender(Protocol):
@@ -20,6 +22,9 @@ class EmailSender(Protocol):
 
     async def send(self, message: EmailMessage) -> bool:
         """Send the message, best effort. Returns whether it went out."""
+
+    async def send_many(self, messages: Sequence[EmailMessage]) -> int:
+        """Send several, best effort. Returns how many went out."""
 
 
 _COPY = {

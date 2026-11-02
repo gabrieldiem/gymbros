@@ -67,6 +67,14 @@ test('backoffice', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin accounts');
+  await page.getByRole('button', { name: /^Email$/ }).click();
+  await expect(
+    page.getByRole('heading', { name: /Automatic emails|Emails automáticos/ }),
+  ).toBeVisible();
+  await audit(page, 'admin email');
+  await page.getByRole('button', { name: /^(Feedback|Comentarios)$/ }).click();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin feedback');
   await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin crews');

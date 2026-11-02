@@ -4,6 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, 
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.repositories.email_repository import EmailRepository
 from dependencies import (
     get_auth_service,
     get_email_sender,
@@ -94,7 +95,7 @@ async def google_callback(  # pylint: disable=too-many-arguments,too-many-positi
         return failed
     # The browser follows this redirect at once: its session must already be stored.
     await session.commit()
-    if logged_in.created:
+    if logged_in.created and (await EmailRepository(session).settings()).welcome_enabled:
         user = logged_in.user
         message = welcome_email(user.email, user.display_name, user.language, settings.public_url)
         background.add_task(email.send, message)

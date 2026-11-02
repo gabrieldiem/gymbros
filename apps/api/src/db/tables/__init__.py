@@ -5,7 +5,9 @@ from db.tables.auth_session import AuthSession
 from db.tables.avatar import Avatar
 from db.tables.comment import Comment
 from db.tables.crew import Crew
+from db.tables.digest_send import DigestSend
 from db.tables.duel import Duel
+from db.tables.email_settings import EmailSettings
 from db.tables.feed_item import FeedItem
 from db.tables.feedback import Feedback
 from db.tables.gym import Gym
@@ -26,7 +28,9 @@ __all__ = [
     "Avatar",
     "Comment",
     "Crew",
+    "DigestSend",
     "Duel",
+    "EmailSettings",
     "FeedItem",
     "Feedback",
     "Gym",

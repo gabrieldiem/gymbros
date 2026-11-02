@@ -27,8 +27,9 @@ import { timeAgo } from '../../i18n/timeAgo';
 import { useProfileLanguage } from '../../i18n/useLanguage';
 import styles from './Admin.module.css';
 import { CrewSheet, MemberSheet } from './AdminSheets';
+import { EmailTab } from './EmailTab';
 
-type View = 'overview' | 'crews' | 'members' | 'feedback' | 'log';
+type View = 'overview' | 'crews' | 'members' | 'email' | 'feedback' | 'log';
 
 function Overview() {
   const { t, n } = useI18n();
@@ -280,6 +281,7 @@ export function AdminPage() {
               { value: 'overview', label: t('admin_view_overview') },
               { value: 'crews', label: t('admin_crews') },
               { value: 'members', label: t('admin_users') },
+              { value: 'email', label: t('admin_view_email') },
               { value: 'feedback', label: t('admin_view_feedback') },
               { value: 'log', label: t('admin_view_log') },
             ]}
@@ -289,6 +291,7 @@ export function AdminPage() {
           {view === 'overview' && <Overview />}
           {view === 'crews' && <Crews />}
           {view === 'members' && <Members />}
+          {view === 'email' && <EmailTab />}
           {view === 'feedback' && <Feedback />}
           {view === 'log' && <Log />}
         </div>

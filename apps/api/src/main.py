@@ -7,7 +7,7 @@ from fastapi import FastAPI
 
 from controller import general
 from db.migrate import run_migrations
-from dependencies import engine, logger, settings
+from dependencies import engine, logger, settings, run_digest_loop
 from routes import (
     admin,
     auth,
@@ -17,6 +17,7 @@ from routes import (
     compete,
     crew,
     crews,
+    email,
     feed,
     feedback,
     gyms,
@@ -37,7 +38,10 @@ async def lifespan(_app: FastAPI):
     if settings.run_migrations_on_startup:
         await asyncio.to_thread(run_migrations)
         logger.info("Database migrated to head")
+    digests = asyncio.create_task(run_digest_loop()) if settings.email_scheduler_enabled else None
     yield
+    if digests is not None:
+        digests.cancel()
     logger.info("Shutting down gymbros-api...")
     await engine.dispose()
 
@@ -56,6 +60,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
+app.include_router(email.router, prefix="/api")
 app.include_router(feedback.router, prefix="/api")
 app.include_router(avatars.router, prefix="/api")
 app.include_router(whats_new.router, prefix="/api")

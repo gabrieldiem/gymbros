@@ -43,6 +43,30 @@ describe('Your data', () => {
   });
 });
 
+describe('Unsubscribing from an email', () => {
+  it('asks first, because mail apps open links on their own', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [401, { detail: { code: 'not_authenticated' } }],
+      'POST /api/email/unsubscribe?u=u1&t=abc': [204, null],
+    });
+    renderApp('/unsubscribe?u=u1&t=abc');
+    const stop = await screen.findByRole('button', { name: 'Stop them' });
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false);
+    await userEvent.click(stop);
+    expect(await screen.findByText(/You won’t get these emails any more/)).toBeVisible();
+  });
+
+  it('says so when the link is bad', async () => {
+    mockApi({
+      'GET /api/me': [401, { detail: { code: 'not_authenticated' } }],
+      'POST /api/email/unsubscribe?u=u1&t=bad': [401, { detail: { code: 'not_authenticated' } }],
+    });
+    renderApp('/unsubscribe?u=u1&t=bad');
+    await userEvent.click(await screen.findByRole('button', { name: 'Stop them' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/That link didn’t work/);
+  });
+});
+
 describe('Your gyms in settings', () => {
   const openSettings = async () => {
     const menu = within(await openMenu());

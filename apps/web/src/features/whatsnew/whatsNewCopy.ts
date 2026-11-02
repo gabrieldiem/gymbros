@@ -5,6 +5,7 @@ import type { MessageKey } from '../../i18n/en';
  * tests/whatsNew.test.tsx fails if an entry there has no copy here.
  */
 export const WHATS_NEW_COPY: Record<string, { title: MessageKey; body: MessageKey }> = {
+  'weekly-email': { title: 'wn_weekly_email_title', body: 'wn_weekly_email_body' },
   offline: { title: 'wn_offline_title', body: 'wn_offline_body' },
   export: { title: 'wn_export_title', body: 'wn_export_body' },
   feedback: { title: 'wn_feedback_title', body: 'wn_feedback_body' },

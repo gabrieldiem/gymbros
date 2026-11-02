@@ -246,3 +246,78 @@
 .handled p {
   color: var(--smoke);
 }
+
+.emailBox {
+  display: grid;
+  gap: 12px;
+  max-width: 640px;
+  margin-bottom: 28px;
+  padding: 18px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+}
+
+.emailForm {
+  display: grid;
+  gap: 14px;
+}
+
+.warning {
+  color: var(--red-text);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+}
+
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--volt);
+}
+
+.inlineField {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-weight: 600;
+}
+
+.inlineField select {
+  max-width: 100%;
+  min-height: var(--touch);
+  padding: 0 10px;
+  color: var(--chalk);
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}
+
+.bodyField {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.bodyField textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--chalk);
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control);
+  resize: vertical;
+}
+
+.bodyField textarea:focus {
+  outline: none;
+  border-color: var(--volt);
+}

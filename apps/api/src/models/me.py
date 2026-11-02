@@ -35,6 +35,7 @@ class MeResponse(BaseModel):
     color: Color
     language: Language
     rest_seconds: int
+    email_updates: bool = True
     crew: CrewResponse | None
     is_admin: bool = False
 
@@ -48,6 +49,7 @@ class UpdateMeRequest(BaseModel):
     color: Color | None = None
     language: Language | None = None
     rest_seconds: int | None = Field(default=None, ge=30, le=300)
+    email_updates: bool | None = None
 
 
 class JoinCrewRequest(BaseModel):
