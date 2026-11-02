@@ -148,6 +148,7 @@ class PrModel(BaseModel):
 
     exercise_id: str
     load_kg: float
+    bar_kg: float | None = None
     reps: int
     e1rm: float
     achieved_at: datetime

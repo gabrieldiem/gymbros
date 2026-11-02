@@ -19,6 +19,7 @@ class PersonalRecord(Base):  # pylint: disable=too-few-public-methods
     )
     exercise_id: Mapped[str] = mapped_column(String(32), primary_key=True)
     load_kg: Mapped[float] = mapped_column(Float)
+    bar_kg: Mapped[float | None] = mapped_column(Float)
     reps: Mapped[int] = mapped_column(Integer)
     e1rm: Mapped[float] = mapped_column(Float)
     workout_id: Mapped[uuid.UUID | None] = mapped_column(

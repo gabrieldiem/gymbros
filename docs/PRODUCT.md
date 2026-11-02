@@ -57,6 +57,12 @@ A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A worko
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
+## Entering sets
+
+- **Repeat:** the second column of every row copies the set above it into that row, or that set from last time when the row above is empty. It fills the numbers and leaves the set unchecked.
+- **Remove a row:** the × under the set number removes it. An exercise always keeps one row; to drop it, remove the exercise.
+- **Disks and bar:** on a barbell lift you enter the total weight of the disks, the number shown everywhere you read a barbell lift ("40 kg + bar × 5"). The bar sits beside it and can be 20, 15 or 10 kg, and the row you're on shows the full weight and the kg per side. Points, PRs and badges read the whole weight, bar included, so changing how it's shown changed no scores. Reps with no disks count as the empty bar. Other lifts show plain kg.
+
 ## Past workouts
 
 Forgot to log one? From Train you can log a workout for any of the last 7 days (`game.past_workout_days`, in the crew's time zone). Today isn't one of them: that's a normal workout.

@@ -38,8 +38,8 @@ describe('Crew feed', () => {
     expect(post).toHaveTextContent('64 min');
     expect(post).toHaveTextContent('6,820 kg');
     expect(post).toHaveTextContent('+6% volume');
-    expect(post).toHaveTextContent('New PR: Bench press 110 kg × 3');
-    expect(post).toHaveTextContent('110×3, 105×5');
+    expect(post).toHaveTextContent('New PR: Bench press 90 kg + bar × 3');
+    expect(post).toHaveTextContent('90+bar×3, 85+bar×5');
     await userEvent.click(within(post).getByRole('button', { name: '1 comments' }));
     expect(within(post).getByText('Light weight baby')).toBeVisible();
     expect(screen.getByText(/reached Iron rank/)).toBeVisible();
@@ -120,7 +120,7 @@ describe('Hall of fame', () => {
     expect(improved).toHaveTextContent('+18%');
     const records = screen.getByRole('region', { name: 'Crew records' });
     expect(records).toHaveTextContent('Heaviest Back squat');
-    expect(records).toHaveTextContent('140 kg × 3');
+    expect(records).toHaveTextContent('120 kg + bar × 3');
     expect(records).toHaveTextContent('You hold this one');
     expect(records).toHaveTextContent('14 weeks');
     expect(records).toHaveTextContent('412 pts');

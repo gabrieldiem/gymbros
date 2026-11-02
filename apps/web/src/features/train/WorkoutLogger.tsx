@@ -66,7 +66,7 @@ export function WorkoutLogger(props: Props) {
   const rest = useRestTimer();
   const restSeconds = useMe().data?.rest_seconds;
   const [picking, setPicking] = useState(false);
-  const [platesKg, setPlatesKg] = useState<number | null>(null);
+  const [plates, setPlates] = useState<{ disks: number; bar: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const exerciseById = (id: string) => catalog.exercises.find((e) => e.id === id);
 
@@ -140,7 +140,7 @@ export function WorkoutLogger(props: Props) {
             onSetDone={() => {
               if (!past) rest.start(restSeconds);
             }}
-            onPlates={setPlatesKg}
+            onPlates={(disks, bar) => setPlates({ disks, bar })}
           />
         );
       })}
@@ -170,8 +170,12 @@ export function WorkoutLogger(props: Props) {
           onClose={() => setPicking(false)}
         />
       )}
-      {platesKg !== null && (
-        <PlateCalculator initialKg={platesKg} onClose={() => setPlatesKg(null)} />
+      {plates && (
+        <PlateCalculator
+          initialDisks={plates.disks}
+          barKg={plates.bar}
+          onClose={() => setPlates(null)}
+        />
       )}
       {confirmDiscard && (
         <Sheet title={t('discard_q')} onClose={() => setConfirmDiscard(false)}>

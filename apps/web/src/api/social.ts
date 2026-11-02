@@ -32,6 +32,7 @@ export type Comment = {
 
 export type PostedSet = {
   load_kg: number | null;
+  bar_kg?: number | null;
   reps: number | null;
   minutes: number | null;
   km: number | null;
@@ -48,7 +49,7 @@ export type WorkoutPostVars = {
   cardio_minutes: number;
   points: number;
   vs_last_pct: number | null;
-  prs: { exercise_id: string; load_kg: number; reps: number }[];
+  prs: { exercise_id: string; load_kg: number; reps: number; bar_kg?: number | null }[];
   exercises: { exercise_id: string; sets: PostedSet[] }[];
 };
 

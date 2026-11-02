@@ -50,6 +50,8 @@ export type SetData = {
   minutes: number | null;
   km: number | null;
   done: boolean;
+  /** The bar inside `load_kg`, on a barbell lift. */
+  bar_kg?: number | null;
 };
 
 export type WorkoutExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
@@ -79,7 +81,7 @@ export type FinishResult = {
   cardio_minutes: number;
   completed_sets: number;
   vs_last_pct: number | null;
-  prs: { exercise_id: string; load_kg: number; reps: number }[];
+  prs: { exercise_id: string; load_kg: number; reps: number; bar_kg?: number | null }[];
   workouts_this_week: number;
   weekly_target: number;
   climb: ClimbChange;

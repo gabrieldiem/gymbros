@@ -33,6 +33,99 @@ function bodyOf(fetchMock: ReturnType<typeof mockApi>, method: string, url: stri
   return call ? (JSON.parse(String(call[1]?.body)) as unknown) : undefined;
 }
 
+describe('Train: entering sets', () => {
+  const lastPut = (fetchMock: ReturnType<typeof mockApi>) =>
+    bodyOf(fetchMock, 'PUT', '/api/workouts/w1') as {
+      exercises: { sets: Record<string, unknown>[] }[];
+    };
+  const twoEmptySets = makeWorkout({
+    exercises: [
+      {
+        exercise_id: 'bench',
+        sets: [
+          { load_kg: 60, bar_kg: 20, reps: 8, minutes: null, km: null, done: true },
+          { load_kg: null, reps: null, minutes: null, km: null, done: false },
+        ],
+        previous_sets: [],
+      },
+    ],
+  });
+  const openBench = async (routes = {}) => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, twoEmptySets],
+      'PUT /api/workouts/w1': () => [200, twoEmptySets],
+      ...routes,
+    });
+    renderApp('/train');
+    return {
+      fetchMock,
+      bench: within(await screen.findByRole('article', { name: 'Bench press' })),
+    };
+  };
+
+  it('repeats the set above without checking it off', async () => {
+    const { fetchMock, bench } = await openBench();
+    await userEvent.click(bench.getByRole('button', { name: 'Repeat 40 × 8 on set 2' }));
+    expect(bench.getByLabelText('Bench press, set 2, disks')).toHaveValue(40);
+    expect(bench.getByLabelText('Bench press, set 2, reps')).toHaveValue(8);
+    expect(bench.getByRole('button', { name: 'Complete set 2' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    await waitFor(() =>
+      expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({
+        load_kg: 60,
+        bar_kg: 20,
+        reps: 8,
+        done: false,
+      }),
+    );
+  });
+
+  it('has nothing to repeat on the first set of a new exercise', async () => {
+    const { bench } = await openBench();
+    const first = bench.getByLabelText('Bench press, set 1, disks').parentElement as HTMLElement;
+    expect(within(first).getAllByRole('button')[1]).toBeDisabled();
+  });
+
+  it('sends the whole weight when you type the disks', async () => {
+    const { fetchMock, bench } = await openBench();
+    await userEvent.type(bench.getByLabelText('Bench press, set 2, disks'), '50');
+    await waitFor(() =>
+      expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({ load_kg: 70, bar_kg: 20 }),
+    );
+  });
+
+  it('keeps the disks and changes the whole weight with another bar', async () => {
+    const { fetchMock, bench } = await openBench();
+    await userEvent.selectOptions(bench.getByLabelText('Bar'), '15');
+    expect(bench.getByLabelText('Bench press, set 1, disks')).toHaveValue(40);
+    await waitFor(() =>
+      expect(lastPut(fetchMock).exercises[0]?.sets[0]).toMatchObject({ load_kg: 55, bar_kg: 15 }),
+    );
+  });
+
+  it('counts reps with no disks as the empty bar', async () => {
+    const { fetchMock, bench } = await openBench();
+    await userEvent.type(bench.getByLabelText('Bench press, set 2, reps'), '10');
+    await userEvent.click(bench.getByRole('button', { name: 'Complete set 2' }));
+    await waitFor(() =>
+      expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({
+        load_kg: 20,
+        reps: 10,
+        done: true,
+      }),
+    );
+  });
+
+  it('removes a row, but not the only one', async () => {
+    const { bench } = await openBench();
+    await userEvent.click(bench.getByRole('button', { name: 'Remove set 2' }));
+    expect(bench.queryByLabelText('Bench press, set 2, disks')).toBeNull();
+    expect(bench.getByRole('button', { name: 'Remove set 1' })).toBeDisabled();
+  });
+});
+
 describe('Train: your PR in the logger', () => {
   it('shows your current PR next to the exercise', async () => {
     trainApi({
@@ -54,7 +147,7 @@ describe('Train: your PR in the logger', () => {
     });
     renderApp('/train');
     const bench = await screen.findByRole('article', { name: 'Bench press' });
-    expect(await within(bench).findByText('PR 92.5 kg × 5')).toBeVisible();
+    expect(await within(bench).findByText('PR 72.5 kg + bar × 5')).toBeVisible();
   });
 
   it('shows nothing for an exercise you have no PR on', async () => {
@@ -154,8 +247,11 @@ describe('Train: start screen', () => {
     await userEvent.click(await screen.findByRole('button', { name: /Push day/ }));
     const bench = await screen.findByRole('article', { name: 'Bench press' });
     expect(within(bench).getByText('↑ Loaded to beat last time')).toBeVisible();
-    expect(within(bench).getAllByText('90 × 5')).toHaveLength(2);
-    expect(within(bench).getByLabelText('Bench press, set 1, kg')).toHaveValue(92.5);
+    // Last time's set on the first row, the row above on the next one. The disks, not the bar.
+    expect(within(bench).getByRole('button', { name: 'Repeat 70 × 5 on set 1' })).toBeVisible();
+    expect(within(bench).getByRole('button', { name: 'Repeat 72.5 × 5 on set 2' })).toBeVisible();
+    expect(within(bench).getByLabelText('Bench press, set 1, disks')).toHaveValue(72.5);
+    expect(within(bench).getByText('= 92.5 kg with the bar, 36.25 kg per side')).toBeVisible();
     expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({ routine_id: 'push' });
   });
 });
@@ -204,6 +300,7 @@ describe('Train: logging', () => {
     expect(within(dialog).getByRole('status')).toHaveTextContent(
       'Each side: 1 × 25 kg, 1 × 10 kg, 1 × 1.25 kg',
     );
+    expect(within(dialog).getByText('Bar 20 kg + disks 72.5 kg = 92.5 kg')).toBeVisible();
     await userEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -240,7 +337,7 @@ describe('Train: finishing', () => {
     expect(within(dialog).getByText('Push day done in 52 min')).toBeVisible();
     expect(within(dialog).getByText('Showed up')).toBeVisible();
     expect(within(dialog).getByText('2 completed sets')).toBeVisible();
-    expect(within(dialog).getByText('New PR: Bench press 92.5 kg × 5')).toBeVisible();
+    expect(within(dialog).getByText('New PR: Bench press 72.5 kg + bar × 5')).toBeVisible();
     expect(within(dialog).getByText('Better than last time (+3%)')).toBeVisible();
     expect(
       within(dialog).getByText('+3% volume vs last time. Better than yesterday.'),

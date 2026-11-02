@@ -4,7 +4,7 @@ import { Button } from '../../components/Button';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import styles from './PlateCalculator.module.css';
-import { BAR_KG, countPlates, platesPerSide } from './plates';
+import { countPlates, platesPerSide } from './plates';
 
 // Plate colours follow the common competition colour code. Decorative only.
 const PLATE_STYLE: Record<number, [string, number]> = {
@@ -58,17 +58,20 @@ function BarDrawing({ perSide, label }: { perSide: number[]; label: string }) {
   );
 }
 
-/** How to load a 20 kg bar for a total weight, per side. */
+/** The disks for each side of the bar, and how they add up with the bar. */
 export function PlateCalculator({
-  initialKg,
+  initialDisks,
+  barKg,
   onClose,
 }: {
-  initialKg: number;
+  initialDisks: number;
+  barKg: number;
   onClose: () => void;
 }) {
   const { t, n } = useI18n();
-  const [kg, setKg] = useState(Math.max(BAR_KG, initialKg));
-  const { perSide, leftoverKg } = platesPerSide(kg);
+  const [disks, setDisks] = useState(Math.max(0, initialDisks));
+  const total = disks + barKg;
+  const { perSide, leftoverKg } = platesPerSide(total, barKg);
   const list = countPlates(perSide)
     .map(([plate, count]) => `${count} × ${n(plate)} kg`)
     .join(', ');
@@ -80,7 +83,7 @@ export function PlateCalculator({
         <button
           type="button"
           aria-label={t('plate_less')}
-          onClick={() => setKg((v) => Math.max(BAR_KG, v - 2.5))}
+          onClick={() => setDisks((v) => Math.max(0, v - 2.5))}
         >
           −
         </button>
@@ -89,18 +92,21 @@ export function PlateCalculator({
           inputMode="decimal"
           step={2.5}
           min={0}
-          value={kg}
-          aria-label={t('kg_total')}
-          onChange={(e) => setKg(Number(e.target.value) || 0)}
+          value={disks}
+          aria-label={t('kg_disks')}
+          onChange={(e) => setDisks(Number(e.target.value) || 0)}
         />
-        <button type="button" aria-label={t('plate_more')} onClick={() => setKg((v) => v + 2.5)}>
+        <button type="button" aria-label={t('plate_more')} onClick={() => setDisks((v) => v + 2.5)}>
           +
         </button>
-        <span className={styles.unit}>{t('kg_total')}</span>
+        <span className={styles.unit}>{t('kg_disks')}</span>
       </div>
       <BarDrawing perSide={perSide} label={t('plate_sub')} />
       <p className={styles.result} role="status">
         {perSide.length ? t('each_side', { x: list }) : t('just_bar')}
+      </p>
+      <p className={styles.total}>
+        {t('plate_total', { bar: n(barKg), disks: n(disks), total: n(total) })}
       </p>
       {leftoverKg > 0 && <p className={styles.note}>{t('cant_load', { n: n(leftoverKg) })}</p>}
       <div className={styles.done}>

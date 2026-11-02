@@ -28,7 +28,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
 
   const bench = page.getByRole('article', { name: 'Bench press' });
   await expect(bench).toBeVisible();
-  const load = bench.getByLabel('Bench press, set 1, kg');
+  const load = bench.getByLabel('Bench press, set 1, disks');
   const reps = bench.getByLabel('Bench press, set 1, reps');
   if (!(await load.inputValue())) await load.fill('60');
   if (!(await reps.inputValue())) await reps.fill('5');

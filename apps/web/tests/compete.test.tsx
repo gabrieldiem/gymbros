@@ -111,7 +111,7 @@ describe('Weekly recap', () => {
     expect(story).toHaveTextContent('+812 pts, 5 workouts');
     await userEvent.click(within(story).getByRole('button', { name: 'Next slide' }));
     expect(story).toHaveTextContent('110 kg');
-    expect(story).toHaveTextContent('Maxo, Bench press 110 kg × 3');
+    expect(story).toHaveTextContent('Maxo, Bench press 90 kg + bar × 3');
     await userEvent.click(within(story).getByRole('button', { name: 'Next slide' }));
     expect(story).toHaveTextContent('4 / 3');
     expect(story).toHaveTextContent('From 3rd to 2nd on the rope.');

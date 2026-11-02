@@ -91,7 +91,14 @@ export type MeStats = {
   badges_unlocked: number;
   heatmap: { day: string; workouts: number }[];
   weekly_volume: { week_start: string; volume_kg: number }[];
-  prs: { exercise_id: string; load_kg: number; reps: number; e1rm: number; achieved_at: string }[];
+  prs: {
+    exercise_id: string;
+    load_kg: number;
+    bar_kg?: number | null;
+    reps: number;
+    e1rm: number;
+    achieved_at: string;
+  }[];
   history: {
     id: string;
     name: string;

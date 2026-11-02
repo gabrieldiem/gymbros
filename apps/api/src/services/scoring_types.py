@@ -102,6 +102,7 @@ class RecordSet:
     reps: int
     e1rm: float
     is_improvement: bool
+    bar_kg: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

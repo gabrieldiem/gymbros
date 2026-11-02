@@ -180,7 +180,14 @@ export function MePage() {
           {data.prs.length === 0 && <p className={styles.muted}>{t('prs_empty')}</p>}
           <ul className={`${styles.prs} stagger`}>
             {data.prs.slice(0, 8).map((pr) => {
-              const best = formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n);
+              const best = formatLift(
+                exercise(pr.exercise_id),
+                pr.load_kg,
+                pr.reps,
+                t,
+                n,
+                pr.bar_kg,
+              );
               const name = exercise(pr.exercise_id)?.name ?? pr.exercise_id;
               // Cardio records have no e1RM and no lift chart.
               if (exercise(pr.exercise_id)?.type === 'c') {

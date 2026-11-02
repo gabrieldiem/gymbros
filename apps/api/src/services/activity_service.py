@@ -25,7 +25,13 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
         {
             "exercise_id": entry.exercise_id,
             "sets": [
-                {"load_kg": s.load_kg, "reps": s.reps, "minutes": s.minutes, "km": s.km}
+                {
+                    "load_kg": s.load_kg,
+                    "bar_kg": s.bar_kg,
+                    "reps": s.reps,
+                    "minutes": s.minutes,
+                    "km": s.km,
+                }
                 for s in entry.sets
                 if s.done
             ],
@@ -43,7 +49,7 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
         "points": workout.points or 0,
         "vs_last_pct": score.vs_last_pct if score else None,
         "prs": [
-            {"exercise_id": r.exercise_id, "load_kg": r.load_kg, "reps": r.reps}
+            {"exercise_id": r.exercise_id, "load_kg": r.load_kg, "bar_kg": r.bar_kg, "reps": r.reps}
             for r in (score.records if score else ())
             if r.is_improvement
         ],

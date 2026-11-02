@@ -20,6 +20,7 @@ class SetModel(BaseModel):
     minutes: int | None = Field(default=None, ge=0, le=600)
     km: float | None = Field(default=None, ge=0, le=200)
     done: bool = False
+    bar_kg: float | None = Field(default=None, ge=0, le=100)
 
 
 class ExerciseInput(BaseModel):
@@ -78,6 +79,7 @@ class PersonalRecordModel(BaseModel):
     exercise_id: str
     load_kg: float
     reps: int
+    bar_kg: float | None = None
 
 
 class FinishResponse(BaseModel):

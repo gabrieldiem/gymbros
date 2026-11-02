@@ -62,7 +62,9 @@ def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishR
         completed_sets=score.completed_sets,
         vs_last_pct=score.vs_last_pct,
         prs=[
-            PersonalRecordModel(exercise_id=r.exercise_id, load_kg=r.load_kg, reps=r.reps)
+            PersonalRecordModel(
+                exercise_id=r.exercise_id, load_kg=r.load_kg, reps=r.reps, bar_kg=r.bar_kg
+            )
             for r in score.records
             if r.is_improvement
         ],

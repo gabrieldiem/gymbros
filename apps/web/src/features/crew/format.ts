@@ -1,4 +1,5 @@
 import type { Exercise } from '../../api/train';
+import { DEFAULT_BAR_KG, disksOf } from '../train/barbell';
 import type { Notification, PostedSet } from '../../api/social';
 import type { MessageKey } from '../../i18n/en';
 import type { Vars } from '../../i18n/translate';
@@ -8,7 +9,16 @@ type T = (key: MessageKey, vars?: Vars) => string;
 type N = (value: number) => string;
 
 /** One posted set: "110×3", "+15×8", "BW×10", "28 min, 5 km". */
-export function formatPostedSet(exercise: Exercise | undefined, set: PostedSet, n: N): string {
+export function formatPostedSet(
+  exercise: Exercise | undefined,
+  set: PostedSet,
+  n: N,
+  t: T,
+): string {
+  if (exercise?.barbell && (set.load_kg ?? 0) >= (set.bar_kg ?? DEFAULT_BAR_KG)) {
+    const disks = disksOf(set.load_kg ?? 0, set.bar_kg ?? DEFAULT_BAR_KG);
+    return t('posted_disks', { kg: n(disks), reps: set.reps ?? 0 });
+  }
   if (exercise?.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
   const load = set.load_kg ?? 0;
   if (exercise?.type === 'bw') return `${load > 0 ? `+${n(load)}` : 'BW'}×${set.reps ?? 0}`;

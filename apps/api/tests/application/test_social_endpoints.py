@@ -57,8 +57,8 @@ async def test_a_finished_workout_is_posted_to_the_crew(client, member, other_cl
         {
             "exercise_id": "squat",
             "sets": [
-                {"load_kg": 100.0, "reps": 5, "minutes": None, "km": None},
-                {"load_kg": 100.0, "reps": 5, "minutes": None, "km": None},
+                {"load_kg": 100.0, "bar_kg": None, "reps": 5, "minutes": None, "km": None},
+                {"load_kg": 100.0, "bar_kg": None, "reps": 5, "minutes": None, "km": None},
             ],
         }
     ]

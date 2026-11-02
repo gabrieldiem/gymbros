@@ -23,6 +23,8 @@ class LoggedSet:
     minutes: int | None = None
     km: float | None = None
     done: bool = False
+    # The bar inside load_kg, for showing disks + bar. Scoring only reads load_kg.
+    bar_kg: float | None = None
 
 
 def is_completed(exercise: Exercise, logged: LoggedSet) -> bool:
@@ -68,7 +70,7 @@ def overload(exercise: Exercise, last: LoggedSet) -> LoggedSet:
     if exercise.is_cardio:
         return LoggedSet(minutes=(last.minutes or 0) + 1, km=last.km)
     if exercise.barbell and last.load_kg is not None:
-        return LoggedSet(load_kg=last.load_kg + BARBELL_STEP_KG, reps=last.reps)
+        return LoggedSet(load_kg=last.load_kg + BARBELL_STEP_KG, reps=last.reps, bar_kg=last.bar_kg)
     return replace(last, reps=(last.reps or 0) + 1, done=False, minutes=None, km=None)
 
 

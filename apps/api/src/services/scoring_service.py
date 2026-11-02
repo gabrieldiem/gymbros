@@ -5,7 +5,7 @@ the rule in docs/PRODUCT.md. Point values come from ScoringRules (settings.json)
 """
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from services.scoring_types import (
     History,
@@ -114,7 +114,12 @@ def _best_set(
         e1rm = estimated_1rm(load, logged_set.reps or 0)
         if best is None or e1rm > best.e1rm:
             best = RecordSet(
-                logged.exercise.id, logged_set.load_kg or 0.0, logged_set.reps or 0, e1rm, False
+                logged.exercise.id,
+                logged_set.load_kg or 0.0,
+                logged_set.reps or 0,
+                e1rm,
+                False,
+                logged_set.bar_kg,
             )
     return best
 
@@ -140,7 +145,7 @@ def _records(bests: tuple[RecordSet, ...], history: History) -> tuple[RecordSet,
         if stored is None:
             records.append(best)
         elif best.e1rm > stored + _PR_EPSILON:
-            records.append(RecordSet(best.exercise_id, best.load_kg, best.reps, best.e1rm, True))
+            records.append(replace(best, is_improvement=True))
     return tuple(records)
 
 
@@ -206,6 +211,8 @@ def _pr_items(
                 "load_kg": _number(record.load_kg),
                 "reps": record.reps,
             }
+            if record.bar_kg is not None:
+                variables["bar_kg"] = _number(record.bar_kg)
             items.append(LineItem("ln_pr", variables, rules.pr))
     return tuple(items)
 

@@ -24,7 +24,9 @@ class WorkoutSet(Base):  # pylint: disable=too-few-public-methods
     exercise_id: Mapped[str] = mapped_column(String(32), index=True)
     exercise_position: Mapped[int] = mapped_column(Integer)
     set_position: Mapped[int] = mapped_column(Integer)
+    # The whole weight, bar included: what scoring reads. The logger shows it as disks + bar.
     load_kg: Mapped[float | None] = mapped_column(Float)
+    bar_kg: Mapped[float | None] = mapped_column(Float)
     reps: Mapped[int | None] = mapped_column(Integer)
     minutes: Mapped[int | None] = mapped_column(Integer)
     km: Mapped[float | None] = mapped_column(Float)

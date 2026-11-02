@@ -1,6 +1,7 @@
 import type { MessageKey } from '../../i18n/en';
 import type { Vars } from '../../i18n/translate';
 import type { Exercise, LineItem, SetData } from '../../api/train';
+import { DEFAULT_BAR_KG, disksOf } from './barbell';
 
 type T = (key: MessageKey, vars?: Vars) => string;
 type N = (value: number) => string;
@@ -22,7 +23,12 @@ export function formatLift(
   reps: number,
   t: T,
   n: N,
+  barKg?: number | null,
 ) {
+  const bar = barKg ?? DEFAULT_BAR_KG;
+  if (exercise?.barbell && loadKg >= bar) {
+    return t('pr_disks', { kg: n(disksOf(loadKg, bar)), reps });
+  }
   if (exercise?.type === 'c') return t('pr_distance', { km: n(loadKg), minutes: reps });
   if (exercise?.type === 'bw') {
     return loadKg > 0 ? t('pr_added', { kg: n(loadKg), reps }) : t('pr_reps', { reps });
@@ -33,6 +39,9 @@ export function formatLift(
 /** Last time's set in the logger's "Last time" column. */
 export function formatPrevious(exercise: Exercise, set: SetData | undefined, n: N): string {
   if (!set) return '–';
+  if (exercise.barbell && (set.load_kg ?? 0) > 0) {
+    return `${n(disksOf(set.load_kg ?? 0, set.bar_kg ?? DEFAULT_BAR_KG))} × ${set.reps ?? 0}`;
+  }
   if (exercise.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
   const load = set.load_kg ?? 0;
   const prefix = exercise.type === 'bw' ? (load > 0 ? `+${n(load)}` : 'BW') : n(load);
@@ -51,7 +60,8 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
       return t('ln_leg_event', { w: t('leg_event_name'), n: Number(vars.n) });
     case 'ln_pr': {
       const exercise = exercises.find((e) => e.id === vars.exercise_id);
-      const lift = formatLift(exercise, Number(vars.load_kg), Number(vars.reps), t, n);
+      const bar = vars.bar_kg === undefined ? null : Number(vars.bar_kg);
+      const lift = formatLift(exercise, Number(vars.load_kg), Number(vars.reps), t, n, bar);
       return t('ln_pr', { x: `${exercise?.name ?? String(vars.exercise_id)} ${lift}` });
     }
     case 'ln_pr_distance': {

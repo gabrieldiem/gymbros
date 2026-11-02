@@ -145,6 +145,7 @@ def to_me_stats(stats: MeStats) -> MeStatsResponse:
             PrModel(
                 exercise_id=r.exercise_id,
                 load_kg=r.load_kg,
+                bar_kg=r.bar_kg,
                 reps=r.reps,
                 e1rm=round(r.e1rm, 1),
                 achieved_at=r.achieved_at,

@@ -104,6 +104,7 @@ async def test_saving_sets_returns_live_points(client, member):
     active = (await client.get("/api/workouts/active")).json()
     assert active["exercises"][0]["sets"][0] == {
         "load_kg": 60.0,
+        "bar_kg": None,
         "reps": 5,
         "minutes": None,
         "km": None,
@@ -222,7 +223,7 @@ async def test_beating_last_time_pays_pr_and_better_than_last_time(client, membe
     }
     assert keys["ln_better"]["vars"] == {"pct": 2}
     assert body["vs_last_pct"] == 2
-    assert body["prs"] == [{"exercise_id": "squat", "load_kg": 102.5, "reps": 5}]
+    assert body["prs"] == [{"exercise_id": "squat", "load_kg": 102.5, "reps": 5, "bar_kg": None}]
 
 
 async def test_third_workout_of_the_week_pays_the_weekly_goal_and_streak(client, member):
@@ -276,3 +277,32 @@ async def test_training_now_is_scoped_to_the_crew(client, member, other_client, 
     await register_on(other_client, "stranger@example.com", "OTHERCREW")
     await start(other_client, "push")
     assert (await client.get("/api/crew/training-now")).json() == []
+
+
+# --- Disks and bar -------------------------------------------------------------------------
+
+
+async def test_the_bar_is_kept_and_scoring_reads_the_whole_weight(client, member):
+    bench = {
+        "exercise_id": "bench",
+        "sets": [{"load_kg": 60, "bar_kg": 15, "reps": 5, "done": True}],
+    }
+    body = (await log_and_finish(client, "push", [bench])).json()
+    # 60 × 5 = 300 kg: the bar is inside load_kg and doesn't change what it pays.
+    assert body["volume_kg"] == 300
+    stats = (await client.get("/api/me/stats")).json()
+    assert stats["prs"][0]["load_kg"] == 60
+    assert stats["prs"][0]["bar_kg"] == 15
+
+
+async def test_the_next_session_keeps_your_bar_with_the_overload(client, member):
+    bench = {
+        "exercise_id": "bench",
+        "sets": [{"load_kg": 60, "bar_kg": 15, "reps": 5, "done": True}],
+    }
+    await log_and_finish(client, "push", [bench])
+    started = (await start(client, "push")).json()
+    first = started["exercises"][0]
+    assert first["sets"][0]["load_kg"] == 62.5
+    assert first["sets"][0]["bar_kg"] == 15
+    assert first["previous_sets"][0]["bar_kg"] == 15

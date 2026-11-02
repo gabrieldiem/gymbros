@@ -56,3 +56,9 @@
 .done {
   margin-top: 12px;
 }
+
+.total {
+  margin-top: 4px;
+  color: var(--smoke);
+  text-align: center;
+}

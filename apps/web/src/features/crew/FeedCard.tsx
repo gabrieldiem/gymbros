@@ -50,7 +50,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         <p key={pr.exercise_id} className={styles.pr}>
           ★{' '}
           {t('new_pr', {
-            x: `${exercise(pr.exercise_id)?.name ?? pr.exercise_id} ${formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n)}`,
+            x: `${exercise(pr.exercise_id)?.name ?? pr.exercise_id} ${formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n, pr.bar_kg)}`,
           })}
         </p>
       ))}
@@ -61,7 +61,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
             <li key={e.exercise_id}>
               <span>{exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
               <span>
-                {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n)).join(', ')}
+                {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n, t)).join(', ')}
               </span>
             </li>
           ))}

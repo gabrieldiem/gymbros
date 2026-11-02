@@ -14,7 +14,12 @@ from services.workout_types import ExerciseEntry
 def to_logged_set(row: WorkoutSet) -> LoggedSet:
     """A set row as a scoring input."""
     return LoggedSet(
-        load_kg=row.load_kg, reps=row.reps, minutes=row.minutes, km=row.km, done=row.done
+        load_kg=row.load_kg,
+        reps=row.reps,
+        minutes=row.minutes,
+        km=row.km,
+        done=row.done,
+        bar_kg=row.bar_kg,
     )
 
 
@@ -36,6 +41,7 @@ def to_rows(entries: tuple[ExerciseEntry, ...]) -> list[WorkoutSet]:
             exercise_position=exercise_position,
             set_position=set_position,
             load_kg=logged.load_kg,
+            bar_kg=logged.bar_kg,
             reps=logged.reps,
             minutes=logged.minutes,
             km=logged.km,
