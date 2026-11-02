@@ -13,6 +13,7 @@ import type { MessageKey } from '../../i18n/en';
 import { ordinal } from '../../i18n/ordinal';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
+import { WorkoutDetailSheet } from './WorkoutDetailSheet';
 import { heatLevel } from './charts';
 import styles from './Me.module.css';
 import { PrChart } from './PrChart';
@@ -75,6 +76,7 @@ export function MePage() {
   const stats = useMyStats();
   const exercises = useCatalog().data?.exercises ?? [];
   const [settings, setSettings] = useState(false);
+  const [openWorkout, setOpenWorkout] = useState<{ id: string; name: string } | null>(null);
   const [chart, setChart] = useState<string | null>(null);
   const data = stats.data;
   if (!me || !data) {
@@ -222,14 +224,16 @@ export function MePage() {
           <ul className={`${styles.history} stagger`}>
             {data.history.map((h) => (
               <li key={h.id}>
-                <span>
-                  {h.name}
-                  <small>
-                    {timeAgo(lang, h.finished_at)} ·{' '}
-                    {t('history_row', { sets: h.sets, kg: n(h.volume_kg), min: h.duration_min })}
-                  </small>
-                </span>
-                <b>+{n(h.points)}</b>
+                <button type="button" onClick={() => setOpenWorkout({ id: h.id, name: h.name })}>
+                  <span>
+                    {h.name}
+                    <small>
+                      {timeAgo(lang, h.finished_at)} ·{' '}
+                      {t('history_row', { sets: h.sets, kg: n(h.volume_kg), min: h.duration_min })}
+                    </small>
+                  </span>
+                  <b>+{n(h.points)}</b>
+                </button>
               </li>
             ))}
           </ul>
@@ -237,6 +241,13 @@ export function MePage() {
       </div>
 
       {settings && <SettingsSheet onClose={() => setSettings(false)} />}
+      {openWorkout && (
+        <WorkoutDetailSheet
+          workoutId={openWorkout.id}
+          title={openWorkout.name}
+          onClose={() => setOpenWorkout(null)}
+        />
+      )}
       {chart && (
         <Sheet title={exercise(chart)?.name ?? chart} onClose={() => setChart(null)}>
           <p className={styles.muted}>{t('pr_chart_sub')}</p>

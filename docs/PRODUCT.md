@@ -14,7 +14,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 | Crew | Crew / Equipo | Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
 | Train | Train / Entrenar | Pick a routine or empty workout, log sets, rest timer, plate calculator, finish → points breakdown → climb animation |
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
-| You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history, settings |
+| You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
 
 Desktop (≥960 px) shows a side rail with Train as the primary button and the Quests sections nested under Quests. Mobile shows a floating dock with Train as the raised centre button, and a sticky section bar inside Quests. Achievements and Points are also in the profile menu. The code and API call achievements `badge`; the UI says Achievements / Logros.
 

@@ -425,4 +425,5 @@ def get_me_stats_service(session: AsyncSession = Depends(get_session)) -> MeStat
         ),
         load_catalog(),
         utc_now,
+        PointEventRepository(session),
     )

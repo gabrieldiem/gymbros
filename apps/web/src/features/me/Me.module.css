@@ -306,11 +306,21 @@
 }
 
 .history li {
+  border-bottom: 1px solid var(--steel);
+}
+
+.history button {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  width: 100%;
+  min-height: var(--touch);
   padding: 12px 0;
-  border-bottom: 1px solid var(--steel);
+  text-align: left;
+}
+
+.history button:hover {
+  color: var(--volt);
 }
 
 .history small {

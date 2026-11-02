@@ -99,6 +99,46 @@ describe('Quests tab', () => {
   });
 });
 
+describe('Workout details', () => {
+  it('opens from your history with what you did and what it paid', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/catalog': [200, CATALOG],
+      'GET /api/me/stats': [200, STATS],
+      'GET /api/me/workouts/w1': [
+        200,
+        {
+          id: 'w1',
+          name: 'Leg day',
+          performed_on: null,
+          finished_at: '2026-10-30T18:00:00Z',
+          duration_min: 52,
+          points: 175,
+          sets: 1,
+          volume_kg: 300,
+          exercises: [
+            {
+              exercise_id: 'squat',
+              sets: [{ load_kg: 60, bar_kg: 20, reps: 5, minutes: null, km: null }],
+            },
+          ],
+          line_items: [
+            { key: 'ln_show', vars: {}, points: 50 },
+            { key: 'ln_sets', vars: { n: 1 }, points: 125 },
+          ],
+        },
+      ],
+    });
+    renderApp('/me');
+    await userEvent.click(await screen.findByRole('button', { name: /^Leg day/ }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Leg day' }));
+    expect(await sheet.findByText('40+bar×5')).toBeVisible();
+    expect(sheet.getByText('52 min')).toBeVisible();
+    expect(sheet.getByText('Showed up')).toBeVisible();
+    expect(sheet.getByText('+175')).toBeVisible();
+  });
+});
+
 describe('Weekly recap', () => {
   it('opens from ATUS Climb and steps through the slides', async () => {
     api();

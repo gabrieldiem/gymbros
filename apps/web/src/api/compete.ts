@@ -2,7 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { Climb } from './climb';
 import { apiRequest } from './client';
-import type { Actor } from './social';
+import type { Actor, PostedSet } from './social';
+import type { LineItem } from './train';
 
 export type QuestId = 'legs2' | 'ppl' | 'tonnes' | 'distance' | 'cardio';
 export type Quest = {
@@ -110,6 +111,19 @@ export type MeStats = {
   }[];
 };
 
+export type WorkoutDetail = {
+  id: string;
+  name: string;
+  performed_on: string | null;
+  finished_at: string;
+  duration_min: number;
+  points: number;
+  sets: number;
+  volume_kg: number;
+  exercises: { exercise_id: string; sets: PostedSet[] }[];
+  line_items: LineItem[];
+};
+
 export type LiftPoint = { week_start: string; e1rm: number };
 
 export const questsKey = ['quests'] as const;
@@ -169,6 +183,14 @@ export function useMyStats() {
   return useQuery({
     queryKey: ['me', 'stats'],
     queryFn: ({ signal }) => apiRequest<MeStats>('/me/stats', { signal }),
+  });
+}
+
+export function useWorkoutDetail(workoutId: string) {
+  return useQuery({
+    queryKey: ['me', 'workouts', workoutId],
+    queryFn: ({ signal }) => apiRequest<WorkoutDetail>(`/me/workouts/${workoutId}`, { signal }),
+    staleTime: Infinity, // A finished workout doesn't change.
   });
 }
 

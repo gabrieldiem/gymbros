@@ -329,6 +329,10 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  workout_detail_failed: 'No se pudo cargar este entreno.',
+  detail_exercises: 'Lo que hiciste',
+  detail_points: 'Lo que pagó',
+  detail_total: 'Total',
   col_disks: 'discos',
   bar_label: 'Barra',
   bar_option: '{n} kg',
@@ -524,6 +528,9 @@ export const es = {
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_workout_details_title: 'Mira el detalle de cualquier entreno',
+  wn_workout_details_body:
+    'En tu página, toca un entreno para ver sus ejercicios, sets y lo que pagó cada cosa.',
   wn_faster_sets_title: 'Sets más rápidos, pesos más claros',
   wn_faster_sets_body:
     'Toca para repetir el set de arriba, quita una fila que no necesites y mira los levantamientos con barra como discos más la barra. Tus puntos no cambian.',

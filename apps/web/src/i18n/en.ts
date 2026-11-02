@@ -322,6 +322,10 @@ export const en = {
   col_set: 'Set',
   col_last: 'Last time',
   col_repeat: 'Repeat',
+  workout_detail_failed: 'Couldn’t load this workout.',
+  detail_exercises: 'What you did',
+  detail_points: 'What it paid',
+  detail_total: 'Total',
   col_disks: 'disks',
   bar_label: 'Bar',
   bar_option: '{n} kg',
@@ -517,6 +521,9 @@ export const en = {
   n_whats_new: 'New in GYMBROS: {title}.',
   n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
   n_whats_new_other: 'There’s something new in GYMBROS.',
+  wn_workout_details_title: 'See the details of any workout',
+  wn_workout_details_body:
+    'On your page, tap a workout to see its exercises, sets and what each thing paid.',
   wn_faster_sets_title: 'Faster sets, clearer weights',
   wn_faster_sets_body:
     'Tap to repeat the set above, remove a row you don’t need, and see barbell lifts as disks plus the bar. Your points don’t change.',

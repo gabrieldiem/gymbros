@@ -1,0 +1,48 @@
+.when {
+  margin-bottom: 10px;
+  color: var(--smoke);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.chips span {
+  padding: 4px 10px;
+  background: var(--iron);
+  border-radius: 999px;
+  color: var(--smoke);
+  font-size: 0.875rem;
+}
+
+.rows {
+  margin: 8px 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--steel);
+}
+
+.rows b {
+  font-family: var(--display);
+  white-space: nowrap;
+}
+
+.sets {
+  color: var(--smoke);
+  text-align: right;
+}
+
+.total {
+  font-weight: 700;
+  border-bottom: none !important;
+}

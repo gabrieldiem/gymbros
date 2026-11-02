@@ -1,5 +1,6 @@
 {
   "entries": [
+    { "id": "workout-details", "date": "2026-11-02", "link": "/me" },
     { "id": "faster-sets", "date": "2026-11-02", "link": "/train" },
     { "id": "past-workouts", "date": "2026-11-02", "link": "/train" },
     { "id": "achievements-menu", "date": "2026-11-02", "link": "/quests/achievements" },

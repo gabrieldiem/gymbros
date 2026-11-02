@@ -1,5 +1,7 @@
 """Compete domain objects → API models."""
 
+from dataclasses import asdict
+
 from models.climb_mappers import to_climb_response
 from models.compete import (
     BadgeModel,
@@ -14,14 +16,17 @@ from models.compete import (
     QuestBoardResponse,
     QuestModel,
     RecapPrModel,
+    WorkoutDetailExercise,
+    WorkoutDetailResponse,
     RecapResponse,
     WeekVolume,
 )
 from models.social_mappers import to_actor
+from models.workouts import LineItemModel, SetModel
 from db.tables.workout import Workout
 from services.compete_types import BadgeView, QuestBoard
 from services.duel_service import DuelView
-from services.me_stats_service import MeStats
+from services.me_stats_service import MeStats, WorkoutDetail
 from services.recap_service import Recap, RecapPr
 
 
@@ -131,6 +136,32 @@ def _duration(workout: Workout) -> int:
     if workout.finished_at is None or workout.performed_on is not None:
         return 0
     return max(1, round((workout.finished_at - workout.started_at).total_seconds() / 60))
+
+
+def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
+    """The details sheet on the You tab."""
+    workout = detail.workout
+    assert workout.finished_at is not None
+    return WorkoutDetailResponse(
+        id=workout.id,
+        name=workout.name,
+        performed_on=workout.performed_on,
+        finished_at=workout.finished_at,
+        duration_min=_duration(workout),
+        points=workout.points or 0,
+        sets=detail.sets,
+        volume_kg=round(workout.volume_kg or 0, 1),
+        exercises=[
+            WorkoutDetailExercise(
+                exercise_id=entry.exercise_id,
+                sets=[SetModel(**asdict(logged)) for logged in entry.sets],
+            )
+            for entry in detail.exercises
+        ],
+        line_items=[
+            LineItemModel(key=e.key, vars=e.vars, points=e.points) for e in detail.line_items
+        ],
+    )
 
 
 def to_me_stats(stats: MeStats) -> MeStatsResponse:

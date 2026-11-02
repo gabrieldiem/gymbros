@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from models.climb import ClimbResponse
 from models.social import ActorModel
+from models.workouts import LineItemModel, SetModel
 
 DuelMetric = Literal["points", "bench_volume"]
 Stake = Literal["stake_shakes", "stake_plates", "stake_playlist", "stake_burritos"]
@@ -164,6 +165,28 @@ class HistoryModel(BaseModel):
     points: int
     sets: int
     volume_kg: float
+
+
+class WorkoutDetailExercise(BaseModel):
+    """An exercise in a finished workout, with its completed sets."""
+
+    exercise_id: str
+    sets: list[SetModel]
+
+
+class WorkoutDetailResponse(BaseModel):
+    """One of your finished workouts: what you did and what it paid."""
+
+    id: uuid.UUID
+    name: str
+    performed_on: date | None
+    finished_at: datetime
+    duration_min: int
+    points: int
+    sets: int
+    volume_kg: float
+    exercises: list[WorkoutDetailExercise]
+    line_items: list[LineItemModel]
 
 
 class MeStatsResponse(BaseModel):

@@ -1,5 +1,7 @@
 """The signed-in user's profile."""
 
+import uuid
+
 from fastapi import APIRouter, Depends, Response, status
 
 from db.tables.user import User
@@ -10,8 +12,8 @@ from dependencies import (
     get_profile_service,
     get_settings,
 )
-from models.compete import LiftPoint, MeStatsResponse
-from models.compete_mappers import to_me_stats
+from models.compete import LiftPoint, MeStatsResponse, WorkoutDetailResponse
+from models.compete_mappers import to_me_stats, to_workout_detail
 from models.errors import error_responses
 from models.mappers import to_me_response
 from models.me import DeleteAccountRequest, MeResponse, UpdateMeRequest
@@ -64,6 +66,20 @@ async def get_my_stats(
 ) -> MeStatsResponse:
     """The You tab: totals, heatmap, weekly tonnage, PRs and recent workouts."""
     return to_me_stats(await stats.stats(member))
+
+
+@router.get(
+    "/workouts/{workout_id}",
+    response_model=WorkoutDetailResponse,
+    responses=error_responses(401, 403, 404),
+)
+async def get_workout_detail(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    stats: MeStatsService = Depends(get_me_stats_service),
+) -> WorkoutDetailResponse:
+    """One of your finished workouts: what you did and what it paid."""
+    return to_workout_detail(await stats.workout_detail(member, workout_id))
 
 
 @router.get(
