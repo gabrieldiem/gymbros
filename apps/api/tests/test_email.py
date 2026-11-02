@@ -5,6 +5,7 @@ import logging
 from dataclasses import replace
 
 import httpx
+import pytest
 
 from clients.resend_client import SEND_URL, ResendEmailClient
 from services.welcome_email import welcome_email
@@ -71,6 +72,28 @@ async def test_a_rejected_email_is_logged_and_never_raises(caplog):
     assert "Sending email failed" in caplog.text
     assert "gabi@example.com" not in caplog.text
     assert "the-key" not in caplog.text
+
+
+async def test_the_log_says_why_resend_refused(caplog):
+    # This is the difference between a bad key and an unverified domain.
+    refusal = {"name": "validation_error", "message": "The x.com domain is not verified."}
+    assert await _client(lambda _: httpx.Response(403, json=refusal)).send(MESSAGE) is False
+    assert "HTTP 403, validation_error: The x.com domain is not verified." in caplog.text
+
+
+async def test_an_address_in_a_refusal_is_masked(caplog):
+    refusal = {"name": "invalid_to", "message": "Can't send to gabi@example.com today"}
+    await _client(lambda _: httpx.Response(422, json=refusal)).send(MESSAGE)
+    assert "gabi@example.com" not in caplog.text
+    assert "<address>" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "response", [httpx.Response(502, text="<html>"), httpx.Response(500, json=[])]
+)
+async def test_a_refusal_without_details_is_still_logged(caplog, response):
+    assert await _client(lambda _: response).send(MESSAGE) is False
+    assert "no details" in caplog.text
 
 
 async def test_a_network_error_is_logged_and_never_raises(caplog):

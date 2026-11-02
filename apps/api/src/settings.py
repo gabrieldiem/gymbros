@@ -41,7 +41,7 @@ class Settings:
     resend_api_key: str = ""
     # Whether this server looks for weekly digests to send. Off only for tests and one-off runs.
     email_scheduler_enabled: bool = True
-    email_from: str = "GYMBROS <hola@contact.gabrieldiem.com>"
+    email_from: str = "GYMBROS <contact@gabrieldiem.com>"
     # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
     dev_login_enabled: bool = False
     # Who can open the backoffice. Set on the server only, so nobody can grant it from the app.
