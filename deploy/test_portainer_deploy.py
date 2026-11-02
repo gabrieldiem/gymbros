@@ -144,6 +144,12 @@ class DeployTest(unittest.TestCase):
                 [SCRIPT, NEW], env=env, capture_output=True, text=True, timeout=60, check=False
             )
 
+    def test_the_deploy_scripts_are_executable(self):
+        """CI runs them directly. On a checkout this reads the mode stored in git."""
+        for name in ("portainer-deploy.sh", "smoke-test.sh"):
+            path = os.path.join(os.path.dirname(SCRIPT), name)
+            self.assertTrue(os.access(path, os.X_OK), f"{name} isn't executable")
+
     def test_a_healthy_deploy_goes_live(self):
         portainer = FakePortainer({**STARTING_ENV, "GOOGLE_ID": "id"})
         result = self._deploy(portainer)
