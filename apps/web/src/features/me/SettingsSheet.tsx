@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router';
 
 import { useLogout } from '../../api/auth';
 import { useDeleteMyAccount, useMe, useUpdateMe } from '../../api/me';
@@ -144,6 +145,10 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
           {t('log_out')}
         </Button>
         <DeleteAccount />
+        <p className={styles.legal}>
+          <Link to="/privacy">{t('legal_privacy')}</Link>
+          <Link to="/terms">{t('legal_terms')}</Link>
+        </p>
       </div>
     </Sheet>
   );

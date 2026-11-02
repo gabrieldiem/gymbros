@@ -73,6 +73,22 @@ describe('Profile menu', () => {
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
   });
 
+  it('links the privacy policy and terms from settings', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
+    renderApp('/climb');
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Settings' }));
+    expect(dialog.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+    expect(dialog.getByRole('link', { name: 'Terms of service' })).toHaveAttribute(
+      'href',
+      '/terms',
+    );
+  });
+
   it('opens settings, where you can rename yourself and pick a color', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
