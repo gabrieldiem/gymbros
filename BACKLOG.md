@@ -18,10 +18,11 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-12` **Who hears about a goal hit** (product, S): default chosen: the rest of the crew gets "X hit the weekly goal". The finisher already sees it on the finish screen. _Added 2026-10-31_
 - [ ] `GYM-13` **Bounty rules** (game, S): default chosen: the bounty is always on the all-time leader and pays the first member to pass them each week. The prototype only said "while a bounty is active". _Added 2026-10-31_
 - [ ] `GYM-14` **Badges earned by seeded history** (product, S): default chosen: demo members get the badges their seeded history earns, with no extra points, so the prototype's totals stay exact. _Added 2026-10-31_
-- [ ] `GYM-58` **Which emails should GYMBROS send** (product, S): default chosen: only a welcome email on first sign-up, through Resend. Weekly recap, nudges or "someone passed you" by email are possible next steps, but each needs an opt-out first. _Added 2026-11-01_
 - [ ] `GYM-61` **Cardio point balance** (game, S): default chosen: 2 pts per minute plus 8 per run-equivalent km, a swim km counting as 4 and a rowing km as 0.8. An hour pays 255 for a 10 km run or a 2.5 km swim, against 250 for a 12-tonne lifting session. Check it against real workouts after a few weeks. _Added 2026-11-02_
 - [ ] `GYM-62` **Leg day x2 pays only lifters** (game, S): the weekly event doubles leg set points, so runners and swimmers get nothing from it. Default chosen: unchanged until more weekly events exist (GYM-17). _Added 2026-11-02_
 - [ ] `GYM-69` **How past workouts score** (game, S): defaults chosen and written in `docs/PRODUCT.md`: it counts on the day picked with that week's goal, streak and quests; bounty, badges and passed stay this week's; paid bonuses and settled duels aren't redone. The risk is holding a workout back to take a duel or bounty: the feed shows the day it was for (see GYM-4). _Added 2026-11-02_
+- [ ] `GYM-71` **Where uploaded pictures live** (infra, S): default chosen: in Postgres, because this stack has no file storage. They make backups larger; if crews grow, move them to object storage. The URLs already go through the API, so the web app wouldn't change. _Added 2026-11-02_
+- [ ] `GYM-72` **Phone clocks decide when an offline workout happened** (game, S): default chosen: a synced workout keeps the phone's times, within a week of now, so a member could claim dawn or night badges. Same trust as past workouts (see GYM-4, GYM-69). _Added 2026-11-02_
 
 ## Later
 
@@ -33,7 +34,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-20` **Custom routines and exercises** (product, M): v1 ships a fixed catalog and four routines. _Added 2026-10-31_
 - [ ] `GYM-22` **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user. An admin can remove someone from a crew in the backoffice, but members can't leave by themselves. _Added 2026-10-31_
-- [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
 - [ ] `GYM-31` **Climber sheet** (web, M): tapping a marker or rope row in the prototype opens a profile sheet (head to head, last workout, best lift, gap, Start a duel, Nudge). Unblocked: duels and nudges exist now. _Added 2026-10-31_
 - [ ] `GYM-32` **YOU tag can overlap a marker** (web, S): on the map, the "YOU" label above your marker can touch a neighbour nudged just above it (same as the prototype). Offset the tag away from neighbours. _Added 2026-10-31_
 - [ ] `GYM-33` **Climb standings query cost** (api, S): `/api/climb` runs several aggregates per poll (every 20 s per open tab). Fine for 5 people; cache per crew for a few seconds if crews grow. _Added 2026-10-31_
@@ -47,7 +47,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
 - [ ] `GYM-60` **Blue/green deploys with no downtime** (infra, M): a version that passes the smoke test but fails in production causes an outage until the previous one is restored, up to a few minutes. Start the new version beside the old one and switch Caddy only once it is healthy. Needs room on the box for both. _Added 2026-11-01_
 - [ ] `GYM-64` **Cardio is missing from the You tab and most improved** (game+web, M): points are fair across sports, but the stats read lifts and tonnage only, and feed posts show minutes but not distance. Someone who only runs or swims sees empty stats and can't win most improved. _Added 2026-11-02_
-- [ ] `GYM-66` **Moderate comments in the backoffice** (product, S): admins can delete an account but not a single comment. Add it, with an audit log entry. _Added 2026-11-02_
+- [ ] `GYM-66` **Moderate comments in the backoffice** (product, S): admins can delete an account but not a single comment. Workout photos need the same: only their owner can remove one. Add it, with an audit log entry. _Added 2026-11-02_
 
 ## Tech debt
 
@@ -89,3 +89,5 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-34` **Reply notifications for commenters**: closed 2026-11-02 in 55637b1.
 - [x] `GYM-65` **Point adjustments are silent**: closed 2026-11-02 in 55637b1.
 - [x] `GYM-27` **Show the current PR in the logger**: closed 2026-11-02 in d95005a.
+- [x] `GYM-29` **Offline logging**: closed 2026-11-02 in f48399e.
+- [x] `GYM-58` **Which emails should GYMBROS send**: answered 2026-11-02: welcome, weekly digest and messages from admins, in 06a8909.
