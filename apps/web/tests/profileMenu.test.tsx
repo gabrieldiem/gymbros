@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -56,6 +56,7 @@ describe('Profile menu', () => {
     expect(menu.getByText('gabi@example.com')).toBeVisible();
     expect(menu.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
       'Your profile',
+      'Edit profile',
       'Achievements',
       'Points',
       'What’s new',
@@ -99,7 +100,7 @@ describe('Profile menu', () => {
     renderApp('/climb');
     await openMenu();
     await userEvent.keyboard('{ArrowDown}');
-    expect(screen.getByRole('menuitem', { name: 'Achievements' })).toHaveFocus();
+    expect(screen.getByRole('menuitem', { name: 'Edit profile' })).toHaveFocus();
     await userEvent.keyboard('{ArrowUp}{ArrowUp}');
     expect(screen.getByRole('menuitem', { name: 'Log out' })).toHaveFocus();
   });
@@ -128,16 +129,16 @@ describe('Profile menu', () => {
     );
   });
 
-  it('opens settings, where you can rename yourself and pick a color', async () => {
+  it('opens Edit profile, where you can rename yourself and pick a color', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
       'PATCH /api/me': (body) => [200, makeMe(body as object)],
     });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Settings' }));
-    const name = dialog.getByLabelText('Your name');
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    const name = dialog.getByLabelText(/Your name/);
     expect(dialog.getByRole('button', { name: 'Save' })).toBeDisabled();
     await userEvent.clear(name);
     await userEvent.type(name, 'Gabo');
@@ -148,5 +149,48 @@ describe('Profile menu', () => {
       .filter(([, init]) => init?.method === 'PATCH')
       .map(([, init]) => JSON.parse(String(init?.body)) as unknown);
     expect(bodies).toEqual([{ display_name: 'Gabo' }, { color: 'cyan' }]);
+  });
+
+  it('takes any two characters, counting an emoji as one', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'PATCH /api/me': (body) => [200, makeMe(body as object)],
+    });
+    renderApp('/climb');
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    const field = dialog.getByLabelText(/Your two characters/);
+    fireEvent.change(field, { target: { value: '👨‍👩‍👧‍👦🔥💪' } });
+    expect(field).toHaveValue('👨‍👩‍👧‍👦🔥');
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }));
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH');
+      expect(JSON.parse(String(call?.[1]?.body))).toEqual({ initials: '👨‍👩‍👧‍👦🔥' });
+    });
+  });
+
+  it('offers a color picker for any color', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'PATCH /api/me': (body) => [200, makeMe(body as object)],
+    });
+    renderApp('/climb');
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    fireEvent.change(dialog.getByLabelText('Pick any color'), { target: { value: '#123456' } });
+    await waitFor(() => {
+      const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH');
+      expect(JSON.parse(String(call?.[1]?.body))).toEqual({ color: '#123456' });
+    });
+  });
+
+  it('shows an uploaded picture instead of your characters', async () => {
+    mockApi({ 'GET /api/me': [200, makeMe({ avatar_url: '/api/avatars/u1?v=1' })] });
+    renderApp('/climb');
+    await screen.findByRole('button', { name: /^Your profile/ });
+    const trigger = screen.getByRole('button', { name: /^Your profile/ });
+    expect(trigger.querySelector('img')).toHaveAttribute('src', '/api/avatars/u1?v=1');
   });
 });

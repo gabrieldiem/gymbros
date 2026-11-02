@@ -54,7 +54,7 @@ export function DuelSheet({ members, winPoints, onClose }: Props) {
                 aria-pressed={opponent?.user_id === m.user_id}
                 onClick={() => setOpponent(m)}
               >
-                <Avatar initials={m.initials} color={m.color} size={32} />
+                <Avatar initials={m.initials} color={m.color} image={m.avatar_url} size={32} />
                 {m.display_name}
               </button>
             ))}

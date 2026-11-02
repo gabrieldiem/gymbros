@@ -1,15 +1,8 @@
 import type { QuestBoard } from '../../api/compete';
 import { Avatar } from '../../components/Avatar';
+import { memberColorHex } from '../../components/memberColor';
 import { useI18n } from '../../i18n/context';
 import styles from './Quests.module.css';
-
-const COLOR_VARS: Record<string, string> = {
-  volt: 'var(--crew-volt)',
-  red: 'var(--crew-red)',
-  cyan: 'var(--crew-cyan)',
-  pink: 'var(--crew-pink)',
-  violet: 'var(--crew-violet)',
-};
 
 /**
  * The crew quest as one segmented bar (each member's share of the goal) with a legend.
@@ -37,7 +30,7 @@ export function CrewQuest({ crew }: { crew: QuestBoard['crew_quest'] }) {
               key={s.member.user_id}
               title={`${s.member.display_name}: ${n(s.points)}`}
               style={{
-                ['--c' as string]: COLOR_VARS[s.member.color],
+                ['--c' as string]: memberColorHex(s.member.color),
                 width: `${(s.points / scale) * 100}%`,
               }}
             />
@@ -48,10 +41,15 @@ export function CrewQuest({ crew }: { crew: QuestBoard['crew_quest'] }) {
           <li key={s.member.user_id}>
             <span
               className={styles.swatch}
-              style={{ ['--c' as string]: COLOR_VARS[s.member.color] }}
+              style={{ ['--c' as string]: memberColorHex(s.member.color) }}
               aria-hidden="true"
             />
-            <Avatar initials={s.member.initials} color={s.member.color} size={20} />
+            <Avatar
+              initials={s.member.initials}
+              color={s.member.color}
+              image={s.member.avatar_url}
+              size={20}
+            />
             {s.member.display_name} {n(s.points)}
           </li>
         ))}

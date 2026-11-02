@@ -11,7 +11,11 @@ import styles from './StandingPanel.module.css';
 
 type Props = {
   climb: Climb;
-  myAvatar: { initials: string; color: Climb['standings'][0]['color'] };
+  myAvatar: {
+    initials: string;
+    color: Climb['standings'][0]['color'];
+    avatar_url?: string | null;
+  };
   training: boolean;
   onRecap: () => void;
 };
@@ -72,19 +76,34 @@ export function StandingPanel({ climb, myAvatar, training, onRecap }: Props) {
         <li>
           {me.above ? (
             <>
-              <Avatar initials={me.above.initials} color={me.above.color} size={28} />
+              <Avatar
+                initials={me.above.initials}
+                color={me.above.color}
+                image={me.above.avatar_url}
+                size={28}
+              />
               <span>{gapAbove}</span>
             </>
           ) : (
             <>
-              <Avatar initials={myAvatar.initials} color={myAvatar.color} size={28} />
+              <Avatar
+                initials={myAvatar.initials}
+                color={myAvatar.color}
+                image={myAvatar.avatar_url}
+                size={28}
+              />
               <span>{t('you_lead')}</span>
             </>
           )}
         </li>
         {me.below && (
           <li>
-            <Avatar initials={me.below.initials} color={me.below.color} size={28} />
+            <Avatar
+              initials={me.below.initials}
+              color={me.below.color}
+              image={me.below.avatar_url}
+              size={28}
+            />
             <span>{gapBelow}</span>
           </li>
         )}

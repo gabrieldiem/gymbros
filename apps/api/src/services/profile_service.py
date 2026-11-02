@@ -6,6 +6,7 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.user_repository import UserRepository
 from db.tables.crew import Crew
 from db.tables.user import User
+from services.avatar_text import clean_avatar_text
 from services.errors import DeleteNotConfirmed
 from services.profile_rules import derive_initials
 
@@ -58,14 +59,16 @@ class ProfileService:
         await self._users.delete(user)
 
     async def update(self, user: User, changes: ProfileChanges) -> Profile:
-        """Apply the changes. A new display name re-derives initials unless initials are given."""
+        """Apply the changes. A new name changes your characters only if you never chose any."""
         if changes.display_name is not None:
+            derived = user.initials == derive_initials(user.display_name)
             user.display_name = changes.display_name.strip()
-            user.initials = derive_initials(user.display_name)
+            if derived:
+                user.initials = derive_initials(user.display_name)
         if changes.initials is not None:
-            user.initials = changes.initials.upper()
+            user.initials = clean_avatar_text(changes.initials)
         if changes.color is not None:
-            user.color = changes.color
+            user.color = changes.color.lower()
         if changes.language is not None:
             user.language = changes.language
         if changes.rest_seconds is not None:

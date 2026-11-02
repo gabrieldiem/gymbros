@@ -1,7 +1,8 @@
 /** API contract types. Mirror apps/api/src/models. */
 
 export type Language = 'en' | 'es';
-export type CrewColor = 'volt' | 'red' | 'cyan' | 'pink' | 'violet';
+/** A name from the crew palette, or any color as #rrggbb. */
+export type CrewColor = 'volt' | 'red' | 'cyan' | 'pink' | 'violet' | `#${string}`;
 
 export type Crew = {
   id: string;
@@ -15,6 +16,7 @@ export type Me = {
   email: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   language: Language;
   rest_seconds: number;

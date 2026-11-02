@@ -20,6 +20,7 @@ class ActorModel(BaseModel):
     user_id: uuid.UUID
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
 
 

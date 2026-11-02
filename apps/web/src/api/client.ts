@@ -15,6 +15,8 @@ export class ApiError extends Error {
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
+  /** Sent as it is, for an uploaded file. */
+  file?: Blob;
   signal?: AbortSignal | undefined;
 };
 
@@ -39,6 +41,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   if (options.body !== undefined) {
     init.headers = { ...init.headers, 'Content-Type': 'application/json' };
     init.body = JSON.stringify(options.body);
+  }
+  if (options.file) {
+    init.headers = { ...init.headers, 'Content-Type': options.file.type };
+    init.body = options.file;
   }
   const response = await fetch(`/api${path}`, init);
   const body = await parseBody(response);

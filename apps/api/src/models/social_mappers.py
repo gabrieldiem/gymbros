@@ -1,6 +1,7 @@
 """Crew tab domain objects → API models."""
 
 from db.tables.user import User
+from models.avatar import avatar_url
 from models.social import (
     ActorModel,
     CommentModel,
@@ -31,6 +32,7 @@ def to_actor(user: User) -> ActorModel:
             "user_id": user.id,
             "display_name": user.display_name,
             "initials": user.initials,
+            "avatar_url": avatar_url(user),
             "color": user.color,
         }
     )

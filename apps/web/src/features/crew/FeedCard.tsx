@@ -25,7 +25,12 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
   return (
     <li className={cx(styles.post, item.is_mine && styles.mine)}>
       <div className={styles.top}>
-        <Avatar initials={item.actor.initials} color={item.actor.color} size={42} />
+        <Avatar
+          initials={item.actor.initials}
+          color={item.actor.color}
+          image={item.actor.avatar_url}
+          size={42}
+        />
         <div className={styles.who}>
           <b>{item.is_mine ? t('you') : item.actor.display_name}</b>
           <span>{timeAgo(lang, item.created_at)}</span>

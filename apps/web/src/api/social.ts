@@ -9,7 +9,13 @@ import {
 import { apiRequest } from './client';
 import type { CrewColor } from './types';
 
-export type Actor = { user_id: string; display_name: string; initials: string; color: CrewColor };
+export type Actor = {
+  user_id: string;
+  display_name: string;
+  initials: string;
+  avatar_url?: string | null;
+  color: CrewColor;
+};
 export type ReactionKind = 'fist' | 'fire';
 export type Reactions = { fist: number; fire: number; mine: ReactionKind[] };
 export type QuickReply = 'q_light' | 'q_beast' | 'q_form' | 'q_six' | 'q_spot' | 'q_respect';

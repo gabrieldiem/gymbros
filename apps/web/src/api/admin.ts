@@ -31,6 +31,7 @@ export type AdminMember = {
   email: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   crew_name: string | null;
   points: number;

@@ -4,6 +4,7 @@ import { useMyStats, type MeStats } from '../../api/compete';
 import { useMe } from '../../api/me';
 import { useCatalog } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
+import { Button } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { Pips } from '../../components/Pips';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
@@ -13,6 +14,7 @@ import type { MessageKey } from '../../i18n/en';
 import { ordinal } from '../../i18n/ordinal';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
+import { ProfileSheet } from './ProfileSheet';
 import { WorkoutDetailSheet } from './WorkoutDetailSheet';
 import { heatLevel } from './charts';
 import styles from './Me.module.css';
@@ -76,6 +78,7 @@ export function MePage() {
   const stats = useMyStats();
   const exercises = useCatalog().data?.exercises ?? [];
   const [settings, setSettings] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [openWorkout, setOpenWorkout] = useState<{ id: string; name: string } | null>(null);
   const [chart, setChart] = useState<string | null>(null);
   const data = stats.data;
@@ -102,7 +105,7 @@ export function MePage() {
   return (
     <section aria-labelledby="page-title">
       <div className={styles.head}>
-        <Avatar initials={me.initials} color={me.color} size={88} />
+        <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={88} />
         <div className={styles.grow}>
           <h1 id="page-title">{me.display_name}</h1>
           <p className={styles.muted}>
@@ -114,6 +117,9 @@ export function MePage() {
             {t('pips_label', { n: climb.me.workouts_this_week, target: climb.weekly_target })}
           </p>
         </div>
+        <Button variant="ghost" className={styles.editProfile} onClick={() => setEditing(true)}>
+          {t('profile_edit')}
+        </Button>
         <button
           type="button"
           className={styles.gear}
@@ -241,6 +247,7 @@ export function MePage() {
       </div>
 
       {settings && <SettingsSheet onClose={() => setSettings(false)} />}
+      {editing && <ProfileSheet onClose={() => setEditing(false)} />}
       {openWorkout && (
         <WorkoutDetailSheet
           workoutId={openWorkout.id}

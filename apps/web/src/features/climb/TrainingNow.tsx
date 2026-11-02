@@ -31,7 +31,12 @@ export function TrainingNow({ myId }: { myId: string | undefined }) {
           const minutes = Math.max(1, Math.round((now - Date.parse(item.started_at)) / 60_000));
           return (
             <li key={item.user_id} className={styles.chip}>
-              <Avatar initials={item.initials} color={item.color} size={34} />
+              <Avatar
+                initials={item.initials}
+                color={item.color}
+                image={item.avatar_url}
+                size={34}
+              />
               <span>
                 {item.user_id === myId ? t('you') : item.display_name}
                 <small>

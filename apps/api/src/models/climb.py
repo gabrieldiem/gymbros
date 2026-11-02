@@ -14,6 +14,7 @@ class StandingModel(BaseModel):
     user_id: uuid.UUID
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
     points: int
     position: int
@@ -29,6 +30,7 @@ class NeighbourModel(BaseModel):
 
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
     gap: int
     training_now: bool

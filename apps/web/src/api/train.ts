@@ -107,6 +107,7 @@ export type TrainingNowItem = {
   user_id: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   workout_name: string;
   gym: string | null;

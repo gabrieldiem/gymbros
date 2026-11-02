@@ -2,6 +2,7 @@
 
 from dataclasses import asdict
 
+from models.avatar import avatar_url
 from models.climb import (
     ClimbChangeModel,
     ClimbResponse,
@@ -21,6 +22,7 @@ def _standing(standing: Standing, my_position: int) -> StandingModel:
             "user_id": user.id,
             "display_name": user.display_name,
             "initials": user.initials,
+            "avatar_url": avatar_url(user),
             "color": user.color,
             "points": standing.points,
             "position": standing.position,
@@ -40,6 +42,7 @@ def _neighbour(standing: Standing | None, gap: int) -> NeighbourModel | None:
         {
             "display_name": standing.user.display_name,
             "initials": standing.user.initials,
+            "avatar_url": avatar_url(standing.user),
             "color": standing.user.color,
             "gap": gap,
             "training_now": standing.training_now,

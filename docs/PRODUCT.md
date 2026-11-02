@@ -199,7 +199,10 @@ An invite code can have a maximum number of uses and an expiry. A code that's us
 
 ## Your account
 
-The avatar opens a menu with your profile, settings, inviting friends and log out. In settings you can change your name, color, language and rest time, and delete your account and everything in it by typing your email.
+The avatar opens a menu with your profile, Edit profile, settings, inviting friends and log out. Edit profile is also a button on the You tab.
+
+- **Edit profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
+- **Settings:** your gyms, language and rest time, and deleting your account and everything in it by typing your email.
 
 ## Backoffice
 

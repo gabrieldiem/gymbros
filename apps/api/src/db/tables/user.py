@@ -20,7 +20,10 @@ class User(Base):  # pylint: disable=too-few-public-methods
     password_hash: Mapped[str | None] = mapped_column(String(255))
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True)
     display_name: Mapped[str] = mapped_column(String(24))
-    initials: Mapped[str] = mapped_column(String(2))
+    # Shown when there's no picture: up to two characters, which can be emoji (see avatar_text).
+    initials: Mapped[str] = mapped_column(String(32))
+    # Changes with each uploaded picture, so a browser never shows an old one. Null: no picture.
+    avatar_version: Mapped[int | None] = mapped_column(Integer)
     color: Mapped[str] = mapped_column(String(16))
     language: Mapped[str] = mapped_column(String(2))
     rest_seconds: Mapped[int] = mapped_column(Integer, default=90, server_default="90")

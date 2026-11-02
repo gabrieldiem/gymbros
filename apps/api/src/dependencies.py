@@ -20,6 +20,7 @@ from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
+from db.repositories.avatar_repository import AvatarRepository
 from db.repositories.gym_repository import GymRepository
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
@@ -44,6 +45,7 @@ from services.duel_service import DuelService
 from services.errors import NotInCrew
 from services.feed_service import FeedService
 from services.hall_of_fame_service import HallOfFameService
+from services.avatar_service import AvatarService
 from services.gym_service import GymService
 from services.inbox_service import InboxService
 from services.me_stats_service import MeStatsService
@@ -102,6 +104,15 @@ DB_SESSION = Depends(get_session, scope="function")
 def get_crew_service(session: AsyncSession = DB_SESSION) -> CrewService:
     """FastAPI dependency provider for CrewService."""
     return CrewService(CrewRepository(session))
+
+
+def get_avatar_service(session: AsyncSession = DB_SESSION) -> AvatarService:
+    """FastAPI dependency provider for AvatarService."""
+    return AvatarService(
+        (AvatarRepository(session), UserRepository(session), CrewRepository(session)),
+        utc_now,
+        admin_emails=settings.admin_emails,
+    )
 
 
 def get_gym_service(session: AsyncSession = DB_SESSION) -> GymService:

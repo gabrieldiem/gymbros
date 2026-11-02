@@ -27,7 +27,7 @@ export function NudgePrompt({ member, days }: { member: Actor; days: number }) {
 
   return (
     <li className={styles.event}>
-      <Avatar initials={member.initials} color={member.color} size={38} />
+      <Avatar initials={member.initials} color={member.color} image={member.avatar_url} size={38} />
       <p>
         <b>{name}</b> {t('ev_nudge', { d: days })}
       </p>

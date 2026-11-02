@@ -11,6 +11,7 @@ from dependencies import engine, logger, settings
 from routes import (
     admin,
     auth,
+    avatars,
     catalog,
     climb,
     compete,
@@ -54,6 +55,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
+app.include_router(avatars.router, prefix="/api")
 app.include_router(whats_new.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(gyms.router, prefix="/api")

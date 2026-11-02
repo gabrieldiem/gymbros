@@ -29,6 +29,22 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class InvalidAvatarText(DomainError):
+    """A profile picture can be up to two characters, and they have to be visible."""
+
+
+class AvatarNotFound(DomainError):
+    """No such picture, or not one you can see."""
+
+
+class ImageTooLarge(DomainError):
+    """The upload is bigger than this kind of image may be."""
+
+
+class ImageNotSupported(DomainError):
+    """The upload isn't a JPEG, PNG or WebP picture."""
+
+
 class GymNotFound(DomainError):
     """No such gym of yours."""
 

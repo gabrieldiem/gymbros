@@ -95,7 +95,11 @@ export function ClimbPage() {
             {me && (
               <StandingPanel
                 climb={climb.data}
-                myAvatar={{ initials: me.initials, color: me.color }}
+                myAvatar={{
+                  initials: me.initials,
+                  color: me.color,
+                  avatar_url: me.avatar_url ?? null,
+                }}
                 training={training}
                 onRecap={() => setRecapOpen(true)}
               />

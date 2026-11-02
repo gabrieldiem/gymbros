@@ -2,10 +2,11 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from db.tables.user import User
 from dependencies import (
+    get_avatar_service,
     get_current_member,
     get_current_user,
     get_me_stats_service,
@@ -18,6 +19,9 @@ from models.errors import error_responses
 from models.mappers import to_me_response
 from models.me import DeleteAccountRequest, MeResponse, UpdateMeRequest
 from routes.session_cookie import clear_session_cookie
+from routes.uploads import read_upload
+from services.avatar_service import AvatarService
+from services.images import MAX_AVATAR_BYTES
 from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.profile_service import ProfileChanges, ProfileService
@@ -66,6 +70,29 @@ async def get_my_stats(
 ) -> MeStatsResponse:
     """The You tab: totals, heatmap, weekly tonnage, PRs and recent workouts."""
     return to_me_stats(await stats.stats(member))
+
+
+@router.put("/avatar", response_model=MeResponse, responses=error_responses(401, 413, 415))
+async def upload_avatar(
+    request: Request,
+    user: User = Depends(get_current_user),
+    avatars: AvatarService = Depends(get_avatar_service),
+    profiles: ProfileService = Depends(get_profile_service),
+) -> MeResponse:
+    """Replace your profile picture. The body is the image itself."""
+    await avatars.upload(user, await read_upload(request, MAX_AVATAR_BYTES))
+    return to_me_response(await profiles.get(user))
+
+
+@router.delete("/avatar", response_model=MeResponse, responses=error_responses(401))
+async def remove_avatar(
+    user: User = Depends(get_current_user),
+    avatars: AvatarService = Depends(get_avatar_service),
+    profiles: ProfileService = Depends(get_profile_service),
+) -> MeResponse:
+    """Remove your profile picture, back to your characters."""
+    await avatars.remove(user)
+    return to_me_response(await profiles.get(user))
 
 
 @router.get(

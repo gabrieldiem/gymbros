@@ -47,3 +47,26 @@ export function useUpdateMe() {
     onSuccess: (me) => queryClient.setQueryData(meKey, me),
   });
 }
+
+/** Replace your profile picture. Everywhere that shows you refetches with its new URL. */
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: Blob) => apiRequest<Me>('/me/avatar', { method: 'PUT', file }),
+    onSuccess: (me) => {
+      queryClient.setQueryData(meKey, me);
+      void queryClient.invalidateQueries({ predicate: (q) => q.queryKey[0] !== meKey[0] });
+    },
+  });
+}
+
+export function useRemoveAvatar() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiRequest<Me>('/me/avatar', { method: 'DELETE' }),
+    onSuccess: (me) => {
+      queryClient.setQueryData(meKey, me);
+      void queryClient.invalidateQueries({ predicate: (q) => q.queryKey[0] !== meKey[0] });
+    },
+  });
+}

@@ -2,6 +2,7 @@
 
 from dataclasses import asdict
 
+from models.avatar import avatar_url
 from models.climb_mappers import to_climb_change
 from models.workouts import (
     ExerciseOutput,
@@ -82,6 +83,7 @@ def to_training_now_item(active: ActiveWorkout) -> TrainingNowItem:
             "user_id": active.user.id,
             "display_name": active.user.display_name,
             "initials": active.user.initials,
+            "avatar_url": avatar_url(active.user),
             "color": active.user.color,
             "workout_name": active.workout.name,
             "gym": active.workout.gym_name,

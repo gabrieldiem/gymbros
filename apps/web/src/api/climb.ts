@@ -9,6 +9,7 @@ export type Standing = {
   user_id: string;
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   points: number;
   position: number;
@@ -22,6 +23,7 @@ export type Standing = {
 export type Neighbour = {
   display_name: string;
   initials: string;
+  avatar_url?: string | null;
   color: CrewColor;
   gap: number;
   training_now: boolean;

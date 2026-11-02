@@ -2,6 +2,7 @@
 
 from db.tables.admin_action import AdminAction
 from db.tables.auth_session import AuthSession
+from db.tables.avatar import Avatar
 from db.tables.comment import Comment
 from db.tables.crew import Crew
 from db.tables.duel import Duel
@@ -20,6 +21,7 @@ from db.tables.workout_set import WorkoutSet
 __all__ = [
     "AdminAction",
     "AuthSession",
+    "Avatar",
     "Comment",
     "Crew",
     "Duel",

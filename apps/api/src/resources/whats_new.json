@@ -1,5 +1,6 @@
 {
   "entries": [
+    { "id": "profile", "date": "2026-11-02", "link": "/me" },
     { "id": "gyms", "date": "2026-11-02", "link": "/train" },
     { "id": "rest-timer", "date": "2026-11-02", "link": "/train" },
     { "id": "stretching", "date": "2026-11-02", "link": "/train" },

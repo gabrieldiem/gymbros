@@ -136,7 +136,12 @@ function Members() {
               {members.map((member) => (
                 <li key={member.id}>
                   <button type="button" className={styles.row} onClick={() => setOpen(member)}>
-                    <Avatar initials={member.initials} color={member.color} size={40} />
+                    <Avatar
+                      initials={member.initials}
+                      color={member.color}
+                      image={member.avatar_url}
+                      size={40}
+                    />
                     <span className={styles.rowMain}>
                       <b>
                         {member.display_name}

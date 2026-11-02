@@ -23,13 +23,14 @@ async def test_patch_me_changes_language_color_and_name(client, register):
 async def test_patch_me_keeps_omitted_fields(client, register):
     await register(language="es")
     response = await client.patch("/api/me", json={"initials": "gx"})
-    assert response.json()["initials"] == "GX"
+    assert response.json()["initials"] == "gx"
     assert response.json()["language"] == "es"
 
 
 async def test_patch_me_rejects_values_outside_the_palette_and_languages(client, register):
     await register()
-    assert (await client.patch("/api/me", json={"color": "#123456"})).status_code == 422
+    assert (await client.patch("/api/me", json={"color": "blue"})).status_code == 422
+    assert (await client.patch("/api/me", json={"color": "#12345"})).status_code == 422
     assert (await client.patch("/api/me", json={"language": "fr"})).status_code == 422
     assert (await client.patch("/api/me", json={"initials": "ABC"})).status_code == 422
 

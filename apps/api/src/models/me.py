@@ -1,15 +1,14 @@
 """The signed-in user's profile, as returned by /api/me and the auth endpoints."""
 
 import uuid
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from typing_extensions import Annotated
 
 from models.auth import DisplayName, InviteCode, Language
 
-Color = Literal["volt", "red", "cyan", "pink", "violet"]
-Initials = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9]{1,2}$")]
+# A name from the crew palette, or any color from the picker.
+Color = Annotated[str, StringConstraints(pattern=r"^(volt|red|cyan|pink|violet|#[0-9a-fA-F]{6})$")]
 
 
 class CrewResponse(BaseModel):
@@ -32,6 +31,7 @@ class MeResponse(BaseModel):
     email: str
     display_name: str
     initials: str
+    avatar_url: str | None = None
     color: Color
     language: Language
     rest_seconds: int
@@ -43,7 +43,8 @@ class UpdateMeRequest(BaseModel):
     """Profile changes. Omitted fields stay as they are."""
 
     display_name: DisplayName | None = None
-    initials: Initials | None = None
+    # Up to two characters, which can be emoji. services/avatar_text.py decides.
+    initials: str | None = Field(default=None, max_length=64)
     color: Color | None = None
     language: Language | None = None
     rest_seconds: int | None = Field(default=None, ge=30, le=300)

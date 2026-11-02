@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, status
 
 from db.tables.user import User
 from dependencies import get_admin_service, get_current_admin, get_settings
+from models.avatar import avatar_url
 from models.admin import (
     AdjustPointsRequest,
     AdminActionResponse,
@@ -53,6 +54,7 @@ def _member(row: MemberRow, settings: Settings) -> AdminMemberResponse:
         email=user.email,
         display_name=user.display_name,
         initials=user.initials,
+        avatar_url=avatar_url(user),
         color=user.color,  # type: ignore[arg-type]
         crew_name=row.crew.name if row.crew else None,
         points=row.points,

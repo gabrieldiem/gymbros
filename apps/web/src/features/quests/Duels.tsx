@@ -33,7 +33,12 @@ function DuelCard({ duel, myId, winPoints }: { duel: Duel; myId: string; winPoin
         const actor = who as Duel['challenger'];
         return (
           <div key={actor.user_id} className={styles.duelRow}>
-            <Avatar initials={actor.initials} color={actor.color} size={36} />
+            <Avatar
+              initials={actor.initials}
+              color={actor.color}
+              image={actor.avatar_url}
+              size={36}
+            />
             <div className={styles.bar}>
               <i style={{ width: `${(Number(value) / max) * 100}%` }} />
             </div>
