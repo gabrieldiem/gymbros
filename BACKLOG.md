@@ -33,12 +33,10 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-20` **Custom routines and exercises** (product, M): v1 ships a fixed catalog and four routines. _Added 2026-10-31_
 - [ ] `GYM-22` **Health app import** (product, L): Apple Health / Google Fit cardio. _Added 2026-10-31_
 - [ ] `GYM-26` **Leave or switch crew** (product, S): one crew per user. An admin can remove someone from a crew in the backoffice, but members can't leave by themselves. _Added 2026-10-31_
-- [ ] `GYM-27` **Show the current PR in the logger** (web, S): the prototype shows "PR 92.5 kg × 5" next to each exercise and in the picker. Unblocked: the data exists in `/api/me/stats`. Cardio PRs need the km and minutes format too. _Added 2026-10-31_
 - [ ] `GYM-29` **Offline logging** (web, M): the logger retries saves while offline, but a reload loses unsaved edits. Persist the draft locally until the server confirms it. _Added 2026-10-31_
 - [ ] `GYM-31` **Climber sheet** (web, M): tapping a marker or rope row in the prototype opens a profile sheet (head to head, last workout, best lift, gap, Start a duel, Nudge). Unblocked: duels and nudges exist now. _Added 2026-10-31_
 - [ ] `GYM-32` **YOU tag can overlap a marker** (web, S): on the map, the "YOU" label above your marker can touch a neighbour nudged just above it (same as the prototype). Offset the tag away from neighbours. _Added 2026-10-31_
 - [ ] `GYM-33` **Climb standings query cost** (api, S): `/api/climb` runs several aggregates per poll (every 20 s per open tab). Fine for 5 people; cache per crew for a few seconds if crews grow. _Added 2026-10-31_
-- [ ] `GYM-34` **Reply notifications for commenters** (api, S): only the post's owner is notified of new comments; others in the thread aren't (the prototype's "replied to your comment"). _Added 2026-10-31_
 - [ ] `GYM-35` **Notification fan-out to the actor's camp-mates** (api, S): "someone close behind" uses a fixed 300 pt window (`social.close_behind_points`). Consider week mode too. _Added 2026-10-31_
 - [ ] `GYM-36` **Delete own comment / undo nudge** (product, S): neither exists. _Added 2026-10-31_
 - [ ] `GYM-38` **Weekly recap notification** (api, S): "Your weekly recap is ready" isn't sent; the recap is a card on ATUS Climb. Send it on the first request after Monday 00:00. _Added 2026-10-31_
@@ -49,7 +47,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
 - [ ] `GYM-60` **Blue/green deploys with no downtime** (infra, M): a version that passes the smoke test but fails in production causes an outage until the previous one is restored, up to a few minutes. Start the new version beside the old one and switch Caddy only once it is healthy. Needs room on the box for both. _Added 2026-11-01_
 - [ ] `GYM-64` **Cardio is missing from the You tab and most improved** (game+web, M): points are fair across sports, but the stats read lifts and tonnage only, and feed posts show minutes but not distance. Someone who only runs or swims sees empty stats and can't win most improved. _Added 2026-11-02_
-- [ ] `GYM-65` **Point adjustments are silent** (api+web, S): an admin's adjustment changes a member's points, but nothing tells them or shows the reason. Send a notification with the amount and reason. _Added 2026-11-02_
 - [ ] `GYM-66` **Moderate comments in the backoffice** (product, S): admins can delete an account but not a single comment. Add it, with an audit log entry. _Added 2026-11-02_
 
 ## Tech debt
@@ -60,8 +57,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-49` **Pylint inference on table modules** (api, S): `db/tables/workout.py` and `workout_set.py` disable `unsubscriptable-object` because astroid mis-infers `Mapped` in a full run. Remove when astroid fixes it. _Added 2026-10-31_
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
 - [ ] `GYM-59` **Drop users.password_hash** (api, S): nothing reads it since Google sign-in. It stays nullable for one release so the migration can be rolled back; drop it once Google sign-in has worked in production, as it still holds old argon2 hashes. _Added 2026-11-01_
-- [ ] `GYM-63` **App stays on the old version after a deploy** (web, S): the page opens from the old service worker cache, so a new version takes two reloads to appear and an open tab never checks. Check on focus and hourly, then show a reload banner; don't reload by itself (GYM-29). _Added 2026-11-02_
-- [ ] `GYM-68` **Cap how long server logs are kept** (infra, S): the privacy policy says request logs with IP addresses remain until cleared, and `deploy/compose.edge.yaml` sets no limits. Set `logging` max-size and max-file, check what Caddy keeps, then state the real period in the policy. _Added 2026-11-02_
+- [ ] `GYM-68` **Cap how long server logs are kept** (infra, S): Docker logs are capped at 30 MB per service. Still to do: check what Caddy keeps on the host, then state the real retention period in the privacy policy. _Added 2026-11-02_
 
 ## Done
 
@@ -88,3 +84,7 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-21` **Hero height on mobile**: no longer true: at 390×844 the map starts at y=319, with 451 px visible. Cancelled 2026-11-02.
 - [x] `GYM-30` **Prototype: first-time PR**: duplicate of GYM-10. Cancelled 2026-11-02.
 - [x] `GYM-67` **Legal pages still say badges**: closed 2026-11-02 in 6748084.
+- [x] `GYM-63` **App stays on the old version after a deploy**: closed 2026-11-02 in c9ddaf5.
+- [x] `GYM-34` **Reply notifications for commenters**: closed 2026-11-02 in 55637b1.
+- [x] `GYM-65` **Point adjustments are silent**: closed 2026-11-02 in 55637b1.
+- [x] `GYM-27` **Show the current PR in the logger**: closed 2026-11-02 in d95005a.
