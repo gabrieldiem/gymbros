@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { markCrewWelcomePending } from '../features/auth/crewWelcome';
+import { forgetInvite } from '../features/auth/pendingInvite';
 import { apiRequest } from './client';
 import { meKey } from './me';
 import type { AuthOptions, DevLoginBody, Invite, Me } from './types';
@@ -14,7 +15,10 @@ function useMeMutation<TBody>(request: (body: TBody) => Promise<Me>, joinsCrew =
   return useMutation({
     mutationFn: request,
     onSuccess: (me) => {
-      if (joinsCrew && me.crew) markCrewWelcomePending();
+      if (joinsCrew && me.crew) {
+        markCrewWelcomePending();
+        forgetInvite();
+      }
       queryClient.setQueryData(meKey, me);
     },
   });

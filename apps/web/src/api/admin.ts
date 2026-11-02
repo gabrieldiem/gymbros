@@ -18,6 +18,10 @@ export type AdminCrew = {
   name: string;
   time_zone: string;
   invite_code: string;
+  invite_uses: number;
+  invite_max_uses: number | null;
+  invite_expires_at: string | null;
+  invite_status: 'active' | 'expired' | 'used_up';
   members: number;
   points: number;
 };
@@ -77,7 +81,7 @@ export function useAdminActions() {
 }
 
 /** Any change can touch every list, and the audit log always grows: refetch them all. */
-function useAdminMutation<TBody>(request: (body: TBody) => Promise<unknown>) {
+function useAdminMutation<TBody, TResult>(request: (body: TBody) => Promise<TResult>) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: request,
@@ -85,15 +89,32 @@ function useAdminMutation<TBody>(request: (body: TBody) => Promise<unknown>) {
   });
 }
 
+export type CrewChanges = {
+  name?: string;
+  time_zone?: string;
+  invite_code?: string;
+  invite_max_uses?: number | null;
+  invite_expires_at?: string | null;
+};
+
 export function useCreateCrew() {
-  return useAdminMutation((body: { name: string; time_zone: string }) =>
+  return useAdminMutation((body: CrewChanges) =>
     apiRequest<AdminCrew>('/admin/crews', { method: 'POST', body }),
   );
 }
 
+/** Only the fields sent change. A limit sent as null is removed. */
 export function useUpdateCrew() {
-  return useAdminMutation(({ id, ...body }: { id: string; name: string; time_zone: string }) =>
+  return useAdminMutation(({ id, ...body }: CrewChanges & { id: string }) =>
     apiRequest<AdminCrew>(`/admin/crews/${id}`, { method: 'PATCH', body }),
+  );
+}
+
+export type InviteSent = { sent: boolean; link: string; existing_account: boolean };
+
+export function useSendInvite() {
+  return useAdminMutation(({ id, ...body }: { id: string; email: string; language: string }) =>
+    apiRequest<InviteSent>(`/admin/crews/${id}/invites`, { method: 'POST', body }),
   );
 }
 

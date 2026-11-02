@@ -10,6 +10,7 @@ import { LanguageToggle } from '../../components/LanguageToggle';
 import { Logo } from '../../components/Logo';
 import { useI18n } from '../../i18n/context';
 import { gateRedirect } from '../auth/gate';
+import { pendingInvite } from '../auth/pendingInvite';
 import { ClimbDemo } from './ClimbDemo';
 import styles from './LandingPage.module.css';
 import { AchievementList, PointsList, SportsCompare } from './LandingSections';
@@ -76,7 +77,7 @@ export function LandingPage() {
   const me = useMe();
   const options = useAuthOptions().data;
   const rules = useRules().data;
-  const redirect = gateRedirect('guest', me.data ?? null, false);
+  const redirect = gateRedirect('guest', me.data ?? null, false, Boolean(pendingInvite()));
   if (redirect) return <Navigate to={redirect} replace />;
   const liftSession = rules?.sessions.find((s) => s.id === 'lift');
 

@@ -7,6 +7,13 @@ const member = makeMe();
 const noCrew = makeMe({ crew: null });
 
 describe('gateRedirect', () => {
+  it('takes an invited admin to the join screen, not the backoffice', () => {
+    const admin = makeMe({ is_admin: true, crew: null });
+    expect(gateRedirect('member', admin, false, true)).toBe('/join');
+    expect(gateRedirect('guest', admin, false, true)).toBe('/join');
+    expect(gateRedirect('member', admin, false, false)).toBe('/admin');
+  });
+
   it.each<[Allow, ReturnType<typeof makeMe> | null, boolean, string | null]>([
     ['guest', null, false, null],
     ['guest', makeMe({ is_admin: true, crew: null }), false, '/admin'],

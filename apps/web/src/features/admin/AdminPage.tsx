@@ -82,9 +82,20 @@ function Crews() {
                       <b>{crew.name}</b>
                       <small>{crew.time_zone}</small>
                     </span>
-                    <code className={styles.code}>{crew.invite_code}</code>
+                    <span className={styles.rowInvite}>
+                      <code className={styles.code}>{crew.invite_code}</code>
+                      {crew.invite_status !== 'active' && (
+                        <em className={styles.dead}>
+                          {t(`admin_invite_status_${crew.invite_status}`)}
+                        </em>
+                      )}
+                    </span>
                     <span className={styles.rowNumbers}>
-                      <span>{t('admin_members_n', { n: crew.members })}</span>
+                      <span>
+                        {crew.members === 1
+                          ? t('admin_members_1')
+                          : t('admin_members_n', { n: crew.members })}
+                      </span>
                       <b>{t('pts_n', { n: n(crew.points) })}</b>
                     </span>
                   </button>

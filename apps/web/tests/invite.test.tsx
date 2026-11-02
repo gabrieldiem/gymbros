@@ -38,15 +38,13 @@ describe('Invite links', () => {
     ).toBeVisible();
   });
 
-  it('fills in the join screen after signing in, and forgets the code once joined', async () => {
+  it('joins by itself after signing in, and forgets the code', async () => {
     localStorage.setItem('gymbros.invite', 'IRONRIDGE');
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe({ crew: null })],
       'POST /api/crews/join': [200, makeMe({ crew: CREW })],
     });
-    renderApp('/join');
-    expect(await screen.findByLabelText('Invite code')).toHaveValue('IRONRIDGE');
-    await userEvent.click(screen.getByRole('button', { name: 'Join crew' }));
+    renderApp('/climb');
     expect(await screen.findByRole('heading', { name: 'This is Iron Ridge' })).toBeVisible();
     const call = fetchMock.mock.calls.find(([url]) => url === '/api/crews/join');
     expect(JSON.parse(String(call?.[1]?.body))).toEqual({ invite_code: 'IRONRIDGE' });
@@ -59,10 +57,66 @@ describe('Invite links', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   });
 
-  it('sends someone without a crew to the filled-in join screen', async () => {
-    mockApi({ 'GET /api/me': [200, makeMe({ crew: null })], ...INVITE } as never);
+  it('joins someone signed in without a crew straight away', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe({ crew: null })],
+      'POST /api/crews/join': [200, makeMe({ crew: CREW })],
+      ...INVITE,
+    } as never);
     renderApp('/invite/IRONRIDGE');
-    expect(await screen.findByLabelText('Invite code')).toHaveValue('IRONRIDGE');
+    expect(await screen.findByRole('heading', { name: 'This is Iron Ridge' })).toBeVisible();
+    const joins = fetchMock.mock.calls.filter(([url]) => url === '/api/crews/join');
+    expect(joins).toHaveLength(1);
+  });
+
+  it('takes an invited admin into the crew, not the backoffice', async () => {
+    localStorage.setItem('gymbros.invite', 'IRONRIDGE');
+    mockApi({
+      'GET /api/me': [200, makeMe({ crew: null, is_admin: true })],
+      'POST /api/crews/join': [200, makeMe({ crew: CREW, is_admin: true })],
+    });
+    renderApp('/climb');
+    expect(await screen.findByRole('heading', { name: 'This is Iron Ridge' })).toBeVisible();
+  });
+
+  it('shows why a code failed, keeps the form, and does not try again', async () => {
+    localStorage.setItem('gymbros.invite', 'IRONRIDGE');
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe({ crew: null })],
+      'POST /api/crews/join': [410, { detail: { code: 'invite_code_used_up' } }],
+    });
+    renderApp('/join');
+    expect(await screen.findByRole('alert')).toHaveTextContent('used up');
+    expect(screen.getByLabelText('Invite code')).toHaveValue('IRONRIDGE');
+    expect(localStorage.getItem('gymbros.invite')).toBeNull();
+    const joins = fetchMock.mock.calls.filter(([url]) => url === '/api/crews/join');
+    expect(joins).toHaveLength(1);
+  });
+
+  it('never moves someone already in another crew', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe({ crew: { ...CREW, invite_code: 'OTHERONE' } })],
+      ...INVITE,
+    } as never);
+    renderApp('/invite/IRONRIDGE');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'You’re already in Iron Ridge' }),
+    ).toBeVisible();
+    expect(fetchMock.mock.calls.some(([url]) => url === '/api/crews/join')).toBe(false);
+    expect(localStorage.getItem('gymbros.invite')).toBeNull();
+  });
+
+  it.each([
+    ['invite_code_expired', 'This invite has expired'],
+    ['invite_code_used_up', 'This invite has been used up'],
+  ])('explains a dead link: %s', async (code, heading) => {
+    mockApi({
+      'GET /api/me': SIGNED_OUT,
+      'GET /api/crews/invite/DEADCODE': [410, { detail: { code } }],
+    });
+    renderApp('/invite/DEADCODE');
+    expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeVisible();
+    await waitFor(() => expect(localStorage.getItem('gymbros.invite')).toBeNull());
   });
 
   it('copies the link from the profile menu when the phone has no share sheet', async () => {

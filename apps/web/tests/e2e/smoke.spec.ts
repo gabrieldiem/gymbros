@@ -188,3 +188,51 @@ test('invite link: shows the crew before signing in', async ({ page }, testInfo)
   await expect(page.getByRole('heading', { level: 1 })).toContainText(/doesn’t work|no funciona/);
   expect(errors.filter((e) => !e.includes('status of 404'))).toEqual([]);
 });
+
+test('invite limits: an admin sets a custom code with one use, then the link joins and runs out', async ({
+  browser,
+  page,
+}, testInfo) => {
+  const stamp = Date.now().toString(36).toUpperCase().slice(-6);
+  const code = `T${stamp}${testInfo.project.name === 'mobile' ? 'M' : 'D'}`;
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.goto('/admin');
+  await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
+  await page.getByRole('button', { name: /New crew|Nuevo equipo/ }).click();
+  const sheet = page.getByRole('dialog');
+  await sheet.getByLabel(/Crew name|Nombre del equipo/).fill(`Invite ${code}`);
+  await sheet.getByLabel(/^(Code|Código)/).fill(code);
+  await sheet.getByLabel(/Maximum uses|Usos máximos/).fill('1');
+  await page.waitForTimeout(100);
+  await page.screenshot({
+    path: `${SCREENS}/admin-crew-sheet-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  await sheet.getByRole('button', { name: /^(Save|Guardar)$/ }).click();
+  await expect(page.getByRole('button', { name: new RegExp(`Invite ${code}`) })).toBeVisible();
+
+  const signInAndOpen = async (name: string) => {
+    const context = await browser.newContext({ locale: 'en-US' });
+    const visitor = await context.newPage();
+    await visitor.goto('/login');
+    await visitor.getByLabel('Email').fill(`${name}-${code.toLowerCase()}@example.com`);
+    await visitor.getByRole('button', { name: /Log in|Entrar/ }).click();
+    await expect(visitor).toHaveURL(/\/join$/);
+    await visitor.goto(`/invite/${code.toLowerCase()}`);
+    return { context, visitor };
+  };
+
+  const first = await signInAndOpen('first');
+  await expect(
+    first.visitor.getByRole('heading', { name: `This is Invite ${code}` }),
+  ).toBeVisible();
+  await first.context.close();
+
+  const second = await signInAndOpen('second');
+  await expect(second.visitor.getByRole('alert')).toContainText('used up');
+  await expect(second.visitor).toHaveURL(/\/join$/);
+  await second.context.close();
+});
