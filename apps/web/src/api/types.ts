@@ -22,6 +22,8 @@ export type Me = {
   is_admin?: boolean;
 };
 
+export type Invite = { crew_name: string; members: number };
+
 export type AuthOptions = { google: boolean; dev_login: boolean };
 
 export type DevLoginBody = { email: string; language: Language };

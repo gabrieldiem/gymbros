@@ -59,3 +59,10 @@ class DeleteAccountRequest(BaseModel):
     """The account's email, typed again to confirm."""
 
     confirm_email: str
+
+
+class InviteResponse(BaseModel):
+    """What an invite link shows before signing in."""
+
+    crew_name: str
+    members: int

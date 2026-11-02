@@ -4,6 +4,7 @@ import { AppShell } from './components/AppShell';
 import { AuthLayout } from './features/auth/AuthLayout';
 import { Gate } from './features/auth/Gate';
 import { HelloPage } from './features/auth/HelloPage';
+import { InvitePage } from './features/auth/InvitePage';
 import { JoinPage } from './features/auth/JoinPage';
 import { LoginPage } from './features/auth/LoginPage';
 import { ClimbPage } from './features/climb/ClimbPage';
@@ -26,6 +27,7 @@ export function App() {
         <Route path="admin" element={<AdminPage />} />
       </Route>
       <Route element={<AuthLayout />}>
+        <Route path="invite/:code" element={<InvitePage />} />
         <Route element={<Gate allow="guest" />}>
           <Route path="login" element={<LoginPage />} />
         </Route>

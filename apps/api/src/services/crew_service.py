@@ -31,6 +31,11 @@ class CrewService:
             raise InviteCodeNotFound(invite_code)
         return crew
 
+    async def invite(self, invite_code: str) -> tuple[Crew, int]:
+        """The crew behind an invite code and how many members it has."""
+        crew = await self.find_by_code(invite_code)
+        return crew, len(await self._crews.members(crew.id))
+
     async def join(self, user: User, crew: Crew) -> Crew:
         """Add the user to the crew and give them the first free palette color."""
         if await self._crews.get_crew_of(user.id) is not None:

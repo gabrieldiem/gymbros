@@ -15,7 +15,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-5` **Hosting** (infra, M): where does GYMBROS run, and on which domain? `deploy.yml` has a placeholder `deploy` job (tests and the image scan still run on main); the data-service Coolify webhook flow is in its git history if that's the choice. _Added 2026-10-31_
 - [ ] `GYM-6` **Spanish slang** (i18n, S): Spanish rank names (Novato … Imparable) and other words the crew actually uses. _Added 2026-10-31_
 - [ ] `GYM-7` **Production migrations** (infra, S): default chosen: the api image runs `alembic upgrade head` before starting the workers, so a deploy migrates itself. Alternative: a separate one-off migrate job on the hosting platform. _Added 2026-10-31_
-- [ ] `GYM-8` **Who creates a crew** (product, S): default chosen: crews are created by an operator with `make crew` (CLI) and shared by invite code; there is no in-app "create crew". Add an in-app flow if the app should onboard other groups. _Added 2026-10-31_
 - [ ] `GYM-9` **Crew time zone** (product, S): default chosen: the demo crew uses `America/Argentina/Buenos_Aires`. Confirm the real crew's zone (weeks reset Monday 00:00 there). _Added 2026-10-31_
 - [ ] `GYM-10` **First log of an exercise and PR points** (game, S): default chosen: the first time you log an exercise it sets your baseline PR and pays nothing; PRODUCT.md says a PR must beat the stored one. The prototype paid 100 for it, which lets anyone farm points by logging every exercise once. _Added 2026-10-31_
 - [ ] `GYM-11` **Most improved formula** (game, S): default chosen: the mean of strength change (squat/bench/deadlift e1RM vs 4 weeks ago) and volume change (last 3 weeks vs the 3 before), over whichever the member has history for. The prototype's "+18%" had no formula. _Added 2026-10-31_
@@ -23,6 +22,8 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-13` **Bounty rules** (game, S): default chosen: the bounty is always on the all-time leader and pays the first member to pass them each week. The prototype only said "while a bounty is active". _Added 2026-10-31_
 - [ ] `GYM-14` **Badges earned by seeded history** (product, S): default chosen: demo members get the badges their seeded history earns, with no extra points, so the prototype's totals stay exact. _Added 2026-10-31_
 - [ ] `GYM-58` **Which emails should GYMBROS send** (product, S): default chosen: only a welcome email on first sign-up, through Resend. Weekly recap, nudges or "someone passed you" by email are possible next steps, but each needs an opt-out first. _Added 2026-11-01_
+- [ ] `GYM-61` **Cardio point balance** (game, S): default chosen: 2 pts per minute plus 8 per run-equivalent km, a swim km counting as 4 and a rowing km as 0.8. An hour pays 255 for a 10 km run or a 2.5 km swim, against 250 for a 12-tonne lifting session. Check it against real workouts after a few weeks. _Added 2026-11-02_
+- [ ] `GYM-62` **Leg day x2 pays only lifters** (game, S): the weekly event doubles leg set points, so runners and swimmers get nothing from it. Default chosen: unchanged until more weekly events exist (GYM-17). _Added 2026-11-02_
 
 ## Later
 
@@ -79,3 +80,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-23` **Login rate limiting**: no longer applies: the password endpoints are gone and Google handles credentials. Cancelled 2026-11-01 on feat/google-auth.
 - [x] `GYM-24` **Password reset**: no longer applies: there are no passwords to reset. Cancelled 2026-11-01 on feat/google-auth.
 - [x] `GYM-57` **Feed says "Tú desbloqueó" for your own badge**: your own badge and rank posts read in second person. Closed 2026-11-02 on feat/motion-menu.
+- [x] `GYM-8` **Who creates a crew**: crews can be created in the app from the backoffice; `make crew` still works. Closed 2026-11-02 on feat/invites.

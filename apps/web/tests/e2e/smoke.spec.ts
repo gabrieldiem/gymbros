@@ -176,3 +176,15 @@ test('backoffice: an admin opens it from the menu, a member is sent away', async
   await shoot(page, 'admin-members', testInfo);
   expect(errors).toEqual([]);
 });
+
+test('invite link: shows the crew before signing in', async ({ page }, testInfo) => {
+  const errors = collectErrors(page);
+  const crew = testInfo.project.name === 'mobile' ? 'E2EMOBILE' : 'E2EDESKTOP';
+  await page.goto(`/invite/${crew}`);
+  await expect(page.getByRole('heading', { level: 1, name: /E2E/ })).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await shoot(page, 'invite', testInfo);
+  await page.goto('/invite/NOTACODE');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(/doesn’t work|no funciona/);
+  expect(errors.filter((e) => !e.includes('status of 404'))).toEqual([]);
+});

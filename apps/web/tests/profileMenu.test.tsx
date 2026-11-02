@@ -19,6 +19,7 @@ describe('Profile menu', () => {
     expect(menu.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
       'Your profile',
       'Settings',
+      'Invite friends',
       'Log out',
     ]);
   });

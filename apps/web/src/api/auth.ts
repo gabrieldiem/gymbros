@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { markCrewWelcomePending } from '../features/auth/crewWelcome';
 import { apiRequest } from './client';
 import { meKey } from './me';
-import type { AuthOptions, DevLoginBody, Me } from './types';
+import type { AuthOptions, DevLoginBody, Invite, Me } from './types';
 
 /**
  * Every auth mutation answers with the new /api/me body; put it straight in the cache and let
@@ -38,6 +38,16 @@ export function useDevLogin() {
   return useMeMutation((body: DevLoginBody) =>
     apiRequest<Me>('/auth/dev-login', { method: 'POST', body }),
   );
+}
+
+export function useInvite(code: string) {
+  return useQuery({
+    queryKey: ['invite', code],
+    queryFn: ({ signal }) =>
+      apiRequest<Invite>(`/crews/invite/${encodeURIComponent(code)}`, { signal }),
+    retry: false,
+    staleTime: 60_000,
+  });
 }
 
 export function useJoinCrew() {

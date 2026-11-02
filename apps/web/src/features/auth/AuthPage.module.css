@@ -35,3 +35,7 @@
   font-weight: 600;
   font-size: var(--fs-small);
 }
+
+.switch {
+  text-align: center;
+}

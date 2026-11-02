@@ -6,6 +6,7 @@ import { useMe } from '../api/me';
 import { SettingsSheet } from '../features/me/SettingsSheet';
 import { useI18n } from '../i18n/context';
 import { Avatar } from './Avatar';
+import { useShareInvite } from './useShareInvite';
 import styles from './ProfileMenu.module.css';
 
 const ITEMS = '[role="menuitem"]';
@@ -15,6 +16,7 @@ export function ProfileMenu() {
   const { t } = useI18n();
   const me = useMe().data;
   const logout = useLogout();
+  const shareInvite = useShareInvite();
   const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -94,6 +96,19 @@ export function ProfileMenu() {
           >
             {t('settings')}
           </button>
+          {shareInvite && (
+            <button
+              type="button"
+              role="menuitem"
+              className={styles.item}
+              onClick={() => {
+                setOpen(false);
+                void shareInvite();
+              }}
+            >
+              {t('invite_friends')}
+            </button>
+          )}
           {me.is_admin && (
             <Link
               to="/admin"

@@ -150,6 +150,27 @@ Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up
 - Exercise search also matches Spanish aliases (typing "sentadilla" finds Back squat).
 - Numbers use the locale format (`3,880` / `3.880`).
 
+## Public landing page
+
+Anyone can see `/` without signing in: a sample crew on the real map and rope order with a demo that finishes a workout, an hour of each sport compared, what every task pays and every achievement. All numbers come from the public `GET /api/rules`, so the page can't drift from what the game pays.
+
+## Joining a crew
+
+A crew's invite link (`/invite/<code>`) shows the crew's name and size before signing in, and fills in the join screen afterwards. Share it from the profile menu. Typing the code still works.
+
+## Your account
+
+The avatar opens a menu with your profile, settings, inviting friends and log out. In settings you can change your name, color, language and rest time, and delete your account and everything in it by typing your email.
+
+## Backoffice
+
+`/admin` is for the accounts listed in the `ADMIN_EMAILS` server setting. Nobody can grant it from the app.
+
+- **Overview:** accounts, crews, workouts, and the last 7 days.
+- **Crews:** create, rename, change the time zone, replace the invite code (the old one stops working; members stay).
+- **Accounts:** search, adjust points with a reason (±5,000, counted like any other points), remove from a crew (history stays), delete.
+- **Log:** every change, with who made it. It stores ids, so a deleted account leaves no personal data behind.
+
 ## Not in v1
 
 kg/lb toggle, photo or video proof, multiple crews per user, push notifications, Apple/Google Health import. Each of these is tracked in `BACKLOG.md`.

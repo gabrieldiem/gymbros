@@ -49,3 +49,24 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
   await expect(page).toHaveURL(/\/climb$/);
   expect(errors).toEqual([]);
 });
+
+test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
+  await logIn(page, 'santi', testInfo);
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await page.getByRole('button', { name: /^Swim/ }).click();
+  const swim = page.getByRole('article', { name: 'Pool swim' });
+  await expect(swim).toBeVisible();
+  await swim.getByLabel('Pool swim, set 1, min').fill('40');
+  await swim.getByLabel('Pool swim, set 1, km').fill('1.5');
+  await swim.getByRole('button', { name: 'Complete set 1' }).click();
+  await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  const summary = page.getByRole('dialog');
+  await expect(summary.getByText('40 cardio minutes')).toBeVisible();
+  await expect(summary.getByText('1.5 km covered')).toBeVisible();
+  await expect(summary.getByText(/Full mile/)).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/swim-finish-${testInfo.project.name}.png` });
+  await summary.getByRole('button', { name: 'See ATUS Climb' }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+});
