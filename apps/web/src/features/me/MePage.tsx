@@ -179,17 +179,30 @@ export function MePage() {
           <h2 id="prs-title">{t('prs_title')}</h2>
           {data.prs.length === 0 && <p className={styles.muted}>{t('prs_empty')}</p>}
           <ul className={styles.prs}>
-            {data.prs.slice(0, 8).map((pr) => (
-              <li key={pr.exercise_id}>
-                <button type="button" onClick={() => setChart(pr.exercise_id)}>
-                  <span>
-                    {exercise(pr.exercise_id)?.name ?? pr.exercise_id}
-                    <small>{t('e1rm', { n: n(pr.e1rm) })}</small>
-                  </span>
-                  <b>{formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n)}</b>
-                </button>
-              </li>
-            ))}
+            {data.prs.slice(0, 8).map((pr) => {
+              const best = formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n);
+              const name = exercise(pr.exercise_id)?.name ?? pr.exercise_id;
+              // Cardio records have no e1RM and no lift chart.
+              if (exercise(pr.exercise_id)?.type === 'c') {
+                return (
+                  <li key={pr.exercise_id} className={styles.prStatic}>
+                    <span>{name}</span>
+                    <b>{best}</b>
+                  </li>
+                );
+              }
+              return (
+                <li key={pr.exercise_id}>
+                  <button type="button" onClick={() => setChart(pr.exercise_id)}>
+                    <span>
+                      {name}
+                      <small>{t('e1rm', { n: n(pr.e1rm) })}</small>
+                    </span>
+                    <b>{best}</b>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </section>
         <section aria-labelledby="ladder-title">

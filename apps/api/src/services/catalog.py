@@ -22,6 +22,8 @@ class Exercise:
     barbell: bool
     ppl: str | None
     aliases_es: tuple[str, ...]
+    # Cardio only: how many km of an easy reference run one km of this is worth (a swim km is 4).
+    km_factor: float = 1.0
 
     @property
     def is_cardio(self) -> bool:

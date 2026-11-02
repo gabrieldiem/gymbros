@@ -17,7 +17,14 @@ from services.scoring_types import (
     WeekState,
     WorkoutLog,
 )
-from services.training_rules import LoggedSet, effective_load, estimated_1rm, is_completed
+from services.training_rules import (
+    LoggedSet,
+    effective_load,
+    effort_km,
+    endurance_score,
+    estimated_1rm,
+    is_completed,
+)
 
 __all__ = [
     "History",
@@ -40,6 +47,8 @@ class _Tally:
     leg_sets: int
     volume_kg: float
     cardio_minutes: int
+    cardio_km: float
+    effort_km: float
     bests: tuple[RecordSet, ...]
 
 
@@ -51,10 +60,10 @@ def score_workout(
     if tally.completed_sets == 0:
         return ScoreResult((), 0, 0.0, 0, 0, None, ())
     records = _records(tally.bests, history)
-    vs_last = _vs_last_pct(tally.volume_kg, history, log)
+    vs_last = _vs_last_pct(tally, history, log, rules)
     items = (
         _base_items(tally, week, rules)
-        + _pr_items(records, rules)
+        + _pr_items(records, log, rules)
         + _week_items(week, rules)
         + _better_items(vs_last, rules)
     )
@@ -66,12 +75,13 @@ def score_workout(
         completed_sets=tally.completed_sets,
         vs_last_pct=vs_last,
         records=records,
+        effort_km=tally.effort_km,
     )
 
 
 def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
     sets = legs = minutes = 0
-    volume = 0.0
+    volume = km = effort = 0.0
     bests: list[RecordSet] = []
     for logged in log.exercises:
         done = [s for s in logged.sets if is_completed(logged.exercise, s)]
@@ -79,12 +89,15 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
         legs += len(done) if logged.exercise.group == "Legs" else 0
         if logged.exercise.is_cardio:
             minutes += sum(s.minutes or 0 for s in done)
-            continue
-        volume += sum(_set_volume(logged, s, rules) for s in done)
-        best = _best_set(logged, done, rules)
+            km += sum(s.km or 0 for s in done)
+            effort += sum(effort_km(logged.exercise, s) for s in done)
+            best = _best_cardio(logged, done)
+        else:
+            volume += sum(_set_volume(logged, s, rules) for s in done)
+            best = _best_set(logged, done, rules)
         if best is not None:
             bests.append(best)
-    return _Tally(sets, legs, volume, minutes, tuple(bests))
+    return _Tally(sets, legs, volume, minutes, km, effort, tuple(bests))
 
 
 def _set_volume(logged: LoggedExercise, logged_set: LoggedSet, rules: ScoringRules) -> float:
@@ -106,6 +119,19 @@ def _best_set(
     return best
 
 
+def _best_cardio(logged: LoggedExercise, done: list[LoggedSet]) -> RecordSet | None:
+    """The entry with the best endurance score. A cardio record stores km and minutes in the
+    load_kg and reps fields, next to its score."""
+    best: RecordSet | None = None
+    for logged_set in done:
+        points = endurance_score(logged.exercise, logged_set)
+        if points is not None and (best is None or points > best.e1rm):
+            best = RecordSet(
+                logged.exercise.id, logged_set.km or 0.0, logged_set.minutes or 0, points, False
+            )
+    return best
+
+
 def _records(bests: tuple[RecordSet, ...], history: History) -> tuple[RecordSet, ...]:
     """New bests to store: a first log sets the baseline; later ones must beat the stored PR."""
     records = []
@@ -118,11 +144,18 @@ def _records(bests: tuple[RecordSet, ...], history: History) -> tuple[RecordSet,
     return tuple(records)
 
 
-def _vs_last_pct(volume_kg: float, history: History, log: WorkoutLog) -> int | None:
-    previous = history.previous_routine_volume_kg
-    if log.routine_id is None or not previous:
+def _vs_last_pct(
+    tally: _Tally, history: History, log: WorkoutLog, rules: ScoringRules
+) -> int | None:
+    """Change in work, where one effort km counts for the kg that pay the same points."""
+    kg_per_effort_km = rules.cardio_effort_km * rules.volume_kg_per_point
+    work = tally.volume_kg + tally.effort_km * kg_per_effort_km
+    previous = (history.previous_routine_volume_kg or 0) + (
+        history.previous_routine_effort_km * kg_per_effort_km
+    )
+    if log.routine_id is None or not previous or not work:
         return None
-    return round((volume_kg / previous - 1) * 100)
+    return round((work / previous - 1) * 100)
 
 
 def _number(value: float) -> int | float:
@@ -145,19 +178,36 @@ def _base_items(tally: _Tally, week: WeekState, rules: ScoringRules) -> tuple[Li
     if tally.cardio_minutes:
         minutes = tally.cardio_minutes
         items.append(LineItem("ln_cardio", {"minutes": minutes}, minutes * rules.cardio_minute))
+    distance_points = math.floor(tally.effort_km * rules.cardio_effort_km)
+    if distance_points > 0:
+        km = _number(round(tally.cardio_km, 2))
+        items.append(LineItem("ln_distance", {"km": km}, distance_points))
     return tuple(items)
 
 
-def _pr_items(records: tuple[RecordSet, ...], rules: ScoringRules) -> tuple[LineItem, ...]:
-    return tuple(
-        LineItem(
-            "ln_pr",
-            {"exercise_id": r.exercise_id, "load_kg": _number(r.load_kg), "reps": r.reps},
-            rules.pr,
-        )
-        for r in records
-        if r.is_improvement
-    )
+def _pr_items(
+    records: tuple[RecordSet, ...], log: WorkoutLog, rules: ScoringRules
+) -> tuple[LineItem, ...]:
+    cardio = {e.exercise.id for e in log.exercises if e.exercise.is_cardio}
+    items = []
+    for record in records:
+        if not record.is_improvement:
+            continue
+        if record.exercise_id in cardio:
+            variables = {
+                "exercise_id": record.exercise_id,
+                "km": _number(record.load_kg),
+                "minutes": record.reps,
+            }
+            items.append(LineItem("ln_pr_distance", variables, rules.pr))
+        else:
+            variables = {
+                "exercise_id": record.exercise_id,
+                "load_kg": _number(record.load_kg),
+                "reps": record.reps,
+            }
+            items.append(LineItem("ln_pr", variables, rules.pr))
+    return tuple(items)
 
 
 def _week_items(week: WeekState, rules: ScoringRules) -> tuple[LineItem, ...]:

@@ -35,7 +35,8 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Completed set | 5 each | Cardio entries count as one set |
 | Leg day x2 event | +5 per leg set | Only while the weekly event is active |
 | Volume | 1 per 100 kg | Σ load × reps; bodyweight load = 80 kg + added kg (v1: fixed 80, profile bodyweight later) |
-| Cardio | 3 per minute | |
+| Cardio time | 2 per minute | |
+| Cardio distance | 8 per run-equivalent km | A swim km counts as 4, a rowing km as 0.8. Capped at 20 km/h equivalent, so a typo can't pay |
 | PR | 100 per exercise | Best e1RM in the workout beats the stored PR. e1RM = load × (1 + reps / 30) (Epley). The first log of an exercise only sets the baseline (no points; see BACKLOG *Decide*) |
 | Weekly goal hit | 150 | On the 3rd workout of the week |
 | Goal streak | 20 × streak weeks, max 100 | Paid together with the weekly goal |
@@ -45,6 +46,10 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Crew quest complete | 200 to everyone | Crew total for the week reaches the goal (4,000) |
 | Bounty | 150 | Pass the current leader (all-time) while a bounty is active |
 | Badge unlocked | badge points (50 to 300) | Once per badge, ever |
+
+**One hour of any sport pays about the same.** At an ordinary pace, 60 minutes pays 255 for a 10 km run, a 2.5 km swim or a 12.5 km row, against 250 for a 12-tonne, 16-set lifting session. Time always pays, so a longer session earns more in total; over the same time, going further pays more. Logging no distance pays time only. `test_an_hour_of_cardio_pays_about_the_same_as_an_hour_of_lifting` holds this in place: retune the numbers together.
+
+**Cardio PRs and "better than last time" match lifting.** A cardio PR beats your best endurance score for that exercise, the counterpart of e1RM: run-equivalent km^1.06 / minutes × 1000 (Riegel's formula), so going faster over the same distance or further at the same pace both count. Efforts under 1 run-equivalent km (a 250 m swim) don't count, and the first log only sets the baseline. "Better than last time" compares work, where one run-equivalent km counts as the 800 kg that pay the same points.
 
 The finish screen lists every line item (an i18n key plus variables) and the total, plus "+X% volume vs last time".
 
@@ -58,7 +63,7 @@ When a routine starts, every set is pre-filled from the last session:
 
 - Barbell lifts: +2.5 kg, same reps
 - Other weighted lifts and bodyweight: same load, +1 rep
-- Cardio: +1 minute
+- Cardio: +1 minute, same distance
 
 The logger shows the last-time values per set and a "Loaded to beat last time" hint.
 
@@ -101,13 +106,13 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 
 ## Competition mechanics
 
-- **Weekly quests** (reset Monday): Leg day twice (150), Push, pull and legs (120), Move 20 tonnes (200), Sixty cardio minutes (100).
+- **Weekly quests** (reset Monday): Leg day twice (150), Push, pull and legs (120), Move 20 tonnes (200), Run 20 km or swim 5 km (200), Sixty cardio minutes (100).
 - **Crew quest:** the crew climbs 4,000 pts in a week → +200 each. Shown as a stacked bar per person.
 - **Duels:** a 1v1 until Sunday night, by points or by bench volume, with a stake ("Loser buys the protein shakes"). The opponent accepts or declines. The winner gets 150 once the week is over (paid into the new week); a tie pays nobody.
 - **Bounty:** every week the bounty is on the all-time leader; the first member to pass them that week takes 150 (then it's claimed until Monday). Checked after quests and the crew quest, before badges.
 - **Weekly event:** one twist per week. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). It is always on in v1 (`game.weekly_event` in settings.json).
 
-## Badges (15)
+## Badges (18)
 
 | Badge | Condition | Pts |
 |---|---|---|
@@ -117,6 +122,9 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 | Hundred tonnes | 100 t lifetime volume | 150 |
 | Iron month | 4 goal weeks in a row | 150 |
 | Plate club | Bench press 100 kg | 200 |
+| Ten K | Run 10 km in one go | 200 |
+| Full mile | Swim 1.5 km in one go | 200 |
+| The long road | Run 100 km or swim 25 km in total | 150 |
 | Dawn patrol | 5 workouts finished before 07:00 | 100 |
 | Leg day loyalist | 10 leg days | 150 |
 | Bounty hunter | Claim a bounty | 100 |
@@ -129,11 +137,11 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 
 ## Exercise catalog (v1)
 
-Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km), a `barbell` flag, and a push/pull/legs class.
+Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
 
-Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Treadmill run, Rowing machine.
+Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim.
 
-Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (run, rower), and Empty workout.
+Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), and Empty workout.
 
 ## i18n
 

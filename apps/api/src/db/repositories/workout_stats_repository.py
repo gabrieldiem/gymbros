@@ -34,6 +34,21 @@ class WorkoutStatsRepository:
         )
         return float(total or 0)
 
+    async def distance_by_exercise(self, user_id: uuid.UUID) -> dict[str, tuple[float, float]]:
+        """(longest entry, total) km per exercise, over completed sets of finished workouts."""
+        result = await self._session.execute(
+            select(WorkoutSet.exercise_id, func.max(WorkoutSet.km), func.sum(WorkoutSet.km))
+            .join(Workout, Workout.id == WorkoutSet.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at.is_not(None),
+                WorkoutSet.done.is_(True),
+                WorkoutSet.km.is_not(None),
+            )
+            .group_by(WorkoutSet.exercise_id)
+        )
+        return {exercise: (best or 0.0, total or 0.0) for exercise, best, total in result.all()}
+
     async def workouts_with(self, user_id: uuid.UUID, exercise_ids: list[str]) -> int:
         """Finished workouts with at least one completed set of these exercises."""
         count = await self._session.scalar(

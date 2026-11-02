@@ -14,7 +14,8 @@ export function formatElapsed(ms: number): string {
   return h ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
 
-/** A best set as text: "102.5 kg × 5", "+10 kg × 6", "12 reps". */
+/** A best set as text: "102.5 kg × 5", "+10 kg × 6", "12 reps", "10 km in 52 min" (cardio records
+ * keep km and minutes in the load and reps fields). */
 export function formatLift(
   exercise: Exercise | undefined,
   loadKg: number,
@@ -22,6 +23,7 @@ export function formatLift(
   t: T,
   n: N,
 ) {
+  if (exercise?.type === 'c') return t('pr_distance', { km: n(loadKg), minutes: reps });
   if (exercise?.type === 'bw') {
     return loadKg > 0 ? t('pr_added', { kg: n(loadKg), reps }) : t('pr_reps', { reps });
   }
@@ -52,6 +54,13 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
       const lift = formatLift(exercise, Number(vars.load_kg), Number(vars.reps), t, n);
       return t('ln_pr', { x: `${exercise?.name ?? String(vars.exercise_id)} ${lift}` });
     }
+    case 'ln_pr_distance': {
+      const exercise = exercises.find((e) => e.id === vars.exercise_id);
+      const best = t('pr_distance', { km: n(Number(vars.km)), minutes: Number(vars.minutes) });
+      return t('ln_pr_distance', { x: `${exercise?.name ?? String(vars.exercise_id)} ${best}` });
+    }
+    case 'ln_distance':
+      return t('ln_distance', { km: n(Number(vars.km)) });
     case 'ln_show':
     case 'ln_vol':
     case 'ln_cardio':

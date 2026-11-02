@@ -76,10 +76,12 @@ class WorkoutRepository:
             by_exercise[workout_set.exercise_id].append(workout_set)
         return dict(by_exercise)
 
-    async def previous_routine_volume(self, user_id: uuid.UUID, routine_id: str) -> float | None:
-        """Volume of the user's last finished workout of this routine."""
+    async def previous_routine_work(
+        self, user_id: uuid.UUID, routine_id: str
+    ) -> tuple[float | None, float]:
+        """(volume, effort km) of the user's last finished workout of this routine."""
         result = await self._session.execute(
-            select(Workout.volume_kg)
+            select(Workout.volume_kg, Workout.effort_km)
             .where(
                 Workout.user_id == user_id,
                 Workout.routine_id == routine_id,
@@ -88,7 +90,8 @@ class WorkoutRepository:
             .order_by(Workout.finished_at.desc())
             .limit(1)
         )
-        return result.scalar_one_or_none()
+        row = result.first()
+        return (row[0], row[1] or 0.0) if row else (None, 0.0)
 
     async def count_by_week(self, user_id: uuid.UUID, since: date) -> dict[date, int]:
         """Finished workouts per crew-local week, from `since` on."""

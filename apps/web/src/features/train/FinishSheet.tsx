@@ -76,7 +76,9 @@ export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
         <ul className={styles.lines}>
           {result.line_items.map((item, i) => (
             <li key={`${item.key}-${i}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
-              <span className={cx(item.key === 'ln_pr' && styles.pr)}>
+              <span
+                className={cx((item.key === 'ln_pr' || item.key === 'ln_pr_distance') && styles.pr)}
+              >
                 {lineItemText(item, exercises, t, n)}
               </span>
               <b>+{n(item.points)}</b>

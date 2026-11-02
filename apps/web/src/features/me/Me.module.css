@@ -214,6 +214,17 @@
   margin-top: 8px;
 }
 
+.prStatic {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--steel);
+  font-weight: 600;
+}
+
 .prs button {
   display: flex;
   justify-content: space-between;

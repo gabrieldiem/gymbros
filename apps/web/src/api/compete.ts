@@ -4,7 +4,7 @@ import type { Climb } from './climb';
 import { apiRequest } from './client';
 import type { Actor } from './social';
 
-export type QuestId = 'legs2' | 'ppl' | 'tonnes' | 'cardio';
+export type QuestId = 'legs2' | 'ppl' | 'tonnes' | 'distance' | 'cardio';
 export type Quest = {
   id: QuestId;
   goal: number;

@@ -34,6 +34,9 @@ class BadgeStats:
     night_workouts: int
     comebacks: int
     total_points: int
+    best_run_km: float = 0.0
+    best_swim_km: float = 0.0
+    lifetime_effort_km: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -65,6 +68,9 @@ BADGE_METRICS: dict[str, Callable[[BadgeStats], float]] = {
     "night_workouts": lambda s: s.night_workouts,
     "comebacks": lambda s: s.comebacks,
     "total_points": lambda s: s.total_points,
+    "best_run_km": lambda s: s.best_run_km,
+    "best_swim_km": lambda s: s.best_swim_km,
+    "lifetime_effort_km": lambda s: s.lifetime_effort_km,
 }
 
 

@@ -7,7 +7,7 @@ from functools import cache
 from pathlib import Path
 
 from services.scoring_types import WorkoutLog
-from services.training_rules import effective_load, is_completed
+from services.training_rules import effective_load, effort_km, is_completed
 
 QUESTS_PATH = Path(__file__).resolve().parent.parent / "resources" / "quests.json"
 
@@ -20,6 +20,7 @@ class WeekActivity:
     ppl_groups: frozenset[str]
     volume_kg: float
     cardio_minutes: int
+    effort_km: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +39,7 @@ QUEST_METRICS: dict[str, Callable[[WeekActivity], float]] = {
     "ppl_groups": lambda a: len(a.ppl_groups),
     "volume_tonnes": lambda a: a.volume_kg / 1000,
     "cardio_minutes": lambda a: a.cardio_minutes,
+    "effort_km": lambda a: a.effort_km,
 }
 
 
@@ -60,7 +62,7 @@ def quest_progress(quest: Quest, activity: WeekActivity) -> float:
 def week_activity(logs: Iterable[WorkoutLog], bodyweight_kg: float) -> WeekActivity:
     """Fold a week's workouts into quest inputs. Only completed sets count."""
     legs = minutes = 0
-    volume = 0.0
+    volume = effort = 0.0
     groups: set[str] = set()
     for log in logs:
         trained_legs = False
@@ -74,9 +76,10 @@ def week_activity(logs: Iterable[WorkoutLog], bodyweight_kg: float) -> WeekActiv
                 groups.add(exercise.ppl)
             if exercise.is_cardio:
                 minutes += sum(s.minutes or 0 for s in done)
+                effort += sum(effort_km(exercise, s) for s in done)
             else:
                 volume += sum(
                     effective_load(exercise, s.load_kg, bodyweight_kg) * (s.reps or 0) for s in done
                 )
         legs += int(trained_legs)
-    return WeekActivity(legs, frozenset(groups), volume, minutes)
+    return WeekActivity(legs, frozenset(groups), volume, minutes, effort)

@@ -17,6 +17,7 @@ class ExerciseModel(BaseModel):
     barbell: bool
     ppl: Literal["push", "pull", "legs"] | None
     aliases_es: list[str]
+    km_factor: float
 
 
 class RoutineModel(BaseModel):

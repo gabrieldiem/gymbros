@@ -5,13 +5,20 @@ from services.catalog import load_catalog
 
 def test_catalog_has_the_eighteen_v1_exercises():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 18
-    assert len({ex.id for ex in catalog.exercises}) == 18
+    assert len(catalog.exercises) == 20
+    assert len({ex.id for ex in catalog.exercises}) == 20
 
 
 def test_every_routine_uses_known_exercises():
     catalog = load_catalog()
-    assert [r.name for r in catalog.routines] == ["Push day", "Pull day", "Leg day", "Cardio"]
+    assert [r.name for r in catalog.routines] == [
+        "Push day",
+        "Pull day",
+        "Leg day",
+        "Cardio",
+        "Run",
+        "Swim",
+    ]
     for routine in catalog.routines:
         assert all(catalog.exercise(ex_id) for ex_id in routine.exercise_ids)
 

@@ -56,7 +56,8 @@ class Settings:
     scoring_completed_set: int = 5
     scoring_leg_event_set_bonus: int = 5
     scoring_volume_kg_per_point: int = 100
-    scoring_cardio_minute: int = 3
+    scoring_cardio_minute: int = 2
+    scoring_cardio_effort_km: int = 8
     scoring_pr: int = 100
     scoring_weekly_goal: int = 150
     scoring_goal_streak_per_week: int = 20

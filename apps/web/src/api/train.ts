@@ -15,6 +15,8 @@ export type Exercise = {
   barbell: boolean;
   ppl: 'push' | 'pull' | 'legs' | null;
   aliases_es: string[];
+  /** Cardio only: run km one km of this is worth. */
+  km_factor?: number;
 };
 
 export type Routine = { id: string; name: string; exercise_ids: string[] };
@@ -25,6 +27,7 @@ export type PointsTable = {
   leg_event_set_bonus: number;
   volume_kg_per_point: number;
   cardio_minute: number;
+  cardio_effort_km: number;
   pr: number;
   weekly_goal: number;
   goal_streak_per_week: number;

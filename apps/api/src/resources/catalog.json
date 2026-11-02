@@ -197,6 +197,21 @@
       ]
     },
     {
+      "id": "outrun",
+      "name": "Outdoor run",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "correr al aire libre",
+        "carrera",
+        "running",
+        "trote"
+      ],
+      "km_factor": 1.0
+    },
+    {
       "id": "run",
       "name": "Treadmill run",
       "group": "Cardio",
@@ -207,7 +222,8 @@
         "carrera en cinta",
         "cinta",
         "correr"
-      ]
+      ],
+      "km_factor": 1.0
     },
     {
       "id": "rower",
@@ -220,7 +236,24 @@
         "remo en máquina",
         "remoergómetro",
         "remo ergómetro"
-      ]
+      ],
+      "km_factor": 0.8
+    },
+    {
+      "id": "swim",
+      "name": "Pool swim",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "natación",
+        "natacion",
+        "nadar",
+        "pileta",
+        "piscina"
+      ],
+      "km_factor": 4.0
     }
   ],
   "routines": [
@@ -260,6 +293,20 @@
       "exercise_ids": [
         "run",
         "rower"
+      ]
+    },
+    {
+      "id": "run",
+      "name": "Run",
+      "exercise_ids": [
+        "outrun"
+      ]
+    },
+    {
+      "id": "swim",
+      "name": "Swim",
+      "exercise_ids": [
+        "swim"
       ]
     }
   ]
