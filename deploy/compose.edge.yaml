@@ -10,8 +10,16 @@
 # api's environment list below as NAME: ${NAME} and set its value in Portainer.
 name: gymbros
 
+# Docker keeps at most 30 MB of logs per service, then drops the oldest.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
+    logging: *logging
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
@@ -30,6 +38,7 @@ services:
     mem_limit: 384m
 
   api:
+    logging: *logging
     image: registry.gabrieldiem.com/gymbros-api:${IMAGE_TAG:?set IMAGE_TAG (a commit SHA) in Portainer}
     restart: unless-stopped
     depends_on:
@@ -65,6 +74,7 @@ services:
     mem_limit: 512m
 
   web:
+    logging: *logging
     image: registry.gabrieldiem.com/gymbros-web:${IMAGE_TAG:?set IMAGE_TAG (a commit SHA) in Portainer}
     restart: unless-stopped
     depends_on:
