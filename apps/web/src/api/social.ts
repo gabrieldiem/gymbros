@@ -39,6 +39,8 @@ export type PostedSet = {
 
 export type WorkoutPostVars = {
   name: string;
+  /** The past day this was logged for. Missing on posts from before past workouts existed. */
+  performed_on?: string | null;
   routine_id: string | null;
   duration_min: number;
   sets: number;

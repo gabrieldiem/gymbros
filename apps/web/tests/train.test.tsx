@@ -5,7 +5,16 @@ import { describe, expect, it } from 'vitest';
 import { makeMe, mockApi, renderApp } from './renderApp';
 import { CATALOG, FINISHED, makeWorkout } from './trainFixtures';
 
-const WEEK = { workouts: 1, target: 3, leg_event_active: true };
+const WEEK = {
+  workouts: 1,
+  target: 3,
+  leg_event_active: true,
+  past_days: [
+    { day: '2026-11-01', workouts: 0 },
+    { day: '2026-10-31', workouts: 1 },
+    { day: '2026-10-30', workouts: 0 },
+  ],
+};
 
 function trainApi(routes: Parameters<typeof mockApi>[0] = {}) {
   return mockApi({
@@ -23,6 +32,74 @@ function bodyOf(fetchMock: ReturnType<typeof mockApi>, method: string, url: stri
     .find(([u, init]) => u === url && init?.method === method);
   return call ? (JSON.parse(String(call[1]?.body)) as unknown) : undefined;
 }
+
+describe('Train: logging a past workout', () => {
+  const openPicker = async () => {
+    await userEvent.click(await screen.findByRole('button', { name: /Log a past workout/ }));
+    return within(await screen.findByRole('dialog', { name: 'Which day was it?' }));
+  };
+
+  it('lists the days the server allows and what is already logged', async () => {
+    trainApi();
+    renderApp('/train');
+    const sheet = await openPicker();
+    expect(sheet.getByRole('button', { name: /^Yesterday, Sun,? 1 Nov/ })).toBeVisible();
+    expect(sheet.getByRole('button', { name: /Sat,? 31 Oct/ })).toHaveTextContent(
+      'Already logged: 1',
+    );
+    expect(sheet.getAllByRole('button', { name: /Oct|Nov/ })).toHaveLength(3);
+  });
+
+  it('starts the routine you pick for that day', async () => {
+    const past = makeWorkout({ performed_on: '2026-10-30' });
+    const fetchMock = trainApi({ 'POST /api/workouts': [201, past] });
+    renderApp('/train');
+    const sheet = await openPicker();
+    await userEvent.click(sheet.getByRole('button', { name: /Fri,? 30 Oct/ }));
+    expect(await screen.findByText(/^Logging a workout for Fri,? 30 Oct\.$/)).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: /Push day/ }));
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({
+      routine_id: 'push',
+      performed_on: '2026-10-30',
+    });
+  });
+
+  it('can go back to logging today', async () => {
+    const fetchMock = trainApi({ 'POST /api/workouts': [201, makeWorkout()] });
+    renderApp('/train');
+    const sheet = await openPicker();
+    await userEvent.click(sheet.getByRole('button', { name: /Fri,? 30 Oct/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Log today instead' }));
+    await userEvent.click(screen.getByRole('button', { name: /Push day/ }));
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({ routine_id: 'push' });
+  });
+
+  it('logs without a clock, a rest timer or the overload hint', async () => {
+    trainApi({
+      'GET /api/workouts/active': [200, makeWorkout({ performed_on: '2026-10-30' })],
+      'PUT /api/workouts/w1': () => [200, makeWorkout({ performed_on: '2026-10-30' })],
+    });
+    renderApp('/train');
+    const bench = await screen.findByRole('article', { name: 'Bench press' });
+    expect(screen.getByText(/^For Fri,? 30 Oct$/)).toBeVisible();
+    expect(screen.queryByRole('timer')).toBeNull();
+    expect(within(bench).queryByText('↑ Loaded to beat last time')).toBeNull();
+    await userEvent.click(within(bench).getByRole('button', { name: 'Complete set 1' }));
+    expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
+  });
+
+  it('says which day it was for on the finish screen', async () => {
+    trainApi({
+      'GET /api/workouts/active': [200, makeWorkout({ performed_on: '2026-10-30' })],
+      'POST /api/workouts/w1/finish': [200, { ...FINISHED, performed_on: '2026-10-30' }],
+    });
+    renderApp('/train');
+    await userEvent.click(await screen.findByRole('button', { name: 'Finish workout' }));
+    expect(await screen.findByText(/^Push day logged for Fri,? 30 Oct$/)).toBeVisible();
+  });
+});
 
 describe('Train: start screen', () => {
   it('shows routines, the week pips and how points are earned', async () => {

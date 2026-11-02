@@ -2,6 +2,7 @@ import type { Catalog, Week } from '../../api/train';
 import { FormError } from '../../components/FormError';
 import { Pips } from '../../components/Pips';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import { goalText } from './goalText';
 import styles from './RoutinePicker.module.css';
 
@@ -10,12 +11,17 @@ type Props = {
   week: Week | undefined;
   starting: boolean;
   error: unknown;
+  /** The past day being logged, or null to log today. */
+  pastDay: string | null;
   onStart: (routineId: string | null) => void;
+  onPickPastDay: () => void;
+  onClearPastDay: () => void;
 };
 
 /** The Train start screen: routines, the week's pips and how points are earned. */
-export function RoutinePicker({ catalog, week, starting, error, onStart }: Props) {
-  const { t } = useI18n();
+export function RoutinePicker(props: Props) {
+  const { catalog, week, starting, error, pastDay, onStart, onPickPastDay, onClearPastDay } = props;
+  const { t, lang } = useI18n();
   const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
   const exerciseName = (id: string) => catalog.exercises.find((e) => e.id === id)?.name ?? id;
   const hasLegs = (ids: string[]) =>
@@ -31,6 +37,23 @@ export function RoutinePicker({ catalog, week, starting, error, onStart }: Props
             <Pips done={week.workouts} target={week.target} large />
             <span>{goalText(t, week.workouts, week.target)}</span>
           </p>
+        )}
+        {pastDay ? (
+          <div className={styles.past}>
+            <p>{t('past_notice', { day: formatDay(lang, pastDay) })}</p>
+            <button type="button" onClick={onPickPastDay}>
+              {t('past_change')}
+            </button>
+            <button type="button" onClick={onClearPastDay}>
+              {t('past_today')}
+            </button>
+          </div>
+        ) : (
+          Boolean(week?.past_days.length) && (
+            <button type="button" className={styles.pastOpen} onClick={onPickPastDay}>
+              {t('past_open')}
+            </button>
+          )
         )}
       </div>
       <div className={styles.error}>

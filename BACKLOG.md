@@ -21,6 +21,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-58` **Which emails should GYMBROS send** (product, S): default chosen: only a welcome email on first sign-up, through Resend. Weekly recap, nudges or "someone passed you" by email are possible next steps, but each needs an opt-out first. _Added 2026-11-01_
 - [ ] `GYM-61` **Cardio point balance** (game, S): default chosen: 2 pts per minute plus 8 per run-equivalent km, a swim km counting as 4 and a rowing km as 0.8. An hour pays 255 for a 10 km run or a 2.5 km swim, against 250 for a 12-tonne lifting session. Check it against real workouts after a few weeks. _Added 2026-11-02_
 - [ ] `GYM-62` **Leg day x2 pays only lifters** (game, S): the weekly event doubles leg set points, so runners and swimmers get nothing from it. Default chosen: unchanged until more weekly events exist (GYM-17). _Added 2026-11-02_
+- [ ] `GYM-69` **How past workouts score** (game, S): defaults chosen and written in `docs/PRODUCT.md`: it counts on the day picked with that week's goal, streak and quests; bounty, badges and passed stay this week's; paid bonuses and settled duels aren't redone. The risk is holding a workout back to take a duel or bounty: the feed shows the day it was for (see GYM-4). _Added 2026-11-02_
 
 ## Later
 

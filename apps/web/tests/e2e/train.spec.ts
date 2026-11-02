@@ -70,3 +70,38 @@ test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
   await summary.getByRole('button', { name: 'See ATUS Climb' }).click();
   await expect(page).toHaveURL(/\/climb$/);
 });
+
+test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
+  await logIn(page, 'matex', testInfo);
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await page.getByRole('button', { name: /Log a past workout/ }).click();
+  const days = page.getByRole('dialog', { name: 'Which day was it?' });
+  await page.waitForTimeout(400); // let the sheet settle for the screenshot
+  await page.screenshot({ path: `${SCREENS}/past-days-${testInfo.project.name}.png` });
+  await days.getByRole('button', { name: /^Yesterday/ }).click();
+  await expect(page.getByText(/^Logging a workout for /)).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.waitForTimeout(400); // the sheet's exit copy is gone by now
+  await page.screenshot({ path: `${SCREENS}/past-start-${testInfo.project.name}.png` });
+
+  await page.getByRole('button', { name: /^Run/ }).click();
+  const run = page.getByRole('article', { name: 'Outdoor run' });
+  await run.getByLabel('Outdoor run, set 1, min').fill('30');
+  await run.getByLabel('Outdoor run, set 1, km').fill('5');
+  await run.getByRole('button', { name: 'Complete set 1' }).click();
+  await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
+  await expect(page.getByRole('timer')).toHaveCount(0);
+  await expect(page.getByText(/^For /)).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/past-logger-${testInfo.project.name}.png` });
+
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  const summary = page.getByRole('dialog');
+  await expect(summary.getByText(/logged for/)).toBeVisible();
+  await summary.getByRole('button', { name: 'Done' }).click();
+
+  await page.goto('/crew');
+  const post = page.getByRole('listitem').filter({ hasText: 'Run' }).first();
+  await expect(post.getByText(/^For /)).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/past-feed-${testInfo.project.name}.png` });
+});

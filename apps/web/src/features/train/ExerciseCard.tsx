@@ -12,6 +12,8 @@ type Props = {
   onChange: (sets: SetData[]) => void;
   onRemove: () => void;
   onSetDone: () => void;
+  /** Logging a past day: there's nothing to beat, it already happened. */
+  past?: boolean;
   onPlates: (kg: number) => void;
 };
 
@@ -34,7 +36,8 @@ function fields(exercise: Exercise): [keyof SetData, keyof SetData] {
   return exercise.type === 'c' ? ['minutes', 'km'] : ['load_kg', 'reps'];
 }
 
-export function ExerciseCard({ exercise, entry, onChange, onRemove, onSetDone, onPlates }: Props) {
+export function ExerciseCard(props: Props) {
+  const { exercise, entry, onChange, onRemove, onSetDone, onPlates, past = false } = props;
   const { t, n } = useI18n();
   const [colA, colB] = COLUMNS[exercise.type];
   const [fieldA, fieldB] = fields(exercise);
@@ -75,7 +78,7 @@ export function ExerciseCard({ exercise, entry, onChange, onRemove, onSetDone, o
           </button>
         </span>
       </header>
-      {entry.previous_sets.length > 0 && <p className={styles.beat}>↑ {t('beat')}</p>}
+      {!past && entry.previous_sets.length > 0 && <p className={styles.beat}>↑ {t('beat')}</p>}
       <div className={cx(styles.row, styles.headRow)} aria-hidden="true">
         <span>{t('col_set')}</span>
         <span>{t('col_last')}</span>

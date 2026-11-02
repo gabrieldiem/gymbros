@@ -58,6 +58,8 @@ export type Workout = {
   id: string;
   name: string;
   routine_id: string | null;
+  /** The past day this logs (a calendar day), or null for a workout happening now. */
+  performed_on: string | null;
   started_at: string;
   exercises: WorkoutExercise[];
   live_points: number;
@@ -68,6 +70,7 @@ export type LineItem = { key: string; vars: Record<string, string | number>; poi
 export type FinishResult = {
   workout_id: string;
   name: string;
+  performed_on: string | null;
   started_at: string;
   finished_at: string;
   total: number;
@@ -82,7 +85,15 @@ export type FinishResult = {
   climb: ClimbChange;
 };
 
-export type Week = { workouts: number; target: number; leg_event_active: boolean };
+export type PastDay = { day: string; workouts: number };
+
+export type Week = {
+  workouts: number;
+  target: number;
+  leg_event_active: boolean;
+  /** The days a forgotten workout can be logged for, newest first. */
+  past_days: PastDay[];
+};
 
 export type TrainingNowItem = {
   user_id: string;
@@ -139,7 +150,7 @@ export function useTrainingNow() {
 export function useStartWorkout() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: { routine_id: string | null; name?: string }) =>
+    mutationFn: (body: { routine_id: string | null; name?: string; performed_on?: string }) =>
       apiRequest<Workout>('/workouts', { method: 'POST', body }),
     onSuccess: (workout) => queryClient.setQueryData(activeWorkoutKey, workout),
   });

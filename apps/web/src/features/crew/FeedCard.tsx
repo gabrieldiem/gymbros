@@ -5,6 +5,7 @@ import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
 import styles from './Feed.module.css';
@@ -33,7 +34,11 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
       </div>
       <h3>{v.name}</h3>
       <div className={styles.chips}>
-        <span>{t('min_n', { n: v.duration_min })}</span>
+        <span>
+          {v.performed_on
+            ? t('past_for', { day: formatDay(lang, v.performed_on) })
+            : t('min_n', { n: v.duration_min })}
+        </span>
         <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>
         {v.volume_kg > 0 && <span>{t('kg_n', { n: n(v.volume_kg) })}</span>}
         {v.cardio_minutes > 0 && <span>{t('cardio_min', { n: v.cardio_minutes })}</span>}

@@ -74,6 +74,7 @@ export function makeWorkout(overrides: Partial<Workout> = {}): Workout {
     id: 'w1',
     name: 'Push day',
     routine_id: 'push',
+    performed_on: null,
     started_at: new Date(Date.now() - 5 * 60_000).toISOString(),
     exercises: [
       {
@@ -90,6 +91,7 @@ export function makeWorkout(overrides: Partial<Workout> = {}): Workout {
 export const FINISHED: FinishResult = {
   workout_id: 'w1',
   name: 'Push day',
+  performed_on: null,
   started_at: '2026-11-02T18:00:00Z',
   finished_at: '2026-11-02T18:52:00Z',
   total: 213,

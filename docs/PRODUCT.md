@@ -57,6 +57,17 @@ A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A worko
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
+## Past workouts
+
+Forgot to log one? From Train you can log a workout for any of the last 7 days (`game.past_workout_days`, in the crew's time zone). Today isn't one of them: that's a normal workout.
+
+- **It counts on the day you picked**, at noon crew time, so it can't earn the dawn or night badges. Its points, pips, goal, streak, over-target bonus, weekly quests and crew quest all belong to that day's week, so a forgotten workout doesn't break a streak.
+- **It's compared with what came before that day:** "better than last time" and the last-time column use the session before it. A PR still has to beat your stored best, and it's dated that day.
+- **What's about now stays now:** bounty, badges and "passed" compare where you stand when the points arrive, and they land in this week.
+- **Nothing is redone:** bonuses already paid aren't recalculated (a streak paid this week stays as paid), and a settled duel stays settled.
+- **The crew can see it:** it's posted to the feed when you log it, with the day it was for and no duration. It isn't "training now", the crew isn't told you're coming, and a goal in a week that's over isn't announced.
+- **Logging it:** routines pre-fill what you did last time as it was, without the overload. There's no clock or rest timer.
+
 ## Progressive overload
 
 When a routine starts, every set is pre-filled from the last session:

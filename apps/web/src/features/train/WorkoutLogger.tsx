@@ -7,6 +7,7 @@ import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
+import { formatDay } from '../../i18n/formatDay';
 import { ExerciseCard } from './ExerciseCard';
 import { ExercisePicker } from './ExercisePicker';
 import { formatElapsed } from './format';
@@ -57,7 +58,8 @@ function nthText(t: ReturnType<typeof useI18n>['t'], week: Week | undefined): st
 
 export function WorkoutLogger(props: Props) {
   const { workout, catalog, week, finishing, finishError, discarding, onFinish, onDiscard } = props;
-  const { t, n } = useI18n();
+  const { t, n, lang } = useI18n();
+  const past = workout.performed_on;
   const { draft, update, livePoints, status, flush } = useWorkoutDraft(workout);
   const elapsed = useElapsed(workout.started_at);
   const gain = usePointsGain(livePoints);
@@ -101,8 +103,14 @@ export function WorkoutLogger(props: Props) {
             onChange={(e) => update((d) => ({ ...d, name: e.target.value }))}
           />
           <span className={styles.meta}>
-            <span role="timer">{elapsed}</span>
-            {nthText(t, week)}
+            {past ? (
+              t('past_for', { day: formatDay(lang, past) })
+            ) : (
+              <>
+                <span role="timer">{elapsed}</span>
+                {nthText(t, week)}
+              </>
+            )}
           </span>
         </div>
         <div className={styles.live} aria-live="polite">
@@ -128,7 +136,10 @@ export function WorkoutLogger(props: Props) {
             entry={entry}
             onChange={(sets) => setSets(i, sets)}
             onRemove={() => removeExercise(i)}
-            onSetDone={() => rest.start(restSeconds)}
+            past={past !== null}
+            onSetDone={() => {
+              if (!past) rest.start(restSeconds);
+            }}
             onPlates={setPlatesKg}
           />
         );
