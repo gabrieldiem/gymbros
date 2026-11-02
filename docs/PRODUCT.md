@@ -160,6 +160,10 @@ A crew's invite link (`/invite/<code>`) shows the crew's name and size before si
 
 An invite code can have a maximum number of uses and an expiry. A code that's used up or expired stops working and says why. People who already joined stay.
 
+## Privacy policy
+
+`/privacy` follows Google's OAuth verification requirements (support.google.com/cloud/answer/13806988): what Google data is accessed, how it's used, who it's shared with, how it's protected, retention and deletion, and a Limited Use statement. It's plain HTML, linked from the home page and from settings. Everything it says has to be true of the code: when data handling changes, change the policy and tell members in the app before the change applies.
+
 ## Your account
 
 The avatar opens a menu with your profile, settings, inviting friends and log out. In settings you can change your name, color, language and rest time, and delete your account and everything in it by typing your email.

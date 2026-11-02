@@ -204,33 +204,39 @@ export const es = {
   legal_updated: 'Última actualización: 2 de noviembre de 2026',
   legal_back: 'Volver a GYMBROS',
   privacy_intro:
-    'GYMBROS es un registro de entrenos para pequeños equipos de amigos, gestionado por Gabriel Diem. Esta página explica qué guarda y por qué.',
-  privacy_collect_h: 'Qué recogemos',
-  privacy_collect:
-    'De Google, al entrar: tu nombre, tu email y el ID de tu cuenta de Google. Nunca vemos tu contraseña de Google. De ti: tus entrenos, sets, pesos, comentarios, reacciones, duelos y ajustes. De la propia app: tus puntos, rangos, PR, insignias y notificaciones.',
-  privacy_google_h: 'Datos de usuario de Google',
+    'GYMBROS (gymbros.gabrieldiem.com) es un registro de entrenos para pequeños equipos de amigos, gestionado por Gabriel Diem. Esta política explica a qué datos accede, cómo los usa, guarda, comparte y protege, y cómo puedes borrarlos.',
+  privacy_google_h: 'Datos de usuario de Google a los que accedemos',
   privacy_google:
-    'Cuando entras con Google, GYMBROS accede a tu nombre, tu email y el ID de tu cuenta de Google, y a nada más de tu cuenta de Google. Los usamos solo para identificarte, crear tu cuenta, mostrar tu nombre a tu equipo y enviarte el email de bienvenida. Los guardamos en nuestra base de datos hasta que nos pidas borrar tu cuenta. Amazon Web Services aloja esa base de datos, y Resend recibe tu nombre y tu email para entregar ese email. No los compartimos con nadie más, aparte de mostrar tu nombre a tu equipo. No vendemos los datos de usuario de Google, ni los usamos para publicidad o para entrenar modelos de IA.',
-  privacy_use_h: 'Para qué lo usamos',
+    'Cuando entras con Google, GYMBROS solo pide tu perfil básico y tu email (los permisos openid, email y profile). De ahí guardamos tu nombre, tu email y el ID de tu cuenta de Google. No guardamos tu foto de perfil, nunca vemos tu contraseña de Google y no tenemos acceso a tu Gmail, Drive, Contactos, Calendario ni a nada más de tu cuenta de Google.',
+  privacy_collect_h: 'Otros datos que guardamos',
+  privacy_collect:
+    'Lo que añades: tus entrenos, sets, pesos, tiempos, distancias, comentarios, reacciones, duelos y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
+  privacy_use_h: 'Cómo usamos tus datos',
   privacy_use:
-    'Solo para que GYMBROS funcione: para que entres, puntuar tus entrenos, mostrar la clasificación de tu equipo, enviarte notificaciones dentro de la app y un email de bienvenida. No hay anuncios ni herramientas de analítica, y no vendemos tus datos.',
-  privacy_who_h: 'Quién puede verlo',
+    'Solo para ofrecer y mejorar las funciones de GYMBROS. El ID de tu cuenta de Google y tu email te identifican en la misma cuenta cada vez. Tu nombre se muestra a tu equipo en la clasificación, el muro y las notificaciones. Tu email también se usa para enviarte el email de bienvenida. Tus entrenos se usan para puntuarlos, clasificar a tu equipo, mostrar tu progreso y publicarlos en el muro de tu equipo. No hay anuncios ni herramientas de analítica.',
+  privacy_who_h: 'Con quién los compartimos',
   privacy_who:
-    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, insignias, comentarios y reacciones. Tu email no se le muestra; solo pueden verlo los administradores de GYMBROS. Tres proveedores tratan datos para nosotros: Google (inicio de sesión), Resend (envío de emails) y Amazon Web Services (alojamiento, en Brasil). Solo compartimos algo más si la ley lo exige.',
+    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluido tu email. Tres proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), Resend (recibe tu nombre y tu email para entregar los emails) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
+  privacy_protect_h: 'Cómo protegemos tus datos',
+  privacy_protect:
+    'Todo el tráfico de GYMBROS va cifrado con HTTPS. La base de datos no es accesible desde internet: solo puede conectarse el propio servidor de la app. La cookie que mantiene tu sesión no puede leerse desde scripts y solo se envía por HTTPS, y el servidor guarda solo un hash con clave, no su valor. GYMBROS no te pide contraseña. Solo los administradores indicados en la configuración del servidor pueden abrir el área de administración, y cada cambio que hacen queda en un registro.',
+  privacy_keep_h: 'Cuánto tiempo los guardamos y cómo borrarlos',
+  privacy_keep:
+    'Guardamos tu cuenta y tus entrenos hasta que los borres. Para borrarlo todo, abre Ajustes y elige Borrar cuenta: tu cuenta, entrenos, puntos, publicaciones, comentarios y reacciones se eliminan de nuestra base de datos en el momento, incluidos tus datos de Google. También puedes pedirnos que lo hagamos escribiendo a {email}. Lo que puede quedar: tu nombre en notificaciones de otros miembros y en sus registros de recompensas o duelos que te mencionen, los registros del servidor hasta que se borren, los registros de entrega de Resend según su política, y una entrada en el registro de administración que solo contiene un ID interno. Las sesiones caducan a los 30 días. Las notificaciones antiguas se eliminan a los 60 días, la próxima vez que su dueño las abra.',
+  privacy_limited_h: 'Uso limitado',
+  privacy_limited:
+    'El uso y la transferencia por parte de GYMBROS de la información recibida de las API de Google se ajustan a la Política de datos de usuario de los servicios de API de Google (https://developers.google.com/terms/api-services-user-data-policy), incluidos los requisitos de uso limitado. Usamos los datos de usuario de Google solo para ofrecer y mejorar las funciones descritas aquí. No los usamos ni transferimos para publicidad, no los vendemos, no los usamos para evaluar la solvencia y no los usamos para desarrollar, mejorar o entrenar modelos de IA o de aprendizaje automático.',
   privacy_cookies_h: 'Cookies y almacenamiento del navegador',
   privacy_cookies:
-    'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma y algunas preferencias de la app. Nada se usa para rastrearte.',
-  privacy_keep_h: 'Cuánto tiempo lo guardamos',
-  privacy_keep:
-    'Tu cuenta y tus entrenos se guardan hasta que nos pidas borrarlos. Las notificaciones pueden eliminarse cuando cumplen 60 días, y las sesiones caducadas se eliminan con el tiempo.',
+    'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma, un código de invitación mientras lo usas y algunas preferencias de la app. Nada se usa para rastrearte.',
   privacy_rights_h: 'Qué puedes hacer',
   privacy_rights:
-    'Puedes cambiar tu nombre, color, idioma y tiempo de descanso en los ajustes de la app. Ahí también puedes borrar tu cuenta con todo su contenido. Para obtener una copia de tus datos o corregirlos, escribe a {email}.',
+    'Puedes cambiar tu nombre, color, idioma y tiempo de descanso en los ajustes de la app. Para obtener una copia de tus datos o corregirlos, escribe a {email}.',
   privacy_kids_h: 'Menores',
   privacy_kids: 'GYMBROS no está pensado para menores de 13 años.',
   privacy_changes_h: 'Cambios y contacto',
   privacy_changes:
-    'Si esta política cambia, actualizaremos la fecha de arriba. ¿Dudas? Escribe a {email}.',
+    'Si cambiamos cómo usamos tus datos, te avisaremos en la app antes de que el cambio se aplique y actualizaremos la fecha de arriba. ¿Dudas? Escribe a {email}.',
   terms_intro:
     'Estos términos se aplican cuando usas GYMBROS, un registro de entrenos gratuito para pequeños equipos de amigos, gestionado por Gabriel Diem.',
   terms_service_h: 'El servicio',
@@ -244,7 +250,7 @@ export const es = {
     'GYMBROS no es consejo médico ni profesional, y los puntos nunca son motivo para seguir con dolor. Entrenas bajo tu propia responsabilidad. Consulta a un médico si tienes dudas y para si algo te duele.',
   terms_fair_h: 'Juego limpio',
   terms_fair:
-    'Registra lo que hiciste de verdad y trata bien a tu equipo. Las cuentas que hagan trampas, acosen a otros o abusen del servicio pueden eliminarse. Los puntos, rangos e insignias no tienen valor económico.',
+    'Registra lo que hiciste de verdad y trata bien a tu equipo. Las cuentas que hagan trampas, acosen a otros o abusen del servicio pueden eliminarse. Los puntos, rangos y logros no tienen valor económico.',
   terms_content_h: 'Tu contenido',
   terms_content:
     'Lo que registras y escribes sigue siendo tuyo. Permites que GYMBROS lo guarde y lo muestre a tu equipo para que la app funcione.',

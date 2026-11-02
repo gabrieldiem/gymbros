@@ -198,33 +198,39 @@ export const en = {
   legal_updated: 'Last updated: 2 November 2026',
   legal_back: 'Back to GYMBROS',
   privacy_intro:
-    'GYMBROS is a gym tracker for small crews of friends, run by Gabriel Diem. This page explains what it stores and why.',
-  privacy_collect_h: 'What we collect',
-  privacy_collect:
-    'From Google, when you sign in: your name, email address and Google account ID. We never see your Google password. From you: your workouts, sets, weights, comments, reactions, duels and settings. From the app itself: your points, ranks, PRs, badges and notifications.',
-  privacy_google_h: 'Google user data',
+    'GYMBROS (gymbros.gabrieldiem.com) is a gym tracker for small crews of friends, run by Gabriel Diem. This policy explains what data it accesses, how it uses, stores, shares and protects that data, and how you can delete it.',
+  privacy_google_h: 'Google user data we access',
   privacy_google:
-    'When you sign in with Google, GYMBROS accesses your name, email address and Google account ID, and nothing else from your Google account. We use them only to identify you, create your account, show your name to your crew and send your welcome email. We store them in our database until you ask us to delete your account. Amazon Web Services hosts that database, and Resend receives your name and email address to deliver that email. We don’t share them with anyone else, apart from showing your name to your crew. We don’t sell Google user data, use it for advertising or use it to train AI models.',
-  privacy_use_h: 'How we use it',
+    'When you sign in with Google, GYMBROS asks only for your basic profile and email (the openid, email and profile permissions). From that we keep your name, your email address and your Google account ID. We don’t keep your profile picture, we never see your Google password, and we have no access to your Gmail, Drive, Contacts, Calendar or anything else in your Google account.',
+  privacy_collect_h: 'Other data we store',
+  privacy_collect:
+    'What you add: your workouts, sets, weights, times, distances, comments, reactions, duels and settings. What the app works out from that: your points, ranks, PRs, achievements and notifications. If an admin invites you by email, your address is used to send that one email and isn’t stored until you sign in. Like most websites, our servers also keep technical logs of requests, including your IP address and browser type, to keep the service running and fix problems.',
+  privacy_use_h: 'How we use your data',
   privacy_use:
-    'Only to run GYMBROS: to sign you in, score your workouts, show your crew’s standings, send in-app notifications and send you a welcome email. There are no ads and no analytics tools, and we don’t sell your data.',
-  privacy_who_h: 'Who can see it',
+    'Only to provide and improve the features of GYMBROS. Your Google account ID and email sign you in to the same account each time. Your name is shown to your crew on the leaderboard, feed and notifications. Your email is also used to send your welcome email. Your workouts are used to score them, rank your crew, show your progress and post to your crew’s feed. There are no ads and no analytics tools.',
+  privacy_who_h: 'Who we share it with',
   privacy_who:
-    'Your crew sees your name, workouts, points, ranks, PRs, badges, comments and reactions. Your email address isn’t shown to them; only the admins who run GYMBROS can see it. Three providers handle data for us: Google (sign-in), Resend (sending email) and Amazon Web Services (hosting, in Brazil). We only share anything else if the law requires it.',
+    'Your crew sees your name, workouts, points, ranks, PRs, achievements, comments and reactions, but not your email address. The admins who run GYMBROS can see account details, including your email address. Three providers handle data for us, only to run the service: Google (sign-in), Resend (receives your name and email address to deliver email) and Amazon Web Services (hosts the servers and database, in Brazil). We don’t sell your data or transfer it to anyone else, unless the law requires it.',
+  privacy_protect_h: 'How we protect your data',
+  privacy_protect:
+    'All traffic to GYMBROS is encrypted with HTTPS. The database isn’t reachable from the internet: only the app’s own server can connect to it. The cookie that keeps you signed in can’t be read by scripts and is only sent over HTTPS, and the server stores only a keyed hash of it, not the value itself. GYMBROS doesn’t ask you for a password. Only the admins listed in the server’s settings can open the admin area, and every change they make there is recorded in a log.',
+  privacy_keep_h: 'How long we keep it, and how to delete it',
+  privacy_keep:
+    'We keep your account and workouts until you delete them. To delete everything, open Settings and choose Delete account: your account, workouts, points, posts, comments and reactions are removed from our database straight away, including your Google data. You can also ask us to do it by writing to {email}. What can remain: your name inside other members’ notifications and their bounty or duel records that mention you, server logs until they’re cleared, Resend’s own delivery records under its policy, and an entry in the admin log that holds only an internal ID. Sessions expire after 30 days. Old notifications are removed after 60 days, the next time their owner opens them.',
+  privacy_limited_h: 'Limited Use',
+  privacy_limited:
+    'GYMBROS’s use and transfer of information received from Google APIs adheres to the Google API Services User Data Policy (https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements. We use Google user data only to provide and improve the user-facing features described here. We don’t use it or transfer it for advertising, we don’t sell it, we don’t use it to determine credit-worthiness, and we don’t use it to develop, improve or train AI or machine learning models.',
   privacy_cookies_h: 'Cookies and browser storage',
   privacy_cookies:
-    'We use one cookie to keep you signed in for up to 30 days and a second one for up to 10 minutes while you sign in. Your browser also stores your language and a few app preferences. Nothing is used for tracking.',
-  privacy_keep_h: 'How long we keep it',
-  privacy_keep:
-    'Your account and workouts stay until you ask us to delete them. Notifications can be removed once they are 60 days old, and expired sessions are removed over time.',
+    'We use one cookie to keep you signed in for up to 30 days and a second one for up to 10 minutes while you sign in. Your browser also stores your language, an invite code while you use it, and a few app preferences. Nothing is used for tracking.',
   privacy_rights_h: 'Your choices',
   privacy_rights:
-    'You can change your name, color, language and rest time in the app’s settings. You can also delete your account and everything in it there. To get a copy of your data or correct it, write to {email}.',
+    'You can change your name, color, language and rest time in the app’s settings. To get a copy of your data or correct it, write to {email}.',
   privacy_kids_h: 'Children',
   privacy_kids: 'GYMBROS isn’t meant for anyone under 13.',
   privacy_changes_h: 'Changes and contact',
   privacy_changes:
-    'If this policy changes, we’ll update the date above. Questions? Write to {email}.',
+    'If we change how we use your data, we’ll tell you in the app before the change applies and update the date above. Questions? Write to {email}.',
   terms_intro:
     'These terms apply when you use GYMBROS, a free gym tracker for small crews of friends, run by Gabriel Diem.',
   terms_service_h: 'The service',
@@ -238,7 +244,7 @@ export const en = {
     'GYMBROS isn’t medical or professional advice, and points are never a reason to push through pain. You train at your own risk. Check with a doctor if you’re unsure, and stop if something hurts.',
   terms_fair_h: 'Fair play',
   terms_fair:
-    'Log what you actually did and be decent to your crew. Accounts that cheat, harass others or abuse the service can be removed. Points, ranks and badges have no monetary value.',
+    'Log what you actually did and be decent to your crew. Accounts that cheat, harass others or abuse the service can be removed. Points, ranks and achievements have no monetary value.',
   terms_content_h: 'Your content',
   terms_content:
     'What you log and write stays yours. You let GYMBROS store it and show it to your crew so the app can work.',
