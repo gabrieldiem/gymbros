@@ -61,6 +61,7 @@ export const en = {
   admin_title: 'Backoffice',
   admin_sub: 'Every crew and account. Each change is recorded in the log.',
   admin_back: 'Back to the app',
+  admin_join_crew: 'Join a crew',
   admin_view_overview: 'Overview',
   admin_view_log: 'Log',
   admin_users: 'Accounts',

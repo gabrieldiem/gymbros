@@ -64,6 +64,7 @@ export const es = {
   admin_title: 'Backoffice',
   admin_sub: 'Todos los equipos y cuentas. Cada cambio queda en el registro.',
   admin_back: 'Volver a la app',
+  admin_join_crew: 'Unirme a un equipo',
   admin_view_overview: 'Resumen',
   admin_view_log: 'Registro',
   admin_users: 'Cuentas',

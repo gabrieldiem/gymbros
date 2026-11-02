@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from 'react';
 
+import { Link } from 'react-router';
+
 import { useJoinCrew, useLogout } from '../../api/auth';
+import { useMe } from '../../api/me';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { TextField } from '../../components/TextField';
@@ -12,6 +15,7 @@ export function JoinPage() {
   const { t } = useI18n();
   const join = useJoinCrew();
   const logout = useLogout();
+  const isAdmin = useMe().data?.is_admin;
   // Filled in when an invite link brought them here.
   const [code, setCode] = useState(pendingInvite);
 
@@ -42,6 +46,7 @@ export function JoinPage() {
         </Button>
       </form>
       <p className={styles.switch}>
+        {isAdmin && <Link to="/admin">{t('admin_title')}</Link>}{' '}
         <Button variant="quiet" onClick={() => logout.mutate()}>
           {t('log_out')}
         </Button>

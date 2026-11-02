@@ -9,6 +9,8 @@ import {
   type AdminCrew,
   type AdminMember,
 } from '../../api/admin';
+import { useLogout } from '../../api/auth';
+import { useMe } from '../../api/me';
 import { Avatar } from '../../components/Avatar';
 import { Brand } from '../../components/Brand';
 import { Button } from '../../components/Button';
@@ -188,6 +190,8 @@ function Log() {
 export function AdminPage() {
   const { t } = useI18n();
   useProfileLanguage();
+  const me = useMe().data;
+  const logout = useLogout();
   const [view, setView] = useState<View>('overview');
   return (
     <div className={styles.page}>
@@ -195,9 +199,20 @@ export function AdminPage() {
         <Brand />
         <div className={styles.topActions}>
           <LanguageToggle />
-          <Link to="/" className={styles.back}>
-            {t('admin_back')}
-          </Link>
+          {me?.crew ? (
+            <Link to="/" className={styles.back}>
+              {t('admin_back')}
+            </Link>
+          ) : (
+            <>
+              <Link to="/join" className={styles.back}>
+                {t('admin_join_crew')}
+              </Link>
+              <Button variant="quiet" onClick={() => logout.mutate()} disabled={logout.isPending}>
+                {t('log_out')}
+              </Button>
+            </>
+          )}
         </div>
       </header>
       <main>
