@@ -74,7 +74,7 @@ describe('Your gyms in settings', () => {
     return within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
   };
 
-  it('adds a gym and makes another the default', async () => {
+  it('makes another the default and removes one', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
       'GET /api/me/gyms': [
@@ -84,24 +84,38 @@ describe('Your gyms in settings', () => {
           { id: 'g2', name: 'Home', is_default: false },
         ],
       ],
-      'POST /api/me/gyms': [201, { id: 'g3', name: 'Club', is_default: false }],
       'PATCH /api/me/gyms/g2': [200, { id: 'g2', name: 'Home', is_default: true }],
       'DELETE /api/me/gyms/g1': [204, null],
     });
     renderApp('/climb');
     const sheet = await openSettings();
     await userEvent.click(await sheet.findByRole('radio', { name: 'Make Home your default' }));
-    await userEvent.type(sheet.getByLabelText('Add a gym'), 'Club');
-    await userEvent.click(sheet.getByRole('button', { name: 'Add' }));
     await userEvent.click(sheet.getByRole('button', { name: 'Remove Smart Fit' }));
     await waitFor(() => {
-      const latest = fetchMock.mock.calls.map(
+      const calls = fetchMock.mock.calls.map(
         ([url, init]) => `${init?.method ?? 'GET'} ${String(url)}`,
       );
-      expect(latest).toContain('PATCH /api/me/gyms/g2');
-      expect(latest).toContain('POST /api/me/gyms');
-      expect(latest).toContain('DELETE /api/me/gyms/g1');
+      expect(calls).toContain('PATCH /api/me/gyms/g2');
+      expect(calls).toContain('DELETE /api/me/gyms/g1');
     });
+  });
+
+  it('opens a gym on the map from its row', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/me/gyms': [
+        200,
+        [{ id: 'g1', name: 'Smart Fit', is_default: true, location: { lat: -34.5, lon: -58.4 } }],
+      ],
+    });
+    renderApp('/climb');
+    const sheet = await openSettings();
+    const link = await sheet.findByRole('link', { name: 'Open Smart Fit in Google Maps' });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://www.google.com/maps/search/?api=1&query=-34.5,-58.4',
+    );
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });
 

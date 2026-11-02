@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { useTrainingNow } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
+import { GymLink } from '../../components/GymLink';
 import { useI18n } from '../../i18n/context';
 import styles from './TrainingNow.module.css';
 
@@ -40,8 +41,8 @@ export function TrainingNow({ myId }: { myId: string | undefined }) {
               <span>
                 {item.user_id === myId ? t('you') : item.display_name}
                 <small>
-                  {item.workout_name}, {item.gym ? `${item.gym}, ` : ''}
-                  {t('min_n', { n: minutes })}
+                  {item.workout_name}, {t('min_n', { n: minutes })}
+                  {item.gym && <GymLink label={item.gym} lat={item.gym_lat} lon={item.gym_lon} />}
                 </small>
               </span>
             </li>

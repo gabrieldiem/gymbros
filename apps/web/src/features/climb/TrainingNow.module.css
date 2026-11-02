@@ -60,3 +60,11 @@
     animation: none;
   }
 }
+
+.chip small a,
+.chip small > span {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: inherit;
+}

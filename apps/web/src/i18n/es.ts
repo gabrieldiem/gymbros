@@ -210,13 +210,13 @@ export const es = {
     'Cuando entras con Google, GYMBROS solo pide tu perfil básico y tu email (los permisos openid, email y profile). De ahí guardamos tu nombre, tu email y el ID de tu cuenta de Google. No guardamos tu foto de perfil de Google, nunca vemos tu contraseña de Google y no tenemos acceso a tu Gmail, Drive, Contactos, Calendario ni a nada más de tu cuenta de Google.',
   privacy_collect_h: 'Otros datos que guardamos',
   privacy_collect:
-    'Lo que añades, si decides hacerlo: tus entrenos, sets, pesos, tiempos, distancias, los nombres de tus gimnasios, una foto de un entreno, una foto de perfil, comentarios, reacciones, duelos, los comentarios que nos envías y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
+    'Lo que añades, si decides hacerlo: tus entrenos, sets, pesos, tiempos, distancias, los nombres de tus gimnasios y dónde están si los pones en el mapa, una foto de un entreno, una foto de perfil, comentarios, reacciones, duelos, los comentarios que nos envías y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
   privacy_use_h: 'Cómo usamos tus datos',
   privacy_use:
     'Solo para ofrecer y mejorar las funciones de GYMBROS. El ID de tu cuenta de Google y tu email te identifican en la misma cuenta cada vez. Tu nombre se muestra a tu equipo en la clasificación, el muro y las notificaciones. Tu email también se usa para enviarte el email de bienvenida y, salvo que los desactives en ajustes o con el enlace de cada uno, un resumen semanal de tu semana y mensajes de quienes llevan GYMBROS. Tus entrenos se usan para puntuarlos, clasificar a tu equipo, mostrar tu progreso y publicarlos en el muro de tu equipo. Los comentarios que envías se leen para mejorar la app. No hay anuncios ni herramientas de analítica.',
   privacy_who_h: 'Con quién los compartimos',
   privacy_who:
-    'Tu equipo ve tu nombre, foto, entrenos, gimnasios, fotos de entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluidos tu email, tu foto de perfil y los comentarios que envías. Tres proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), Resend (recibe tu nombre, tu email y el contenido de cada email, que puede incluir los nombres y números semanales de tu equipo, para entregarlo) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
+    'Tu equipo ve tu nombre, foto, entrenos, gimnasios y dónde están en el mapa, fotos de entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluidos tu email, tu foto de perfil y los comentarios que envías. Cuatro proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), OpenStreetMap (recibe lo que buscas al ubicar un gimnasio, a través de nuestro servidor, así que no quién buscó, y tu navegador carga sus imágenes de mapa directamente, lo que le muestra tu dirección IP), Resend (recibe tu nombre, tu email y el contenido de cada email, que puede incluir los nombres y números semanales de tu equipo, para entregarlo) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). Si abres un gimnasio en Google Maps, a esa visita se le aplica la política de Google. No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
   privacy_protect_h: 'Cómo protegemos tus datos',
   privacy_protect:
     'Todo el tráfico de GYMBROS va cifrado con HTTPS. La base de datos no es accesible desde internet: solo puede conectarse el propio servidor de la app. La cookie que mantiene tu sesión no puede leerse desde scripts y solo se envía por HTTPS, y el servidor guarda solo un hash con clave, no su valor. GYMBROS no te pide contraseña. Las fotos que subes se reducen primero en tu dispositivo, lo que elimina sus metadatos, como dónde se tomaron, y solo pueden abrirlas los miembros de tu equipo con sesión iniciada. Solo los administradores indicados en la configuración del servidor pueden abrir el área de administración, y cada cambio que hacen queda en un registro.',
@@ -336,6 +336,27 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  gym_edit_title: 'Cambiar gimnasio',
+  gym_edit: 'Cambiar {name}',
+  gym_search: 'Busca un lugar o pega un enlace de Google Maps',
+  gym_search_cta: 'Buscar',
+  gym_map: 'Mapa',
+  gym_map_hint:
+    'O toca el mapa para poner el pin donde está tu gimnasio. Es opcional, y tu equipo puede verlo.',
+  gym_locate: 'Usar mi ubicación',
+  gym_locate_failed: 'Tu ubicación no está disponible. Busca o toca el mapa.',
+  gym_open_map: 'Abrir en Google Maps',
+  gym_open_named: 'Abrir {name} en Google Maps',
+  gym_remove_pin: 'Quitar del mapa',
+  gym_save: 'Guardar gimnasio',
+  gym_no_results:
+    'No se encontró nada. Prueba una dirección, pega un enlace de Google Maps o toca el mapa.',
+  err_places_unavailable:
+    'La búsqueda no está disponible ahora. Pega un enlace de Google Maps o toca el mapa.',
+  err_map_link_not_understood: 'Ese enlace no dice dónde está el lugar. Búscalo o toca el mapa.',
+  wn_gym_map_title: 'Pon tu gimnasio en el mapa',
+  wn_gym_map_body:
+    'Busca tu gimnasio, pega un enlace de Google Maps o toca el mapa. Tu equipo puede abrirlo en Google Maps desde tus publicaciones.',
   email_updates_title: 'Emails',
   email_updates_hint: 'El resumen semanal y los mensajes de quienes llevan GYMBROS.',
   unsubscribe_title: '¿No recibir más estos emails?',
@@ -427,9 +448,10 @@ export const es = {
   err_image_too_large: 'Esa foto es demasiado grande. Prueba con otra más pequeña.',
   err_image_not_supported: 'Ese archivo no sirve. Elige una foto JPEG, PNG o WebP.',
   gyms_title: 'Tus gimnasios',
-  gyms_hint: 'Tu equipo ve en cuál estás. El predeterminado se elige solo.',
-  gym_name: 'Añadir un gimnasio',
-  gym_add: 'Añadir',
+  gyms_hint:
+    'Tu equipo ve en cuál estás y puede abrirlo en un mapa. El predeterminado se elige solo.',
+  gym_name: 'Nombre',
+  gym_add: 'Añadir un gimnasio',
   gym_default: 'Predeterminado',
   gym_default_of: 'Hacer de {name} tu predeterminado',
   gym_remove: 'Quitar {name}',

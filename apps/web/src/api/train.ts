@@ -128,6 +128,8 @@ export type TrainingNowItem = {
   color: CrewColor;
   workout_name: string;
   gym: string | null;
+  gym_lat?: number | null;
+  gym_lon?: number | null;
   routine_id: string | null;
   started_at: string;
   current_exercise_id: string | null;

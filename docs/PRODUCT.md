@@ -72,7 +72,9 @@ Gyms are often in basements, so logging never depends on the connection.
 
 ## Gyms
 
-Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. It's only a name, not a location. A workout keeps the name it was logged with, so renaming or deleting a gym doesn't change your history.
+Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. A workout keeps the name and place it was logged with, so changing or deleting a gym doesn't change your history.
+
+A gym can be put on a map, which is optional: search for it, paste a Google Maps or OpenStreetMap link, use your location, or tap the map. Small gyms often aren't in the free search, so the last three matter. Friends get a link that opens the place in Google Maps. None of this uses a paid API: the map and search are OpenStreetMap's, credited on the map, and the Google link is a plain link with no key.
 
 ## Workout photos
 

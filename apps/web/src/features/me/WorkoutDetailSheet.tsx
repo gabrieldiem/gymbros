@@ -1,6 +1,6 @@
-import { MapPin } from 'lucide-react';
 import { useWorkoutDetail } from '../../api/compete';
 import { useCatalog } from '../../api/train';
+import { GymLink } from '../../components/GymLink';
 import { QueryState } from '../../components/QueryState';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
@@ -31,10 +31,11 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
             </p>
             <div className={styles.chips}>
               {workout.gym && (
-                <span>
-                  <MapPin size={13} aria-hidden="true" />
-                  {t('at_gym', { gym: workout.gym })}
-                </span>
+                <GymLink
+                  label={t('at_gym', { gym: workout.gym })}
+                  lat={workout.gym_lat}
+                  lon={workout.gym_lon}
+                />
               )}
               {workout.duration_min > 0 && <span>{t('min_n', { n: workout.duration_min })}</span>}
               <span>{workout.sets === 1 ? t('sets_1') : t('sets_n', { n: workout.sets })}</span>

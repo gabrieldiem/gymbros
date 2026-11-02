@@ -1,10 +1,11 @@
-import { ListChecks, MapPin, MessageCircle } from 'lucide-react';
+import { ListChecks, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { useReact, type FeedItem, type ReactionKind, type WorkoutPostVars } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
+import { GymLink } from '../../components/GymLink';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { timeAgo } from '../../i18n/timeAgo';
@@ -48,12 +49,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         />
       )}
       <div className={styles.chips}>
-        {v.gym && (
-          <span>
-            <MapPin size={13} aria-hidden="true" />
-            {t('at_gym', { gym: v.gym })}
-          </span>
-        )}
+        {v.gym && <GymLink label={t('at_gym', { gym: v.gym })} lat={v.gym_lat} lon={v.gym_lon} />}
         <span>
           {v.performed_on
             ? t('past_for', { day: formatDay(lang, v.performed_on) })

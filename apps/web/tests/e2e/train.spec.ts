@@ -193,3 +193,43 @@ test('a whole workout with no signal sends itself when the signal is back', asyn
   await expect(page.getByText(/^Cardio sent: \+\d+ points\.$/)).toBeVisible({ timeout: 40000 });
   await expect(page.getByText(/^1 workout is waiting/)).toHaveCount(0);
 });
+
+test('put a gym on a real map and friends get a link to it', async ({ page }, testInfo) => {
+  // The map library runs for real. Only the outside services are stood in for.
+  const tiles: string[] = [];
+  await page.route('**/tile.openstreetmap.org/**', (route) => {
+    tiles.push(route.request().url());
+    return route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.alloc(0) });
+  });
+  await page.route('**/api/places?*', (route) =>
+    route.fulfill({
+      json: [{ name: 'Tolón', address: 'Santa Fe 3200, Buenos Aires', lat: -34.589, lon: -58.41 }],
+    }),
+  );
+  await logIn(page, 'santi', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/me');
+  await page.getByRole('button', { name: 'Profile and settings' }).click();
+  await page.getByRole('button', { name: 'Add a gym' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Add a gym' });
+  await expect(sheet.locator('.leaflet-container')).toBeVisible();
+  await expect(sheet.locator('.leaflet-marker-icon')).toHaveCount(0);
+
+  await sheet.getByRole('group', { name: 'Map' }).click({ position: { x: 150, y: 150 } });
+  await expect(sheet.locator('.leaflet-marker-icon')).toHaveCount(1);
+  // From the world view a tap closes in a little. It doesn't jump to a street it can't be sure of.
+  await expect.poll(() => tiles.some((url) => /\.org\/6\//.test(url))).toBe(true);
+  expect(tiles.some((url) => /\.org\/16\//.test(url))).toBe(false);
+
+  await sheet.getByLabel(/^Search for a place/).fill('Santa Fe 3200');
+  await sheet.getByRole('button', { name: 'Search' }).click();
+  await expect(sheet.getByLabel('Name')).toHaveValue('Tolón');
+  await expect(sheet.getByRole('link', { name: 'Open in Google Maps' })).toHaveAttribute(
+    'href',
+    /query=-34\.589,-58\.41$/,
+  );
+  await sheet.getByRole('button', { name: 'Save gym' }).click();
+  await expect(page.getByRole('link', { name: 'Open Tolón in Google Maps' })).toBeVisible();
+  await expect(page.locator('#root')).toHaveAttribute('inert', '');
+  await page.screenshot({ path: `${SCREENS}/gym-saved-${testInfo.project.name}.png` });
+});

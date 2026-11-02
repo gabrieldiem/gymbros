@@ -52,6 +52,12 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: /Profile and settings|Perfil y ajustes/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await audit(page, 'settings sheet');
+  await page.getByRole('button', { name: /^(Add a gym|Añadir un gimnasio)$/ }).click();
+  await expect(page.locator('.leaflet-container')).toBeVisible();
+  await page.locator('.leaflet-container').click({ position: { x: 150, y: 150 } });
+  await expect(page.locator('.leaflet-marker-icon')).toBeVisible();
+  await audit(page, 'gym picker');
+  await page.keyboard.press('Escape');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
   await expect(page.getByRole('menu')).toBeVisible();

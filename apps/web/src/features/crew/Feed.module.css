@@ -207,7 +207,9 @@ button[aria-pressed='true'] > .emoji {
   border-radius: var(--r-control);
 }
 
-.chips span {
+.chips > span > span,
+.chips > a,
+.chips > span {
   display: inline-flex;
   align-items: center;
   gap: 4px;

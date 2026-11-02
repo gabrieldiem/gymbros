@@ -469,13 +469,6 @@
   color: var(--smoke);
 }
 
-.gyms button {
-  width: var(--touch);
-  height: var(--touch);
-  color: var(--smoke);
-  font-size: 1.2rem;
-}
-
 .editProfile {
   flex: 1 1 auto;
 }
@@ -615,4 +608,26 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.gymAction {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: var(--touch);
+  color: var(--smoke);
+}
+
+.gymAction:hover {
+  color: var(--chalk);
+}
+
+.gymAddress {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.gymAdd {
+  margin-top: 10px;
 }
