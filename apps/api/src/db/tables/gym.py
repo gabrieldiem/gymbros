@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, Uuid, func, text
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, String, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base
@@ -27,4 +27,8 @@ class Gym(Base):  # pylint: disable=too-few-public-methods
     user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"))
     name: Mapped[str] = mapped_column(String(40))
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Where it is, if placed on the map. All three come from the member.
+    lat: Mapped[float | None] = mapped_column(Float)
+    lon: Mapped[float | None] = mapped_column(Float)
+    address: Mapped[str | None] = mapped_column(String(200))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -91,7 +91,7 @@ class WorkoutFinisher:
                 raise UnknownExercise(entry.exercise_id)
         workout = existing or await self._new_row(member, logged, started_at)
         workout.name = logged.name
-        workout.gym_name = logged.gym
+        await self._workouts.set_gym(member, workout, logged.gym)
         workout.routine_id = logged.routine_id
         workout.performed_on = logged.performed_on
         workout.started_at = started_at

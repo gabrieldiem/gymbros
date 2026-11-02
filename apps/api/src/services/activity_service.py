@@ -41,6 +41,8 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
     return {
         "name": workout.name,
         "gym": workout.gym_name,
+        "gym_lat": workout.gym_lat,
+        "gym_lon": workout.gym_lon,
         "performed_on": workout.performed_on.isoformat() if workout.performed_on else None,
         "routine_id": workout.routine_id,
         "duration_min": duration,

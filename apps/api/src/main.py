@@ -23,6 +23,7 @@ from routes import (
     gyms,
     me,
     notifications,
+    places,
     rules,
     whats_new,
     workouts,
@@ -60,6 +61,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
+app.include_router(places.router, prefix="/api")
 app.include_router(email.router, prefix="/api")
 app.include_router(feedback.router, prefix="/api")
 app.include_router(avatars.router, prefix="/api")

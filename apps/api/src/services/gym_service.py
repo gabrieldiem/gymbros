@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime
 
 from db.repositories.gym_repository import GymRepository
@@ -9,6 +10,21 @@ from db.tables.gym import Gym
 from services.errors import GymNameTaken, GymNotFound, TooManyGyms
 
 MAX_GYMS = 10
+
+
+@dataclass(frozen=True, slots=True)
+class GymLocation:
+    """Where a gym is."""
+
+    lat: float
+    lon: float
+    address: str | None = None
+
+
+def _place(gym: Gym, location: GymLocation | None) -> None:
+    gym.lat = location.lat if location else None
+    gym.lon = location.lon if location else None
+    gym.address = location.address if location else None
 
 
 class GymService:
@@ -26,20 +42,27 @@ class GymService:
         """Where a workout starts unless the member says otherwise."""
         return await self._gyms.default_name(user_id)
 
-    async def add(self, user_id: uuid.UUID, name: str) -> Gym:
-        """Add a gym. The first one becomes the default."""
+    async def add(self, user_id: uuid.UUID, name: str, location: GymLocation | None = None) -> Gym:
+        """Add a gym, on the map if it says where. The first one becomes the default."""
         existing = await self._gyms.for_user(user_id)
         if len(existing) >= MAX_GYMS:
             raise TooManyGyms(str(user_id))
         await self._check_name(user_id, name, None)
-        return await self._gyms.add(
-            Gym(user_id=user_id, name=name, is_default=not existing, created_at=self._now())
-        )
+        gym = Gym(user_id=user_id, name=name, is_default=not existing, created_at=self._now())
+        _place(gym, location)
+        return await self._gyms.add(gym)
 
     async def update(
-        self, user_id: uuid.UUID, gym_id: uuid.UUID, name: str | None, make_default: bool
+        self,
+        user_id: uuid.UUID,
+        gym_id: uuid.UUID,
+        name: str | None,
+        make_default: bool,
+        change_location: bool = False,
+        location: GymLocation | None = None,
     ) -> Gym:
-        """Rename a gym, make it the default, or both."""
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
+        """Rename a gym, make it the default, move it on the map, or any of these."""
         gym = await self._own(user_id, gym_id)
         if name is not None:
             await self._check_name(user_id, name, gym.id)
@@ -47,6 +70,8 @@ class GymService:
         if make_default and not gym.is_default:
             await self._gyms.clear_default(user_id)
             gym.is_default = True
+        if change_location:
+            _place(gym, location)
         return await self._gyms.save(gym)
 
     async def delete(self, user_id: uuid.UUID, gym_id: uuid.UUID) -> None:

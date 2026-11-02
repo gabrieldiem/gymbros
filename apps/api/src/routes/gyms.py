@@ -4,18 +4,23 @@ import uuid
 
 from fastapi import APIRouter, Depends, status
 
-from db.tables.gym import Gym
 from db.tables.user import User
 from dependencies import get_current_user, get_gym_service
 from models.errors import error_responses
-from models.gyms import AddGymRequest, GymModel, UpdateGymRequest
-from services.gym_service import GymService
+from models.gyms import (
+    AddGymRequest,
+    GymLocationModel,
+    GymModel,
+    UpdateGymRequest,
+    to_gym_model,
+)
+from services.gym_service import GymLocation, GymService
 
 router = APIRouter(prefix="/me/gyms", tags=["Me"])
 
 
-def _model(gym: Gym) -> GymModel:
-    return GymModel(id=gym.id, name=gym.name, is_default=gym.is_default)
+def _location(model: GymLocationModel | None) -> GymLocation | None:
+    return GymLocation(model.lat, model.lon, model.address) if model else None
 
 
 @router.get("", response_model=list[GymModel], responses=error_responses(401))
@@ -24,7 +29,7 @@ async def list_gyms(
     gyms: GymService = Depends(get_gym_service),
 ) -> list[GymModel]:
     """Your gyms, oldest first."""
-    return [_model(gym) for gym in await gyms.list(user.id)]
+    return [to_gym_model(gym) for gym in await gyms.list(user.id)]
 
 
 @router.post(
@@ -39,7 +44,7 @@ async def add_gym(
     gyms: GymService = Depends(get_gym_service),
 ) -> GymModel:
     """Add a gym. The first one becomes the default."""
-    return _model(await gyms.add(user.id, body.name))
+    return to_gym_model(await gyms.add(user.id, body.name, _location(body.location)))
 
 
 @router.patch("/{gym_id}", response_model=GymModel, responses=error_responses(401, 404, 409, 422))
@@ -50,7 +55,11 @@ async def update_gym(
     gyms: GymService = Depends(get_gym_service),
 ) -> GymModel:
     """Rename a gym or make it the default."""
-    return _model(await gyms.update(user.id, gym_id, body.name, body.is_default))
+    change_location = "location" in body.model_fields_set
+    gym = await gyms.update(
+        user.id, gym_id, body.name, body.is_default, change_location, _location(body.location)
+    )
+    return to_gym_model(gym)
 
 
 @router.delete(

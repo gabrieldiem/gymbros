@@ -180,6 +180,8 @@ class WorkoutDetailResponse(BaseModel):
     id: uuid.UUID
     name: str
     gym: str | None
+    gym_lat: float | None = None
+    gym_lon: float | None = None
     photo_url: str | None
     performed_on: date | None
     finished_at: datetime

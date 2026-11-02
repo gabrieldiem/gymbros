@@ -147,6 +147,8 @@ def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
         id=workout.id,
         name=workout.name,
         gym=workout.gym_name,
+        gym_lat=workout.gym_lat,
+        gym_lon=workout.gym_lon,
         photo_url=photo_url(workout.id, workout.photo_version),
         performed_on=workout.performed_on,
         finished_at=workout.finished_at,

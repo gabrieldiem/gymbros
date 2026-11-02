@@ -25,6 +25,12 @@ class GymRepository:
         """The gym, if any."""
         return await self._session.get(Gym, gym_id)
 
+    async def by_name(self, user_id: uuid.UUID, name: str) -> Gym | None:
+        """The user's gym with this name, whatever the case."""
+        return await self._session.scalar(
+            select(Gym).where(Gym.user_id == user_id, func.lower(Gym.name) == name.lower())
+        )
+
     async def default_name(self, user_id: uuid.UUID) -> str | None:
         """The name of the user's default gym, if any."""
         return await self._session.scalar(
