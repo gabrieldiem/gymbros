@@ -164,9 +164,10 @@ export function useCatalog() {
   });
 }
 
-export function useActiveWorkout() {
+export function useActiveWorkout(enabled = true) {
   return useQuery({
     queryKey: activeWorkoutKey,
+    enabled,
     // One started with no signal stays here, whatever the server says, until it's finished.
     queryFn: ({ signal }) =>
       loadLocalWorkout() ?? apiRequest<Workout | null>('/workouts/active', { signal }),
