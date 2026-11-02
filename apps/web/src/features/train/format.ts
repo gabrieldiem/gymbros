@@ -39,6 +39,7 @@ export function formatLift(
 /** Last time's set in the logger's "Last time" column. */
 export function formatPrevious(exercise: Exercise, set: SetData | undefined, n: N): string {
   if (!set) return '–';
+  if (exercise.type === 's') return `${set.minutes ?? 0} min`;
   if (exercise.barbell && (set.load_kg ?? 0) > 0) {
     return `${n(disksOf(set.load_kg ?? 0, set.bar_kg ?? DEFAULT_BAR_KG))} × ${set.reps ?? 0}`;
   }
@@ -71,6 +72,7 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
     }
     case 'ln_distance':
       return t('ln_distance', { km: n(Number(vars.km)) });
+    case 'ln_stretch':
     case 'ln_show':
     case 'ln_vol':
     case 'ln_cardio':

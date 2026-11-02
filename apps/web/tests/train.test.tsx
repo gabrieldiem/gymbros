@@ -126,6 +126,56 @@ describe('Train: entering sets', () => {
   });
 });
 
+describe('Train: stretching', () => {
+  const stretching = makeWorkout({
+    name: 'Stretching',
+    routine_id: 'stretch',
+    exercises: [
+      {
+        exercise_id: 'stretch',
+        sets: [{ load_kg: null, reps: null, minutes: 5, km: null, done: false }],
+        previous_sets: [],
+      },
+    ],
+  });
+
+  it('asks only how long and whether you did it, without a rest timer', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, stretching],
+      'PUT /api/workouts/w1': () => [200, stretching],
+    });
+    renderApp('/train');
+    const card = within(await screen.findByRole('article', { name: 'Stretching' }));
+    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText(/Doesn’t count towards your weekly goal/)).toBeVisible();
+    await userEvent.click(card.getByRole('button', { name: '10 min' }));
+    await userEvent.click(card.getByRole('button', { name: 'Complete set 1' }));
+    expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
+    await waitFor(() =>
+      expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+        exercises: [{ exercise_id: 'stretch', sets: [{ minutes: 10, done: true }] }],
+      }),
+    );
+  });
+
+  it('starts at five minutes when added to a workout', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, makeWorkout()],
+      'PUT /api/workouts/w1': () => [200, makeWorkout()],
+    });
+    renderApp('/train');
+    await userEvent.click(await screen.findByRole('button', { name: /Add exercise/ }));
+    await userEvent.click(await screen.findByRole('button', { name: /Stretching/ }));
+    const card = within(await screen.findByRole('article', { name: 'Stretching' }));
+    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'true');
+    await waitFor(() =>
+      expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+        exercises: [{}, { exercise_id: 'stretch', sets: [{ minutes: 5, done: false }] }],
+      }),
+    );
+  });
+});
+
 describe('Train: your PR in the logger', () => {
   it('shows your current PR next to the exercise', async () => {
     trainApi({

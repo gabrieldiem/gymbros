@@ -8,7 +8,7 @@ import { searchExercises } from './exerciseSearch';
 
 type Props = { exercises: Exercise[]; onPick: (id: string) => void; onClose: () => void };
 
-const GROUPS: MuscleGroup[] = ['Chest', 'Legs', 'Back', 'Shoulders', 'Arms', 'Cardio'];
+const GROUPS: MuscleGroup[] = ['Chest', 'Legs', 'Back', 'Shoulders', 'Arms', 'Cardio', 'Mobility'];
 
 /** Search the catalog by English name or Spanish alias ("sentadilla" finds Back squat). */
 export function ExercisePicker({ exercises, onPick, onClose }: Props) {

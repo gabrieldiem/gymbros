@@ -190,6 +190,7 @@
 }
 
 .title {
+  flex: 1 1 55%;
   min-width: 0;
 }
 
@@ -239,4 +240,37 @@
 
 .meta .bar {
   margin-left: auto;
+}
+
+.stretch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.choices {
+  display: flex;
+  gap: 6px;
+}
+
+.choices button {
+  min-width: 72px;
+  height: 46px;
+  color: var(--smoke);
+  font-weight: 600;
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}
+
+.choices button[aria-pressed='true'] {
+  color: var(--chalk);
+  border-color: var(--chalk);
+}
+
+.stretch .check {
+  width: 46px;
+  flex: none;
 }

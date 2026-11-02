@@ -322,6 +322,15 @@ export const en = {
   col_set: 'Set',
   col_last: 'Last time',
   col_repeat: 'Repeat',
+  stretch_minutes: 'How long',
+  stretch_for: '{n} min',
+  stretch_pays: 'Pays the same however long it is, once a day.',
+  stretch_only: 'Doesn’t count towards your weekly goal',
+  ln_stretch: 'Stretching',
+  e_stretch: 'Stretching, once a day',
+  group_Mobility: 'Mobility',
+  err_stretching_already_logged:
+    'You already got that day’s stretching points. Add a set or discard this.',
   workout_detail_failed: 'Couldn’t load this workout.',
   detail_exercises: 'What you did',
   detail_points: 'What it paid',
@@ -521,6 +530,9 @@ export const en = {
   n_whats_new: 'New in GYMBROS: {title}.',
   n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
   n_whats_new_other: 'There’s something new in GYMBROS.',
+  wn_stretching_title: 'Stretching pays now',
+  wn_stretching_body:
+    'Add 5 or 10 minutes to a workout, or log it alone on a rest day, for fixed points once a day. Alone, it doesn’t count towards your weekly goal.',
   wn_workout_details_title: 'See the details of any workout',
   wn_workout_details_body:
     'On your page, tap a workout to see its exercises, sets and what each thing paid.',

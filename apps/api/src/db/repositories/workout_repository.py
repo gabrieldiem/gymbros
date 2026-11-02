@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import distinct_on
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.membership import Membership
+from db.tables.point_event import PointEvent
 from db.tables.user import User
 from db.tables.workout import Workout
 from db.tables.workout_set import WorkoutSet
@@ -114,6 +115,21 @@ class WorkoutRepository:
         )
         return {week: count for week, count in result.all() if week is not None}
 
+    async def stretched_between(self, user_id: uuid.UUID, start: datetime, end: datetime) -> bool:
+        """Whether a workout that counts as finished in this window paid for stretching."""
+        found = await self._session.scalar(
+            select(func.count())
+            .select_from(PointEvent)
+            .join(Workout, Workout.id == PointEvent.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at >= start,
+                Workout.finished_at < end,
+                PointEvent.key == "ln_stretch",
+            )
+        )
+        return bool(found)
+
     async def finished_since(self, user_id: uuid.UUID, since: datetime) -> list[datetime]:
         """When the user's workouts from `since` on count as finished."""
         result = await self._session.execute(
@@ -190,7 +206,7 @@ class WorkoutRepository:
         """When each member of the crew last finished a workout."""
         result = await self._session.execute(
             select(Workout.user_id, func.max(Workout.finished_at))
-            .where(Workout.crew_id == crew_id, Workout.finished_at.is_not(None))
+            .where(Workout.crew_id == crew_id, Workout.week_start.is_not(None))
             .group_by(Workout.user_id)
         )
         return {user_id: last for user_id, last in result.all() if last is not None}

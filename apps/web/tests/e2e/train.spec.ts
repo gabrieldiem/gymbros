@@ -105,3 +105,24 @@ test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
   await expect(post.getByText(/^For /)).toBeVisible();
   await page.screenshot({ path: `${SCREENS}/past-feed-${testInfo.project.name}.png` });
 });
+
+test('stretching alone pays fixed points and leaves the week alone', async ({ page }, testInfo) => {
+  await logIn(page, 'maxo', testInfo);
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  const pips = page.getByRole('img', { name: /workouts this week/ });
+  await expect(pips).toBeVisible();
+  const before = await pips.getAttribute('aria-label');
+  await page.getByRole('button', { name: /^Stretching/ }).click();
+  const card = page.getByRole('article', { name: 'Stretching' });
+  await card.getByRole('button', { name: '10 min' }).click();
+  await card.getByRole('button', { name: 'Complete set 1' }).click();
+  await expect(page.getByTestId('live-points')).toHaveText('25', { timeout: 5000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: `${SCREENS}/stretch-${testInfo.project.name}.png` });
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  const summary = page.getByRole('dialog');
+  await expect(summary.getByText('Stretching', { exact: true }).last()).toBeVisible();
+  await summary.getByRole('button', { name: 'Done' }).click();
+  await expect(pips).toHaveAttribute('aria-label', before ?? '');
+});

@@ -1,6 +1,7 @@
 """Builds the scoring inputs that come from the database: history and the member's week."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.workout_repository import WorkoutRepository
@@ -29,8 +30,8 @@ class ScoringContextBuilder:
         self._weekly_target = weekly_target
         self._weekly_event = weekly_event
 
-    async def history(self, member: Member, workout: Workout) -> History:
-        """Stored PRs and the previous session of the same routine."""
+    async def history(self, member: Member, workout: Workout, moment: datetime) -> History:
+        """Stored PRs, the previous session of the same routine, and that day's stretching."""
         volume, effort = None, 0.0
         if workout.routine_id:
             before = None
@@ -43,6 +44,15 @@ class ScoringContextBuilder:
             personal_records=await self._records.best_e1rm_by_exercise(member.user.id),
             previous_routine_volume_kg=volume,
             previous_routine_effort_km=effort,
+            stretched_that_day=await self._stretched_on(member, moment),
+        )
+
+    async def _stretched_on(self, member: Member, moment: datetime) -> bool:
+        zone = ZoneInfo(member.crew.time_zone)
+        day = moment.astimezone(zone).date()
+        start = datetime.combine(day, time(0, 0), zone)
+        return await self._workouts.stretched_between(
+            member.user.id, start, start + timedelta(days=1)
         )
 
     async def week(self, member: Member, moment: datetime) -> WeekState:

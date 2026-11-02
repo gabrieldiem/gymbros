@@ -25,6 +25,7 @@ const COLUMNS: Record<Exercise['type'], [MessageKey, MessageKey]> = {
   w: ['col_kg', 'col_reps'],
   bw: ['col_added_kg', 'col_reps'],
   c: ['col_min', 'col_km'],
+  s: ['col_min', 'col_km'], // Never shown: stretching has its own card.
 };
 
 const EMPTY_SET: SetData = { load_kg: null, reps: null, minutes: null, km: null, done: false };

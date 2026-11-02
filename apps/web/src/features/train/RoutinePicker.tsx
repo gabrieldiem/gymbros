@@ -101,6 +101,7 @@ function EarnList({ catalog, legEvent }: { catalog: Catalog; legEvent: boolean }
     [t('e_over', { n: p.weekly_target }), `+${n(p.over_target)}`],
     [t('e_streak'), t('up_to', { per: p.goal_streak_per_week, max: p.goal_streak_max })],
     [t('e_better'), `+${n(p.better_than_last_time)}`],
+    [t('e_stretch'), `+${n(p.stretching)}`],
     [t('e_pr'), n(p.pr)],
     [t('e_vol', { kg: p.volume_kg_per_point }), '1'],
     [t('e_cardio'), n(p.cardio_minute)],

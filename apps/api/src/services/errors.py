@@ -29,6 +29,10 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class StretchingAlreadyLogged(DomainError):
+    """Stretching pays once a day, and this session has nothing else in it."""
+
+
 class WorkoutDateOutOfRange(DomainError):
     """A past workout has to be for one of the last few days, not today or further back."""
 

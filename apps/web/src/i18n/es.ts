@@ -329,6 +329,15 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  stretch_minutes: 'Cuánto tiempo',
+  stretch_for: '{n} min',
+  stretch_pays: 'Paga lo mismo sin importar el tiempo, una vez al día.',
+  stretch_only: 'No cuenta para tu meta semanal',
+  ln_stretch: 'Estiramiento',
+  e_stretch: 'Estiramiento, una vez al día',
+  group_Mobility: 'Movilidad',
+  err_stretching_already_logged:
+    'Ya recibiste los puntos de estiramiento de ese día. Añade un set o descarta esto.',
   workout_detail_failed: 'No se pudo cargar este entreno.',
   detail_exercises: 'Lo que hiciste',
   detail_points: 'Lo que pagó',
@@ -528,6 +537,9 @@ export const es = {
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_stretching_title: 'Estirar ahora paga',
+  wn_stretching_body:
+    'Añade 5 o 10 minutos a un entreno, o regístralo solo en un día de descanso, por puntos fijos una vez al día. Solo, no cuenta para tu meta semanal.',
   wn_workout_details_title: 'Mira el detalle de cualquier entreno',
   wn_workout_details_body:
     'En tu página, toca un entreno para ver sus ejercicios, sets y lo que pagó cada cosa.',

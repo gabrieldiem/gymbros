@@ -13,6 +13,7 @@ import { ExercisePicker } from './ExercisePicker';
 import { formatElapsed } from './format';
 import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
+import { StretchCard } from './StretchCard';
 import { useRestTimer } from './useRestTimer';
 import { useWorkoutDraft } from './useWorkoutDraft';
 import styles from './WorkoutLogger.module.css';
@@ -69,6 +70,9 @@ export function WorkoutLogger(props: Props) {
   const [plates, setPlates] = useState<{ disks: number; bar: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const exerciseById = (id: string) => catalog.exercises.find((e) => e.id === id);
+  const stretchOnly =
+    draft.exercises.length > 0 &&
+    draft.exercises.every((e) => exerciseById(e.exercise_id)?.type === 's');
 
   const setSets = (index: number, sets: SetData[]) =>
     update((d) => ({
@@ -78,9 +82,16 @@ export function WorkoutLogger(props: Props) {
   const removeExercise = (index: number) =>
     update((d) => ({ ...d, exercises: d.exercises.filter((_, i) => i !== index) }));
   const addExercise = (id: string) => {
-    const cardio = exerciseById(id)?.type === 'c';
-    const empty: SetData = { load_kg: null, reps: null, minutes: null, km: null, done: false };
-    const sets = Array.from({ length: cardio ? 1 : 3 }, () => ({ ...empty }));
+    const exercise = exerciseById(id);
+    const single = exercise?.type === 'c' || exercise?.type === 's';
+    const empty: SetData = {
+      load_kg: null,
+      reps: null,
+      minutes: exercise?.default_minutes ?? null,
+      km: null,
+      done: false,
+    };
+    const sets = Array.from({ length: single ? 1 : 3 }, () => ({ ...empty }));
     update((d) => ({
       ...d,
       exercises: [...d.exercises, { exercise_id: id, sets, previous_sets: [] }],
@@ -108,7 +119,7 @@ export function WorkoutLogger(props: Props) {
             ) : (
               <>
                 <span role="timer">{elapsed}</span>
-                {nthText(t, week)}
+                {stretchOnly ? `, ${t('stretch_only')}` : nthText(t, week)}
               </>
             )}
           </span>
@@ -129,6 +140,18 @@ export function WorkoutLogger(props: Props) {
       {draft.exercises.map((entry, i) => {
         const exercise = exerciseById(entry.exercise_id);
         if (!exercise) return null;
+        const firstSet = entry.sets[0];
+        if (exercise.type === 's' && firstSet) {
+          return (
+            <StretchCard
+              key={`${entry.exercise_id}-${i}`}
+              exercise={exercise}
+              set={firstSet}
+              onChange={(set) => setSets(i, [set])}
+              onRemove={() => removeExercise(i)}
+            />
+          );
+        }
         return (
           <ExerciseCard
             key={`${entry.exercise_id}-${i}`}

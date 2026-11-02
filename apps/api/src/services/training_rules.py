@@ -31,7 +31,7 @@ def is_completed(exercise: Exercise, logged: LoggedSet) -> bool:
     """Checked off and not empty (reps for lifts, minutes for cardio)."""
     if not logged.done:
         return False
-    if exercise.is_cardio:
+    if exercise.is_cardio or exercise.is_stretch:
         return (logged.minutes or 0) > 0
     return (logged.reps or 0) > 0
 
@@ -66,7 +66,12 @@ def endurance_score(exercise: Exercise, logged: LoggedSet) -> float | None:
 
 
 def overload(exercise: Exercise, last: LoggedSet) -> LoggedSet:
-    """The pre-filled set for next time: +2.5 kg on barbell lifts, else +1 rep; cardio +1 min."""
+    """The pre-filled set for next time: +2.5 kg on barbell lifts, else +1 rep; cardio +1 min.
+
+    Stretching pays the same however long it is, so there's nothing to beat.
+    """
+    if exercise.is_stretch:
+        return LoggedSet(minutes=last.minutes)
     if exercise.is_cardio:
         return LoggedSet(minutes=(last.minutes or 0) + 1, km=last.km)
     if exercise.barbell and last.load_kg is not None:

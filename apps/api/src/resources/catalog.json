@@ -254,6 +254,22 @@
         "piscina"
       ],
       "km_factor": 4.0
+    },
+    {
+      "id": "stretch",
+      "name": "Stretching",
+      "group": "Mobility",
+      "type": "s",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "estiramiento",
+        "estirar",
+        "elongación",
+        "elongar",
+        "movilidad"
+      ],
+      "default_minutes": 5
     }
   ],
   "routines": [
@@ -307,6 +323,13 @@
       "name": "Swim",
       "exercise_ids": [
         "swim"
+      ]
+    },
+    {
+      "id": "stretch",
+      "name": "Stretching",
+      "exercise_ids": [
+        "stretch"
       ]
     }
   ]

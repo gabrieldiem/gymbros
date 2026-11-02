@@ -4,8 +4,8 @@ import { apiRequest } from './client';
 import type { ClimbChange } from './climb';
 import type { CrewColor } from './types';
 
-export type ExerciseType = 'w' | 'bw' | 'c';
-export type MuscleGroup = 'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Cardio';
+export type ExerciseType = 'w' | 'bw' | 'c' | 's';
+export type MuscleGroup = 'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Cardio' | 'Mobility';
 
 export type Exercise = {
   id: string;
@@ -17,6 +17,8 @@ export type Exercise = {
   aliases_es: string[];
   /** Cardio only: run km one km of this is worth. */
   km_factor?: number;
+  /** Stretching only: the minutes it starts with. */
+  default_minutes?: number | null;
 };
 
 export type Routine = { id: string; name: string; exercise_ids: string[] };
@@ -34,6 +36,7 @@ export type PointsTable = {
   goal_streak_max: number;
   over_target: number;
   better_than_last_time: number;
+  stretching: number;
   weekly_target: number;
 };
 

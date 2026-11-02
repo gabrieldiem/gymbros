@@ -21,6 +21,7 @@
     "goal_streak_max": 100,
     "over_target": 50,
     "better_than_last_time": 25,
+    "stretching": 25,
     "crew_quest": 200,
     "crew_quest_goal": 4000,
     "bounty": 150,

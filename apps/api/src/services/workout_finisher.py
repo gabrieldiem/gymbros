@@ -13,12 +13,12 @@ from services.activity_service import ActivityService
 from services.bonus_service import BonusService
 from services.catalog import Catalog
 from services.climb_service import ClimbService
-from services.errors import WorkoutEmpty
+from services.errors import DomainError, StretchingAlreadyLogged, WorkoutEmpty
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_service import score_workout
-from services.scoring_types import LineItem, ScoreResult, ScoringRules
-from services.training_rules import performed_at, week_start
+from services.scoring_types import LineItem, ScoreResult, ScoringRules, WorkoutLog
+from services.training_rules import is_completed, performed_at, week_start
 from services.workout_mapping import to_workout_log
 from services.workout_service import WorkoutService
 from services.workout_types import FinishedWorkout
@@ -61,10 +61,11 @@ class WorkoutFinisher:
         workout = await self._workouts.get_in_progress(member, workout_id)
         moment = performed_at(workout.performed_on, member.crew.time_zone, self._now())
         week = await self._context.week(member, moment)
-        history = await self._context.history(member, workout)
-        score = score_workout(to_workout_log(workout, self._catalog), history, week, self._rules)
-        if score.completed_sets == 0:
-            raise WorkoutEmpty(str(workout_id))
+        history = await self._context.history(member, workout, moment)
+        log = to_workout_log(workout, self._catalog)
+        score = score_workout(log, history, week, self._rules)
+        if not score.line_items:
+            raise self._nothing_to_pay(log, workout_id)
         before = await self._climb.totals(member)
         await self._close(member, workout, score, moment)
         bonus: list[LineItem] = []
@@ -74,7 +75,7 @@ class WorkoutFinisher:
         finished = FinishedWorkout(
             workout,
             score,
-            workouts_this_week=week.workouts_before + 1,
+            workouts_this_week=week.workouts_before + (1 if score.completed_sets else 0),
             climb=await self._climb.change(member, before, after),
             bonus_items=tuple(bonus),
         )
@@ -83,6 +84,16 @@ class WorkoutFinisher:
         if self._activity is not None:
             await self._activity.workout_finished(member, finished)
         return finished
+
+    @staticmethod
+    def _nothing_to_pay(log: WorkoutLog, workout_id: uuid.UUID) -> DomainError:
+        stretched = any(
+            is_completed(e.exercise, s)
+            for e in log.exercises
+            if e.exercise.is_stretch
+            for s in e.sets
+        )
+        return (StretchingAlreadyLogged if stretched else WorkoutEmpty)(str(workout_id))
 
     async def _close(
         self, member: Member, workout: Workout, score: ScoreResult, moment: datetime
@@ -93,7 +104,9 @@ class WorkoutFinisher:
         if workout.performed_on:
             workout.started_at = moment  # How long it took isn't known.
         workout.finished_at = moment
-        workout.week_start = this_week
+        # Stretching alone pays its points but isn't a workout: nothing that counts workouts,
+        # like the weekly goal and streak, sees it.
+        workout.week_start = this_week if score.completed_sets else None
         workout.points = score.total
         workout.volume_kg = score.volume_kg
         workout.effort_km = score.effort_km

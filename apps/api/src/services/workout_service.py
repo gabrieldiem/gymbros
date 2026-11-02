@@ -34,6 +34,7 @@ from services.workout_mapping import to_entries, to_logged_set, to_rows, to_work
 from services.workout_types import ExerciseEntry, ExerciseView, PastDay, WorkoutView
 
 DEFAULT_SETS = 3
+STRETCH_ROUTINE = "stretch"
 
 
 class WorkoutService:
@@ -85,7 +86,7 @@ class WorkoutService:
             sets=to_rows(entries),
         )
         view = await self.view(member, await self._workouts.add(workout))
-        if self._activity is not None and performed_on is None:
+        if self._activity is not None and performed_on is None and routine_id != STRETCH_ROUTINE:
             await self._activity.workout_started(member)
         return view
 
@@ -163,8 +164,8 @@ class WorkoutService:
 
     async def _live(self, member: Member, workout: Workout):
         log = to_workout_log(workout, self._catalog)
-        history = await self._context.history(member, workout)
         moment = performed_at(workout.performed_on, member.crew.time_zone, self._now())
+        history = await self._context.history(member, workout, moment)
         week = await self._context.week(member, moment)
         return score_workout(log, history, week, self._rules)
 
@@ -191,6 +192,8 @@ class WorkoutService:
     @staticmethod
     def _next_sets(exercise: Exercise, last_rows: list, past: bool) -> tuple[LoggedSet, ...]:
         done = [to_logged_set(r) for r in last_rows if r.done]
+        if exercise.is_stretch and not done:
+            return (LoggedSet(minutes=exercise.default_minutes),)
         if done and past:
             return tuple(replace(s, done=False) for s in done)
         if done:

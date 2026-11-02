@@ -68,6 +68,7 @@ class Settings:
     scoring_goal_streak_max: int = 100
     scoring_over_target: int = 50
     scoring_better_than_last_time: int = 25
+    scoring_stretching: int = 25
     scoring_crew_quest: int = 200
     scoring_crew_quest_goal: int = 4000
     scoring_bounty: int = 150

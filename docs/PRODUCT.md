@@ -42,6 +42,7 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Goal streak | 20 × streak weeks, max 100 | Paid together with the weekly goal |
 | Over target | 50 | Each workout after the 3rd in a week |
 | Better than last time | 25 | Volume beats the previous session of the same routine |
+| Stretching | 25 | Fixed, however long (5 or 10 minutes), once per crew-local day. Doesn't count as a set |
 | Weekly quest complete | quest bonus (100 to 200) | Once per quest per week |
 | Crew quest complete | 200 to everyone | Crew total for the week reaches the goal (4,000) |
 | Bounty | 150 | Pass the current leader (all-time) while a bounty is active |
@@ -56,6 +57,12 @@ The finish screen lists every line item (an i18n key plus variables) and the tot
 A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A workout needs at least one completed set to be finished; otherwise discard it. While logging, the app shows the points the workout would pay if finished now (computed by the API).
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
+
+## Stretching
+
+Add it to any workout, or log it alone from its own routine. It asks only how long (5 or 10 minutes, 5 by default) and pays fixed points, once per crew-local day, so it can't be farmed.
+
+Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or badges, and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
 
 ## Entering sets
 
@@ -155,11 +162,11 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 
 ## Exercise catalog (v1)
 
-Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
+Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
 
-Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim.
+Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim, Stretching.
 
-Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), and Empty workout.
+Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), Stretching, and Empty workout.
 
 ## i18n
 
