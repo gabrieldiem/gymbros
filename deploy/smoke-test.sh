@@ -48,6 +48,10 @@ echo "🚀 Starting the stack on ${IMAGE_TAG}"
 echo "🩺 Checking it through the web container"
 check "health, database and migrations" '"database":"up"' "$BASE/api/health"
 check "home page" 'id="root"' "$BASE/"
+# Caddy adds a Via header, and nginx doesn't compress requests with one unless told to.
+script=$(curl -s --max-time 10 "$BASE/" | grep -oE '/assets/[^"]+\.js' | head -1)
+check "script is compressed behind Caddy" 'Content-Encoding: gzip' -D - -o /dev/null \
+  -H 'Accept-Encoding: gzip' -H 'Via: 1.1 Caddy' "$BASE$script"
 check "privacy policy without JavaScript" 'Google user data' "$BASE/privacy"
 check "terms without JavaScript" 'Train safely' "$BASE/terms"
 check "public rules list what the game pays" '"swim_km_factor":4' "$BASE/api/rules"
