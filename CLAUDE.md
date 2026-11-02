@@ -101,7 +101,7 @@ gymbros/
 
 ## Architecture
 
-- **web** (nginx, port 80, published on 8081 by `make prod`) serves the built React app and reverse-proxies `/api/*` to **api**, keeping the `/api` prefix. The browser only ever talks to one origin, so there's no CORS in production. In dev, Vite on 5173 proxies `/api` the same way. nginx caches `/assets/*` (hashed) for a year and serves `index.html` with `no-cache`; unknown paths fall back to `index.html`.
+- **web** (nginx, port 80, published on 8081 by `make prod`) serves the built React app and reverse-proxies `/api/*` to **api**, keeping the `/api` prefix. The browser only ever talks to one origin, so there's no CORS in production. In dev, Vite on 5173 proxies `/api` the same way. nginx gzips its responses, including behind Caddy (`gzip_proxied any`), caches `/assets/*` (hashed) for a year and serves `index.html` with `no-cache`; unknown paths fall back to `index.html`.
 - **api** (FastAPI on uvicorn, port 8080) owns all rules. Scoring, PR detection, goal weeks, ranks, quests, badges and bounties are computed server-side. The client never sends points. `/` and `/health` (database ping, 503 when down) are served at the root for the container healthcheck and again under `/api` for the browser.
 - **postgres** 18 is the only data store, through async SQLAlchemy (asyncpg). Weeks run Monday 00:00 to Sunday 23:59 in the crew's time zone.
 - **Migrations** are Alembic (`apps/api/migrations`). The dev api runs them in its lifespan (`RUN_MIGRATIONS_ON_STARTUP=true`); the prod image runs `alembic upgrade head` once before starting the uvicorn workers.
