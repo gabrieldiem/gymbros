@@ -152,7 +152,7 @@ export const en = {
   legal_notice: 'By signing in you accept:',
   legal_terms: 'Terms of service',
   legal_privacy: 'Privacy policy',
-  legal_updated: 'Last updated: 1 November 2026',
+  legal_updated: 'Last updated: 2 November 2026',
   legal_back: 'Back to GYMBROS',
   privacy_intro:
     'GYMBROS is a gym tracker for small crews of friends, run by Gabriel Diem. This page explains what it stores and why.',
@@ -167,7 +167,7 @@ export const en = {
     'Only to run GYMBROS: to sign you in, score your workouts, show your crew’s standings, send in-app notifications and send you a welcome email. There are no ads and no analytics tools, and we don’t sell your data.',
   privacy_who_h: 'Who can see it',
   privacy_who:
-    'Your crew sees your name, workouts, points, ranks, PRs, badges, comments and reactions. Your email address isn’t shown to them. Three providers handle data for us: Google (sign-in), Resend (sending email) and Amazon Web Services (hosting, in Brazil). We only share anything else if the law requires it.',
+    'Your crew sees your name, workouts, points, ranks, PRs, badges, comments and reactions. Your email address isn’t shown to them; only the admins who run GYMBROS can see it. Three providers handle data for us: Google (sign-in), Resend (sending email) and Amazon Web Services (hosting, in Brazil). We only share anything else if the law requires it.',
   privacy_cookies_h: 'Cookies and browser storage',
   privacy_cookies:
     'We use one cookie to keep you signed in for up to 30 days and a second one for up to 10 minutes while you sign in. Your browser also stores your language and a few app preferences. Nothing is used for tracking.',

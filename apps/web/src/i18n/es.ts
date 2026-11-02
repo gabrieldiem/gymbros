@@ -157,7 +157,7 @@ export const es = {
   legal_notice: 'Al entrar aceptas:',
   legal_terms: 'Términos del servicio',
   legal_privacy: 'Política de privacidad',
-  legal_updated: 'Última actualización: 1 de noviembre de 2026',
+  legal_updated: 'Última actualización: 2 de noviembre de 2026',
   legal_back: 'Volver a GYMBROS',
   privacy_intro:
     'GYMBROS es un registro de entrenos para pequeños equipos de amigos, gestionado por Gabriel Diem. Esta página explica qué guarda y por qué.',
@@ -172,7 +172,7 @@ export const es = {
     'Solo para que GYMBROS funcione: para que entres, puntuar tus entrenos, mostrar la clasificación de tu equipo, enviarte notificaciones dentro de la app y un email de bienvenida. No hay anuncios ni herramientas de analítica, y no vendemos tus datos.',
   privacy_who_h: 'Quién puede verlo',
   privacy_who:
-    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, insignias, comentarios y reacciones. Tu email no se le muestra. Tres proveedores tratan datos para nosotros: Google (inicio de sesión), Resend (envío de emails) y Amazon Web Services (alojamiento, en Brasil). Solo compartimos algo más si la ley lo exige.',
+    'Tu equipo ve tu nombre, entrenos, puntos, rangos, PR, insignias, comentarios y reacciones. Tu email no se le muestra; solo pueden verlo los administradores de GYMBROS. Tres proveedores tratan datos para nosotros: Google (inicio de sesión), Resend (envío de emails) y Amazon Web Services (alojamiento, en Brasil). Solo compartimos algo más si la ley lo exige.',
   privacy_cookies_h: 'Cookies y almacenamiento del navegador',
   privacy_cookies:
     'Usamos una cookie para mantener tu sesión hasta 30 días y otra durante un máximo de 10 minutos mientras entras. Tu navegador también guarda tu idioma y algunas preferencias de la app. Nada se usa para rastrearte.',
