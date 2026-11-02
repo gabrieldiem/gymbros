@@ -9,6 +9,44 @@ const openMenu = async () => {
   return screen.findByRole('menu');
 };
 
+describe('Your gyms in settings', () => {
+  const openSettings = async () => {
+    const menu = within(await openMenu());
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
+    return within(await screen.findByRole('dialog', { name: 'Settings' }));
+  };
+
+  it('adds a gym and makes another the default', async () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/me/gyms': [
+        200,
+        [
+          { id: 'g1', name: 'Smart Fit', is_default: true },
+          { id: 'g2', name: 'Home', is_default: false },
+        ],
+      ],
+      'POST /api/me/gyms': [201, { id: 'g3', name: 'Club', is_default: false }],
+      'PATCH /api/me/gyms/g2': [200, { id: 'g2', name: 'Home', is_default: true }],
+      'DELETE /api/me/gyms/g1': [204, null],
+    });
+    renderApp('/climb');
+    const sheet = await openSettings();
+    await userEvent.click(await sheet.findByRole('radio', { name: 'Make Home your default' }));
+    await userEvent.type(sheet.getByLabelText('Add a gym'), 'Club');
+    await userEvent.click(sheet.getByRole('button', { name: 'Add' }));
+    await userEvent.click(sheet.getByRole('button', { name: 'Remove Smart Fit' }));
+    await waitFor(() => {
+      const latest = fetchMock.mock.calls.map(
+        ([url, init]) => `${init?.method ?? 'GET'} ${String(url)}`,
+      );
+      expect(latest).toContain('PATCH /api/me/gyms/g2');
+      expect(latest).toContain('POST /api/me/gyms');
+      expect(latest).toContain('DELETE /api/me/gyms/g1');
+    });
+  });
+});
+
 describe('Profile menu', () => {
   it('opens from the avatar and shows who you are', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });

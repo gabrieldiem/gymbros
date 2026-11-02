@@ -65,7 +65,9 @@ class WorkoutService:
         routine_id: str | None,
         name: str | None,
         performed_on: date | None = None,
+        gym: str | None = None,
     ) -> WorkoutView:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         """Start a workout from a routine (pre-filled to beat last time) or empty.
 
         With `performed_on`, this logs a past day instead: nothing is happening now, so the crew
@@ -82,6 +84,7 @@ class WorkoutService:
             routine_id=routine_id,
             name=(name or self._routine_name(routine_id)).strip(),
             performed_on=performed_on,
+            gym_name=gym,
             started_at=self._now(),
             sets=to_rows(entries),
         )
@@ -119,13 +122,18 @@ class WorkoutService:
         workout_id: uuid.UUID,
         name: str | None,
         entries: tuple[ExerciseEntry, ...],
+        change_gym: bool = False,
+        gym: str | None = None,
     ) -> WorkoutView:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         """Replace the logger state (exercises and sets) of an in-progress workout."""
         workout = await self.get_in_progress(member, workout_id)
         for entry in entries:
             self._exercise(entry.exercise_id)
         if name is not None:
             workout.name = name.strip()
+        if change_gym:
+            workout.gym_name = gym
         workout.sets = to_rows(entries)
         return await self.view(member, await self._workouts.save(workout))
 

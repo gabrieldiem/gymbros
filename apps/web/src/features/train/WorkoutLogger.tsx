@@ -11,6 +11,7 @@ import { formatDay } from '../../i18n/formatDay';
 import { ExerciseCard } from './ExerciseCard';
 import { ExercisePicker } from './ExercisePicker';
 import { formatElapsed } from './format';
+import { GymSelect } from './GymSelect';
 import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
 import { StretchCard } from './StretchCard';
@@ -124,6 +125,7 @@ export function WorkoutLogger(props: Props) {
               </>
             )}
           </span>
+          <GymSelect value={draft.gym} onChange={(gym) => update((d) => ({ ...d, gym }))} />
         </div>
         <div className={styles.live} aria-live="polite">
           {gain.gain > 0 && (

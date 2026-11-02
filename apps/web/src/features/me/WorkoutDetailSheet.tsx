@@ -28,6 +28,7 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
                 : formatMoment(lang, workout.finished_at)}
             </p>
             <div className={styles.chips}>
+              {workout.gym && <span>{t('at_gym', { gym: workout.gym })}</span>}
               {workout.duration_min > 0 && <span>{t('min_n', { n: workout.duration_min })}</span>}
               <span>{workout.sets === 1 ? t('sets_1') : t('sets_n', { n: workout.sets })}</span>
               {workout.volume_kg > 0 && <span>{t('kg_n', { n: n(workout.volume_kg) })}</span>}

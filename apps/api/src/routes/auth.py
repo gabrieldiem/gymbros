@@ -9,7 +9,7 @@ from dependencies import (
     get_email_sender,
     get_google_sign_in,
     get_profile_service,
-    get_session,
+    DB_SESSION,
     get_session_token,
     get_settings,
     logger,
@@ -80,7 +80,7 @@ async def google_callback(  # pylint: disable=too-many-arguments,too-many-positi
     google: GoogleSignIn | None = Depends(get_google_sign_in),
     auth: AuthService = Depends(get_auth_service),
     email: EmailSender = Depends(get_email_sender),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = DB_SESSION,
     settings: Settings = Depends(get_settings),
 ) -> RedirectResponse:
     """Finish signing in and land on the app. The gates send members without a crew to /join."""

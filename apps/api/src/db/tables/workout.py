@@ -48,6 +48,8 @@ class Workout(Base):  # pylint: disable=too-few-public-methods
     name: Mapped[str] = mapped_column(String(60))
     # Set when this logs a past day (crew-local); null for a workout happening now.
     performed_on: Mapped[date | None] = mapped_column(Date)
+    # The name as it was: a gym can be renamed or deleted later.
+    gym_name: Mapped[str | None] = mapped_column(String(40))
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     week_start: Mapped[date | None] = mapped_column(Date)

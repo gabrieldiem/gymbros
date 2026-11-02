@@ -65,6 +65,7 @@ export type Workout = {
   routine_id: string | null;
   /** The past day this logs (a calendar day), or null for a workout happening now. */
   performed_on: string | null;
+  gym: string | null;
   started_at: string;
   exercises: WorkoutExercise[];
   live_points: number;
@@ -108,6 +109,7 @@ export type TrainingNowItem = {
   initials: string;
   color: CrewColor;
   workout_name: string;
+  gym: string | null;
   routine_id: string | null;
   started_at: string;
   current_exercise_id: string | null;
@@ -115,6 +117,7 @@ export type TrainingNowItem = {
 
 export type SaveBody = {
   name?: string;
+  gym: string | null;
   exercises: { exercise_id: string; sets: SetData[] }[];
 };
 
@@ -157,8 +160,12 @@ export function useTrainingNow() {
 export function useStartWorkout() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: { routine_id: string | null; name?: string; performed_on?: string }) =>
-      apiRequest<Workout>('/workouts', { method: 'POST', body }),
+    mutationFn: (body: {
+      routine_id: string | null;
+      name?: string;
+      performed_on?: string;
+      gym?: string | null;
+    }) => apiRequest<Workout>('/workouts', { method: 'POST', body }),
     onSuccess: (workout) => queryClient.setQueryData(activeWorkoutKey, workout),
   });
 }

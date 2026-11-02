@@ -58,6 +58,10 @@ A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A worko
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
+## Gyms
+
+Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. It's only a name, not a location. A workout keeps the name it was logged with, so renaming or deleting a gym doesn't change your history.
+
 ## Stretching
 
 Add it to any workout, or log it alone from its own routine. It asks only how long (5 or 10 minutes, 5 by default) and pays fixed points, once per crew-local day, so it can't be farmed.

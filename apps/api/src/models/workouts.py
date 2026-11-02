@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from typing_extensions import Annotated
 
 from models.climb import ClimbChangeModel
+from models.gyms import GymName
 from models.me import Color
 
 WorkoutName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)]
@@ -36,6 +37,8 @@ class StartWorkoutRequest(BaseModel):
     routine_id: str | None = Field(default=None, max_length=32)
     name: WorkoutName | None = None
     performed_on: date | None = None
+    # Leave it out for your default gym; null for no gym.
+    gym: GymName | None = None
 
 
 class SaveWorkoutRequest(BaseModel):
@@ -43,6 +46,8 @@ class SaveWorkoutRequest(BaseModel):
 
     name: WorkoutName | None = None
     exercises: list[ExerciseInput] = Field(max_length=20)
+    # Leave it out to keep the gym; null for no gym.
+    gym: GymName | None = None
 
 
 class ExerciseOutput(BaseModel):
@@ -60,6 +65,7 @@ class WorkoutResponse(BaseModel):
     name: str
     routine_id: str | None
     performed_on: date | None
+    gym: str | None
     started_at: datetime
     exercises: list[ExerciseOutput]
     live_points: int
@@ -127,6 +133,7 @@ class TrainingNowItem(BaseModel):
     initials: str
     color: Color
     workout_name: str
+    gym: str | None
     routine_id: str | None
     started_at: datetime
     current_exercise_id: str | None

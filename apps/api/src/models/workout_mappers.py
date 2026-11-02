@@ -29,6 +29,7 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         name=workout.name,
         routine_id=workout.routine_id,
         performed_on=workout.performed_on,
+        gym=workout.gym_name,
         started_at=workout.started_at,
         exercises=[
             ExerciseOutput(
@@ -83,6 +84,7 @@ def to_training_now_item(active: ActiveWorkout) -> TrainingNowItem:
             "initials": active.user.initials,
             "color": active.user.color,
             "workout_name": active.workout.name,
+            "gym": active.workout.gym_name,
             "routine_id": active.workout.routine_id,
             "started_at": active.workout.started_at,
             "current_exercise_id": active.current_exercise_id,

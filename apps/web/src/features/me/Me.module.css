@@ -444,3 +444,43 @@
   color: var(--smoke);
   font-weight: 600;
 }
+
+.gyms {
+  margin: 8px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.gyms li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--steel);
+}
+
+.gyms label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: var(--touch);
+}
+
+.gyms input {
+  accent-color: var(--volt);
+  width: 18px;
+  height: 18px;
+}
+
+.gyms small {
+  color: var(--smoke);
+}
+
+.gyms button {
+  width: var(--touch);
+  height: var(--touch);
+  color: var(--smoke);
+  font-size: 1.2rem;
+}

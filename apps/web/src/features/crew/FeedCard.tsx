@@ -34,6 +34,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
       </div>
       <h3>{v.name}</h3>
       <div className={styles.chips}>
+        {v.gym && <span>{t('at_gym', { gym: v.gym })}</span>}
         <span>
           {v.performed_on
             ? t('past_for', { day: formatDay(lang, v.performed_on) })

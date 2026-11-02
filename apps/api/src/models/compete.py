@@ -179,6 +179,7 @@ class WorkoutDetailResponse(BaseModel):
 
     id: uuid.UUID
     name: str
+    gym: str | None
     performed_on: date | None
     finished_at: datetime
     duration_min: int

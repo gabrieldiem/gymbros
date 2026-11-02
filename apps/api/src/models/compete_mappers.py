@@ -145,6 +145,7 @@ def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
     return WorkoutDetailResponse(
         id=workout.id,
         name=workout.name,
+        gym=workout.gym_name,
         performed_on=workout.performed_on,
         finished_at=workout.finished_at,
         duration_min=_duration(workout),

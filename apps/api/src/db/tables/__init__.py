@@ -6,6 +6,7 @@ from db.tables.comment import Comment
 from db.tables.crew import Crew
 from db.tables.duel import Duel
 from db.tables.feed_item import FeedItem
+from db.tables.gym import Gym
 from db.tables.membership import Membership
 from db.tables.notification import Notification
 from db.tables.personal_record import PersonalRecord
@@ -23,6 +24,7 @@ __all__ = [
     "Crew",
     "Duel",
     "FeedItem",
+    "Gym",
     "Membership",
     "Notification",
     "PersonalRecord",

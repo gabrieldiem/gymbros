@@ -126,6 +126,66 @@ describe('Train: entering sets', () => {
   });
 });
 
+describe('Train: gyms', () => {
+  const GYMS = [
+    { id: 'g1', name: 'Smart Fit', is_default: true },
+    { id: 'g2', name: 'Home', is_default: false },
+  ];
+
+  it('starts at your default gym unless you pick another', async () => {
+    const fetchMock = trainApi({
+      'GET /api/me/gyms': [200, GYMS],
+      'POST /api/workouts': [201, makeWorkout({ gym: 'Home' })],
+    });
+    renderApp('/train');
+    const select = await screen.findByRole('combobox', { name: 'At' });
+    await waitFor(() => expect(select).toHaveValue('Smart Fit'));
+    await userEvent.selectOptions(select, 'Home');
+    await userEvent.click(screen.getByRole('button', { name: /Push day/ }));
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({
+      routine_id: 'push',
+      gym: 'Home',
+    });
+  });
+
+  it('leaves the default to the server when you don’t choose', async () => {
+    const fetchMock = trainApi({
+      'GET /api/me/gyms': [200, GYMS],
+      'POST /api/workouts': [201, makeWorkout({ gym: 'Smart Fit' })],
+    });
+    renderApp('/train');
+    await screen.findByRole('combobox', { name: 'At' });
+    await userEvent.click(screen.getByRole('button', { name: /Push day/ }));
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({ routine_id: 'push' });
+  });
+
+  it('hides the picker when you have no gyms', async () => {
+    trainApi({ 'GET /api/me/gyms': [200, []] });
+    renderApp('/train');
+    await screen.findByRole('button', { name: /Push day/ });
+    expect(screen.queryByRole('combobox', { name: 'At' })).toBeNull();
+  });
+
+  it('changes the gym while logging and keeps a gym you’ve since deleted', async () => {
+    const workout = makeWorkout({ gym: 'Old place' });
+    const fetchMock = trainApi({
+      'GET /api/me/gyms': [200, GYMS],
+      'GET /api/workouts/active': [200, workout],
+      'PUT /api/workouts/w1': () => [200, workout],
+    });
+    renderApp('/train');
+    const select = await screen.findByRole('combobox', { name: 'At' });
+    expect(select).toHaveValue('Old place');
+    await waitFor(() => expect(within(select).getByRole('option', { name: 'Home' })).toBeTruthy());
+    await userEvent.selectOptions(select, 'No gym');
+    await waitFor(() =>
+      expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({ gym: null }),
+    );
+  });
+});
+
 describe('Train: the timed event', () => {
   it('marks every leg exercise, in any workout, and not the others', async () => {
     trainApi({

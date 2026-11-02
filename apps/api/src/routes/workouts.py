@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, status
 from clock import utc_now
 from dependencies import (
     get_current_member,
+    get_gym_service,
     get_scoring_context,
     get_settings,
     get_workout_finisher,
@@ -22,6 +23,7 @@ from models.workouts import (
     WeekResponse,
     WorkoutResponse,
 )
+from services.gym_service import GymService
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.training_rules import LoggedSet, week_end
@@ -43,9 +45,11 @@ async def start_workout(
     body: StartWorkoutRequest,
     member: Member = Depends(get_current_member),
     workouts: WorkoutService = Depends(get_workout_service),
+    gyms: GymService = Depends(get_gym_service),
 ) -> WorkoutResponse:
     """Start a workout from a routine (pre-filled to beat last time) or empty, or log a past day."""
-    view = await workouts.start(member, body.routine_id, body.name, body.performed_on)
+    gym = body.gym if "gym" in body.model_fields_set else await gyms.default_name(member.user.id)
+    view = await workouts.start(member, body.routine_id, body.name, body.performed_on, gym)
     return to_workout_response(view)
 
 
@@ -94,7 +98,10 @@ async def save_workout(
         ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
         for e in body.exercises
     )
-    return to_workout_response(await workouts.save(member, workout_id, body.name, entries))
+    change_gym = "gym" in body.model_fields_set
+    return to_workout_response(
+        await workouts.save(member, workout_id, body.name, entries, change_gym, body.gym)
+    )
 
 
 @router.delete(

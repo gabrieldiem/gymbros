@@ -86,6 +86,7 @@ export function makeWorkout(overrides: Partial<Workout> = {}): Workout {
     name: 'Push day',
     routine_id: 'push',
     performed_on: null,
+    gym: null,
     started_at: new Date(Date.now() - 5 * 60_000).toISOString(),
     exercises: [
       {

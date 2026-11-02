@@ -13,6 +13,7 @@ import { Segmented } from '../../components/Segmented';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
+import { GymsSection } from './GymsSection';
 import styles from './Me.module.css';
 
 const REST_OPTIONS = ['60', '90', '120', '180'] as const;
@@ -123,6 +124,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
       <div className={styles.settings}>
         <NameForm />
         <ColorPicker />
+        <GymsSection />
         <div>
           <h3>{t('language')}</h3>
           <p>{t('language_hint')}</p>

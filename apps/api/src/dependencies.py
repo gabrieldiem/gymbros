@@ -20,6 +20,7 @@ from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
+from db.repositories.gym_repository import GymRepository
 from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
@@ -43,6 +44,7 @@ from services.duel_service import DuelService
 from services.errors import NotInCrew
 from services.feed_service import FeedService
 from services.hall_of_fame_service import HallOfFameService
+from services.gym_service import GymService
 from services.inbox_service import InboxService
 from services.me_stats_service import MeStatsService
 from services.member import Member
@@ -92,12 +94,22 @@ async def get_session() -> AsyncIterator[AsyncSession]:
             raise
 
 
-def get_crew_service(session: AsyncSession = Depends(get_session)) -> CrewService:
+# scope="function" commits before the response goes out. With the default the commit comes after
+# it: a client could read stale data right away, and a failed commit would still have said 200.
+DB_SESSION = Depends(get_session, scope="function")
+
+
+def get_crew_service(session: AsyncSession = DB_SESSION) -> CrewService:
     """FastAPI dependency provider for CrewService."""
     return CrewService(CrewRepository(session))
 
 
-def get_profile_service(session: AsyncSession = Depends(get_session)) -> ProfileService:
+def get_gym_service(session: AsyncSession = DB_SESSION) -> GymService:
+    """FastAPI dependency provider for GymService."""
+    return GymService(GymRepository(session), utc_now)
+
+
+def get_profile_service(session: AsyncSession = DB_SESSION) -> ProfileService:
     """FastAPI dependency provider for ProfileService."""
     return ProfileService(UserRepository(session), CrewRepository(session), settings.admin_emails)
 
@@ -131,7 +143,7 @@ def get_email_sender() -> EmailSender:
     return ResendEmailClient(settings.resend_api_key, settings.email_from, logger)
 
 
-def get_auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
+def get_auth_service(session: AsyncSession = DB_SESSION) -> AuthService:
     """FastAPI dependency provider for AuthService."""
     return build_auth_service(session)
 
@@ -150,7 +162,7 @@ async def get_current_user(
 
 
 async def get_current_member(
-    user: User = Depends(get_current_user), session: AsyncSession = Depends(get_session)
+    user: User = Depends(get_current_user), session: AsyncSession = DB_SESSION
 ) -> Member:
     """The signed-in user with their crew. Raises NotInCrew (→ 403) before they join one."""
     crew = await CrewRepository(session).get_crew_of(user.id)
@@ -167,7 +179,7 @@ async def get_current_admin(user: User = Depends(get_current_user)) -> User:
 
 
 def get_admin_service(
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = DB_SESSION,
     email: EmailSender = Depends(get_email_sender),
 ) -> AdminService:
     """FastAPI dependency provider for AdminService."""
@@ -216,7 +228,7 @@ def build_activity_service(session: AsyncSession) -> ActivityService:
     )
 
 
-def get_workout_service(session: AsyncSession = Depends(get_session)) -> WorkoutService:
+def get_workout_service(session: AsyncSession = DB_SESSION) -> WorkoutService:
     """FastAPI dependency provider for WorkoutService."""
     return WorkoutService(
         WorkoutRepository(session),
@@ -245,13 +257,13 @@ def build_climb_service(session: AsyncSession) -> ClimbService:
     )
 
 
-def get_climb_service(session: AsyncSession = Depends(get_session)) -> ClimbService:
+def get_climb_service(session: AsyncSession = DB_SESSION) -> ClimbService:
     """FastAPI dependency provider for ClimbService."""
     return build_climb_service(session)
 
 
 def get_workout_finisher(
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = DB_SESSION,
     workouts: WorkoutService = Depends(get_workout_service),
 ) -> WorkoutFinisher:
     """FastAPI dependency provider for WorkoutFinisher."""
@@ -270,19 +282,19 @@ def get_workout_finisher(
     )
 
 
-def get_scoring_context(session: AsyncSession = Depends(get_session)) -> ScoringContextBuilder:
+def get_scoring_context(session: AsyncSession = DB_SESSION) -> ScoringContextBuilder:
     """FastAPI dependency provider for ScoringContextBuilder."""
     return _context(session)
 
 
 def get_training_now_service(
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = DB_SESSION,
 ) -> TrainingNowService:
     """FastAPI dependency provider for TrainingNowService."""
     return TrainingNowService(WorkoutRepository(session))
 
 
-def get_feed_service(session: AsyncSession = Depends(get_session)) -> FeedService:
+def get_feed_service(session: AsyncSession = DB_SESSION) -> FeedService:
     """FastAPI dependency provider for FeedService."""
     return FeedService(
         feed=FeedRepository(session),
@@ -296,14 +308,14 @@ def get_feed_service(session: AsyncSession = Depends(get_session)) -> FeedServic
     )
 
 
-def get_nudge_service(session: AsyncSession = Depends(get_session)) -> NudgeService:
+def get_nudge_service(session: AsyncSession = DB_SESSION) -> NudgeService:
     """FastAPI dependency provider for NudgeService."""
     return NudgeService(
         CrewRepository(session), NotificationRepository(session), _notifier(session), utc_now
     )
 
 
-def get_inbox_service(session: AsyncSession = Depends(get_session)) -> InboxService:
+def get_inbox_service(session: AsyncSession = DB_SESSION) -> InboxService:
     """FastAPI dependency provider for InboxService."""
     return InboxService(
         NotificationRepository(session),
@@ -315,7 +327,7 @@ def get_inbox_service(session: AsyncSession = Depends(get_session)) -> InboxServ
 
 
 def get_hall_of_fame_service(
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = DB_SESSION,
 ) -> HallOfFameService:
     """FastAPI dependency provider for HallOfFameService."""
     return HallOfFameService(
@@ -376,17 +388,17 @@ def build_bonus_service(session: AsyncSession) -> BonusService:
     )
 
 
-def get_quest_service(session: AsyncSession = Depends(get_session)) -> QuestService:
+def get_quest_service(session: AsyncSession = DB_SESSION) -> QuestService:
     """FastAPI dependency provider for QuestService."""
     return build_quest_service(session)
 
 
-def get_badge_service(session: AsyncSession = Depends(get_session)) -> BadgeService:
+def get_badge_service(session: AsyncSession = DB_SESSION) -> BadgeService:
     """FastAPI dependency provider for BadgeService."""
     return build_badge_service(session)
 
 
-def get_duel_service(session: AsyncSession = Depends(get_session)) -> DuelService:
+def get_duel_service(session: AsyncSession = DB_SESSION) -> DuelService:
     """FastAPI dependency provider for DuelService."""
     return DuelService(
         (
@@ -402,7 +414,7 @@ def get_duel_service(session: AsyncSession = Depends(get_session)) -> DuelServic
     )
 
 
-def get_recap_service(session: AsyncSession = Depends(get_session)) -> RecapService:
+def get_recap_service(session: AsyncSession = DB_SESSION) -> RecapService:
     """FastAPI dependency provider for RecapService."""
     return RecapService(
         (PointEventRepository(session), WorkoutRepository(session), CrewRepository(session)),
@@ -413,7 +425,7 @@ def get_recap_service(session: AsyncSession = Depends(get_session)) -> RecapServ
     )
 
 
-def get_me_stats_service(session: AsyncSession = Depends(get_session)) -> MeStatsService:
+def get_me_stats_service(session: AsyncSession = DB_SESSION) -> MeStatsService:
     """FastAPI dependency provider for MeStatsService."""
     return MeStatsService(
         build_climb_service(session),

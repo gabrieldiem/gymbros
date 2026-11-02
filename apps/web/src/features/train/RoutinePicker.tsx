@@ -4,6 +4,7 @@ import { Pips } from '../../components/Pips';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { goalText } from './goalText';
+import { GymSelect } from './GymSelect';
 import styles from './RoutinePicker.module.css';
 
 type Props = {
@@ -13,6 +14,9 @@ type Props = {
   error: unknown;
   /** The past day being logged, or null to log today. */
   pastDay: string | null;
+  /** Where this workout is, while you haven't started it. */
+  gym: string | null;
+  onGym: (gym: string | null) => void;
   onStart: (routineId: string | null) => void;
   onPickPastDay: () => void;
   onClearPastDay: () => void;
@@ -20,7 +24,8 @@ type Props = {
 
 /** The Train start screen: routines, the week's pips and how points are earned. */
 export function RoutinePicker(props: Props) {
-  const { catalog, week, starting, error, pastDay, onStart, onPickPastDay, onClearPastDay } = props;
+  const { catalog, week, starting, error, pastDay, gym, onGym } = props;
+  const { onStart, onPickPastDay, onClearPastDay } = props;
   const { t, lang } = useI18n();
   const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
   const exerciseName = (id: string) => catalog.exercises.find((e) => e.id === id)?.name ?? id;
@@ -38,6 +43,9 @@ export function RoutinePicker(props: Props) {
             <span>{goalText(t, week.workouts, week.target)}</span>
           </p>
         )}
+        <div className={styles.gym}>
+          <GymSelect value={gym} onChange={onGym} />
+        </div>
         {pastDay ? (
           <div className={styles.past}>
             <p>{t('past_notice', { day: formatDay(lang, pastDay) })}</p>

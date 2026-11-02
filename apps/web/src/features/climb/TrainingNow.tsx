@@ -35,7 +35,8 @@ export function TrainingNow({ myId }: { myId: string | undefined }) {
               <span>
                 {item.user_id === myId ? t('you') : item.display_name}
                 <small>
-                  {item.workout_name}, {t('min_n', { n: minutes })}
+                  {item.workout_name}, {item.gym ? `${item.gym}, ` : ''}
+                  {t('min_n', { n: minutes })}
                 </small>
               </span>
             </li>

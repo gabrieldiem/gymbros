@@ -10,6 +10,7 @@ import {
   useWeek,
   type FinishResult,
 } from '../../api/train';
+import { useGyms } from '../../api/gyms';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { FinishSheet } from './FinishSheet';
@@ -29,6 +30,9 @@ export function TrainPage() {
   const [result, setResult] = useState<FinishResult | null>(null);
   const [pastDay, setPastDay] = useState<string | null>(null);
   const [pickingDay, setPickingDay] = useState(false);
+  // Undefined until you choose: the default gym, which the server knows.
+  const [chosenGym, setChosenGym] = useState<string | null | undefined>(undefined);
+  const defaultGym = useGyms().data?.find((gym) => gym.is_default)?.name ?? null;
 
   if ((catalog.isError && !catalog.data) || (active.isError && active.data === undefined)) {
     return (
@@ -47,8 +51,14 @@ export function TrainPage() {
       {
         ...(routineId ? { routine_id: routineId } : { routine_id: null, name: t('wk_default') }),
         ...(pastDay ? { performed_on: pastDay } : {}),
+        ...(chosenGym !== undefined ? { gym: chosenGym } : {}),
       },
-      { onSuccess: () => setPastDay(null) },
+      {
+        onSuccess: () => {
+          setPastDay(null);
+          setChosenGym(undefined);
+        },
+      },
     );
 
   const workout = active.data;
@@ -83,6 +93,8 @@ export function TrainPage() {
           starting={start.isPending}
           error={start.error}
           pastDay={pastDay}
+          gym={chosenGym === undefined ? defaultGym : chosenGym}
+          onGym={setChosenGym}
           onStart={handleStart}
           onPickPastDay={() => setPickingDay(true)}
           onClearPastDay={() => setPastDay(null)}

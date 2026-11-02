@@ -130,3 +130,7 @@
   margin-top: 6px;
   text-align: left;
 }
+
+.gym:not(:empty) {
+  margin-top: 12px;
+}

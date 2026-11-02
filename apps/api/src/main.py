@@ -17,6 +17,7 @@ from routes import (
     crew,
     crews,
     feed,
+    gyms,
     me,
     notifications,
     rules,
@@ -55,6 +56,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
 app.include_router(whats_new.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(gyms.router, prefix="/api")
 app.include_router(me.router, prefix="/api")
 app.include_router(crews.router, prefix="/api")
 app.include_router(catalog.router, prefix="/api")

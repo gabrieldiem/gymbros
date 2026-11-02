@@ -11,19 +11,23 @@ import {
 import { AutosaveQueue, type SaveStatus } from './autosaveQueue';
 
 export type DraftExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
-export type Draft = { name: string; exercises: DraftExercise[] };
+export type Draft = { name: string; gym: string | null; exercises: DraftExercise[] };
 export type { SaveStatus };
 
 const RETRY_MS = 3000;
 
 function toDraft(workout: Workout): Draft {
-  return { name: workout.name, exercises: workout.exercises.map((e) => ({ ...e })) };
+  return {
+    name: workout.name,
+    gym: workout.gym,
+    exercises: workout.exercises.map((e) => ({ ...e })),
+  };
 }
 
 function toBody(draft: Draft): SaveBody {
   const exercises = draft.exercises.map(({ exercise_id, sets }) => ({ exercise_id, sets }));
   const name = draft.name.trim();
-  return name ? { name, exercises } : { exercises };
+  return name ? { name, gym: draft.gym, exercises } : { gym: draft.gym, exercises };
 }
 
 /**

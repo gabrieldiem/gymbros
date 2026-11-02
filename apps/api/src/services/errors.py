@@ -29,6 +29,18 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class GymNotFound(DomainError):
+    """No such gym of yours."""
+
+
+class GymNameTaken(DomainError):
+    """You already have a gym with this name."""
+
+
+class TooManyGyms(DomainError):
+    """There's a limit to how many gyms a member can have."""
+
+
 class StretchingAlreadyLogged(DomainError):
     """Stretching pays once a day, and this session has nothing else in it."""
 
