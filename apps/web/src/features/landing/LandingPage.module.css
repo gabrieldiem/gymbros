@@ -165,6 +165,19 @@
   font-size: 1.05rem;
 }
 
+.section.embedded {
+  padding-top: 8px;
+  scroll-margin-top: 64px;
+}
+
+.section.embedded + .section.embedded {
+  padding-top: 56px;
+}
+
+.section.embedded .groups {
+  margin-top: 8px;
+}
+
 /* An hour is an hour */
 .sports {
   list-style: none;
@@ -523,7 +536,7 @@
     padding-bottom: 40px;
   }
 
-  .section {
+  .section:not(.embedded) {
     padding-top: 110px;
   }
 

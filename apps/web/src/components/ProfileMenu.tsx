@@ -85,6 +85,22 @@ export function ProfileMenu() {
           <Link to="/me" role="menuitem" className={styles.item} onClick={() => setOpen(false)}>
             {t('menu_profile')}
           </Link>
+          <Link
+            to="/quests/achievements"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => setOpen(false)}
+          >
+            {t('nav_achievements')}
+          </Link>
+          <Link
+            to="/quests/points"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => setOpen(false)}
+          >
+            {t('nav_points')}
+          </Link>
           <button
             type="button"
             role="menuitem"

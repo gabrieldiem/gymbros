@@ -35,7 +35,14 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
   await logIn(page, 'matex', testInfo);
 
   await audit(page, 'climb');
-  for (const path of ['/crew', '/train', '/quests', '/me']) {
+  for (const path of [
+    '/crew',
+    '/train',
+    '/quests',
+    '/quests/achievements',
+    '/quests/points',
+    '/me',
+  ]) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await page.waitForLoadState('networkidle');

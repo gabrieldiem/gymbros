@@ -19,9 +19,16 @@ test('quests, badges, recap and the You tab', async ({ page }, testInfo) => {
   await expect(page.getByRole('region', { name: /Crew climbs/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
   await page.screenshot({ path: `${SCREENS}/quests-${testInfo.project.name}.png`, fullPage: true });
-  await page.getByRole('button', { name: 'Badges', exact: true }).click();
+  await page.goto('/quests/achievements');
   await expect(page.getByText(/Each one pays out once/)).toBeVisible();
+  await expect(page.getByRole('button', { name: /^First tracks/ })).toBeVisible();
   await page.screenshot({ path: `${SCREENS}/badges-${testInfo.project.name}.png`, fullPage: true });
+
+  await page.goto('/quests/points');
+  await expect(page.getByText('A new personal record')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'An hour is an hour' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+  await page.screenshot({ path: `${SCREENS}/points-${testInfo.project.name}.png`, fullPage: true });
 
   await page.goto('/climb');
   await page.getByRole('button', { name: /Last week/ }).click();

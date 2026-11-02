@@ -53,6 +53,6 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 
 ## Layout
 
-- Mobile first at 390px. Bottom nav is 72px plus the safe area, with Train as a raised 54px rounded-square button.
+- Mobile first at 390px. The floating dock is 64px high, 10px from the edges and the safe area, with Train as a raised 54px rounded-square button and a tint that slides to the active tab.
 - At ≥960px: a 240px side rail, content max 1240px. ATUS Climb becomes a two-column grid (map | standing panel) at ≥1120px.
 - No horizontal overflow at 390px. Touch targets ≥44px.

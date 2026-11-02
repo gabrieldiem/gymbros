@@ -18,6 +18,8 @@ describe('Profile menu', () => {
     expect(menu.getByText('gabi@example.com')).toBeVisible();
     expect(menu.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
       'Your profile',
+      'Achievements',
+      'Points',
       'Settings',
       'Invite friends',
       'Log out',
@@ -58,7 +60,7 @@ describe('Profile menu', () => {
     renderApp('/climb');
     await openMenu();
     await userEvent.keyboard('{ArrowDown}');
-    expect(screen.getByRole('menuitem', { name: 'Settings' })).toHaveFocus();
+    expect(screen.getByRole('menuitem', { name: 'Achievements' })).toHaveFocus();
     await userEvent.keyboard('{ArrowUp}{ArrowUp}');
     expect(screen.getByRole('menuitem', { name: 'Log out' })).toHaveFocus();
   });

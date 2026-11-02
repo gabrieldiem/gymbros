@@ -13,7 +13,7 @@ function progressText(badge: Badge, n: (v: number) => string): string {
   return `${n(badge.progress)} / ${n(badge.goal)}`;
 }
 
-/** The 15 badges: patches, progress, and a detail sheet. */
+/** Every achievement: what it takes, what it pays, your progress, and a detail sheet. */
 export function Badges({ badges }: { badges: Badge[] }) {
   const { t, n } = useI18n();
   const [open, setOpen] = useState<Badge | null>(null);
@@ -26,12 +26,25 @@ export function Badges({ badges }: { badges: Badge[] }) {
             key={b.id}
             type="button"
             className={cx(styles.badge, !b.unlocked_at && styles.locked)}
-            aria-label={`${name(b)}, ${b.unlocked_at ? t('unlocked') : t('locked')}`}
             onClick={() => setOpen(b)}
           >
-            <BadgePatch icon={b.icon} color={b.color} locked={!b.unlocked_at} />
-            <b>{name(b)}</b>
-            <span>{b.unlocked_at ? `+${n(b.points)}` : progressText(b, n)}</span>
+            <BadgePatch icon={b.icon} color={b.color} locked={!b.unlocked_at} size={60} />
+            <span className={styles.badgeBody}>
+              <b>{name(b)}</b>
+              {!b.unlocked_at && <span className="sr-only">{t('locked')}</span>}
+              <small>{t(`badge_${b.id}_d` as MessageKey)}</small>
+              {b.unlocked_at ? (
+                <em className={styles.badgeDone}>{t('unlocked')}</em>
+              ) : (
+                <span className={styles.badgeBar} aria-hidden="true">
+                  <i style={{ width: `${Math.min(100, (b.progress / b.goal) * 100)}%` }} />
+                </span>
+              )}
+            </span>
+            <span className={styles.badgeSide}>
+              <b>+{n(b.points)}</b>
+              {!b.unlocked_at && <small>{progressText(b, n)}</small>}
+            </span>
           </button>
         ))}
       </div>

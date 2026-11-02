@@ -1,21 +1,22 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router';
 
 import { useBadges, useQuests } from '../../api/compete';
 import { useMe } from '../../api/me';
+import { useRules } from '../../api/rules';
 import { Button, ButtonLink } from '../../components/Button';
 import { cx } from '../../components/cx';
 import { ErrorBlock, LoadingBlock, QueryState } from '../../components/QueryState';
-import { Segmented } from '../../components/Segmented';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
+import { PointsList, SportsCompare } from '../landing/LandingSections';
 import { Badges } from './Badges';
 import { CrewQuest } from './CrewQuest';
 import { DuelSheet } from './DuelSheet';
 import { Duels } from './Duels';
 import styles from './Quests.module.css';
+import { QuestsNav } from './QuestsNav';
 import { questProgressText } from './questFormat';
-
-type View = 'quests' | 'badges';
 
 function QuestsView() {
   const { t, n } = useI18n();
@@ -112,40 +113,53 @@ function QuestsView() {
   );
 }
 
+function PointsView() {
+  const query = useRules();
+  return (
+    <QueryState query={query} failed="points_failed">
+      {(rules) => (
+        <>
+          <PointsList rules={rules} embedded />
+          <SportsCompare sessions={rules.sessions} embedded />
+        </>
+      )}
+    </QueryState>
+  );
+}
+
+/** Quests has three sections, each with its own address: this week, achievements, points. */
 export function QuestsPage() {
   const { t } = useI18n();
-  const [view, setView] = useState<View>('quests');
+  const { pathname } = useLocation();
   const badgesQuery = useBadges();
   const badges = badgesQuery.data;
   const unlocked = badges?.filter((b) => b.unlocked_at).length ?? 0;
+  const view = pathname.endsWith('/achievements')
+    ? 'achievements'
+    : pathname.endsWith('/points')
+      ? 'points'
+      : 'quests';
+  const heading = {
+    quests: [t('quests_title'), t('quests_sub')],
+    achievements: [t('badges_title'), t('badges_sub', { n: unlocked, t: badges?.length ?? 0 })],
+    points: [t('nav_points'), t('points_sub')],
+  }[view];
   return (
     <section aria-labelledby="page-title">
+      <QuestsNav />
       <div className={styles.head}>
         <div>
-          <h1 id="page-title">{view === 'quests' ? t('quests_title') : t('badges_title')}</h1>
-          <p className={styles.sub}>
-            {view === 'quests'
-              ? t('quests_sub')
-              : t('badges_sub', { n: unlocked, t: badges?.length ?? 15 })}
-          </p>
+          <h1 id="page-title">{heading[0]}</h1>
+          <p className={styles.sub}>{heading[1]}</p>
         </div>
-        <Segmented
-          label={t('quests_view')}
-          value={view}
-          onChange={setView}
-          options={[
-            { value: 'quests', label: t('quests_title') },
-            { value: 'badges', label: t('badges_title') },
-          ]}
-        />
       </div>
-      {view === 'quests' ? (
-        <QuestsView />
-      ) : (
+      {view === 'quests' && <QuestsView />}
+      {view === 'achievements' && (
         <QueryState query={badgesQuery} failed="badges_failed">
           {(data) => <Badges badges={data} />}
         </QueryState>
       )}
+      {view === 'points' && <PointsView />}
     </section>
   );
 }
