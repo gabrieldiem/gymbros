@@ -42,6 +42,8 @@ class Settings:
     email_from: str = "GYMBROS <hola@contact.gabrieldiem.com>"
     # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
     dev_login_enabled: bool = False
+    # Who can open the backoffice. Set on the server only, so nobody can grant it from the app.
+    admin_emails: frozenset[str] = frozenset()
 
     # --- Game tuning (settings.json, env overrides) ---
     game_weekly_target: int = 3
@@ -160,6 +162,11 @@ class Settings:
         self.resend_api_key = os.getenv("RESEND_API_KEY", self.resend_api_key)
         self.email_from = os.getenv("EMAIL_FROM", "") or self.email_from
         self.dev_login_enabled = self._env_bool("DEV_LOGIN_ENABLED", self.dev_login_enabled)
+        self.admin_emails = frozenset(
+            email.strip().lower()
+            for email in os.getenv("ADMIN_EMAILS", "").split(",")
+            if email.strip()
+        )
         for key in self._JSON_KEYS:
             setattr(self, key, self._env_override(key))
 
@@ -181,6 +188,10 @@ class Settings:
             raise ValueError("scoring.volume_kg_per_point must be positive")
         if self.social_notification_days < 1:
             raise ValueError("social.notification_days must be positive")
+
+    def is_admin(self, email: str) -> bool:
+        """Whether this account may use the backoffice."""
+        return email.lower() in self.admin_emails
 
     @property
     def google_enabled(self) -> bool:

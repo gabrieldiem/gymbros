@@ -94,6 +94,16 @@ export function ProfileMenu() {
           >
             {t('settings')}
           </button>
+          {me.is_admin && (
+            <Link
+              to="/admin"
+              role="menuitem"
+              className={styles.item}
+              onClick={() => setOpen(false)}
+            >
+              {t('admin_title')}
+            </Link>
+          )}
           <button
             type="button"
             role="menuitem"

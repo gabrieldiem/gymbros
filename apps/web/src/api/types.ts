@@ -19,6 +19,7 @@ export type Me = {
   language: Language;
   rest_seconds: number;
   crew: Crew | null;
+  is_admin?: boolean;
 };
 
 export type AuthOptions = { google: boolean; dev_login: boolean };

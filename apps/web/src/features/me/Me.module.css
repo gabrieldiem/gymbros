@@ -389,3 +389,34 @@
     0 0 0 3px var(--iron),
     0 0 0 5px var(--chalk);
 }
+
+.deleteAccount summary {
+  min-height: var(--touch);
+  padding: 12px 0;
+  color: var(--smoke);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteAccount[open] > :not(summary) {
+  margin-bottom: 10px;
+}
+
+.destroy {
+  width: 100%;
+  min-height: var(--btn-h);
+  border: 1px solid var(--red);
+  border-radius: var(--r-control);
+  color: var(--red-text);
+  font-weight: 700;
+}
+
+.destroy:hover:not(:disabled) {
+  background: var(--red-tint);
+}
+
+.destroy:disabled {
+  border-color: var(--steel);
+  color: var(--smoke);
+  cursor: not-allowed;
+}

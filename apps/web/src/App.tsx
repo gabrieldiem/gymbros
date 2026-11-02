@@ -10,6 +10,7 @@ import { ClimbPage } from './features/climb/ClimbPage';
 import { CrewPage } from './features/crew/CrewPage';
 import { MePage } from './features/me/MePage';
 import { NotFoundPage } from './features/NotFoundPage';
+import { AdminPage } from './features/admin/AdminPage';
 import { LandingPage } from './features/landing/LandingPage';
 import { PrivacyPage, TermsPage } from './features/legal/LegalPages';
 import { QuestsPage } from './features/quests/QuestsPage';
@@ -21,6 +22,9 @@ export function App() {
       <Route index element={<LandingPage />} />
       <Route path="welcome" element={<Navigate to="/" replace />} />
       <Route path="register" element={<Navigate to="/" replace />} />
+      <Route element={<Gate allow="admin" />}>
+        <Route path="admin" element={<AdminPage />} />
+      </Route>
       <Route element={<AuthLayout />}>
         <Route element={<Gate allow="guest" />}>
           <Route path="login" element={<LoginPage />} />

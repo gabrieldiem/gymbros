@@ -1,6 +1,6 @@
 """The signed-in user's profile."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, status
 
 from db.tables.user import User
 from dependencies import (
@@ -8,15 +8,18 @@ from dependencies import (
     get_current_user,
     get_me_stats_service,
     get_profile_service,
+    get_settings,
 )
 from models.compete import LiftPoint, MeStatsResponse
 from models.compete_mappers import to_me_stats
 from models.errors import error_responses
 from models.mappers import to_me_response
-from models.me import MeResponse, UpdateMeRequest
+from models.me import DeleteAccountRequest, MeResponse, UpdateMeRequest
+from routes.session_cookie import clear_session_cookie
 from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.profile_service import ProfileChanges, ProfileService
+from settings import Settings
 
 router = APIRouter(prefix="/me", tags=["Me"])
 
@@ -39,6 +42,19 @@ async def update_me(
     """Change display name, initials, color or language."""
     changes = ProfileChanges(**body.model_dump(exclude_unset=True))
     return to_me_response(await profiles.update(user, changes))
+
+
+@router.post("/delete", status_code=status.HTTP_204_NO_CONTENT, responses=error_responses(401, 422))
+async def delete_me(
+    body: DeleteAccountRequest,
+    response: Response,
+    user: User = Depends(get_current_user),
+    profiles: ProfileService = Depends(get_profile_service),
+    settings: Settings = Depends(get_settings),
+) -> None:
+    """Delete your account and everything in it. The body repeats your email to confirm."""
+    await profiles.delete(user, body.confirm_email)
+    clear_session_cookie(response, settings)
 
 
 @router.get("/stats", response_model=MeStatsResponse, responses=error_responses(401, 403))

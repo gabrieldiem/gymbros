@@ -9,6 +9,7 @@ from controller import general
 from db.migrate import run_migrations
 from dependencies import engine, logger, settings
 from routes import (
+    admin,
     auth,
     catalog,
     climb,
@@ -51,6 +52,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 app.include_router(me.router, prefix="/api")
 app.include_router(crews.router, prefix="/api")
 app.include_router(catalog.router, prefix="/api")

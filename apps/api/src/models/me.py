@@ -36,6 +36,7 @@ class MeResponse(BaseModel):
     language: Language
     rest_seconds: int
     crew: CrewResponse | None
+    is_admin: bool = False
 
 
 class UpdateMeRequest(BaseModel):
@@ -52,3 +53,9 @@ class JoinCrewRequest(BaseModel):
     """Join a crew with the code a friend shared."""
 
     invite_code: InviteCode
+
+
+class DeleteAccountRequest(BaseModel):
+    """The account's email, typed again to confirm."""
+
+    confirm_email: str

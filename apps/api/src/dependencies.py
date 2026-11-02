@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import (
 from clients.google_oauth_client import GoogleOAuthClient
 from clients.resend_client import ResendEmailClient
 from clock import utc_now
+from db.repositories.admin_repository import AdminRepository
 from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
@@ -29,6 +30,8 @@ from db.repositories.workout_stats_repository import WorkoutStatsRepository
 from db.tables.user import User
 from initializers import init_logger
 from services.activity_service import ActivityService
+from services.admin_service import AdminService
+from services.errors import AdminRequired
 from services.auth_service import AuthService
 from services.badge_service import BadgeService
 from services.bonus_service import BonusService
@@ -95,7 +98,7 @@ def get_crew_service(session: AsyncSession = Depends(get_session)) -> CrewServic
 
 def get_profile_service(session: AsyncSession = Depends(get_session)) -> ProfileService:
     """FastAPI dependency provider for ProfileService."""
-    return ProfileService(UserRepository(session), CrewRepository(session))
+    return ProfileService(UserRepository(session), CrewRepository(session), settings.admin_emails)
 
 
 def build_auth_service(session: AsyncSession) -> AuthService:
@@ -153,6 +156,26 @@ async def get_current_member(
     if crew is None:
         raise NotInCrew(str(user.id))
     return Member(user=user, crew=crew)
+
+
+async def get_current_admin(user: User = Depends(get_current_user)) -> User:
+    """The signed-in admin. Raises AdminRequired (→ 403) for everyone else."""
+    if not settings.is_admin(user.email):
+        raise AdminRequired(str(user.id))
+    return user
+
+
+def get_admin_service(session: AsyncSession = Depends(get_session)) -> AdminService:
+    """FastAPI dependency provider for AdminService."""
+    return AdminService(
+        (
+            AdminRepository(session),
+            UserRepository(session),
+            CrewRepository(session),
+            PointEventRepository(session),
+        ),
+        utc_now,
+    )
 
 
 def get_scoring_rules() -> ScoringRules:

@@ -42,3 +42,20 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
   await expect(page.getByRole('menu')).toBeVisible();
   await audit(page, 'profile menu');
 });
+
+test('backoffice', async ({ page }, testInfo) => {
+  await logIn(page, 'gabi', testInfo);
+  await page.goto('/admin');
+  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin overview');
+  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin accounts');
+  await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin crews');
+  await page.getByRole('button', { name: /E2E/ }).first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await audit(page, 'admin crew sheet');
+});

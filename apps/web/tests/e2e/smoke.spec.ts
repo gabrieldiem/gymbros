@@ -144,3 +144,35 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page).toHaveURL(/:\d+\/$/);
   expect(errors).toEqual([]);
 });
+
+test('backoffice: an admin opens it from the menu, a member is sent away', async ({
+  page,
+}, testInfo) => {
+  const errors = collectErrors(page);
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('maxo', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.goto('/admin');
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await page.getByRole('menuitem', { name: /Log out|Salir|Cerrar/ }).click();
+  await expect(page).toHaveURL(/:\d+\/$/);
+
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await page.getByRole('menuitem', { name: 'Backoffice' }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await page.waitForTimeout(1100);
+  await shoot(page, 'admin-overview', testInfo);
+  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await expect(page.getByText(`maxo@${testInfo.project.name}.e2e.gymbros.app`)).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await shoot(page, 'admin-members', testInfo);
+  expect(errors).toEqual([]);
+});

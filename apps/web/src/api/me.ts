@@ -19,6 +19,19 @@ export function useMe() {
   return useQuery({ queryKey: meKey, queryFn: ({ signal }) => fetchMe(signal), staleTime: 60_000 });
 }
 
+/** Delete your account. The body repeats your email to confirm. */
+export function useDeleteMyAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (confirmEmail: string) =>
+      apiRequest<null>('/me/delete', { method: 'POST', body: { confirm_email: confirmEmail } }),
+    onSuccess: () => {
+      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== meKey[0] });
+      queryClient.setQueryData(meKey, null);
+    },
+  });
+}
+
 /** PATCH /api/me. The cache is updated optimistically (profile fields only, never points). */
 export function useUpdateMe() {
   const queryClient = useQueryClient();

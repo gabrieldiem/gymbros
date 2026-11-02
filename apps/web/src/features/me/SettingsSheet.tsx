@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 
 import { useLogout } from '../../api/auth';
-import { useMe, useUpdateMe } from '../../api/me';
+import { useDeleteMyAccount, useMe, useUpdateMe } from '../../api/me';
 import type { CrewColor } from '../../api/types';
 import { Button } from '../../components/Button';
+import { FormError } from '../../components/FormError';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { LanguageToggle } from '../../components/LanguageToggle';
@@ -80,7 +81,37 @@ function ColorPicker() {
   );
 }
 
-/** Name, color, language, rest timer length and log out. */
+function DeleteAccount() {
+  const { t } = useI18n();
+  const me = useMe().data;
+  const destroy = useDeleteMyAccount();
+  const [typed, setTyped] = useState('');
+  const email = me?.email ?? '';
+  const matches = typed.trim().toLowerCase() === email.toLowerCase();
+  return (
+    <details className={styles.deleteAccount}>
+      <summary>{t('delete_account')}</summary>
+      <p>{t('delete_hint')}</p>
+      <TextField
+        label={t('delete_type_email', { email })}
+        autoComplete="off"
+        value={typed}
+        onChange={(e) => setTyped(e.target.value)}
+      />
+      <FormError error={destroy.error} />
+      <button
+        type="button"
+        className={styles.destroy}
+        disabled={!matches || destroy.isPending}
+        onClick={() => destroy.mutate(typed)}
+      >
+        {t('delete_account')}
+      </button>
+    </details>
+  );
+}
+
+/** Name, color, language, rest timer length, log out and deleting the account. */
 export function SettingsSheet({ onClose }: { onClose: () => void }) {
   const { t } = useI18n();
   const me = useMe().data;
@@ -112,6 +143,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
         <Button variant="ghost" wide onClick={() => logout.mutate()} disabled={logout.isPending}>
           {t('log_out')}
         </Button>
+        <DeleteAccount />
       </div>
     </Sheet>
   );
