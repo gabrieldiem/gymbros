@@ -156,7 +156,9 @@ Anyone can see `/` without signing in: a sample crew on the real map and rope or
 
 ## Joining a crew
 
-A crew's invite link (`/invite/<code>`) shows the crew's name and size before signing in, and fills in the join screen afterwards. Share it from the profile menu. Typing the code still works.
+A crew's invite link (`/invite/<code>`) shows the crew's name and size before signing in, and joins you to the crew once you're signed in, whether your account is new or existing. Share it from the profile menu. Typing the code still works. It's one crew per person: if you're already in another crew the link says so and moves nobody.
+
+An invite code can have a maximum number of uses and an expiry. A code that's used up or expired stops working and says why. People who already joined stay.
 
 ## Your account
 
@@ -167,7 +169,7 @@ The avatar opens a menu with your profile, settings, inviting friends and log ou
 `/admin` is for the accounts listed in the `ADMIN_EMAILS` server setting. Nobody can grant it from the app.
 
 - **Overview:** accounts, crews, workouts, and the last 7 days.
-- **Crews:** create, rename, change the time zone, replace the invite code (the old one stops working; members stay).
+- **Crews:** create, rename, change the time zone. Set a custom invite code (4 to 12 letters and digits), maximum uses and an expiry, or replace the code with a random one. A new code stops the old one working and starts counting from zero; members stay. Email someone the invite link: they join when they open it and sign in. If the email can't be sent, the link is offered to copy.
 - **Accounts:** search, adjust points with a reason (±5,000, counted like any other points), remove from a crew (history stays), delete.
 - **Log:** every change, with who made it. It stores ids, so a deleted account leaves no personal data behind.
 

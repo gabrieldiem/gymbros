@@ -12,7 +12,9 @@ from models.admin import (
     AdminCrewResponse,
     AdminMemberResponse,
     CreateCrewRequest,
+    InviteSentResponse,
     OverviewResponse,
+    SendInviteRequest,
     UpdateCrewRequest,
 )
 from models.errors import error_responses
@@ -28,13 +30,17 @@ router = APIRouter(
 )
 
 
-def _crew(row: CrewRow) -> AdminCrewResponse:
+def _crew(row: CrewRow, admin: AdminService) -> AdminCrewResponse:
     crew = row.crew
     return AdminCrewResponse(
         id=crew.id,
         name=crew.name,
         time_zone=crew.time_zone,
         invite_code=crew.invite_code,
+        invite_uses=crew.invite_uses,
+        invite_max_uses=crew.invite_max_uses,
+        invite_expires_at=crew.invite_expires_at,
+        invite_status=admin.invite_status(crew),  # type: ignore[arg-type]
         members=row.members,
         points=row.points,
     )
@@ -66,30 +72,39 @@ async def overview(admin: AdminService = Depends(get_admin_service)) -> Overview
 @router.get("/crews", response_model=list[AdminCrewResponse])
 async def crews(admin: AdminService = Depends(get_admin_service)) -> list[AdminCrewResponse]:
     """Every crew with its invite code."""
-    return [_crew(row) for row in await admin.crews()]
+    return [_crew(row, admin) for row in await admin.crews()]
 
 
-@router.post("/crews", status_code=status.HTTP_201_CREATED, response_model=AdminCrewResponse)
+@router.post(
+    "/crews",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AdminCrewResponse,
+    responses=error_responses(409, 422),
+)
 async def create_crew(
     body: CreateCrewRequest,
     user: User = Depends(get_current_admin),
     admin: AdminService = Depends(get_admin_service),
 ) -> AdminCrewResponse:
-    """Create a crew. It gets a random invite code to share."""
-    return _crew(CrewRow(await admin.create_crew(user, body.name, body.time_zone), 0, 0))
+    """Create a crew, with a chosen invite code and limits or a random code and none."""
+    invite = body.model_dump(include={"invite_code", "invite_max_uses", "invite_expires_at"})
+    crew = await admin.create_crew(user, body.name, body.time_zone, invite)
+    return _crew(CrewRow(crew, 0, 0), admin)
 
 
-@router.patch("/crews/{crew_id}", response_model=AdminCrewResponse, responses=error_responses(404))
+@router.patch(
+    "/crews/{crew_id}", response_model=AdminCrewResponse, responses=error_responses(404, 409, 422)
+)
 async def update_crew(
     crew_id: uuid.UUID,
     body: UpdateCrewRequest,
     user: User = Depends(get_current_admin),
     admin: AdminService = Depends(get_admin_service),
 ) -> AdminCrewResponse:
-    """Rename a crew or change its time zone."""
-    crew = await admin.update_crew(user, crew_id, body.name, body.time_zone)
+    """Change a crew's name, time zone, invite code or invite limits. Only sent fields change."""
+    crew = await admin.update_crew(user, crew_id, body.model_dump(exclude_unset=True))
     row = next(r for r in await admin.crews() if r.crew.id == crew.id)
-    return _crew(row)
+    return _crew(row, admin)
 
 
 @router.post(
@@ -105,7 +120,23 @@ async def rotate_invite_code(
     """Replace the invite code. The old one stops working."""
     crew = await admin.rotate_invite_code(user, crew_id)
     row = next(r for r in await admin.crews() if r.crew.id == crew.id)
-    return _crew(row)
+    return _crew(row, admin)
+
+
+@router.post(
+    "/crews/{crew_id}/invites",
+    response_model=InviteSentResponse,
+    responses=error_responses(404, 409),
+)
+async def send_invite(
+    crew_id: uuid.UUID,
+    body: SendInviteRequest,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> InviteSentResponse:
+    """Email someone the crew's invite link. They join when they open it and sign in."""
+    sent = await admin.send_invite(user, crew_id, body.email, body.language)
+    return InviteSentResponse.model_validate(sent)
 
 
 @router.get("/members", response_model=list[AdminMemberResponse])

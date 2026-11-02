@@ -37,6 +37,34 @@ class InviteCodeNotFound(DomainError):
     """No crew has this invite code."""
 
 
+class InviteCodeExpired(DomainError):
+    """This invite code's time ran out."""
+
+
+class InviteCodeUsedUp(DomainError):
+    """This invite code has reached its maximum uses."""
+
+
+class InviteCodeInvalid(DomainError):
+    """A custom invite code must be 4 to 12 letters and digits."""
+
+
+class InviteCodeTaken(DomainError):
+    """Another crew already uses this invite code."""
+
+
+class InviteExpiryInPast(DomainError):
+    """An invite can't expire in the past."""
+
+
+class AlreadyInThisCrew(DomainError):
+    """The person being invited is already in this crew."""
+
+
+class MemberInOtherCrew(DomainError):
+    """The person being invited is in another crew, and it's one crew per person."""
+
+
 class AlreadyInCrew(DomainError):
     """The user already belongs to a crew (one crew per user)."""
 

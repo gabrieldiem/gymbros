@@ -165,7 +165,10 @@ async def get_current_admin(user: User = Depends(get_current_user)) -> User:
     return user
 
 
-def get_admin_service(session: AsyncSession = Depends(get_session)) -> AdminService:
+def get_admin_service(
+    session: AsyncSession = Depends(get_session),
+    email: EmailSender = Depends(get_email_sender),
+) -> AdminService:
     """FastAPI dependency provider for AdminService."""
     return AdminService(
         (
@@ -175,6 +178,8 @@ def get_admin_service(session: AsyncSession = Depends(get_session)) -> AdminServ
             PointEventRepository(session),
         ),
         utc_now,
+        email,
+        settings.public_url,
     )
 
 

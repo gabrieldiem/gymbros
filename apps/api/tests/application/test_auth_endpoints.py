@@ -40,8 +40,9 @@ class FakeEmail:
     def __init__(self) -> None:
         self.sent = []
 
-    async def send(self, message) -> None:
+    async def send(self, message) -> bool:
         self.sent.append(message)
+        return True
 
 
 @pytest.fixture

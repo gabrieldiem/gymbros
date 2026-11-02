@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, Uuid, func
+from sqlalchemy import DateTime, Integer, String, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.base import Base
@@ -18,4 +18,8 @@ class Crew(Base):  # pylint: disable=too-few-public-methods
     name: Mapped[str] = mapped_column(String(40))
     time_zone: Mapped[str] = mapped_column(String(64))
     invite_code: Mapped[str] = mapped_column(String(12), unique=True)
+    # How many people joined with this code, and its optional limits. None means no limit.
+    invite_uses: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    invite_max_uses: Mapped[int | None] = mapped_column(Integer)
+    invite_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
