@@ -76,7 +76,7 @@ When a routine starts, every set is pre-filled from the last session:
 - Other weighted lifts and bodyweight: same load, +1 rep
 - Cardio: +1 minute, same distance
 
-The logger shows the last-time values per set and a "Loaded to beat last time" hint.
+The logger shows your current PR on each exercise, the last-time values per set and a "Loaded to beat last time" hint.
 
 ## Ranks (lifetime, ATUS Climb camps)
 
@@ -111,7 +111,7 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 
 - **Feed:** finished workouts (title, duration, sets, kg, +% vs last time, PR banner, expandable exercise list), badge unlocks, rank-ups and inactivity nudges ("Matex hasn't trained in 3 days" with a Nudge button).
 - **Reactions:** 👊 and 🔥 (toggle), comments with quick replies.
-- **Notifications** (inbox + toast): someone passed you, someone close behind and training now, new bounty, weekly recap ready, reactions, replies, duel accepted, goal hit.
+- **Notifications** (inbox + toast): someone passed you, someone close behind and training now, new bounty, weekly recap ready, reactions, comments on your post and on posts you commented on, duel accepted, goal hit, an admin changing your points.
 - **Training now:** live "who's at the gym" chips with their current activity.
 - **What's new:** when a feature ships, members hear about it once, as one bell notification that opens the What's new page (also in the profile menu). Several features since your last visit roll into one notification. It never toasts, pops up or emails, and it isn't sent to someone who joined after the feature came out.
 - **Weekly recap:** story-style slides (crew total, biggest climber, heaviest PR, your week, most improved, this week's event). This is the one place where the bold, loud visual treatment is allowed.
@@ -186,7 +186,7 @@ The avatar opens a menu with your profile, settings, inviting friends and log ou
 
 - **Overview:** accounts, crews, workouts, and the last 7 days.
 - **Crews:** create, rename, change the time zone. Set a custom invite code (4 to 12 letters and digits), maximum uses and an expiry, or replace the code with a random one. A new code stops the old one working and starts counting from zero; members stay. Email someone the invite link: they join when they open it and sign in. If the email can't be sent, the link is offered to copy.
-- **Accounts:** search, adjust points with a reason (±5,000, counted like any other points), remove from a crew (history stays), delete.
+- **Accounts:** search, adjust points with a reason (±5,000, counted like any other points; the member gets a notification with the amount and the reason), remove from a crew (history stays), delete.
 - **Log:** every change, with who made it. It stores ids, so a deleted account leaves no personal data behind.
 
 ## Not in v1

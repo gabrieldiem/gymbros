@@ -181,6 +181,7 @@ def get_admin_service(
         utc_now,
         email,
         settings.public_url,
+        _notifier(session),
     )
 
 

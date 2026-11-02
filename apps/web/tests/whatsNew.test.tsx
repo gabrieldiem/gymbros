@@ -58,6 +58,17 @@ describe('What’s new', () => {
     );
   });
 
+  it('tells you why an admin changed your points', () => {
+    const adjusted = (points: number) => ({
+      ...notice({ points, reason: 'Logged twice' }),
+      key: 'n_points_adjusted',
+    });
+    expect(notificationText(adjusted(50), t)).toBe('An admin gave you 50 points: Logged twice');
+    expect(notificationText(adjusted(-50), t)).toBe(
+      'An admin took away 50 of your points: Logged twice',
+    );
+  });
+
   it('lists what’s new with a way to try it', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()], 'GET /api/whats-new': [200, ENTRIES] });
     renderApp('/whats-new');

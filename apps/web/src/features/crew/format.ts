@@ -35,6 +35,14 @@ export function notificationText(item: Notification, t: T): string {
       });
     case 'n_whats_new':
       return whatsNewText(item, t);
+    case 'n_points_adjusted': {
+      const points = Number(vars.points);
+      const reason = String(vars.reason);
+      return points >= 0
+        ? t('n_points_added', { n: points, reason })
+        : t('n_points_removed', { n: -points, reason });
+    }
+    case 'n_reply':
     case 'n_passed':
     case 'n_behind':
     case 'n_goal':

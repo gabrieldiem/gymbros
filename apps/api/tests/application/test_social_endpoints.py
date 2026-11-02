@@ -3,11 +3,14 @@
 import uuid
 from datetime import UTC, datetime, timedelta
 
+from httpx import ASGITransport, AsyncClient
+
 from db.repositories.crew_repository import CrewRepository
 from db.tables.notification import Notification
 from db.tables.workout import Workout
 from services.crew_service import CrewService
 from services.training_rules import week_start
+from main import app
 from tests.application.conftest import register_on
 from tests.application.test_climb_endpoints import give_points
 
@@ -327,3 +330,21 @@ async def test_reading_the_inbox_prunes_notifications_older_than_60_days(
     await db_session.flush()
     assert (await client.post("/api/notifications/read")).status_code == 204
     assert sorted(await keys(client)) == ["n_new", "n_recent"]
+
+
+async def test_a_comment_tells_everyone_in_the_thread_once(client, member, other_client, crew):
+    await finish(client)
+    third = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+    async with third:
+        await register_on(other_client, "maxo@example.com", crew.invite_code)
+        await register_on(third, "santi@example.com", crew.invite_code)
+        item_id = (await other_client.get("/api/feed")).json()["items"][0]["id"]
+        url = f"/api/feed/{item_id}/comments"
+        await other_client.post(url, json={"body": "First"})
+        await third.post(url, json={"body": "Second"})
+        await third.post(url, json={"body": "Third"})
+        # Maxo is told about Santi's comments. The owner gets n_comment, not n_reply too.
+        assert (await keys(other_client)).count("n_reply") == 2
+        assert "n_reply" not in await keys(client)
+        # Nobody is told about their own comment.
+        assert "n_reply" not in await keys(third)
