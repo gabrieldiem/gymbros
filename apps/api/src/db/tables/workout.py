@@ -46,6 +46,8 @@ class Workout(Base):  # pylint: disable=too-few-public-methods
     crew_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("crews.id", ondelete="CASCADE"))
     routine_id: Mapped[str | None] = mapped_column(String(32))
     name: Mapped[str] = mapped_column(String(60))
+    # Set when this logs a past day (crew-local); null for a workout happening now.
+    performed_on: Mapped[date | None] = mapped_column(Date)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     week_start: Mapped[date | None] = mapped_column(Date)

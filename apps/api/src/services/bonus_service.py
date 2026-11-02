@@ -2,7 +2,7 @@
 
 import uuid
 from collections.abc import Callable
-from datetime import datetime
+from datetime import date, datetime
 
 from db.repositories.point_event_repository import PointEventRepository
 from db.tables.point_event import PointEvent
@@ -36,20 +36,27 @@ class BonusService:
 
         The crew quest and the bounty are once per crew per week, so concurrent finishes in the
         same crew are serialized with a transaction-scoped lock before anything is checked.
+
+        A past workout counts towards the quests of its own week. The bounty and badges are about
+        where you stand now, so they're always this week's. Locks go oldest week first, so a past
+        workout and a normal one can't deadlock.
         """
-        week = week_start(self._now(), member.crew.time_zone)
-        await self._events.lock(f"bonus:{member.crew.id}:{week.isoformat()}")
-        paid: list[LineItem] = []
-        paid += await self._store(member, workout, await self._quests.claim_quests(member))
-        paid += await self._store(member, workout, await self._quests.claim_crew_quest(member, 0))
-        paid += await self._store(member, workout, await self._quests.claim_bounty(member, before))
-        paid += await self._store(member, workout, await self._badges.check(member))
+        this_week = week_start(self._now(), member.crew.time_zone)
+        its_week = workout.week_start or this_week
+        for week in sorted({its_week, this_week}):
+            await self._events.lock(f"bonus:{member.crew.id}:{week.isoformat()}")
+        quests = await self._quests.claim_quests(member, its_week)
+        paid = await self._store(member, workout, quests, its_week)
+        crew_quest = await self._quests.claim_crew_quest(member, 0, its_week)
+        paid += await self._store(member, workout, crew_quest, its_week)
+        bounty = await self._quests.claim_bounty(member, before)
+        paid += await self._store(member, workout, bounty, this_week)
+        paid += await self._store(member, workout, await self._badges.check(member), this_week)
         return paid
 
     async def _store(
-        self, member: Member, workout: Workout, items: list[LineItem]
+        self, member: Member, workout: Workout, items: list[LineItem], week: date
     ) -> list[LineItem]:
-        week = week_start(self._now(), member.crew.time_zone)
         await self._events.add_all(
             [
                 PointEvent(

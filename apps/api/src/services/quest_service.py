@@ -2,7 +2,7 @@
 
 import uuid
 from collections.abc import Callable
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from db.repositories.crew_repository import CrewRepository
@@ -47,10 +47,10 @@ class QuestService:
     async def board(self, member: Member) -> QuestBoard:
         """Everything on the Quests tab for this week."""
         week = week_start(self._now(), member.crew.time_zone)
-        activity = await self._activity(member)
+        activity = await self._activity(member, week)
         quests = []
         for quest in load_quests():
-            claimed = await self._claimed(member, quest.id)
+            claimed = await self._claimed(member, quest.id, week)
             quests.append(QuestView(quest, quest_progress(quest, activity), claimed))
         return QuestBoard(
             week_start=week,
@@ -58,28 +58,27 @@ class QuestService:
                 week + timedelta(days=7), time(0, 0), ZoneInfo(member.crew.time_zone)
             ),
             quests=tuple(quests),
-            crew_quest=await self._crew_quest(member),
+            crew_quest=await self._crew_quest(member, week),
             bounty=await self.bounty(member),
             weekly_event=self._weekly_event,
             duel_points=self._duel_points,
         )
 
-    async def claim_quests(self, member: Member) -> list[LineItem]:
-        """Pay every quest completed this week and not paid yet."""
-        activity = await self._activity(member)
+    async def claim_quests(self, member: Member, week: date) -> list[LineItem]:
+        """Pay every quest completed that week and not paid yet."""
+        activity = await self._activity(member, week)
         items = []
         for quest in load_quests():
             done = quest_progress(quest, activity) >= quest.goal
-            if done and not await self._claimed(member, quest.id):
+            if done and not await self._claimed(member, quest.id, week):
                 items.append(LineItem(QUEST_KEY, {"quest": quest.id}, quest.bonus))
         return items
 
-    async def claim_crew_quest(self, member: Member, gained: int) -> list[LineItem]:
+    async def claim_crew_quest(self, member: Member, gained: int, week: date) -> list[LineItem]:
         """When the crew's week reaches the goal, everyone gets the bonus (once per week)."""
-        view = await self._crew_quest(member)
+        view = await self._crew_quest(member, week)
         if view.claimed or view.total + gained < view.goal:
             return []
-        week = week_start(self._now(), member.crew.time_zone)
         others = [u.id for u, _ in view.shares if u.id != member.user.id]
         await self._events.add_all(
             [self._event(member, uid, CREW_QUEST_KEY, {}, self._crew_bonus, week) for uid in others]
@@ -116,18 +115,15 @@ class QuestService:
         leader = (await self._users.get_many({leader_id})).get(leader_id) if leader_id else None
         return BountyView(leader, totals.get(leader_id, 0) if leader_id else 0, self._bounty, None)
 
-    async def _activity(self, member: Member) -> WeekActivity:
-        week = week_start(self._now(), member.crew.time_zone)
+    async def _activity(self, member: Member, week: date) -> WeekActivity:
         workouts = await self._workouts.finished_in_week(member.user.id, week)
         logs = [to_workout_log(w, self._catalog) for w in workouts]
         return week_activity(logs, self._bodyweight)
 
-    async def _claimed(self, member: Member, quest_id: str) -> bool:
-        week = week_start(self._now(), member.crew.time_zone)
+    async def _claimed(self, member: Member, quest_id: str, week: date) -> bool:
         return await self._events.user_has(member.user.id, week, QUEST_KEY, quest=quest_id)
 
-    async def _crew_quest(self, member: Member) -> CrewQuestView:
-        week = week_start(self._now(), member.crew.time_zone)
+    async def _crew_quest(self, member: Member, week: date) -> CrewQuestView:
         totals = await self._events.totals_by_user(member.crew.id, week)
         users = await self._crews.members(member.crew.id)
         shares = tuple(sorted(((u, totals.get(u.id, 0)) for u in users), key=lambda s: -s[1]))

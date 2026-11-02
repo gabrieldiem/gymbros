@@ -16,6 +16,7 @@ from models.errors import error_responses
 from models.workout_mappers import to_finish_response, to_workout_response
 from models.workouts import (
     FinishResponse,
+    PastDayModel,
     SaveWorkoutRequest,
     StartWorkoutRequest,
     WeekResponse,
@@ -43,8 +44,9 @@ async def start_workout(
     member: Member = Depends(get_current_member),
     workouts: WorkoutService = Depends(get_workout_service),
 ) -> WorkoutResponse:
-    """Start a workout from a routine (pre-filled to beat last time) or empty."""
-    return to_workout_response(await workouts.start(member, body.routine_id, body.name))
+    """Start a workout from a routine (pre-filled to beat last time) or empty, or log a past day."""
+    view = await workouts.start(member, body.routine_id, body.name, body.performed_on)
+    return to_workout_response(view)
 
 
 @router.get("/active", response_model=WorkoutResponse | None, responses=error_responses(401, 403))
@@ -61,6 +63,7 @@ async def get_active_workout(
 async def get_week(
     member: Member = Depends(get_current_member),
     context: ScoringContextBuilder = Depends(get_scoring_context),
+    workouts: WorkoutService = Depends(get_workout_service),
     settings: Settings = Depends(get_settings),
 ) -> WeekResponse:
     """Workouts finished this crew-local week against the weekly target."""
@@ -69,6 +72,9 @@ async def get_week(
         workouts=week.workouts_before,
         target=settings.game_weekly_target,
         leg_event_active=week.leg_event_active,
+        past_days=[
+            PastDayModel(day=p.day, workouts=p.workouts) for p in await workouts.past_days(member)
+        ],
     )
 
 

@@ -223,6 +223,7 @@ def get_workout_service(session: AsyncSession = Depends(get_session)) -> Workout
         get_scoring_rules(),
         utc_now,
         activity=build_activity_service(session),
+        past_workout_days=settings.game_past_workout_days,
     )
 
 

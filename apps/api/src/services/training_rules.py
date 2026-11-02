@@ -1,7 +1,7 @@
 """Pure training rules shared by scoring, pre-fill and history: e1RM, load, overload, weeks."""
 
 from dataclasses import dataclass, replace
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from services.catalog import Exercise
@@ -76,6 +76,23 @@ def week_start(moment: datetime, time_zone: str) -> date:
     """The Monday of the crew-local week that contains `moment` (must be timezone-aware)."""
     local = moment.astimezone(ZoneInfo(time_zone)).date()
     return local - timedelta(days=local.weekday())
+
+
+def local_noon(day: date, time_zone: str) -> datetime:
+    """When a past workout counts as done: the day is all we ask for, and noon stays clear of
+    the dawn and night badges."""
+    return datetime.combine(day, time(12, 0), ZoneInfo(time_zone))
+
+
+def performed_at(performed_on: date | None, time_zone: str, now: datetime) -> datetime:
+    """When a workout counts as done: its past day, or now for one happening now."""
+    return local_noon(performed_on, time_zone) if performed_on else now
+
+
+def past_days(now: datetime, time_zone: str, days: int) -> tuple[date, ...]:
+    """The days a forgotten workout can be logged for, newest first. Today isn't one of them."""
+    today = now.astimezone(ZoneInfo(time_zone)).date()
+    return tuple(today - timedelta(days=back) for back in range(1, days + 1))
 
 
 def goal_streak_before(this_week: date, workouts_by_week: dict[date, int], target: int) -> int:

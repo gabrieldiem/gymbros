@@ -235,11 +235,8 @@ async def test_third_workout_of_the_week_pays_the_weekly_goal_and_streak(client,
     assert keys["ln_goal"] == ({"n": 3}, 150)
     assert keys["ln_streak"] == ({"weeks": 1}, 20)
     assert body["workouts_this_week"] == 3
-    assert (await client.get("/api/workouts/week")).json() == {
-        "workouts": 3,
-        "target": 3,
-        "leg_event_active": True,
-    }
+    week = (await client.get("/api/workouts/week")).json()
+    assert (week["workouts"], week["target"], week["leg_event_active"]) == (3, 3, True)
 
 
 # --- Discard and training now --------------------------------------------------------------

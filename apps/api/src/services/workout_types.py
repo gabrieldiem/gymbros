@@ -1,6 +1,7 @@
 """Data containers for the workout services."""
 
 from dataclasses import dataclass
+from datetime import date
 
 from db.tables.workout import Workout
 from services.climb_types import ClimbChange
@@ -32,6 +33,14 @@ class WorkoutView:
     workout: Workout
     exercises: tuple[ExerciseView, ...]
     live: ScoreResult
+
+
+@dataclass(frozen=True, slots=True)
+class PastDay:
+    """A day a forgotten workout can be logged for, with what's already logged on it."""
+
+    day: date
+    workouts: int
 
 
 @dataclass(frozen=True, slots=True)

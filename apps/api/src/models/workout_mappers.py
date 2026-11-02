@@ -28,6 +28,7 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         id=workout.id,
         name=workout.name,
         routine_id=workout.routine_id,
+        performed_on=workout.performed_on,
         started_at=workout.started_at,
         exercises=[
             ExerciseOutput(
@@ -48,6 +49,7 @@ def to_finish_response(finished: FinishedWorkout, weekly_target: int) -> FinishR
     return FinishResponse(
         workout_id=workout.id,
         name=workout.name,
+        performed_on=workout.performed_on,
         started_at=workout.started_at,
         finished_at=workout.finished_at,
         total=finished.total,

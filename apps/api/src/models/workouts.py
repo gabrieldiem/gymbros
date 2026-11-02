@@ -1,7 +1,7 @@
 """Workout request and response models."""
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, Field, StringConstraints
 from typing_extensions import Annotated
@@ -34,6 +34,7 @@ class StartWorkoutRequest(BaseModel):
 
     routine_id: str | None = Field(default=None, max_length=32)
     name: WorkoutName | None = None
+    performed_on: date | None = None
 
 
 class SaveWorkoutRequest(BaseModel):
@@ -57,6 +58,7 @@ class WorkoutResponse(BaseModel):
     id: uuid.UUID
     name: str
     routine_id: str | None
+    performed_on: date | None
     started_at: datetime
     exercises: list[ExerciseOutput]
     live_points: int
@@ -83,6 +85,7 @@ class FinishResponse(BaseModel):
 
     workout_id: uuid.UUID
     name: str
+    performed_on: date | None
     started_at: datetime
     finished_at: datetime
     total: int
@@ -97,12 +100,20 @@ class FinishResponse(BaseModel):
     climb: ClimbChangeModel
 
 
+class PastDayModel(BaseModel):
+    """A day a forgotten workout can be logged for, with what's already logged on it."""
+
+    day: date
+    workouts: int
+
+
 class WeekResponse(BaseModel):
-    """The member's workouts this crew-local week."""
+    """The member's workouts this crew-local week, and the past days they can still log."""
 
     workouts: int
     target: int
     leg_event_active: bool
+    past_days: list[PastDayModel]
 
 
 class TrainingNowItem(BaseModel):

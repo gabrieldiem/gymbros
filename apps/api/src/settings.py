@@ -47,6 +47,8 @@ class Settings:
 
     # --- Game tuning (settings.json, env overrides) ---
     game_weekly_target: int = 3
+    # How many days back a forgotten workout can be logged.
+    game_past_workout_days: int = 7
     game_rank_step: int = 1500
     game_rank_count: int = 7
     game_week_scale: int = 1500
@@ -184,6 +186,8 @@ class Settings:
             raise ValueError("DEV_LOGIN_ENABLED must not be set in production")
         if self.game_weekly_target < 1 or self.game_rank_step < 1:
             raise ValueError("game.weekly_target and game.rank_step must be positive")
+        if self.game_past_workout_days < 0:
+            raise ValueError("game.past_workout_days can't be negative")
         if self.scoring_volume_kg_per_point < 1:
             raise ValueError("scoring.volume_kg_per_point must be positive")
         if self.social_notification_days < 1:

@@ -35,6 +35,7 @@ from services.errors import (
     UnknownRoutine,
     WorkoutAlreadyActive,
     WorkoutAlreadyFinished,
+    WorkoutDateOutOfRange,
     WorkoutEmpty,
     WorkoutNotFound,
 )
@@ -61,6 +62,7 @@ _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     WorkoutAlreadyActive: (status.HTTP_409_CONFLICT, "workout_already_active"),
     WorkoutAlreadyFinished: (status.HTTP_409_CONFLICT, "workout_finished"),
     WorkoutEmpty: (status.HTTP_409_CONFLICT, "workout_empty"),
+    WorkoutDateOutOfRange: (status.HTTP_422_UNPROCESSABLE_CONTENT, "workout_date_out_of_range"),
     UnknownExercise: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_exercise"),
     UnknownRoutine: (status.HTTP_422_UNPROCESSABLE_CONTENT, "unknown_routine"),
     FeedItemNotFound: (status.HTTP_404_NOT_FOUND, "feed_item_not_found"),

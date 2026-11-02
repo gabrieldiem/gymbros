@@ -18,7 +18,7 @@ from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_service import score_workout
 from services.scoring_types import LineItem, ScoreResult, ScoringRules
-from services.training_rules import week_start
+from services.training_rules import performed_at, week_start
 from services.workout_mapping import to_workout_log
 from services.workout_service import WorkoutService
 from services.workout_types import FinishedWorkout
@@ -59,14 +59,14 @@ class WorkoutFinisher:
     async def finish(self, member: Member, workout_id: uuid.UUID) -> FinishedWorkout:
         """Score and close the workout. Needs at least one completed set."""
         workout = await self._workouts.get_in_progress(member, workout_id)
-        now = self._now()
-        week = await self._context.week(member, now)
+        moment = performed_at(workout.performed_on, member.crew.time_zone, self._now())
+        week = await self._context.week(member, moment)
         history = await self._context.history(member, workout)
         score = score_workout(to_workout_log(workout, self._catalog), history, week, self._rules)
         if score.completed_sets == 0:
             raise WorkoutEmpty(str(workout_id))
         before = await self._climb.totals(member)
-        await self._close(member, workout, score, now)
+        await self._close(member, workout, score, moment)
         bonus: list[LineItem] = []
         if self._bonus is not None:
             bonus = await self._bonus.after_workout(member, workout, before)
@@ -85,10 +85,14 @@ class WorkoutFinisher:
         return finished
 
     async def _close(
-        self, member: Member, workout: Workout, score: ScoreResult, now: datetime
+        self, member: Member, workout: Workout, score: ScoreResult, moment: datetime
     ) -> None:
-        this_week = week_start(now, member.crew.time_zone)
-        workout.finished_at = now
+        """Everything is dated `moment`, when the workout counts as done. The points arrive now."""
+        now = self._now()
+        this_week = week_start(moment, member.crew.time_zone)
+        if workout.performed_on:
+            workout.started_at = moment  # How long it took isn't known.
+        workout.finished_at = moment
         workout.week_start = this_week
         workout.points = score.total
         workout.volume_kg = score.volume_kg
@@ -110,4 +114,4 @@ class WorkoutFinisher:
             ]
         )
         for record in score.records:
-            await self._records.store(member.user.id, record, workout.id, now)
+            await self._records.store(member.user.id, record, workout.id, moment)

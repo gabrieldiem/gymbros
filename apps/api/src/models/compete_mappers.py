@@ -128,7 +128,7 @@ def to_recap(recap: Recap) -> RecapResponse:
 
 
 def _duration(workout: Workout) -> int:
-    if workout.finished_at is None:
+    if workout.finished_at is None or workout.performed_on is not None:
         return 0
     return max(1, round((workout.finished_at - workout.started_at).total_seconds() / 60))
 
