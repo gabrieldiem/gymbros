@@ -1,7 +1,12 @@
 """The backoffice: who gets in, and that every change works and is audited."""
 
-import pytest
+from datetime import UTC, datetime, timedelta
 
+import pytest
+from httpx import ASGITransport, AsyncClient
+
+from dependencies import get_email_sender
+from main import app
 from tests.application.conftest import register_on
 
 ADMIN = "boss@example.com"
@@ -16,6 +21,7 @@ ENDPOINTS = [
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000/crew"),
     ("DELETE", "/api/admin/members/00000000-0000-0000-0000-000000000000"),
     ("GET", "/api/admin/actions"),
+    ("POST", "/api/admin/crews/00000000-0000-0000-0000-000000000000/invites"),
 ]
 
 
@@ -250,3 +256,246 @@ async def test_deleting_your_account_needs_your_email(other_client, maxo):
 async def test_deleting_needs_a_session(client):
     response = await client.post("/api/me/delete", json={"confirm_email": "a@b.co"})
     assert response.status_code == 401
+
+
+# --- Invite codes: custom, limited, emailed ---------------------------------------------------
+
+
+class FakeEmail:
+    """Collects invites instead of sending them. Set `works` to False to simulate Resend failing."""
+
+    def __init__(self) -> None:
+        self.sent = []
+        self.works = True
+
+    async def send(self, message) -> bool:
+        self.sent.append(message)
+        return self.works
+
+
+@pytest.fixture
+def outbox(client):
+    fake = FakeEmail()
+    app.dependency_overrides[get_email_sender] = lambda: fake
+    return fake
+
+
+def _in(hours: int) -> str:
+    return (datetime.now(UTC) + timedelta(hours=hours)).isoformat()
+
+
+async def _join(http_client, email: str, code: str):
+    await register_on(http_client, email)
+    return await http_client.post("/api/crews/join", json={"invite_code": code})
+
+
+async def test_a_crew_can_have_a_custom_invite_code(client, other_client, admin, crew):
+    response = await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": "atus-2026"})
+    assert response.status_code == 200
+    assert response.json()["invite_code"] == "ATUS2026"
+    assert (await _join(other_client, "new@example.com", "atus2026")).status_code == 200
+
+
+async def test_a_new_crew_can_start_with_a_custom_code_and_limits(client, admin):
+    response = await client.post(
+        "/api/admin/crews",
+        json={
+            "name": "ATUS",
+            "time_zone": "America/Argentina/Buenos_Aires",
+            "invite_code": "SUMMIT",
+            "invite_max_uses": 5,
+            "invite_expires_at": _in(48),
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert (body["invite_code"], body["invite_max_uses"]) == ("SUMMIT", 5)
+    assert body["invite_status"] == "active"
+
+
+async def test_a_custom_code_must_be_free(client, admin, crew):
+    other = await client.post(
+        "/api/admin/crews", json={"name": "Other", "time_zone": "UTC", "invite_code": "TAKEN1"}
+    )
+    assert other.status_code == 201
+    response = await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": "taken-1"})
+    assert response.status_code == 409
+    assert response.json() == {"detail": {"code": "invite_code_taken"}}
+
+
+async def test_setting_a_crews_own_code_again_is_fine(client, admin, crew):
+    response = await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": "ironridge"})
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("code", ["abc", "THIRTEENCHARS", "ñandú", "!!!!"])
+async def test_a_custom_code_must_be_4_to_12_letters_and_digits(client, admin, crew, code):
+    response = await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": code})
+    assert response.status_code == 422
+    assert response.json() == {"detail": {"code": "invite_code_invalid"}}
+
+
+async def test_max_uses_stops_new_joins_and_counts_them(client, other_client, admin, crew):
+    # The admin's own join already counted once.
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": 2})
+    assert (await _join(other_client, "second@member.com", "IRONRIDGE")).status_code == 200
+    row = (await client.get("/api/admin/crews")).json()[0]
+    assert (row["invite_uses"], row["invite_status"]) == (2, "used_up")
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as third:
+        response = await _join(third, "third@member.com", "IRONRIDGE")
+    assert response.status_code == 410
+    assert response.json() == {"detail": {"code": "invite_code_used_up"}}
+
+
+async def test_an_expired_code_stops_joins(client, other_client, admin, crew, db_session):
+    crew.invite_expires_at = datetime.now(UTC) - timedelta(minutes=1)
+    await db_session.flush()
+    response = await _join(other_client, "late@member.com", "IRONRIDGE")
+    assert response.status_code == 410
+    assert response.json() == {"detail": {"code": "invite_code_expired"}}
+    assert (await client.get("/api/admin/crews")).json()[0]["invite_status"] == "expired"
+    invite = await other_client.get("/api/crews/invite/IRONRIDGE")
+    assert invite.status_code == 410
+
+
+async def test_a_future_expiry_lets_people_join(client, other_client, admin, crew):
+    response = await client.patch(
+        f"/api/admin/crews/{crew.id}", json={"invite_expires_at": _in(24)}
+    )
+    assert response.status_code == 200
+    assert (await _join(other_client, "soon@member.com", "IRONRIDGE")).status_code == 200
+
+
+async def test_an_expiry_in_the_past_is_refused(client, admin, crew):
+    response = await client.patch(
+        f"/api/admin/crews/{crew.id}", json={"invite_expires_at": _in(-1)}
+    )
+    assert response.status_code == 422
+    assert response.json() == {"detail": {"code": "invite_expiry_in_past"}}
+
+
+async def test_an_expiry_needs_a_time_zone(client, admin, crew):
+    response = await client.patch(
+        f"/api/admin/crews/{crew.id}", json={"invite_expires_at": "2030-01-01T10:00:00"}
+    )
+    assert response.status_code == 422
+
+
+async def test_sending_null_removes_a_limit(client, other_client, admin, crew):
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": 1})
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": None})
+    row = (await client.get("/api/admin/crews")).json()[0]
+    assert (row["invite_max_uses"], row["invite_status"]) == (None, "active")
+    assert (await _join(other_client, "free@member.com", "IRONRIDGE")).status_code == 200
+
+
+async def test_editing_a_name_leaves_limits_alone(client, admin, crew):
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": 9})
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"name": "ATUS"})
+    assert (await client.get("/api/admin/crews")).json()[0]["invite_max_uses"] == 9
+
+
+@pytest.mark.parametrize("uses", [0, -1, 100_001])
+async def test_max_uses_must_be_sane(client, admin, crew, uses):
+    response = await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": uses})
+    assert response.status_code == 422
+
+
+async def test_a_new_code_starts_counting_again(client, admin, crew):
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": 1})
+    assert (await client.get("/api/admin/crews")).json()[0]["invite_status"] == "used_up"
+    custom = (
+        await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": "FRESH1"})
+    ).json()
+    assert (custom["invite_uses"], custom["invite_status"]) == (0, "active")
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_code": "IRONRIDGE"})
+
+
+async def test_a_failed_join_does_not_use_up_the_code(client, other_client, admin, crew):
+    before = (await client.get("/api/admin/crews")).json()[0]["invite_uses"]
+    await register_on(other_client, "twice@member.com", "IRONRIDGE")
+    second = await other_client.post("/api/crews/join", json={"invite_code": "IRONRIDGE"})
+    assert second.status_code == 409
+    assert (await client.get("/api/admin/crews")).json()[0]["invite_uses"] == before + 1
+
+
+async def test_emailing_an_invite_to_a_new_person(client, admin, crew, outbox):
+    response = await client.post(
+        f"/api/admin/crews/{crew.id}/invites", json={"email": "New@Friend.com", "language": "es"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "sent": True,
+        "link": "https://app.example.com/invite/IRONRIDGE",
+        "existing_account": False,
+    }
+    message = outbox.sent[0]
+    assert message.to == "new@friend.com"
+    assert "Iron Ridge" in message.subject
+    assert "https://app.example.com/invite/IRONRIDGE" in message.text
+    assert "te invitó" in message.text
+    log = (await _actions(client))[0]
+    assert log["action"] == "invite_sent"
+    assert "friend.com" not in str(log)
+
+
+async def test_emailing_an_existing_account_without_a_crew_uses_its_language(
+    client, other_client, admin, crew, outbox
+):
+    await register_on(other_client, "free@agent.com")
+    await other_client.patch("/api/me", json={"language": "es"})
+    response = await client.post(
+        f"/api/admin/crews/{crew.id}/invites", json={"email": "free@agent.com", "language": "en"}
+    )
+    assert response.json()["existing_account"] is True
+    assert "te invitó" in outbox.sent[0].text
+
+
+async def test_an_invite_says_when_the_email_did_not_go_out(client, admin, crew, outbox):
+    outbox.works = False
+    response = await client.post(
+        f"/api/admin/crews/{crew.id}/invites", json={"email": "new@friend.com"}
+    )
+    assert response.status_code == 200
+    assert response.json()["sent"] is False
+    assert response.json()["link"].endswith("/invite/IRONRIDGE")
+
+
+async def test_someone_already_in_this_crew_is_not_invited(client, admin, maxo, crew, outbox):
+    response = await client.post(
+        f"/api/admin/crews/{crew.id}/invites", json={"email": "MAXO@example.com"}
+    )
+    assert response.status_code == 409
+    assert response.json() == {"detail": {"code": "already_in_this_crew"}}
+    assert outbox.sent == []
+
+
+async def test_someone_in_another_crew_is_not_invited(client, other_client, admin, outbox):
+    created = await client.post("/api/admin/crews", json={"name": "Other", "time_zone": "UTC"})
+    await register_on(other_client, "busy@example.com", "IRONRIDGE")
+    response = await client.post(
+        f"/api/admin/crews/{created.json()['id']}/invites", json={"email": "busy@example.com"}
+    )
+    assert response.status_code == 409
+    assert response.json() == {"detail": {"code": "member_in_other_crew"}}
+    assert outbox.sent == []
+
+
+async def test_a_dead_code_is_not_emailed(client, admin, crew, outbox):
+    await client.patch(f"/api/admin/crews/{crew.id}", json={"invite_max_uses": 1})
+    response = await client.post(
+        f"/api/admin/crews/{crew.id}/invites", json={"email": "new@friend.com"}
+    )
+    assert response.status_code == 410
+    assert outbox.sent == []
+
+
+async def test_a_crew_name_cannot_inject_html_into_the_email(client, admin, outbox):
+    created = await client.post(
+        "/api/admin/crews", json={"name": "<img src=x>", "time_zone": "UTC"}
+    )
+    await client.post(
+        f"/api/admin/crews/{created.json()['id']}/invites", json={"email": "new@friend.com"}
+    )
+    assert "<img" not in outbox.sent[0].html
+    assert "&lt;img" in outbox.sent[0].html

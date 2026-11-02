@@ -1,8 +1,9 @@
 """SQL for crews and memberships."""
 
 import uuid
+from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.crew import Crew
@@ -24,6 +25,30 @@ class CrewRepository:
         """The crew with this invite code, if any."""
         result = await self._session.execute(select(Crew).where(Crew.invite_code == invite_code))
         return result.scalar_one_or_none()
+
+    async def consume_invite(self, crew_id: uuid.UUID, now: datetime) -> bool:
+        """Count one use if the code still has one. One atomic UPDATE, so two people can't both
+        take the last use."""
+        result = await self._session.execute(
+            update(Crew)
+            .where(
+                Crew.id == crew_id,
+                or_(Crew.invite_max_uses.is_(None), Crew.invite_uses < Crew.invite_max_uses),
+                or_(Crew.invite_expires_at.is_(None), Crew.invite_expires_at > now),
+            )
+            .values(invite_uses=Crew.invite_uses + 1)
+            .returning(Crew.id)
+        )
+        return result.first() is not None
+
+    async def refresh(self, crew: Crew) -> None:
+        """Reload a crew's columns from the database."""
+        await self._session.refresh(crew)
+
+    async def save(self, crew: Crew) -> Crew:
+        """Flush changes to a loaded crew, so a constraint failure surfaces here."""
+        await self._session.flush()
+        return crew
 
     async def add(self, crew: Crew) -> Crew:
         """Insert a crew and flush so its id is assigned."""

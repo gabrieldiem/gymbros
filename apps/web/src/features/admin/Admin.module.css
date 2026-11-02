@@ -187,3 +187,30 @@
   color: var(--smoke);
   cursor: not-allowed;
 }
+
+.rowInvite {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dead {
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  background: var(--red-tint);
+  color: var(--red-text);
+  font-size: 0.75rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.unsent {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--r-control);
+  background: var(--red-tint);
+  color: var(--red-text);
+  font-weight: 600;
+}

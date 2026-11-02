@@ -43,7 +43,7 @@ async def test_sending_posts_to_resend():
         requests.append(request)
         return httpx.Response(200, json={"id": "email-id"})
 
-    await _client(handler).send(MESSAGE)
+    assert await _client(handler).send(MESSAGE) is True
     request = requests[0]
     assert str(request.url) == SEND_URL
     assert request.headers["authorization"] == "Bearer the-key"
@@ -60,12 +60,13 @@ async def test_without_a_key_nothing_is_sent(caplog):
         raise AssertionError("no request expected")
 
     with caplog.at_level(logging.INFO, logger="test-email"):
-        await _client(handler, api_key="").send(MESSAGE)
+        assert await _client(handler, api_key="").send(MESSAGE) is False
     assert "skipped" in caplog.text
 
 
 async def test_a_rejected_email_is_logged_and_never_raises(caplog):
-    await _client(lambda _: httpx.Response(403, json={"message": "nope"})).send(MESSAGE)
+    rejected = _client(lambda _: httpx.Response(403, json={"message": "nope"}))
+    assert await rejected.send(MESSAGE) is False
     assert "Sending email failed" in caplog.text
     assert "gabi@example.com" not in caplog.text
     assert "the-key" not in caplog.text

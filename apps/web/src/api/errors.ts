@@ -4,6 +4,13 @@ import { ApiError } from './client';
 /** API error codes (`{"detail": {"code": ...}}`) and the copy each one shows. */
 const CODE_MESSAGES: Record<string, MessageKey> = {
   admin_required: 'err_admin_required',
+  invite_code_expired: 'err_invite_code_expired',
+  invite_code_used_up: 'err_invite_code_used_up',
+  invite_code_invalid: 'err_invite_code_invalid',
+  invite_code_taken: 'err_invite_code_taken',
+  invite_expiry_in_past: 'err_invite_expiry_in_past',
+  already_in_this_crew: 'err_already_in_this_crew',
+  member_in_other_crew: 'err_member_in_other_crew',
   invalid_time_zone: 'err_invalid_time_zone',
   crew_not_found: 'err_crew_not_found',
   member_has_no_crew: 'err_member_has_no_crew',

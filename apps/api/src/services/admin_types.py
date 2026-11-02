@@ -39,3 +39,12 @@ class MemberRow:
     points: int
     workouts: int
     last_workout_at: datetime | None
+
+
+@dataclass(frozen=True, slots=True)
+class InviteSent:
+    """The result of emailing an invite. `link` is there to copy if the email didn't go out."""
+
+    sent: bool
+    link: str
+    existing_account: bool

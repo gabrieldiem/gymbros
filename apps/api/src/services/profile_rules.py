@@ -1,9 +1,10 @@
 """Small pure rules for profiles and crews: initials, colors, invite codes, time zones."""
 
+import re
 import secrets
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from services.errors import InvalidTimeZone
+from services.errors import InvalidTimeZone, InviteCodeInvalid
 
 # Crew palette from docs/DESIGN.md, in assignment order.
 COLORS = ("volt", "red", "cyan", "pink", "violet")
@@ -11,6 +12,7 @@ LANGUAGES = ("en", "es")
 # No 0/O or 1/I so codes read clearly when shared out loud.
 INVITE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 INVITE_LENGTH = 8
+CUSTOM_INVITE_PATTERN = re.compile(r"[A-Z0-9]{4,12}")
 
 
 def derive_initials(display_name: str) -> str:
@@ -34,6 +36,14 @@ def new_invite_code() -> str:
 def normalize_invite_code(raw: str) -> str:
     """Codes are case-insensitive and may be typed with spaces or dashes."""
     return "".join(ch for ch in raw.upper() if ch.isalnum())
+
+
+def validate_custom_invite_code(raw: str) -> str:
+    """A chosen code, normalized: 4 to 12 letters and digits. Raises InviteCodeInvalid otherwise."""
+    code = normalize_invite_code(raw)
+    if not CUSTOM_INVITE_PATTERN.fullmatch(code):
+        raise InviteCodeInvalid(raw)
+    return code
 
 
 def validate_time_zone(name: str) -> str:

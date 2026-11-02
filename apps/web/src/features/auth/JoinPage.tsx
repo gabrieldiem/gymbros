@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 import { Link } from 'react-router';
 
@@ -19,9 +19,19 @@ export function JoinPage() {
   // Filled in when an invite link brought them here.
   const [code, setCode] = useState(pendingInvite);
 
+  // Following an invite link is the decision to join: do it right away. If the code can't be used,
+  // show why and forget it, so the next visit doesn't try again.
+  const autoJoined = useRef(false);
+  useEffect(() => {
+    const invited = pendingInvite();
+    if (!invited || autoJoined.current) return;
+    autoJoined.current = true;
+    join.mutate(invited, { onError: forgetInvite });
+  }, [join]);
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    join.mutate(code.trim(), { onSuccess: forgetInvite });
+    join.mutate(code.trim());
   }
 
   return (

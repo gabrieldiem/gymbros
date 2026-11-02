@@ -18,8 +18,8 @@ class EmailMessage:
 class EmailSender(Protocol):
     """Sends email. A failure is logged, never raised: email must not break signing in."""
 
-    async def send(self, message: EmailMessage) -> None:
-        """Send the message, best effort."""
+    async def send(self, message: EmailMessage) -> bool:
+        """Send the message, best effort. Returns whether it went out."""
 
 
 _COPY = {

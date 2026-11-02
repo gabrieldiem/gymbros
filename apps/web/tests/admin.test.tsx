@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import type { AdminCrew } from '../src/api/admin';
 import { CREW, makeMe, mockApi, renderApp, SIGNED_OUT } from './renderApp';
 
 const ADMIN = makeMe({ is_admin: true });
@@ -14,7 +15,15 @@ const OVERVIEW = {
   recent_active_users: 9,
   recent_points: 4100,
 };
-const CREW_ROW = { ...CREW, members: 5, points: 21000 };
+const CREW_ROW: AdminCrew = {
+  ...CREW,
+  invite_uses: 3,
+  invite_max_uses: null,
+  invite_expires_at: null,
+  invite_status: 'active',
+  members: 5,
+  points: 21000,
+};
 const MAXO = {
   id: 'u2',
   email: 'maxo@example.com',
@@ -234,5 +243,128 @@ describe('Deleting your own account', () => {
     ).toBeVisible();
     const call = fetchMock.mock.calls.find(([url]) => url === '/api/me/delete');
     expect(JSON.parse(String(call?.[1]?.body))).toEqual({ confirm_email: 'gabi@example.com' });
+  });
+});
+
+describe('Invite codes in the backoffice', () => {
+  const openCrew = async (row = CREW_ROW, extra = {}) => {
+    const fetchMock = mockApi({
+      ...ROUTES,
+      'GET /api/admin/crews': [200, [row]],
+      ...extra,
+    });
+    renderApp('/admin');
+    await openView('Crews');
+    await userEvent.click(await screen.findByRole('button', { name: new RegExp(row.name) }));
+    return { fetchMock, dialog: within(await screen.findByRole('dialog')) };
+  };
+  const patchBody = (fetchMock: ReturnType<typeof mockApi>) =>
+    JSON.parse(
+      String(fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH')?.[1]?.body),
+    ) as unknown;
+
+  it('sets a custom code and limits, sending only what changed', async () => {
+    const { fetchMock, dialog } = await openCrew(CREW_ROW, {
+      'PATCH /api/admin/crews/c1': [200, CREW_ROW],
+    });
+    await userEvent.clear(dialog.getByLabelText(/^Code/));
+    await userEvent.type(dialog.getByLabelText(/^Code/), 'ATUS2026');
+    await userEvent.type(dialog.getByLabelText(/^Maximum uses/), '10');
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(patchBody(fetchMock)).toEqual({ invite_code: 'ATUS2026', invite_max_uses: 10 });
+  });
+
+  it('sets an expiry as an absolute time', async () => {
+    const { fetchMock, dialog } = await openCrew(CREW_ROW, {
+      'PATCH /api/admin/crews/c1': [200, CREW_ROW],
+    });
+    await userEvent.type(dialog.getByLabelText(/^Expires/), '2030-05-01T18:30');
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(patchBody(fetchMock)).toEqual({
+      invite_expires_at: new Date('2030-05-01T18:30').toISOString(),
+    });
+  });
+
+  it('clearing a limit sends null, and an old expiry does not block a rename', async () => {
+    const expired: AdminCrew = {
+      ...CREW_ROW,
+      invite_max_uses: 3,
+      invite_expires_at: '2020-01-01T10:00:00Z',
+      invite_status: 'expired',
+    };
+    const { fetchMock, dialog } = await openCrew(expired, {
+      'PATCH /api/admin/crews/c1': [200, expired],
+    });
+    await userEvent.clear(dialog.getByLabelText(/^Maximum uses/));
+    await userEvent.type(dialog.getByLabelText('Crew name'), '!');
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(patchBody(fetchMock)).toEqual({ name: 'Iron Ridge!', invite_max_uses: null });
+  });
+
+  it('shows a taken code as an error and stays open', async () => {
+    const { dialog } = await openCrew(CREW_ROW, {
+      'PATCH /api/admin/crews/c1': [409, { detail: { code: 'invite_code_taken' } }],
+    });
+    await userEvent.clear(dialog.getByLabelText(/^Code/));
+    await userEvent.type(dialog.getByLabelText(/^Code/), 'TAKEN1');
+    await userEvent.click(dialog.getByRole('button', { name: 'Save' }));
+    expect(await dialog.findByRole('alert')).toHaveTextContent('Another crew already uses');
+  });
+
+  it('shows how much of the code is used', async () => {
+    const { dialog } = await openCrew({ ...CREW_ROW, invite_max_uses: 10 });
+    expect(dialog.getByText(/Used 3 of 10 times/)).toBeVisible();
+  });
+
+  it('marks a dead code in the list and offers no email for it', async () => {
+    const used: AdminCrew = { ...CREW_ROW, invite_max_uses: 3, invite_status: 'used_up' };
+    const { dialog } = await openCrew(used);
+    expect(screen.getAllByText('Used up').length).toBeGreaterThan(0);
+    expect(dialog.queryByRole('button', { name: 'Send invite' })).toBeNull();
+  });
+
+  it('emails an invite and confirms it', async () => {
+    const { fetchMock, dialog } = await openCrew(CREW_ROW, {
+      'POST /api/admin/crews/c1/invites': [
+        200,
+        { sent: true, link: 'https://x/invite/IRONRIDGE', existing_account: false },
+      ],
+    });
+    await userEvent.type(dialog.getByLabelText('Email'), 'new@friend.com');
+    await userEvent.click(dialog.getByRole('button', { name: 'Send invite' }));
+    expect(await screen.findByText('Invite sent to new@friend.com')).toBeVisible();
+    const call = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/invites'));
+    expect(JSON.parse(String(call?.[1]?.body))).toEqual({
+      email: 'new@friend.com',
+      language: 'en',
+    });
+  });
+
+  it('offers the link to copy when the email could not go out', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+    const { dialog } = await openCrew(CREW_ROW, {
+      'POST /api/admin/crews/c1/invites': [
+        200,
+        { sent: false, link: 'https://x/invite/IRONRIDGE', existing_account: false },
+      ],
+    });
+    await userEvent.type(dialog.getByLabelText('Email'), 'new@friend.com');
+    await userEvent.click(dialog.getByRole('button', { name: 'Send invite' }));
+    expect(await dialog.findByRole('alert')).toHaveTextContent('couldn’t be sent');
+    await user.click(within(dialog.getByRole('alert')).getByRole('button'));
+    expect(writeText).toHaveBeenCalledWith('https://x/invite/IRONRIDGE');
+  });
+
+  it('explains why someone can’t be invited', async () => {
+    const { dialog } = await openCrew(CREW_ROW, {
+      'POST /api/admin/crews/c1/invites': [409, { detail: { code: 'member_in_other_crew' } }],
+    });
+    await userEvent.type(dialog.getByLabelText('Email'), 'busy@friend.com');
+    await userEvent.click(dialog.getByRole('button', { name: 'Send invite' }));
+    expect(await dialog.findByRole('alert')).toHaveTextContent('in another crew');
   });
 });

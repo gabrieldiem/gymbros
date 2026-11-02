@@ -25,11 +25,12 @@ class ResendEmailClient:
         self._logger = logger
         self._transport = transport
 
-    async def send(self, message: EmailMessage) -> None:
-        """Send the message. Failures are logged without the recipient or the key."""
+    async def send(self, message: EmailMessage) -> bool:
+        """Send the message and say if it went out. Failures are logged without the recipient or
+        the key."""
         if not self._api_key:
             self._logger.info("RESEND_API_KEY is not set; skipped email %r", message.subject)
-            return
+            return False
         try:
             async with httpx.AsyncClient(
                 transport=self._transport, timeout=_TIMEOUT_SECONDS
@@ -51,3 +52,5 @@ class ResendEmailClient:
             response.raise_for_status()
         except httpx.HTTPError as error:
             self._logger.warning("Sending email failed: %s", type(error).__name__)
+            return False
+        return True
