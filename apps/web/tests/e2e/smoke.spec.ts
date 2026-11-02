@@ -55,7 +55,7 @@ test('Google button: starts the sign-in in the chosen language', async ({ page }
   );
   await page.goto('/');
   await page.getByRole('button', { name: 'ES', exact: true }).click();
-  const button = page.getByRole('link', { name: 'Continuar con Google' });
+  const button = page.getByRole('link', { name: 'Continuar con Google' }).first();
   await expect(button).toHaveAttribute('href', '/api/auth/google/start?lang=es');
   const box = await button.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);

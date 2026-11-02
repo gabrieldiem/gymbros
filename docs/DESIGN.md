@@ -4,7 +4,7 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 
 ## Principle: one loud thing per screen
 
-- The **hero headline** on ATUS Climb ("BETTER THAN YESTERDAY." / "MEJOR QUE AYER."), the headline on the public landing page (all chalk: there, yellow stays on the sample "you" and the sign-in) and the **weekly recap slides** are the only places that use the black italic uppercase display style.
+- The **hero headline** on ATUS Climb ("BETTER THAN YESTERDAY." / "MEJOR QUE AYER."), the public landing page's headline, sport names and closing band (the headline is all chalk: yellow stays on the sample "you" and the actions, until the closing volt band) and the **weekly recap slides** are the only places that use the black italic uppercase display style.
 - Everything else is sentence case, upright and calm. Yellow is reserved for **you** and the **primary action**.
 - Reward moments (the points total on the finish screen, rank-ups, confetti) may be bright because they answer an action the user just took.
 

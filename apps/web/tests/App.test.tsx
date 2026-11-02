@@ -84,7 +84,7 @@ describe('Route gates', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),
     ).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Continue with Google' })).toHaveAttribute(
+    expect(screen.getAllByRole('link', { name: 'Continue with Google' })[0]).toHaveAttribute(
       'href',
       '/api/auth/google/start?lang=en',
     );
