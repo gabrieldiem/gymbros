@@ -50,7 +50,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-64` **Cardio is missing from the You tab and most improved** (game+web, M): points are fair across sports, but the stats read lifts and tonnage only, and feed posts show minutes but not distance. Someone who only runs or swims sees empty stats and can't win most improved. _Added 2026-11-02_
 - [ ] `GYM-65` **Point adjustments are silent** (api+web, S): an admin's adjustment changes a member's points, but nothing tells them or shows the reason. Send a notification with the amount and reason. _Added 2026-11-02_
 - [ ] `GYM-66` **Moderate comments in the backoffice** (product, S): admins can delete an account but not a single comment. Add it, with an audit log entry. _Added 2026-11-02_
-- [ ] `GYM-67` **Legal pages still say badges** (docs, S): the app says Achievements / Logros, but the privacy policy says badges / insignias. Align them and update its last updated date. _Added 2026-11-02_
 
 ## Tech debt
 
@@ -61,6 +60,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
 - [ ] `GYM-59` **Drop users.password_hash** (api, S): nothing reads it since Google sign-in. It stays nullable for one release so the migration can be rolled back; drop it once Google sign-in has worked in production, as it still holds old argon2 hashes. _Added 2026-11-01_
 - [ ] `GYM-63` **App stays on the old version after a deploy** (web, S): the page opens from the old service worker cache, so a new version takes two reloads to appear and an open tab never checks. Check on focus and hourly, then show a reload banner; don't reload by itself (GYM-29). _Added 2026-11-02_
+- [ ] `GYM-68` **Cap how long server logs are kept** (infra, S): the privacy policy says request logs with IP addresses remain until cleared, and `deploy/compose.edge.yaml` sets no limits. Set `logging` max-size and max-file, check what Caddy keeps, then state the real period in the policy. _Added 2026-11-02_
 
 ## Done
 
@@ -86,3 +86,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-9` **Crew time zone**: no longer a decision: each crew's time zone is set in the backoffice. Closed 2026-11-02.
 - [x] `GYM-21` **Hero height on mobile**: no longer true: at 390×844 the map starts at y=319, with 451 px visible. Cancelled 2026-11-02.
 - [x] `GYM-30` **Prototype: first-time PR**: duplicate of GYM-10. Cancelled 2026-11-02.
+- [x] `GYM-67` **Legal pages still say badges**: closed 2026-11-02 in 6748084.
