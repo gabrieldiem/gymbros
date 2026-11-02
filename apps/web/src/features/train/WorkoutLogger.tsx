@@ -16,7 +16,7 @@ import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
 import { StretchCard } from './StretchCard';
 import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
-import { useWorkoutDraft } from './useWorkoutDraft';
+import { useWorkoutDraft, type Draft } from './useWorkoutDraft';
 import { WorkoutPhoto } from './WorkoutPhoto';
 import styles from './WorkoutLogger.module.css';
 
@@ -27,7 +27,7 @@ type Props = {
   finishing: boolean;
   finishError: unknown;
   discarding: boolean;
-  onFinish: (flush: () => Promise<void>) => void;
+  onFinish: (flush: () => Promise<void>, draft: Draft) => void;
   onDiscard: () => void;
 };
 
@@ -134,10 +134,16 @@ export function WorkoutLogger(props: Props) {
               +{n(gain.gain)}
             </span>
           )}
-          <b data-testid="live-points">
-            <CountUp value={livePoints} format={n} durationMs={500} />
-          </b>
-          <span>{t('pts_so_far')}</span>
+          {workout.local ? (
+            <span className={styles.localPoints}>{t('offline_points')}</span>
+          ) : (
+            <>
+              <b data-testid="live-points">
+                <CountUp value={livePoints} format={n} durationMs={500} />
+              </b>
+              <span>{t('pts_so_far')}</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -174,14 +180,14 @@ export function WorkoutLogger(props: Props) {
         + {t('add_ex')}
       </Button>
 
-      <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />
+      {!workout.local && <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />}
 
       <p className={styles.status} role="status">
         {status === 'saving' ? t('saving') : status === 'error' ? t('save_failed') : ''}
       </p>
       <FormError error={finishError} />
       <div className={styles.actions}>
-        <Button onClick={() => onFinish(flush)} disabled={finishing}>
+        <Button onClick={() => onFinish(flush, draft)} disabled={finishing}>
           {finishing ? t('finishing') : t('finish')}
         </Button>
         <Button variant="quiet" onClick={() => setConfirmDiscard(true)}>

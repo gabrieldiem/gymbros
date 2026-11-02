@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { apiRequest } from './client';
 import type { CrewColor } from './types';
+import { liveInterval } from './liveInterval';
 
 export type ClimbMode = 'all' | 'week';
 
@@ -63,7 +64,7 @@ export function useClimb(mode: ClimbMode) {
   return useQuery({
     queryKey: climbKey(mode),
     queryFn: ({ signal }) => apiRequest<Climb>(`/climb?mode=${mode}`, { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
     placeholderData: keepPreviousData,
   });
 }

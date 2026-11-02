@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router';
 
+import { OfflineBanner } from '../features/train/OfflineBanner';
 import { useProfileLanguage } from '../i18n/useLanguage';
 import { ActiveWorkoutBar } from './ActiveWorkoutBar';
 import { AnimatedPage } from './AnimatedPage';
@@ -21,6 +22,7 @@ export function AppShell() {
       <NavRail />
       <main className={styles.main}>
         <TopBar />
+        <OfflineBanner />
         <UpdateBanner />
         <InstallBanner />
         <AnimatedPage>

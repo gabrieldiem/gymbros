@@ -1,9 +1,10 @@
+import { clearOfflineData } from '../features/train/offlineStore';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { markCrewWelcomePending } from '../features/auth/crewWelcome';
 import { forgetInvite } from '../features/auth/pendingInvite';
 import { apiRequest } from './client';
-import { meKey } from './me';
+import { meKey, removeEverythingButMe } from './me';
 import type { AuthOptions, DevLoginBody, Invite, Me } from './types';
 
 /**
@@ -71,7 +72,8 @@ export function useLogout() {
   return useMutation({
     mutationFn: () => apiRequest<null>('/auth/logout', { method: 'POST' }),
     onSettled: () => {
-      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== meKey[0] });
+      clearOfflineData();
+      removeEverythingButMe(queryClient);
       queryClient.setQueryData(meKey, null);
     },
   });

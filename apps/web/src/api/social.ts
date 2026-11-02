@@ -8,6 +8,7 @@ import {
 
 import { apiRequest } from './client';
 import type { CrewColor } from './types';
+import { liveInterval } from './liveInterval';
 
 export type Actor = {
   user_id: string;
@@ -119,7 +120,7 @@ export function useFeed() {
       last.next_before && last.next_before_id
         ? { before: last.next_before, id: last.next_before_id }
         : null,
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 
@@ -195,7 +196,7 @@ export function useInbox(enabled = true) {
   return useQuery({
     queryKey: inboxKey,
     queryFn: ({ signal }) => apiRequest<Inbox>('/notifications', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
     enabled,
   });
 }

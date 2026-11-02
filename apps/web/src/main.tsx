@@ -25,7 +25,7 @@ registerServiceWorker();
 
 createRoot(root).render(
   <StrictMode>
-    <Providers client={createQueryClient()}>
+    <Providers client={createQueryClient()} persist>
       <BrowserRouter>
         <App />
       </BrowserRouter>

@@ -1,0 +1,23 @@
+.banner {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-left: 3px solid var(--volt);
+  border-radius: var(--r-control);
+  font-size: var(--fs-small);
+}
+
+.failed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.failed p {
+  color: var(--red-text);
+}

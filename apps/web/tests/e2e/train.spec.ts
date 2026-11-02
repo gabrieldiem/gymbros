@@ -170,3 +170,32 @@ test('add a gym photo and your crew sees it on the post', async ({ page }, testI
   await expect(posted).toBeVisible();
   await page.screenshot({ path: `${SCREENS}/photo-feed-${testInfo.project.name}.png` });
 });
+
+test('a whole workout with no signal sends itself when the signal is back', async ({
+  page,
+  context,
+}, testInfo) => {
+  await logIn(page, 'gabi', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await expect(page.getByRole('button', { name: /^Cardio/ })).toBeVisible();
+  await page.waitForLoadState('networkidle');
+
+  await context.setOffline(true);
+  await page.getByRole('button', { name: /^Cardio/ }).click();
+  const treadmill = page.getByRole('article', { name: 'Treadmill run' });
+  await expect(treadmill).toBeVisible();
+  await expect(page.getByText('Points when there’s signal')).toBeVisible();
+  await expect(page.getByText(/^No signal\. Keep logging/)).toBeVisible();
+  await treadmill.getByLabel('Treadmill run, set 1, min').fill('25');
+  await treadmill.getByRole('button', { name: 'Complete set 1' }).click();
+  await page.waitForTimeout(700); // the save to the phone is debounced
+  await page.screenshot({ path: `${SCREENS}/offline-logger-${testInfo.project.name}.png` });
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  await expect(page.getByText(/^1 workout is waiting/)).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/offline-waiting-${testInfo.project.name}.png` });
+
+  await context.setOffline(false);
+  await expect(page.getByText(/^Cardio sent: \+\d+ points\.$/)).toBeVisible({ timeout: 40000 });
+  await expect(page.getByText(/^1 workout is waiting/)).toHaveCount(0);
+});

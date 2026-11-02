@@ -12,6 +12,22 @@ export class ApiError extends Error {
   }
 }
 
+const TIMEOUT_MS = 15_000;
+const FILE_TIMEOUT_MS = 60_000;
+
+/** A gym with one bar of signal can leave a request hanging: give up, so saving can carry on. */
+function withTimeout(signal: AbortSignal | null | undefined, ms: number): AbortSignal | null {
+  if (typeof AbortSignal.timeout !== 'function') return signal ?? null;
+  const timeout = AbortSignal.timeout(ms);
+  if (!signal) return timeout;
+  return typeof AbortSignal.any === 'function' ? AbortSignal.any([signal, timeout]) : signal;
+}
+
+/** True when the request never got an answer from the server, so it's worth trying again. */
+export function isConnectionError(error: unknown): boolean {
+  return !(error instanceof ApiError);
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
@@ -36,7 +52,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     method: options.method ?? 'GET',
     credentials: 'same-origin',
     headers: { Accept: 'application/json' },
-    signal: options.signal ?? null,
+    signal: withTimeout(options.signal, options.file ? FILE_TIMEOUT_MS : TIMEOUT_MS),
   };
   if (options.body !== undefined) {
     init.headers = { ...init.headers, 'Content-Type': 'application/json' };

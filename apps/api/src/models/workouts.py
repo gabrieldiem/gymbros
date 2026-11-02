@@ -50,6 +50,18 @@ class SaveWorkoutRequest(BaseModel):
     gym: GymName | None = None
 
 
+class SyncWorkoutRequest(BaseModel):
+    """A whole workout logged with no signal, as it stood when it was finished."""
+
+    routine_id: str | None = Field(default=None, max_length=32)
+    name: WorkoutName
+    gym: GymName | None = None
+    performed_on: date | None = None
+    started_at: datetime
+    finished_at: datetime
+    exercises: list[ExerciseInput] = Field(max_length=20)
+
+
 class ExerciseOutput(BaseModel):
     """An exercise with its sets and last time's sets."""
 
@@ -70,6 +82,14 @@ class WorkoutResponse(BaseModel):
     started_at: datetime
     exercises: list[ExerciseOutput]
     live_points: int
+
+
+class WorkoutTemplate(BaseModel):
+    """A routine as it would start now, for starting it with no signal."""
+
+    routine_id: str
+    name: str
+    exercises: list[ExerciseOutput]
 
 
 class LineItemModel(BaseModel):

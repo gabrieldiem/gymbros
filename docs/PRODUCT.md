@@ -58,6 +58,18 @@ A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A worko
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
+## Low signal and offline
+
+Gyms are often in basements, so logging never depends on the connection.
+
+- **The app opens with no signal.** The shell and what's needed to train (you, the catalog, your workout, your gyms, the routines as they'd start, ATUS Climb) are kept on the phone for a week. Other screens say they can't load.
+- **Every edit is on the phone first.** A reload never loses a set. The logger says when something is only on the phone.
+- **A workout can start with no signal**, loaded from what the phone knows, and it stays on the phone until you finish it. Points show once it arrives, because only the server scores. Photos need signal; add one later from the workout's details.
+- **Finishing always works.** If the server can't be reached within a few seconds, the workout waits on the phone and sends itself when there's signal, with a message saying what it paid. It's dated when it really happened: its week, goal and day-based rules go by that time, not when it arrived. Times more than a week old count as now.
+- **Nothing counts twice.** A workout arrives whole in one request, and sending it again is safe. If the server refuses one, the member sees it and can discard it.
+- **Low signal mode** in settings (also automatic on a phone asking to save data, or on 2G) refreshes the crew's activity every 2 minutes instead of 20 seconds.
+- Signing out or deleting the account clears all of this from the phone.
+
 ## Gyms
 
 Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. It's only a name, not a location. A workout keeps the name it was logged with, so renaming or deleting a gym doesn't change your history.

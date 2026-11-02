@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
+import { clearOfflineData } from '../src/features/train/offlineStore';
 import { makeMe, mockApi, renderApp } from './renderApp';
 import { CATALOG, FINISHED, makeWorkout } from './trainFixtures';
 
@@ -32,6 +33,8 @@ function bodyOf(fetchMock: ReturnType<typeof mockApi>, method: string, url: stri
     .find(([u, init]) => u === url && init?.method === method);
   return call ? (JSON.parse(String(call[1]?.body)) as unknown) : undefined;
 }
+
+afterEach(() => clearOfflineData());
 
 describe('Train: entering sets', () => {
   const lastPut = (fetchMock: ReturnType<typeof mockApi>) =>

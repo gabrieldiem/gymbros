@@ -16,11 +16,13 @@ from dependencies import (
 )
 from models.errors import error_responses
 from models.photos import PhotoResponse, photo_url
-from models.workout_mappers import to_finish_response, to_workout_response
+from models.workout_mappers import to_finish_response, to_workout_response, to_workout_template
 from models.workouts import (
     FinishResponse,
     PastDayModel,
     SaveWorkoutRequest,
+    SyncWorkoutRequest,
+    WorkoutTemplate,
     StartWorkoutRequest,
     WeekResponse,
     WorkoutResponse,
@@ -34,7 +36,7 @@ from services.training_rules import LoggedSet, week_end
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
-from services.workout_types import ExerciseEntry
+from services.workout_types import ExerciseEntry, LoggedOffline
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
@@ -89,6 +91,15 @@ async def get_week(
             PastDayModel(day=p.day, workouts=p.workouts) for p in await workouts.past_days(member)
         ],
     )
+
+
+@router.get("/templates", response_model=list[WorkoutTemplate], responses=error_responses(401, 403))
+async def get_templates(
+    member: Member = Depends(get_current_member),
+    workouts: WorkoutService = Depends(get_workout_service),
+) -> list[WorkoutTemplate]:
+    """Every routine as it would start now, so a phone can start one with no signal."""
+    return [to_workout_template(t) for t in await workouts.templates(member)]
 
 
 @router.put(
@@ -172,6 +183,35 @@ async def get_photo(
             "Content-Security-Policy": "default-src 'none'; sandbox",
         },
     )
+
+
+@router.post(
+    "/{workout_id}/sync",
+    response_model=FinishResponse,
+    responses=error_responses(401, 403, 404, 409, 422),
+)
+async def sync_workout(
+    workout_id: uuid.UUID,
+    body: SyncWorkoutRequest,
+    member: Member = Depends(get_current_member),
+    finisher: WorkoutFinisher = Depends(get_workout_finisher),
+    settings: Settings = Depends(get_settings),
+) -> FinishResponse:
+    """A whole workout logged with no signal. Sending it twice is safe: the second is a 409."""
+    logged = LoggedOffline(
+        workout_id=workout_id,
+        routine_id=body.routine_id,
+        name=body.name,
+        gym=body.gym,
+        performed_on=body.performed_on,
+        started_at=body.started_at,
+        finished_at=body.finished_at,
+        entries=tuple(
+            ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+            for e in body.exercises
+        ),
+    )
+    return to_finish_response(await finisher.sync(member, logged), settings.game_weekly_target)
 
 
 @router.post(

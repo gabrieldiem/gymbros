@@ -589,3 +589,18 @@
 .download:hover {
   border-color: var(--chalk);
 }
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  color: var(--smoke);
+}
+
+.switch input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--volt);
+}

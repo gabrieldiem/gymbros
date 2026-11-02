@@ -6,7 +6,14 @@ from typing import Any
 
 # The train-* crews are for specs that post workouts, so what they do can't reach the specs that
 # read the feed or the standings of the main crew.
-E2E_PROJECTS = ("mobile", "desktop", "train-mobile", "train-desktop")
+E2E_PROJECTS = (
+    "mobile",
+    "desktop",
+    "train-mobile",
+    "train-desktop",
+    "offline-mobile",
+    "offline-desktop",
+)
 _MAX_INVITE_SUFFIX = 9
 
 
@@ -18,4 +25,6 @@ def e2e_crew(demo: dict[str, Any], project: str) -> dict[str, Any]:
     data["crew"]["invite_code"] = f"E2E{suffix}"
     for member in data["members"]:
         member["email"] = f"{member['key']}@{project}.e2e.gymbros.app"
+        # One language to start from: a spec that switches it does so on purpose.
+        member["language"] = "en"
     return data

@@ -9,6 +9,7 @@ import {
   type Workout,
 } from '../../api/train';
 import { AutosaveQueue, type SaveStatus } from './autosaveQueue';
+import { clearDraft, loadDraft, saveDraft, saveLocalWorkout } from './offlineStore';
 
 export type DraftExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
 export type Draft = { name: string; gym: string | null; exercises: DraftExercise[] };
@@ -36,13 +37,27 @@ function toBody(draft: Draft): SaveBody {
  */
 export function useWorkoutDraft(workout: Workout, debounceMs = 500) {
   const queryClient = useQueryClient();
-  const [draft, setDraft] = useState<Draft>(() => toDraft(workout));
+  // Edits the server never got, from before a reload, win over what it last had.
+  const [restored] = useState(() => loadDraft(workout.id));
+  const [draft, setDraft] = useState<Draft>(() => restored ?? toDraft(workout));
   const [livePoints, setLivePoints] = useState(workout.live_points);
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [queue] = useState(
     () =>
       new AutosaveQueue<Draft, Workout>({
-        save: (value) => saveWorkout(workout.id, toBody(value)),
+        save: async (value) => {
+          if (workout.local) {
+            const saved = { ...workout, ...value };
+            saveLocalWorkout(saved);
+            return saved;
+          }
+          const saved = await saveWorkout(workout.id, toBody(value));
+          // Unless something newer is already waiting to be saved.
+          if (JSON.stringify(loadDraft(workout.id)) === JSON.stringify(value)) {
+            clearDraft(workout.id);
+          }
+          return saved;
+        },
         onSaved: (saved) => {
           setLivePoints(saved.live_points);
           queryClient.setQueryData(activeWorkoutKey, saved);
@@ -53,16 +68,20 @@ export function useWorkoutDraft(workout: Workout, debounceMs = 500) {
       }),
   );
 
-  useEffect(() => () => queue.dispose(), [queue]);
+  useEffect(() => {
+    if (!workout.local && restored) queue.push(restored);
+    return () => queue.dispose();
+  }, [queue, restored, workout.local]);
 
   const update = useCallback(
     (change: (current: Draft) => Draft) =>
       setDraft((current) => {
         const next = change(current);
+        if (!workout.local) saveDraft(workout.id, next);
         queue.push(next);
         return next;
       }),
-    [queue],
+    [queue, workout.id, workout.local],
   );
 
   const flush = useCallback(() => queue.flush(), [queue]);

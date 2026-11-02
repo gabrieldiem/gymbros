@@ -1,9 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 
+import { clearOfflineData } from '../features/train/offlineStore';
 import { ApiError, apiRequest } from './client';
 import type { Me, UpdateMeBody } from './types';
 
 export const meKey = ['me'] as const;
+
+/** Signing out or deleting the account: nothing of this account stays, in memory or on the phone. */
+export function removeEverythingButMe(queryClient: QueryClient) {
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey.length > 1 || query.queryKey[0] !== meKey[0],
+  });
+}
 
 /** The signed-in user, or null when there is no session. Other errors throw. */
 export async function fetchMe(signal?: AbortSignal): Promise<Me | null> {
@@ -26,7 +34,8 @@ export function useDeleteMyAccount() {
     mutationFn: (confirmEmail: string) =>
       apiRequest<null>('/me/delete', { method: 'POST', body: { confirm_email: confirmEmail } }),
     onSuccess: () => {
-      queryClient.removeQueries({ predicate: (query) => query.queryKey[0] !== meKey[0] });
+      clearOfflineData();
+      removeEverythingButMe(queryClient);
       queryClient.setQueryData(meKey, null);
     },
   });

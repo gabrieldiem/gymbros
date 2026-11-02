@@ -31,7 +31,13 @@ from services.training_rules import (
     performed_at,
 )
 from services.workout_mapping import to_entries, to_logged_set, to_rows, to_workout_log
-from services.workout_types import ExerciseEntry, ExerciseView, PastDay, WorkoutView
+from services.workout_types import (
+    ExerciseEntry,
+    ExerciseView,
+    PastDay,
+    WorkoutTemplateView,
+    WorkoutView,
+)
 
 DEFAULT_SETS = 3
 STRETCH_ROUTINE = "stretch"
@@ -92,6 +98,30 @@ class WorkoutService:
         if self._activity is not None and performed_on is None and routine_id != STRETCH_ROUTINE:
             await self._activity.workout_started(member)
         return view
+
+    async def templates(self, member: Member) -> tuple[WorkoutTemplateView, ...]:
+        """Every routine as it would start now, so a phone can start one with no signal."""
+        templates = []
+        for routine in self._catalog.routines:
+            entries = await self._prefilled(member, list(routine.exercise_ids), None)
+            previous = await self._workouts.last_sets(member.user.id, list(routine.exercise_ids))
+            templates.append(
+                WorkoutTemplateView(
+                    routine.id,
+                    routine.name,
+                    tuple(
+                        ExerciseView(
+                            exercise_id=entry.exercise_id,
+                            sets=entry.sets,
+                            previous_sets=tuple(
+                                to_logged_set(r) for r in previous.get(entry.exercise_id, [])
+                            ),
+                        )
+                        for entry in entries
+                    ),
+                )
+            )
+        return tuple(templates)
 
     async def past_days(self, member: Member) -> tuple[PastDay, ...]:
         """The days a forgotten workout can be logged for, and what's already logged on each."""

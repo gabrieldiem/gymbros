@@ -6,10 +6,10 @@ import { expect, type Page, type TestInfo } from '@playwright/test';
 // a crew of their own ('train'), so they can't change what the other specs read.
 export type MemberKey = 'gabi' | 'maxo' | 'santi' | 'jose' | 'matex';
 
-export type E2eCrew = 'main' | 'train';
+export type E2eCrew = 'main' | 'train' | 'offline';
 
 export function memberEmail(member: MemberKey, testInfo: TestInfo, crew: E2eCrew = 'main'): string {
-  const project = crew === 'train' ? `train-${testInfo.project.name}` : testInfo.project.name;
+  const project = crew === 'main' ? testInfo.project.name : `${crew}-${testInfo.project.name}`;
   return `${member}@${project}.e2e.gymbros.app`;
 }
 

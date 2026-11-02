@@ -4,6 +4,7 @@ import type { Climb } from './climb';
 import { apiRequest } from './client';
 import type { Actor, PostedSet } from './social';
 import type { LineItem } from './train';
+import { liveInterval } from './liveInterval';
 
 export type QuestId = 'legs2' | 'ppl' | 'tonnes' | 'distance' | 'cardio';
 export type Quest = {
@@ -136,7 +137,7 @@ export function useQuests() {
   return useQuery({
     queryKey: questsKey,
     queryFn: ({ signal }) => apiRequest<QuestBoard>('/quests', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 
@@ -151,7 +152,7 @@ export function useDuels() {
   return useQuery({
     queryKey: duelsKey,
     queryFn: ({ signal }) => apiRequest<Duel[]>('/duels', { signal }),
-    refetchInterval: 20_000,
+    refetchInterval: liveInterval,
   });
 }
 

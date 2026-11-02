@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { chooseLowData, lowDataChosen } from '../../api/liveInterval';
 import { Link } from 'react-router';
 
 import { useLogout } from '../../api/auth';
@@ -14,6 +15,27 @@ import { GymsSection } from './GymsSection';
 import styles from './Me.module.css';
 
 const REST_OPTIONS = ['60', '90', '120', '180'] as const;
+
+function LowDataSwitch() {
+  const { t } = useI18n();
+  const [on, setOn] = useState(lowDataChosen);
+  return (
+    <div>
+      <h3>{t('low_data_title')}</h3>
+      <label className={styles.switch}>
+        <input
+          type="checkbox"
+          checked={on}
+          onChange={(e) => {
+            chooseLowData(e.target.checked);
+            setOn(e.target.checked);
+          }}
+        />
+        <span>{t('low_data_hint')}</span>
+      </label>
+    </div>
+  );
+}
 
 function DeleteAccount() {
   const { t } = useI18n();
@@ -73,6 +95,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
             }))}
           />
         </div>
+        <LowDataSwitch />
         <div>
           <h3>{t('export_title')}</h3>
           <p>{t('export_hint')}</p>

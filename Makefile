@@ -19,7 +19,7 @@ install:
 	pre-commit install
 
 up: .env
-	$(DEV) up --build
+	$(DEV) up --renew-anon-volumes --build
 
 prod: .env
 	$(PROD) up --build

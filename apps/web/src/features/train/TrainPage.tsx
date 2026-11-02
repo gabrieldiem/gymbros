@@ -8,14 +8,17 @@ import {
   useFinishWorkout,
   useStartWorkout,
   useWeek,
+  useWorkoutTemplates,
   type FinishResult,
 } from '../../api/train';
 import { useGyms } from '../../api/gyms';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
+import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
 import { FinishSheet } from './FinishSheet';
 import { PastDaySheet } from './PastDaySheet';
 import { RoutinePicker } from './RoutinePicker';
+import type { Draft } from './useWorkoutDraft';
 import { WorkoutLogger } from './WorkoutLogger';
 
 export function TrainPage() {
@@ -27,6 +30,8 @@ export function TrainPage() {
   const start = useStartWorkout();
   const finish = useFinishWorkout();
   const discard = useDiscardWorkout();
+  const showToast = useToast();
+  useWorkoutTemplates(); // Kept on the phone, so a routine can start with no signal.
   const [result, setResult] = useState<FinishResult | null>(null);
   const [pastDay, setPastDay] = useState<string | null>(null);
   const [pickingDay, setPickingDay] = useState(false);
@@ -62,14 +67,17 @@ export function TrainPage() {
     );
 
   const workout = active.data;
-  const handleFinish = async (flush: () => Promise<void>) => {
+  const handleFinish = (flush: () => Promise<void>, draft: Draft) => {
     if (!workout) return;
-    try {
-      await flush();
-    } catch {
-      return; // the logger already shows "Couldn't save. Retrying."
-    }
-    finish.mutate(workout.id, { onSuccess: setResult });
+    finish.mutate(
+      { workout, draft, flush },
+      {
+        onSuccess: (outcome) => {
+          if (outcome.queued) showToast(t('offline_queued'));
+          else setResult(outcome.result);
+        },
+      },
+    );
   };
 
   return (
@@ -83,7 +91,7 @@ export function TrainPage() {
           finishing={finish.isPending}
           finishError={finish.error}
           discarding={discard.isPending}
-          onFinish={(flush) => void handleFinish(flush)}
+          onFinish={handleFinish}
           onDiscard={() => discard.mutate(workout.id)}
         />
       ) : (

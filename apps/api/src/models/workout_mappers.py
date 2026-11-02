@@ -12,11 +12,12 @@ from models.workouts import (
     PersonalRecordModel,
     SetModel,
     TrainingNowItem,
+    WorkoutTemplate,
     WorkoutResponse,
 )
 from services.training_now_service import ActiveWorkout
 from services.training_rules import LoggedSet
-from services.workout_types import FinishedWorkout, WorkoutView
+from services.workout_types import FinishedWorkout, WorkoutTemplateView, WorkoutView
 
 
 def _set(logged: LoggedSet) -> SetModel:
@@ -43,6 +44,22 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
             for e in view.exercises
         ],
         live_points=view.live.total,
+    )
+
+
+def to_workout_template(template: WorkoutTemplateView) -> WorkoutTemplate:
+    """A routine as it would start now."""
+    return WorkoutTemplate(
+        routine_id=template.routine_id,
+        name=template.name,
+        exercises=[
+            ExerciseOutput(
+                exercise_id=e.exercise_id,
+                sets=[_set(s) for s in e.sets],
+                previous_sets=[_set(s) for s in e.previous_sets],
+            )
+            for e in template.exercises
+        ],
     )
 
 
