@@ -15,10 +15,13 @@ import { BrowserRouter } from 'react-router';
 
 import { createQueryClient } from './api/queryClient';
 import { App } from './App';
+import { registerServiceWorker } from './pwa/registerServiceWorker';
 import { Providers } from './Providers';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root element');
+
+registerServiceWorker();
 
 createRoot(root).render(
   <StrictMode>

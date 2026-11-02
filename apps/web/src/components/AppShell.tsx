@@ -6,6 +6,7 @@ import { AnimatedPage } from './AnimatedPage';
 import styles from './AppShell.module.css';
 import { HealthStatus } from './HealthStatus';
 import { InstallBanner } from './InstallBanner';
+import { UpdateBanner } from './UpdateBanner';
 import { NavRail } from './NavRail';
 import { NotificationToasts } from './NotificationToasts';
 import { TopBar } from './TopBar';
@@ -17,6 +18,7 @@ export function AppShell() {
       <NavRail />
       <main className={styles.main}>
         <TopBar />
+        <UpdateBanner />
         <InstallBanner />
         <AnimatedPage>
           <Outlet />
