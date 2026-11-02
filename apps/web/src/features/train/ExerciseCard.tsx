@@ -1,9 +1,10 @@
+import { useMyStats } from '../../api/compete';
 import type { Exercise, SetData } from '../../api/train';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
 import styles from './ExerciseCard.module.css';
-import { formatPrevious } from './format';
+import { formatLift, formatPrevious } from './format';
 import type { DraftExercise } from './useWorkoutDraft';
 
 type Props = {
@@ -39,6 +40,7 @@ function fields(exercise: Exercise): [keyof SetData, keyof SetData] {
 export function ExerciseCard(props: Props) {
   const { exercise, entry, onChange, onRemove, onSetDone, onPlates, past = false } = props;
   const { t, n } = useI18n();
+  const record = useMyStats().data?.prs.find((pr) => pr.exercise_id === exercise.id);
   const [colA, colB] = COLUMNS[exercise.type];
   const [fieldA, fieldB] = fields(exercise);
   const firstLoad = entry.sets.find((s) => s.load_kg)?.load_kg ?? 20;
@@ -61,7 +63,16 @@ export function ExerciseCard(props: Props) {
   return (
     <article className={styles.card} aria-label={exercise.name}>
       <header className={styles.head}>
-        <h3>{exercise.name}</h3>
+        <span className={styles.title}>
+          <h3>{exercise.name}</h3>
+          {record && (
+            <small className={styles.record}>
+              {t('pr_current', {
+                x: formatLift(exercise, record.load_kg, record.reps, t, n),
+              })}
+            </small>
+          )}
+        </span>
         <span className={styles.tools}>
           {exercise.barbell && (
             <button type="button" className={styles.link} onClick={() => onPlates(firstLoad)}>

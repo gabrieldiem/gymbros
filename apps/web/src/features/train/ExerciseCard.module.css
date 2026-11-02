@@ -162,3 +162,13 @@
 .check:hover {
   border-color: var(--smoke);
 }
+
+.title {
+  min-width: 0;
+}
+
+.record {
+  display: block;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}

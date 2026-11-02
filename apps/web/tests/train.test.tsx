@@ -33,6 +33,38 @@ function bodyOf(fetchMock: ReturnType<typeof mockApi>, method: string, url: stri
   return call ? (JSON.parse(String(call[1]?.body)) as unknown) : undefined;
 }
 
+describe('Train: your PR in the logger', () => {
+  it('shows your current PR next to the exercise', async () => {
+    trainApi({
+      'GET /api/workouts/active': [200, makeWorkout()],
+      'GET /api/me/stats': [
+        200,
+        {
+          prs: [
+            {
+              exercise_id: 'bench',
+              load_kg: 92.5,
+              reps: 5,
+              e1rm: 108,
+              achieved_at: '2026-10-30T18:00:00Z',
+            },
+          ],
+        },
+      ],
+    });
+    renderApp('/train');
+    const bench = await screen.findByRole('article', { name: 'Bench press' });
+    expect(await within(bench).findByText('PR 92.5 kg × 5')).toBeVisible();
+  });
+
+  it('shows nothing for an exercise you have no PR on', async () => {
+    trainApi({ 'GET /api/workouts/active': [200, makeWorkout()] });
+    renderApp('/train');
+    const bench = await screen.findByRole('article', { name: 'Bench press' });
+    expect(within(bench).queryByText(/^PR /)).toBeNull();
+  });
+});
+
 describe('Train: logging a past workout', () => {
   const openPicker = async () => {
     await userEvent.click(await screen.findByRole('button', { name: /Log a past workout/ }));
