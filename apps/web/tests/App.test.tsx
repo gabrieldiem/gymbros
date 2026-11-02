@@ -32,12 +32,12 @@ describe('App shell (signed in)', () => {
     );
   });
 
-  it('shows the avatar with initials linking to the profile', async () => {
+  it('shows the avatar with initials, opening the profile menu', async () => {
     mockApi({ 'GET /api/me': [200, makeMe({ initials: 'GD' })] });
     renderApp('/climb');
-    const link = await screen.findByRole('link', { name: /Your profile/ });
-    expect(link).toHaveAttribute('href', '/me');
-    expect(link).toHaveTextContent('GD');
+    const button = await screen.findByRole('button', { name: /Your profile/ });
+    expect(button).toHaveAttribute('aria-haspopup', 'menu');
+    expect(button).toHaveTextContent('GD');
   });
 
   it('switches the language and stores it on the profile', async () => {

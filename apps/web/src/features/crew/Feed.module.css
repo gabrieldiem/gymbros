@@ -183,3 +183,17 @@
 .more {
   margin-top: 16px;
 }
+
+.emoji {
+  display: inline-block;
+  font-style: normal;
+}
+
+button[aria-pressed='true'] > .emoji {
+  animation: pop 380ms var(--ease-out);
+}
+
+.count {
+  display: inline-block;
+  animation: rise-in 240ms var(--ease-out);
+}

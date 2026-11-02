@@ -1,0 +1,133 @@
+/*
+ * The app's motion, in one place. Rules from docs/DESIGN.md: motion answers what someone just did,
+ * rewards are the loudest, and prefers-reduced-motion turns all of it off (see base.css).
+ */
+
+/* Press feedback and state changes on every control. */
+a,
+button,
+summary,
+input,
+select,
+textarea {
+  transition:
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    opacity var(--dur-fast) ease,
+    transform var(--dur-fast) var(--ease-out);
+}
+
+button:active:not(:disabled),
+summary:active {
+  transform: scale(0.97);
+}
+
+/* Lists arrive one after another, not as a block. */
+.stagger > * {
+  animation: rise-in 420ms var(--ease-out) backwards;
+}
+
+.stagger > :nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.stagger > :nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.stagger > :nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.stagger > :nth-child(5) {
+  animation-delay: 180ms;
+}
+
+.stagger > :nth-child(6) {
+  animation-delay: 225ms;
+}
+
+.stagger > :nth-child(n + 7) {
+  animation-delay: 270ms;
+}
+
+/* Details open smoothly where the browser can animate to auto height. */
+@supports (interpolate-size: allow-keywords) {
+  details {
+    interpolate-size: allow-keywords;
+  }
+
+  details::details-content {
+    height: 0;
+    overflow: hidden;
+    transition:
+      height var(--dur) var(--ease-out),
+      content-visibility var(--dur) allow-discrete;
+  }
+
+  details[open]::details-content {
+    height: auto;
+  }
+}
+
+/* Moving to another tab: the page slides in from the side of the tab you came from. */
+.page-enter {
+  animation: page-in 320ms var(--ease-out) backwards;
+}
+
+.page-enter[data-direction='forward'] {
+  --page-from: 18px;
+}
+
+.page-enter[data-direction='back'] {
+  --page-from: -18px;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--page-from, 0)) translateY(var(--page-rise, 6px));
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+}

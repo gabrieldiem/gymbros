@@ -178,7 +178,7 @@ export function MePage() {
         <section aria-labelledby="prs-title">
           <h2 id="prs-title">{t('prs_title')}</h2>
           {data.prs.length === 0 && <p className={styles.muted}>{t('prs_empty')}</p>}
-          <ul className={styles.prs}>
+          <ul className={`${styles.prs} stagger`}>
             {data.prs.slice(0, 8).map((pr) => {
               const best = formatLift(exercise(pr.exercise_id), pr.load_kg, pr.reps, t, n);
               const name = exercise(pr.exercise_id)?.name ?? pr.exercise_id;
@@ -212,7 +212,7 @@ export function MePage() {
         <section aria-labelledby="history-title">
           <h2 id="history-title">{t('history_title')}</h2>
           {data.history.length === 0 && <p className={styles.muted}>{t('history_empty')}</p>}
-          <ul className={styles.history}>
+          <ul className={`${styles.history} stagger`}>
             {data.history.map((h) => (
               <li key={h.id}>
                 <span>

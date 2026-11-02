@@ -38,7 +38,7 @@ function Feed() {
     return <p className={feedStyles.empty}>{t('feed_empty')}</p>;
   return (
     <>
-      <ul className={feedStyles.feed}>
+      <ul className={`${feedStyles.feed} stagger`}>
         {inactive.map((i) => (
           <NudgePrompt key={i.member.user_id} member={i.member} days={i.days} />
         ))}

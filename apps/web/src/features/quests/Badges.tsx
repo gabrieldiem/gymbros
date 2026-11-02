@@ -20,7 +20,7 @@ export function Badges({ badges }: { badges: Badge[] }) {
   const name = (b: Badge) => t(`badge_${b.id}` as MessageKey);
   return (
     <>
-      <div className={styles.badges}>
+      <div className={`${styles.badges} stagger`}>
         {badges.map((b) => (
           <button
             key={b.id}

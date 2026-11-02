@@ -36,7 +36,7 @@ function QuestsView() {
   return (
     <>
       <CrewQuest crew={board.crew_quest} />
-      <div className={styles.cards}>
+      <div className={`${styles.cards} stagger`}>
         {board.weekly_event === 'leg_day_x2' && (
           <article className={cx(styles.panel, styles.card, styles.event)}>
             <h3>{t('event_title', { w: t('leg_event_name') })}</h3>
@@ -73,7 +73,7 @@ function QuestsView() {
         </article>
       </div>
       <h2>{t('weekly_quests')}</h2>
-      <div className={styles.cards}>
+      <div className={`${styles.cards} stagger`}>
         {board.quests.map((quest) => {
           const done = quest.claimed || quest.progress >= quest.goal;
           return (

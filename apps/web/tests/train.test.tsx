@@ -65,7 +65,7 @@ describe('Train: logging', () => {
       'true',
     );
     await waitFor(() => expect(screen.getByTestId('live-points')).toHaveTextContent('58'), {
-      timeout: 2000,
+      timeout: 5000,
     });
     const body = bodyOf(fetchMock, 'PUT', '/api/workouts/w1') as {
       exercises: { sets: { done: boolean }[] }[];

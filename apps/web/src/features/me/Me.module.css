@@ -354,3 +354,38 @@
     font-size: 1.35rem;
   }
 }
+
+.nameForm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.nameForm > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameForm button {
+  margin-top: 28px;
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.color {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  outline-offset: 2px;
+}
+
+.color[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 3px var(--iron),
+    0 0 0 5px var(--chalk);
+}

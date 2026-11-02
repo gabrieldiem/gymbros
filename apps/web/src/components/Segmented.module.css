@@ -1,4 +1,5 @@
 .seg {
+  position: relative;
   display: inline-flex;
   gap: 2px;
   padding: 3px;
@@ -6,7 +7,22 @@
   border-radius: var(--r-control);
 }
 
+.thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--thumb-w, 0);
+  background: var(--chalk);
+  border-radius: 9px;
+  transform: translateX(var(--thumb-x, 0));
+  transition:
+    transform var(--dur) var(--ease-out),
+    width var(--dur) var(--ease-out);
+}
+
 .seg button {
+  position: relative;
   min-height: var(--touch);
   padding: 0 14px;
   border-radius: 9px;
@@ -15,7 +31,10 @@
   color: var(--smoke);
 }
 
+.seg button:hover {
+  color: var(--chalk);
+}
+
 .seg button[aria-pressed='true'] {
-  background: var(--chalk);
   color: var(--iron);
 }

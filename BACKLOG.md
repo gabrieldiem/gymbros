@@ -50,7 +50,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-41` **Crew palette contrast** (design, S): the dataviz validator flags the crew colors on the dark surface (lightness band; pink/violet ΔE 7.0 for deutan vision). Charts that use them always add a legend with names; consider a darker violet step. _Added 2026-10-31_
 - [ ] `GYM-42` **Tonnage chart y-axis** (web, S): only this week's bar is labelled (the rest via tooltip and table). Add light y ticks if people ask for exact values at a glance. _Added 2026-10-31_
 - [ ] `GYM-56` **Split the JS bundle per tab** (web, S): the build is one 426 KB JS chunk (132 KB gzipped). Lazy-load each tab's route so the first paint only parses Climb; check the precache size and e2e after. _Added 2026-10-31_
-- [ ] `GYM-57` **Feed says "Tú desbloqueó" for your own badge** (i18n+web, S): your own badge post reads "Tú desbloqueó Mes de hierro." Needs a second-person key ("Desbloqueaste …", "You unlocked …"). _Added 2026-10-31_
 - [ ] `GYM-60` **Blue/green deploys with no downtime** (infra, M): a version that passes the smoke test but fails in production causes an outage until the previous one is restored, up to a few minutes. Start the new version beside the old one and switch Caddy only once it is healthy. Needs room on the box for both. _Added 2026-11-01_
 
 ## Tech debt
@@ -79,3 +78,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-37` **Old notifications cleanup**: marking the inbox read deletes your notifications older than `social.notification_days` (60). Closed 2026-10-31 on chore/backlog-tech-debt.
 - [x] `GYM-23` **Login rate limiting**: no longer applies: the password endpoints are gone and Google handles credentials. Cancelled 2026-11-01 on feat/google-auth.
 - [x] `GYM-24` **Password reset**: no longer applies: there are no passwords to reset. Cancelled 2026-11-01 on feat/google-auth.
+- [x] `GYM-57` **Feed says "Tú desbloqueó" for your own badge**: your own badge and rank posts read in second person. Closed 2026-11-02 on feat/motion-menu.

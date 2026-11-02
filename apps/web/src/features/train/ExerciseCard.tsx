@@ -44,6 +44,7 @@ export function ExerciseCard({ exercise, entry, onChange, onRemove, onSetDone, o
     onChange(entry.sets.map((s, i) => (i === index ? { ...s, [field]: parse(value) } : s)));
 
   const toggle = (index: number) => {
+    navigator.vibrate?.(10);
     const next = entry.sets.map((s, i) => (i === index ? { ...s, done: !s.done } : s));
     onChange(next);
     if (next[index]?.done) onSetDone();

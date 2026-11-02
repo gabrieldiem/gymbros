@@ -37,4 +37,8 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: /Settings|Ajustes/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await audit(page, 'settings sheet');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await expect(page.getByRole('menu')).toBeVisible();
+  await audit(page, 'profile menu');
 });

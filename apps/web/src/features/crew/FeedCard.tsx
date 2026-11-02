@@ -76,7 +76,10 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
               aria-label={`${t(kind)}, ${item.reactions[kind]}`}
               onClick={() => react.mutate({ itemId: item.id, kind })}
             >
-              {EMOJI[kind]} <span>{item.reactions[kind]}</span>
+              <i className={styles.emoji}>{EMOJI[kind]}</i>{' '}
+              <span key={item.reactions[kind]} className={styles.count}>
+                {item.reactions[kind]}
+              </span>
             </button>
           ))
         )}

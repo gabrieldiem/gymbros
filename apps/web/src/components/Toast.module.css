@@ -21,6 +21,14 @@
   border-color: var(--red);
 }
 
+.leaving {
+  opacity: 0;
+  transform: translate(-50%, -30px);
+  transition:
+    opacity 240ms ease-in,
+    transform 240ms ease-in;
+}
+
 @keyframes drop {
   from {
     transform: translate(-50%, -160%);
