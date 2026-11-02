@@ -1,4 +1,4 @@
-import { Repeat2, Trash2 } from 'lucide-react';
+import { Disc3, Plus, Repeat2, Trash2, TrendingUp, X } from 'lucide-react';
 import { Fragment } from 'react';
 
 import { useMyStats } from '../../api/compete';
@@ -114,6 +114,7 @@ export function ExerciseCard(props: Props) {
               className={styles.link}
               onClick={() => onPlates(firstLoad ? disksOf(firstLoad, bar) : 0, bar)}
             >
+              <Disc3 size={16} aria-hidden="true" />
               {t('plates')}
             </button>
           )}
@@ -123,12 +124,17 @@ export function ExerciseCard(props: Props) {
             onClick={onRemove}
             aria-label={t('remove_ex', { name: exercise.name })}
           >
+            <X size={16} aria-hidden="true" />
             {t('remove')}
           </button>
         </span>
       </header>
       <div className={styles.meta}>
-        {!past && entry.previous_sets.length > 0 && <p className={styles.beat}>↑ {t('beat')}</p>}
+        {!past && entry.previous_sets.length > 0 && (
+          <p className={styles.beat}>
+            <TrendingUp size={15} aria-hidden="true" /> {t('beat')}
+          </p>
+        )}
         {exercise.barbell && (
           <label className={styles.bar}>
             {t('bar_label')}
@@ -212,7 +218,8 @@ export function ExerciseCard(props: Props) {
         );
       })}
       <button type="button" className={styles.addSet} onClick={addSet}>
-        + {t('add_set')}
+        <Plus size={16} aria-hidden="true" />
+        {t('add_set')}
       </button>
     </article>
   );

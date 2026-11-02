@@ -1,3 +1,4 @@
+import { Play, RotateCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { Standing } from '../../api/climb';
@@ -59,6 +60,7 @@ export function ClimbDemo({
         <h2 id="demo-title">{t('landing_demo_title')}</h2>
         <p className={styles.muted}>{t('landing_demo_sub')}</p>
         <Button
+          icon={finished ? RotateCw : Play}
           wide
           disabled={!session || atSummit}
           onClick={() => setFinished((count) => count + 1)}

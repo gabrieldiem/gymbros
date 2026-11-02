@@ -140,7 +140,7 @@ describe('Log out', () => {
       'POST /api/auth/logout': [204, null],
     });
     renderApp('/me');
-    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Profile and settings' }));
     await userEvent.click(screen.getByRole('button', { name: 'Log out' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Climb with your crew.' }),

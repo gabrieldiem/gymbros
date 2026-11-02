@@ -401,7 +401,6 @@ export const en = {
   photo_remove: 'Remove photo',
   photo_yours: 'Your gym photo',
   photo_of: 'Gym photo from {name}',
-  profile_edit: 'Edit profile',
   profile_characters: 'Your two characters',
   profile_characters_hint: 'Up to 2 letters or emoji, shown when you have no picture.',
   profile_picture: 'Your picture',
@@ -654,7 +653,7 @@ export const en = {
     'Show your crew your gym: add a photo while you log, or later from your page. It appears on your post.',
   wn_profile_title: 'Make your profile yours',
   wn_profile_body:
-    'Upload a picture or pick any two letters or emoji, and choose any color. Tap Edit profile on your page.',
+    'Upload a picture or pick any two letters or emoji, and choose any color. Tap Profile and settings on your page.',
   wn_gyms_title: 'Show your crew where you train',
   wn_gyms_body:
     'Add your gyms in settings and pick a default. Your crew sees which one you’re at while you train and on your posts.',
@@ -847,7 +846,7 @@ export const en = {
   history_title: 'History',
   history_empty: 'No workouts yet.',
   history_row: '{sets} sets, {kg} kg, {min} min',
-  settings: 'Settings',
+  settings: 'Profile and settings',
   rest_set: 'Rest timer',
   rest_hint: 'How long the rest timer runs when you start it.',
   language_hint: 'English or Spanish.',

@@ -1,3 +1,4 @@
+import { Check, Coins, Copy, UserMinus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import {
@@ -113,7 +114,7 @@ function SendInvite({ crew }: { crew: AdminCrew }) {
       {unsent && (
         <div className={styles.unsent} role="alert">
           <p>{t('admin_invite_unsent')}</p>
-          <Button variant="ghost" wide onClick={() => void copyLink(unsent)}>
+          <Button icon={Copy} variant="ghost" wide onClick={() => void copyLink(unsent)}>
             {t('admin_copy_link')}
           </Button>
         </div>
@@ -217,13 +218,18 @@ export function CrewSheet({ crew, onClose }: { crew: AdminCrew | null; onClose: 
           onChange={set('expires')}
         />
         <FormError error={save.error} />
-        <Button type="submit" wide disabled={save.isPending}>
+        <Button icon={Check} type="submit" wide disabled={save.isPending}>
           {t('save')}
         </Button>
       </form>
       {crew && (
         <div className={styles.danger}>
-          <Button variant="ghost" wide onClick={() => void copyLink(inviteUrl(crew.invite_code))}>
+          <Button
+            icon={Copy}
+            variant="ghost"
+            wide
+            onClick={() => void copyLink(inviteUrl(crew.invite_code))}
+          >
             {t('admin_copy_link')}
           </Button>
           <p className={styles.muted}>{t('admin_rotate_hint')}</p>
@@ -293,7 +299,7 @@ function AdjustPoints({ member, onDone }: { member: AdminMember; onDone: () => v
         onChange={(e) => setReason(e.target.value)}
       />
       <FormError error={adjust.error} />
-      <Button type="submit" variant="ghost" wide disabled={!valid || adjust.isPending}>
+      <Button icon={Coins} type="submit" variant="ghost" wide disabled={!valid || adjust.isPending}>
         {t('admin_adjust')}
       </Button>
     </form>
@@ -321,6 +327,7 @@ function DangerZone({ member, onDone }: { member: AdminMember; onDone: () => voi
           <p className={styles.muted}>{t('admin_remove_hint', { crew: member.crew_name })}</p>
           <FormError error={remove.error} />
           <Button
+            icon={UserMinus}
             variant="ghost"
             wide
             disabled={remove.isPending}

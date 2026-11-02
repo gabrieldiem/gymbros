@@ -226,11 +226,16 @@ describe('Quests sections', () => {
   });
 
   it('reaches them from the profile menu', async () => {
-    mockApi({ 'GET /api/me': [200, makeMe()], 'GET /api/rules': RULES });
+    mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/rules': RULES,
+      'GET /api/badges': [200, []],
+    });
     renderApp('/climb');
     await userEvent.click(await screen.findByRole('button', { name: /^Your profile/ }));
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Points' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Points' })).toBeVisible();
+    expect(screen.queryByRole('menuitem', { name: 'Points' })).toBeNull();
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Achievements' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Achievements' })).toBeVisible();
     expect(screen.queryByRole('menu')).toBeNull();
   });
 });

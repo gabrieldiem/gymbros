@@ -46,3 +46,9 @@
   font-weight: 700;
   border-bottom: none !important;
 }
+
+.chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -35,8 +35,8 @@ describe('Your data', () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
-    const sheet = within(await screen.findByRole('dialog', { name: 'Settings' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     const link = sheet.getByRole('link', { name: 'Download my data' });
     expect(link).toHaveAttribute('href', '/api/me/export');
     expect(link).toHaveAttribute('download');
@@ -70,8 +70,8 @@ describe('Unsubscribing from an email', () => {
 describe('Your gyms in settings', () => {
   const openSettings = async () => {
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
-    return within(await screen.findByRole('dialog', { name: 'Settings' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    return within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
   };
 
   it('adds a gym and makes another the default', async () => {
@@ -114,11 +114,9 @@ describe('Profile menu', () => {
     expect(menu.getByText('gabi@example.com')).toBeVisible();
     expect(menu.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
       'Your profile',
-      'Edit profile',
       'Achievements',
-      'Points',
       'What’s new',
-      'Settings',
+      'Profile and settings',
       'Send feedback',
       'Invite friends',
       'Log out',
@@ -159,7 +157,7 @@ describe('Profile menu', () => {
     renderApp('/climb');
     await openMenu();
     await userEvent.keyboard('{ArrowDown}');
-    expect(screen.getByRole('menuitem', { name: 'Edit profile' })).toHaveFocus();
+    expect(screen.getByRole('menuitem', { name: 'Achievements' })).toHaveFocus();
     await userEvent.keyboard('{ArrowUp}{ArrowUp}');
     expect(screen.getByRole('menuitem', { name: 'Log out' })).toHaveFocus();
   });
@@ -176,8 +174,8 @@ describe('Profile menu', () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Settings' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Settings' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     expect(dialog.getByRole('link', { name: 'Privacy policy' })).toHaveAttribute(
       'href',
       '/privacy',
@@ -188,15 +186,15 @@ describe('Profile menu', () => {
     );
   });
 
-  it('opens Edit profile, where you can rename yourself and pick a color', async () => {
+  it('opens Profile and settings, where you can rename yourself and pick a color', async () => {
     const fetchMock = mockApi({
       'GET /api/me': [200, makeMe()],
       'PATCH /api/me': (body) => [200, makeMe(body as object)],
     });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     const name = dialog.getByLabelText(/Your name/);
     expect(dialog.getByRole('button', { name: 'Save' })).toBeDisabled();
     await userEvent.clear(name);
@@ -217,8 +215,8 @@ describe('Profile menu', () => {
     });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     const field = dialog.getByLabelText(/Your two characters/);
     fireEvent.change(field, { target: { value: '👨‍👩‍👧‍👦🔥💪' } });
     expect(field).toHaveValue('👨‍👩‍👧‍👦🔥');
@@ -236,8 +234,8 @@ describe('Profile menu', () => {
     });
     renderApp('/climb');
     const menu = within(await openMenu());
-    await userEvent.click(menu.getByRole('menuitem', { name: 'Edit profile' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Edit profile' }));
+    await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     fireEvent.change(dialog.getByLabelText('Pick any color'), { target: { value: '#123456' } });
     await waitFor(() => {
       const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH');

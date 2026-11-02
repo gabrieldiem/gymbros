@@ -231,8 +231,8 @@ describe('Deleting your own account', () => {
     });
     renderApp('/climb');
     await userEvent.click(await screen.findByRole('button', { name: /^Your profile/ }));
-    await userEvent.click(screen.getByRole('menuitem', { name: 'Settings' }));
-    const dialog = within(await screen.findByRole('dialog', { name: 'Settings' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Profile and settings' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
     await userEvent.click(dialog.getByText('Delete account', { selector: 'summary' }));
     const remove = dialog.getByRole('button', { name: 'Delete account' });
     expect(remove).toBeDisabled();

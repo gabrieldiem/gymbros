@@ -409,7 +409,6 @@ export const es = {
   photo_remove: 'Quitar foto',
   photo_yours: 'Tu foto del gym',
   photo_of: 'Foto del gym de {name}',
-  profile_edit: 'Editar perfil',
   profile_characters: 'Tus dos caracteres',
   profile_characters_hint: 'Hasta 2 letras o emojis, que se ven cuando no tienes foto.',
   profile_picture: 'Tu foto',
@@ -663,7 +662,7 @@ export const es = {
     'Muestra tu gym a tu equipo: añade una foto mientras registras, o después desde tu página. Aparece en tu publicación.',
   wn_profile_title: 'Haz tuyo tu perfil',
   wn_profile_body:
-    'Sube una foto o elige dos letras o emojis, y el color que quieras. Toca Editar perfil en tu página.',
+    'Sube una foto o elige dos letras o emojis, y el color que quieras. Toca Perfil y ajustes en tu página.',
   wn_gyms_title: 'Muestra a tu equipo dónde entrenas',
   wn_gyms_body:
     'Añade tus gimnasios en ajustes y elige uno predeterminado. Tu equipo ve en cuál estás mientras entrenas y en tus publicaciones.',
@@ -857,7 +856,7 @@ export const es = {
   history_title: 'Historial',
   history_empty: 'Aún no hay entrenos.',
   history_row: '{sets} sets, {kg} kg, {min} min',
-  settings: 'Ajustes',
+  settings: 'Perfil y ajustes',
   rest_set: 'Descanso',
   rest_hint: 'Cuánto dura el descanso cuando lo inicias.',
   language_hint: 'Español o inglés.',

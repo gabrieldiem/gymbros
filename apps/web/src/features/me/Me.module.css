@@ -24,16 +24,6 @@
   color: var(--smoke);
 }
 
-.gear {
-  display: grid;
-  place-items: center;
-  width: var(--touch);
-  height: var(--touch);
-  background: var(--plate);
-  border: 1px solid var(--steel);
-  border-radius: var(--r-control);
-}
-
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -603,4 +593,26 @@
   width: 20px;
   height: 20px;
   accent-color: var(--volt);
+}
+
+.iconTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download {
+  gap: 8px;
+}
+
+.destroy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history button > b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }

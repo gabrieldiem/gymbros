@@ -59,6 +59,7 @@ export function NavRail() {
             <div className={styles.subs}>
               {QUEST_SECTIONS.map((section) => (
                 <NavLink key={section.to} to={section.to} end className={cx(styles.sub)}>
+                  <section.icon size={15} aria-hidden="true" />
                   {t(section.label)}
                 </NavLink>
               ))}

@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { useState } from 'react';
 
 import type { Badge } from '../../api/compete';
@@ -68,7 +69,7 @@ export function Badges({ badges }: { badges: Badge[] }) {
               <span>{t('have_it', { n: open.crew_count })}</span>
             </li>
           </ul>
-          <Button variant="quiet" wide onClick={() => setOpen(null)}>
+          <Button icon={X} variant="quiet" wide onClick={() => setOpen(null)}>
             {t('close')}
           </Button>
         </Sheet>

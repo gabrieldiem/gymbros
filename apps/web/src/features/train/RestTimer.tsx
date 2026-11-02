@@ -1,3 +1,4 @@
+import { SkipForward, Timer as TimerIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useI18n } from '../../i18n/context';
@@ -63,19 +64,7 @@ export function RestTimer({ rest, leftMs, defaultSeconds, onStart, onAdjust, onS
       )}
       {!rest && (
         <button type="button" className={styles.start} onClick={onStart}>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="13" r="8" />
-            <path d="M12 9v4l2.5 2M9.5 2.5h5" />
-          </svg>
+          <TimerIcon size={20} aria-hidden="true" />
           {t('rest_start', { x: clock(defaultSeconds) })}
         </button>
       )}
@@ -102,6 +91,7 @@ export function RestTimer({ rest, leftMs, defaultSeconds, onStart, onAdjust, onS
             +15
           </button>
           <button type="button" className={styles.skip} onClick={onSkip}>
+            <SkipForward size={16} aria-hidden="true" />
             {t('skip')}
           </button>
         </div>

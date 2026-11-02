@@ -1,3 +1,4 @@
+import { RefreshCw } from 'lucide-react';
 import { useState, useSyncExternalStore } from 'react';
 
 import { useActiveWorkout } from '../api/train';
@@ -22,7 +23,9 @@ export function UpdateBanner() {
         <b>{t('update_title')}</b>
         <span>{t('update_body')}</span>
       </span>
-      <Button onClick={applyUpdate}>{t('update_cta')}</Button>
+      <Button icon={RefreshCw} onClick={applyUpdate}>
+        {t('update_cta')}
+      </Button>
       <Button variant="quiet" onClick={() => setLater(true)}>
         {t('update_later')}
       </Button>

@@ -1,3 +1,4 @@
+import { RotateCw } from 'lucide-react';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
@@ -25,7 +26,7 @@ export function ErrorBlock({ message, onRetry }: { message: MessageKey; onRetry:
   return (
     <div className={styles.error} role="alert">
       <p>{t(message)}</p>
-      <Button variant="ghost" onClick={onRetry}>
+      <Button icon={RotateCw} variant="ghost" onClick={onRetry}>
         {t('retry')}
       </Button>
     </div>

@@ -268,3 +268,9 @@
 .link[aria-current='page'] svg {
   animation: pop 380ms var(--ease-out);
 }
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

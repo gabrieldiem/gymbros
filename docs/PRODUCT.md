@@ -16,7 +16,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
 | You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
 
-Desktop (≥960 px) shows a side rail with Train as the primary button and the Quests sections nested under Quests. Mobile shows a floating dock with Train as the raised centre button, and a sticky section bar inside Quests. Achievements and Points are also in the profile menu. The code and API call achievements `badge`; the UI says Achievements / Logros.
+Desktop (≥960 px) shows a side rail with Train as the primary button and the Quests sections nested under Quests. Mobile shows a floating dock with Train as the raised centre button, and a sticky section bar inside Quests. Achievements is also in the profile menu. The code and API call achievements `badge`; the UI says Achievements / Logros.
 
 ## Weekly goal
 
@@ -225,10 +225,10 @@ Sent through Resend. Nothing goes out without `RESEND_API_KEY` on the server, an
 
 ## Your account
 
-The avatar opens a menu with your profile, Edit profile, settings, inviting friends and log out. Edit profile is also a button on the You tab.
+The avatar opens a menu with your profile, achievements, what's new, Profile and settings, feedback, inviting friends and log out. Profile and settings is also a button on the You tab, and it's one place for everything about you.
 
-- **Edit profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
-- **Settings:** your gyms, language and rest time, downloading your data, and deleting your account and everything in it by typing your email.
+- **Your profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
+- **Settings, in the same sheet:** your gyms, language and rest time, downloading your data, and deleting your account and everything in it by typing your email.
 - **Your data:** Download my data gives you a JSON file with every finished session (its sets as logged, gym, day and what it paid), your PRs and your gyms. Photos appear as links, which need you signed in.
 - **Send feedback:** in the menu, an idea, a bug or anything else, up to 10 a day. Admins read it in the backoffice and it goes when the account goes.
 

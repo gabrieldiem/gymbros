@@ -1,3 +1,4 @@
+import { Check, Mountain } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { Exercise, FinishResult } from '../../api/train';
@@ -95,10 +96,10 @@ export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
           ))}
         </ul>
         <div className={styles.actions}>
-          <Button wide onClick={onClimb}>
+          <Button icon={Mountain} wide onClick={onClimb}>
             {t('see_climb')}
           </Button>
-          <Button variant="quiet" wide onClick={onClose}>
+          <Button icon={Check} variant="quiet" wide onClick={onClose}>
             {t('done')}
           </Button>
         </div>

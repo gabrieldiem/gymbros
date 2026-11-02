@@ -1,3 +1,13 @@
+import {
+  LayoutDashboard,
+  LogOut,
+  Mail,
+  MessageSquare,
+  Plus,
+  ScrollText,
+  UserCog,
+  Users,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 
@@ -70,7 +80,9 @@ function Crews() {
   return (
     <>
       <div className={styles.toolbar}>
-        <Button onClick={() => setEditing('new')}>{t('admin_new_crew')}</Button>
+        <Button icon={Plus} onClick={() => setEditing('new')}>
+          {t('admin_new_crew')}
+        </Button>
       </div>
       <QueryState query={query} failed="admin_failed">
         {(crews) =>
@@ -262,7 +274,12 @@ export function AdminPage() {
               <Link to="/join" className={styles.back}>
                 {t('admin_join_crew')}
               </Link>
-              <Button variant="quiet" onClick={() => logout.mutate()} disabled={logout.isPending}>
+              <Button
+                icon={LogOut}
+                variant="quiet"
+                onClick={() => logout.mutate()}
+                disabled={logout.isPending}
+              >
                 {t('log_out')}
               </Button>
             </>
@@ -278,12 +295,12 @@ export function AdminPage() {
             value={view}
             onChange={setView}
             options={[
-              { value: 'overview', label: t('admin_view_overview') },
-              { value: 'crews', label: t('admin_crews') },
-              { value: 'members', label: t('admin_users') },
-              { value: 'email', label: t('admin_view_email') },
-              { value: 'feedback', label: t('admin_view_feedback') },
-              { value: 'log', label: t('admin_view_log') },
+              { value: 'overview', label: t('admin_view_overview'), icon: LayoutDashboard },
+              { value: 'crews', label: t('admin_crews'), icon: Users },
+              { value: 'members', label: t('admin_users'), icon: UserCog },
+              { value: 'email', label: t('admin_view_email'), icon: Mail },
+              { value: 'feedback', label: t('admin_view_feedback'), icon: MessageSquare },
+              { value: 'log', label: t('admin_view_log'), icon: ScrollText },
             ]}
           />
         </div>

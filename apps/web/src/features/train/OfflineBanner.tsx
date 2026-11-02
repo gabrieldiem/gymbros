@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 
 import { Button } from '../../components/Button';
@@ -33,7 +34,7 @@ export function OfflineBanner() {
       {failed.map((workout) => (
         <div key={workout.id} className={styles.failed}>
           <p>{t('offline_failed', { name: workout.name })}</p>
-          <Button variant="quiet" onClick={() => removeFromOutbox(workout.id)}>
+          <Button icon={Trash2} variant="quiet" onClick={() => removeFromOutbox(workout.id)}>
             {t('offline_discard')}
           </Button>
         </div>

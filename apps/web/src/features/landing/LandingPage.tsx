@@ -1,3 +1,4 @@
+import { LogIn } from 'lucide-react';
 import { Navigate } from 'react-router';
 
 import { useAuthOptions } from '../../api/auth';
@@ -20,7 +21,7 @@ const REPOSITORY_URL = 'https://github.com/gabrieldiem/gymbros';
 function SignIn({ google }: { google: boolean | undefined }) {
   const { t } = useI18n();
   return google === false ? (
-    <ButtonLink to="/login" wide>
+    <ButtonLink icon={LogIn} to="/login" wide>
       {t('log_in')}
     </ButtonLink>
   ) : (
@@ -92,7 +93,7 @@ export function LandingPage() {
         </nav>
         <div className={styles.topActions}>
           <LanguageToggle />
-          <ButtonLink to="/login" variant="ghost" className={styles.logIn}>
+          <ButtonLink icon={LogIn} to="/login" variant="ghost" className={styles.logIn}>
             {t('log_in')}
           </ButtonLink>
         </div>

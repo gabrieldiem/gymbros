@@ -1,3 +1,4 @@
+import { LogIn } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 
@@ -76,7 +77,7 @@ export function InvitePage() {
         {invite.data ? t('invite_sub', { n: invite.data.members }) : t('w_body')}
       </p>
       {options?.google === false ? (
-        <ButtonLink to="/login" wide>
+        <ButtonLink icon={LogIn} to="/login" wide>
           {t('log_in')}
         </ButtonLink>
       ) : (

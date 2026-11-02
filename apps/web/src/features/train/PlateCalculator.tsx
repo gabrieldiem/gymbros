@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '../../components/Button';
@@ -110,7 +111,7 @@ export function PlateCalculator({
       </p>
       {leftoverKg > 0 && <p className={styles.note}>{t('cant_load', { n: n(leftoverKg) })}</p>}
       <div className={styles.done}>
-        <Button variant="quiet" wide onClick={onClose}>
+        <Button icon={Check} variant="quiet" wide onClick={onClose}>
           {t('done')}
         </Button>
       </div>

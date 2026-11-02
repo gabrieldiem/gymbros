@@ -1,3 +1,16 @@
+import {
+  BicepsFlexed,
+  CalendarDays,
+  CalendarPlus,
+  Dumbbell,
+  Footprints,
+  HeartPulse,
+  PersonStanding,
+  Plus,
+  Waves,
+  Weight,
+  type LucideIcon,
+} from 'lucide-react';
 import type { Catalog, Week } from '../../api/train';
 import { FormError } from '../../components/FormError';
 import { Pips } from '../../components/Pips';
@@ -23,6 +36,16 @@ type Props = {
 };
 
 /** The Train start screen: routines, the week's pips and how points are earned. */
+const ROUTINE_ICONS: Record<string, LucideIcon> = {
+  push: Dumbbell,
+  pull: BicepsFlexed,
+  legs: Weight,
+  cardio: HeartPulse,
+  run: Footprints,
+  swim: Waves,
+  stretch: PersonStanding,
+};
+
 export function RoutinePicker(props: Props) {
   const { catalog, week, starting, error, pastDay, gym, onGym } = props;
   const { onStart, onPickPastDay, onClearPastDay } = props;
@@ -50,6 +73,7 @@ export function RoutinePicker(props: Props) {
           <div className={styles.past}>
             <p>{t('past_notice', { day: formatDay(lang, pastDay) })}</p>
             <button type="button" onClick={onPickPastDay}>
+              <CalendarDays size={16} aria-hidden="true" />
               {t('past_change')}
             </button>
             <button type="button" onClick={onClearPastDay}>
@@ -59,6 +83,7 @@ export function RoutinePicker(props: Props) {
         ) : (
           Boolean(week?.past_days.length) && (
             <button type="button" className={styles.pastOpen} onClick={onPickPastDay}>
+              <CalendarPlus size={16} aria-hidden="true" />
               {t('past_open')}
             </button>
           )
@@ -68,28 +93,37 @@ export function RoutinePicker(props: Props) {
         <FormError error={error} />
       </div>
       <div className={styles.routines}>
-        {catalog.routines.map((routine) => (
-          <button
-            key={routine.id}
-            type="button"
-            className={styles.routine}
-            disabled={starting}
-            onClick={() => onStart(routine.id)}
-          >
-            <h3>{routine.name}</h3>
-            <p>{routine.exercise_ids.map(exerciseName).join(', ')}</p>
-            {legEvent && hasLegs(routine.exercise_ids) && (
-              <span className={styles.tag}>{t('leg_event_tag')}</span>
-            )}
-          </button>
-        ))}
+        {catalog.routines.map((routine) => {
+          const RoutineIcon = ROUTINE_ICONS[routine.id] ?? Dumbbell;
+          return (
+            <button
+              key={routine.id}
+              type="button"
+              className={styles.routine}
+              disabled={starting}
+              onClick={() => onStart(routine.id)}
+            >
+              <h3 className={styles.routineTitle}>
+                <RoutineIcon size={20} aria-hidden="true" />
+                {routine.name}
+              </h3>
+              <p>{routine.exercise_ids.map(exerciseName).join(', ')}</p>
+              {legEvent && hasLegs(routine.exercise_ids) && (
+                <span className={styles.tag}>{t('leg_event_tag')}</span>
+              )}
+            </button>
+          );
+        })}
         <button
           type="button"
           className={`${styles.routine} ${styles.empty}`}
           disabled={starting}
           onClick={() => onStart(null)}
         >
-          <h3>{t('empty_title')}</h3>
+          <h3 className={styles.routineTitle}>
+            <Plus size={20} aria-hidden="true" />
+            {t('empty_title')}
+          </h3>
           <p>{t('empty_sub')}</p>
         </button>
       </div>

@@ -1,3 +1,4 @@
+import { MapPin } from 'lucide-react';
 import { useGyms } from '../../api/gyms';
 import { useI18n } from '../../i18n/context';
 import styles from './GymSelect.module.css';
@@ -19,6 +20,7 @@ export function GymSelect({ value, onChange }: Props) {
   if (options.length === 0) return null;
   return (
     <label className={styles.gym}>
+      <MapPin size={15} aria-hidden="true" />
       {t('gym_at')}
       <select value={value ?? NONE} onChange={(e) => onChange(e.target.value || null)}>
         {options.map((name) => (

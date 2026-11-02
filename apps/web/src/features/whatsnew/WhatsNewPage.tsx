@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import { useWhatsNew } from '../../api/whatsNew';
 import { ButtonLink } from '../../components/Button';
 import { QueryState } from '../../components/QueryState';
@@ -25,7 +26,7 @@ export function WhatsNewPage() {
                   <time dateTime={entry.date}>{formatDay(lang, entry.date)}</time>
                   <h2>{t(copy.title)}</h2>
                   <p>{t(copy.body)}</p>
-                  <ButtonLink variant="ghost" to={entry.link}>
+                  <ButtonLink icon={ArrowRight} variant="ghost" to={entry.link}>
                     {t('whats_new_try')}
                   </ButtonLink>
                 </li>

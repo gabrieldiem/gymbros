@@ -49,7 +49,7 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
     await page.waitForLoadState('networkidle');
     await audit(page, path);
   }
-  await page.getByRole('button', { name: /Settings|Ajustes/ }).click();
+  await page.getByRole('button', { name: /Profile and settings|Perfil y ajustes/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await audit(page, 'settings sheet');
   await page.keyboard.press('Escape');

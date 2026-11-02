@@ -41,6 +41,7 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 - Progress: 8px rounded bars. Pips are 10px circles (16px large), steel outline → volt filled → red for over target.
 - Avatars: colored circle with initials, Barlow 700.
 - Badges: hexagon icons in the badge color. Locked badges are greyed.
+- Icons: Lucide (`lucide-react`), line icons at 15 to 20 px beside a label. They sit next to words, not instead of them, and are decorative (`aria-hidden`), so the label names the control. `Button` takes an `icon` prop. The five tabs keep their own icons from `components/Icon.tsx`.
 
 ## Motion
 

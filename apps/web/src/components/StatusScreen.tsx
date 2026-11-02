@@ -1,3 +1,4 @@
+import { RotateCw } from 'lucide-react';
 import { useI18n } from '../i18n/context';
 import { Button } from './Button';
 import { Logo } from './Logo';
@@ -23,7 +24,7 @@ export function LoadErrorScreen({ onRetry }: { onRetry: () => void }) {
     <div className={styles.screen} role="alert">
       <Logo size={48} />
       <p>{t('load_failed')}</p>
-      <Button variant="ghost" onClick={onRetry}>
+      <Button icon={RotateCw} variant="ghost" onClick={onRetry}>
         {t('retry')}
       </Button>
     </div>

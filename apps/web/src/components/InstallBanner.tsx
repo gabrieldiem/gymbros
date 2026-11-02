@@ -1,3 +1,4 @@
+import { Download } from 'lucide-react';
 import { useI18n } from '../i18n/context';
 import { Button } from './Button';
 import styles from './InstallBanner.module.css';
@@ -14,7 +15,9 @@ export function InstallBanner() {
         <b>{t('install_title')}</b>
         <span>{t('install_body')}</span>
       </span>
-      <Button onClick={() => void prompt.install()}>{t('install_cta')}</Button>
+      <Button icon={Download} onClick={() => void prompt.install()}>
+        {t('install_cta')}
+      </Button>
       <Button variant="quiet" onClick={prompt.dismiss}>
         {t('install_later')}
       </Button>

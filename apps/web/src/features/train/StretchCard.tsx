@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import type { Exercise, SetData } from '../../api/train';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
@@ -38,6 +39,7 @@ export function StretchCard({ exercise, set, onChange, onRemove }: Props) {
             onClick={onRemove}
             aria-label={t('remove_ex', { name: exercise.name })}
           >
+            <X size={16} aria-hidden="true" />
             {t('remove')}
           </button>
         </span>

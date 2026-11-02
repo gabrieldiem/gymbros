@@ -1,3 +1,4 @@
+import { Flag, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useMe } from '../../api/me';
@@ -176,8 +177,14 @@ export function WorkoutLogger(props: Props) {
         );
       })}
       {draft.exercises.length === 0 && <p className={styles.empty}>{t('no_ex')}</p>}
-      <Button variant="ghost" wide className={styles.add} onClick={() => setPicking(true)}>
-        + {t('add_ex')}
+      <Button
+        icon={Plus}
+        variant="ghost"
+        wide
+        className={styles.add}
+        onClick={() => setPicking(true)}
+      >
+        {t('add_ex')}
       </Button>
 
       {!workout.local && <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />}
@@ -187,10 +194,10 @@ export function WorkoutLogger(props: Props) {
       </p>
       <FormError error={finishError} />
       <div className={styles.actions}>
-        <Button onClick={() => onFinish(flush, draft)} disabled={finishing}>
+        <Button icon={Flag} onClick={() => onFinish(flush, draft)} disabled={finishing}>
           {finishing ? t('finishing') : t('finish')}
         </Button>
-        <Button variant="quiet" onClick={() => setConfirmDiscard(true)}>
+        <Button icon={Trash2} variant="quiet" onClick={() => setConfirmDiscard(true)}>
           {t('discard')}
         </Button>
       </div>
@@ -223,10 +230,16 @@ export function WorkoutLogger(props: Props) {
       {confirmDiscard && (
         <Sheet title={t('discard_q')} onClose={() => setConfirmDiscard(false)}>
           <div className={styles.confirm}>
-            <Button className={styles.danger} wide disabled={discarding} onClick={onDiscard}>
+            <Button
+              icon={Trash2}
+              className={styles.danger}
+              wide
+              disabled={discarding}
+              onClick={onDiscard}
+            >
               {t('discard_yes')}
             </Button>
-            <Button variant="quiet" wide onClick={() => setConfirmDiscard(false)}>
+            <Button icon={X} variant="quiet" wide onClick={() => setConfirmDiscard(false)}>
               {t('cancel')}
             </Button>
           </div>

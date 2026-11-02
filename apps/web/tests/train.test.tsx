@@ -397,7 +397,7 @@ describe('Train: logging a past workout', () => {
     const bench = await screen.findByRole('article', { name: 'Bench press' });
     expect(screen.getByText(/^For Fri,? 30 Oct$/)).toBeVisible();
     expect(screen.queryByRole('timer')).toBeNull();
-    expect(within(bench).queryByText('↑ Loaded to beat last time')).toBeNull();
+    expect(within(bench).queryByText('Loaded to beat last time')).toBeNull();
     await userEvent.click(within(bench).getByRole('button', { name: /^Repeat .* on set 1$/ }));
     expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
   });
@@ -433,7 +433,7 @@ describe('Train: start screen', () => {
     renderApp('/train');
     await userEvent.click(await screen.findByRole('button', { name: /Push day/ }));
     const bench = await screen.findByRole('article', { name: 'Bench press' });
-    expect(within(bench).getByText('↑ Loaded to beat last time')).toBeVisible();
+    expect(within(bench).getByText('Loaded to beat last time')).toBeVisible();
     // Last time's set on the first row, the row above on the next one. The disks, not the bar.
     expect(within(bench).getByRole('button', { name: 'Repeat 72.5 × 5 on set 1' })).toBeVisible();
     expect(within(bench).getByRole('button', { name: 'Repeat 72.5 × 5 on set 2' })).toBeVisible();
@@ -475,7 +475,7 @@ describe('Train: logging', () => {
   it('finds exercises by Spanish alias and adds them', async () => {
     trainApi({ 'GET /api/workouts/active': [200, makeWorkout({ exercises: [] })] });
     renderApp('/train');
-    await userEvent.click(await screen.findByRole('button', { name: '+ Add exercise' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Add exercise' }));
     const dialog = await screen.findByRole('dialog', { name: 'Add exercise' });
     await userEvent.type(within(dialog).getByRole('searchbox'), 'sentadilla');
     expect(within(dialog).queryByRole('button', { name: 'Bench press' })).toBeNull();

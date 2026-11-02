@@ -281,3 +281,10 @@
   color: var(--red-text);
   border-color: var(--red-text);
 }
+
+.link,
+.addSet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}

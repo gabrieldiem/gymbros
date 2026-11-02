@@ -1,3 +1,4 @@
+import { MapPin, Plus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import { useAddGym, useDeleteGym, useGyms, useMakeGymDefault } from '../../api/gyms';
@@ -24,7 +25,10 @@ export function GymsSection() {
 
   return (
     <div>
-      <h3>{t('gyms_title')}</h3>
+      <h3 className={styles.iconTitle}>
+        <MapPin size={18} aria-hidden="true" />
+        {t('gyms_title')}
+      </h3>
       <p>{t('gyms_hint')}</p>
       {gyms.length > 0 && (
         <ul className={styles.gyms}>
@@ -59,7 +63,7 @@ export function GymsSection() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <Button variant="ghost" type="submit" disabled={add.isPending || !name.trim()}>
+        <Button icon={Plus} variant="ghost" type="submit" disabled={add.isPending || !name.trim()}>
           {t('gym_add')}
         </Button>
       </form>
