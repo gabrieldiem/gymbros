@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { Exercise, FinishResult } from '../../api/train';
 import { Button } from '../../components/Button';
 import { cx } from '../../components/cx';
+import { Confetti } from '../../components/Confetti';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import styles from './FinishSheet.module.css';
@@ -40,6 +41,8 @@ function minutesBetween(start: string, end: string): number {
   return Math.max(1, Math.round((Date.parse(end) - Date.parse(start)) / 60_000));
 }
 
+const CELEBRATED = ['ln_pr', 'ln_pr_distance', 'ln_goal', 'ln_badge', 'ln_bounty', 'ln_crew_quest'];
+
 /** The reward moment: every line item from the API and the total. */
 export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
   const { t, n } = useI18n();
@@ -54,8 +57,11 @@ export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
           ? t('vs_down', { n: -vs })
           : t('vs_same');
 
+  const celebrate = result.line_items.some((item) => CELEBRATED.includes(item.key));
+
   return (
     <Sheet title={result.name} onClose={onClose} hideTitle>
+      {celebrate && <Confetti />}
       <div className={styles.summary}>
         <p className={styles.done}>
           {t('sum_done', {
@@ -76,7 +82,9 @@ export function FinishSheet({ result, exercises, onClimb, onClose }: Props) {
         <ul className={styles.lines}>
           {result.line_items.map((item, i) => (
             <li key={`${item.key}-${i}`} style={{ animationDelay: `${200 + i * 100}ms` }}>
-              <span className={cx(item.key === 'ln_pr' && styles.pr)}>
+              <span
+                className={cx((item.key === 'ln_pr' || item.key === 'ln_pr_distance') && styles.pr)}
+              >
                 {lineItemText(item, exercises, t, n)}
               </span>
               <b>+{n(item.points)}</b>

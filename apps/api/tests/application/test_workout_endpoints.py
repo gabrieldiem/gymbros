@@ -38,8 +38,8 @@ async def test_catalog_lists_exercises_routines_and_points(client, member):
     response = await client.get("/api/catalog")
     assert response.status_code == 200
     body = response.json()
-    assert len(body["exercises"]) == 18
-    assert [r["id"] for r in body["routines"]] == ["push", "pull", "legs", "cardio"]
+    assert len(body["exercises"]) == 20
+    assert [r["id"] for r in body["routines"]] == ["push", "pull", "legs", "cardio", "run", "swim"]
     assert body["points"]["showed_up"] == 50
     assert body["weekly_event"] == "leg_day_x2"
 

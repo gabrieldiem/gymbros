@@ -19,6 +19,7 @@
 .on {
   background: var(--volt);
   border-color: var(--volt);
+  animation: pop 420ms var(--ease-out) backwards;
 }
 
 .over {

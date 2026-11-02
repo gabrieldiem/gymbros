@@ -47,6 +47,7 @@ async def test_quest_board_starts_empty(client, member):
         ("legs2", 0, False),
         ("ppl", 0, False),
         ("tonnes", 0, False),
+        ("distance", 0, False),
         ("cardio", 0, False),
     ]
     assert board["crew_quest"]["goal"] == 4000
@@ -61,8 +62,11 @@ async def test_completing_a_quest_pays_its_bonus_once(client, member):
     first = await finish(client, run)
     quest = next(i for i in first["line_items"] if i["key"] == "ln_quest")
     assert quest == {"key": "ln_quest", "vars": {"quest": "cardio"}, "points": 100}
+    assert keys(first).count("ln_quest") == 1
     second = await finish(client, run)
-    assert "ln_quest" not in keys(second)
+    # The second 10 km completes the distance quest (20 km); cardio doesn't pay a second time.
+    quests = [i["vars"]["quest"] for i in second["line_items"] if i["key"] == "ln_quest"]
+    assert quests == ["distance"]
     board = (await client.get("/api/quests")).json()
     cardio = next(q for q in board["quests"] if q["id"] == "cardio")
     assert (cardio["progress"], cardio["claimed"]) == (120, True)
@@ -98,7 +102,7 @@ async def test_passing_the_leader_claims_the_bounty_once(
 
 async def test_badges_list_progress_and_the_first_unlock(client, member):
     badges = {b["id"]: b for b in (await client.get("/api/badges")).json()}
-    assert len(badges) == 15
+    assert len(badges) == 18
     assert badges["first"]["unlocked_at"] is None
     await finish(client, [{"exercise_id": "squat", "sets": [done(100, 5)]}], "legs")
     badges = {b["id"]: b for b in (await client.get("/api/badges")).json()}
@@ -273,3 +277,26 @@ async def test_a_crew_quest_paid_to_everyone_is_not_passing_anyone(
     assert "ln_crew_quest" in keys(finished)
     assert finished["climb"]["passed"] == []
     assert "ln_bounty" not in keys(finished)
+
+
+async def test_runs_and_swims_earn_prs_quests_and_badges(client, member):
+    swim = lambda km, minutes: [  # noqa: E731
+        {"exercise_id": "swim", "sets": [{"minutes": minutes, "km": km, "done": True}]}
+    ]
+    first = await finish(client, swim(1.5, 40))
+    assert {"key": "ln_distance", "vars": {"km": 1.5}, "points": 48} in first["line_items"]
+    assert {"key": "ln_badge", "vars": {"badge": "mile"}, "points": 200} in first["line_items"]
+    assert "ln_pr_distance" not in keys(first)  # the first log only sets the baseline
+
+    second = await finish(client, swim(1.5, 36))
+    pr = next(i for i in second["line_items"] if i["key"] == "ln_pr_distance")
+    assert pr["vars"] == {"exercise_id": "swim", "km": 1.5, "minutes": 36}
+    assert pr["points"] == 100
+
+    board = (await client.get("/api/quests")).json()
+    distance = next(q for q in board["quests"] if q["id"] == "distance")
+    assert distance["progress"] == 12  # 3 km swum counts as 12 run km
+
+    stats = (await client.get("/api/me/stats")).json()
+    record = next(r for r in stats["prs"] if r["exercise_id"] == "swim")
+    assert (record["load_kg"], record["reps"]) == (1.5, 36)

@@ -48,7 +48,7 @@
     border: 1px solid var(--steel);
     border-radius: var(--r-sheet);
     transform: translate(-50%, -50%);
-    animation: fade var(--dur) ease;
+    animation: pop-in var(--dur) var(--ease-out);
   }
 
   .grab {
@@ -59,6 +59,13 @@
 @keyframes rise {
   from {
     transform: translateY(100%);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.97);
   }
 }
 

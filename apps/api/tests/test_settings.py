@@ -80,3 +80,16 @@ def test_google_needs_both_credentials(monkeypatch):
 def test_public_url_loses_its_trailing_slash(monkeypatch):
     monkeypatch.setenv("PUBLIC_URL", "https://app.example.com/")
     assert Settings().public_url == "https://app.example.com"
+
+
+def test_admin_emails_are_read_loosely_and_compared_without_case(monkeypatch):
+    monkeypatch.setenv("ADMIN_EMAILS", " Boss@Example.com, ,other@example.com ")
+    loaded = Settings()
+    assert loaded.is_admin("boss@example.com")
+    assert loaded.is_admin("OTHER@example.com")
+    assert not loaded.is_admin("someone@example.com")
+
+
+def test_no_admins_by_default(monkeypatch):
+    monkeypatch.setenv("ADMIN_EMAILS", "")
+    assert not Settings().is_admin("boss@example.com")

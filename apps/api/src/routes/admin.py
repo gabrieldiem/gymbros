@@ -1,0 +1,167 @@
+"""The backoffice API. Every route here is for admins only (ADMIN_EMAILS)."""
+
+import uuid
+
+from fastapi import APIRouter, Depends, status
+
+from db.tables.user import User
+from dependencies import get_admin_service, get_current_admin, get_settings
+from models.admin import (
+    AdjustPointsRequest,
+    AdminActionResponse,
+    AdminCrewResponse,
+    AdminMemberResponse,
+    CreateCrewRequest,
+    OverviewResponse,
+    UpdateCrewRequest,
+)
+from models.errors import error_responses
+from services.admin_service import AdminService
+from services.admin_types import CrewRow, MemberRow
+from settings import Settings
+
+router = APIRouter(
+    prefix="/admin",
+    tags=["Admin"],
+    dependencies=[Depends(get_current_admin)],
+    responses=error_responses(401, 403),
+)
+
+
+def _crew(row: CrewRow) -> AdminCrewResponse:
+    crew = row.crew
+    return AdminCrewResponse(
+        id=crew.id,
+        name=crew.name,
+        time_zone=crew.time_zone,
+        invite_code=crew.invite_code,
+        members=row.members,
+        points=row.points,
+    )
+
+
+def _member(row: MemberRow, settings: Settings) -> AdminMemberResponse:
+    user = row.user
+    return AdminMemberResponse(
+        id=user.id,
+        email=user.email,
+        display_name=user.display_name,
+        initials=user.initials,
+        color=user.color,  # type: ignore[arg-type]
+        crew_name=row.crew.name if row.crew else None,
+        points=row.points,
+        workouts=row.workouts,
+        last_workout_at=row.last_workout_at,
+        created_at=user.created_at,
+        is_admin=settings.is_admin(user.email),
+    )
+
+
+@router.get("/overview", response_model=OverviewResponse)
+async def overview(admin: AdminService = Depends(get_admin_service)) -> OverviewResponse:
+    """Totals, and the last seven days."""
+    return OverviewResponse.model_validate(await admin.overview())
+
+
+@router.get("/crews", response_model=list[AdminCrewResponse])
+async def crews(admin: AdminService = Depends(get_admin_service)) -> list[AdminCrewResponse]:
+    """Every crew with its invite code."""
+    return [_crew(row) for row in await admin.crews()]
+
+
+@router.post("/crews", status_code=status.HTTP_201_CREATED, response_model=AdminCrewResponse)
+async def create_crew(
+    body: CreateCrewRequest,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> AdminCrewResponse:
+    """Create a crew. It gets a random invite code to share."""
+    return _crew(CrewRow(await admin.create_crew(user, body.name, body.time_zone), 0, 0))
+
+
+@router.patch("/crews/{crew_id}", response_model=AdminCrewResponse, responses=error_responses(404))
+async def update_crew(
+    crew_id: uuid.UUID,
+    body: UpdateCrewRequest,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> AdminCrewResponse:
+    """Rename a crew or change its time zone."""
+    crew = await admin.update_crew(user, crew_id, body.name, body.time_zone)
+    row = next(r for r in await admin.crews() if r.crew.id == crew.id)
+    return _crew(row)
+
+
+@router.post(
+    "/crews/{crew_id}/invite-code",
+    response_model=AdminCrewResponse,
+    responses=error_responses(404),
+)
+async def rotate_invite_code(
+    crew_id: uuid.UUID,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> AdminCrewResponse:
+    """Replace the invite code. The old one stops working."""
+    crew = await admin.rotate_invite_code(user, crew_id)
+    row = next(r for r in await admin.crews() if r.crew.id == crew.id)
+    return _crew(row)
+
+
+@router.get("/members", response_model=list[AdminMemberResponse])
+async def members(
+    search: str | None = None,
+    admin: AdminService = Depends(get_admin_service),
+    settings: Settings = Depends(get_settings),
+) -> list[AdminMemberResponse]:
+    """Accounts, optionally filtered by name or email."""
+    return [_member(row, settings) for row in await admin.members(search)]
+
+
+@router.post(
+    "/members/{user_id}/points",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses=error_responses(404, 409),
+)
+async def adjust_points(
+    user_id: uuid.UUID,
+    body: AdjustPointsRequest,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> None:
+    """Add or remove points, with a reason."""
+    await admin.adjust_points(user, user_id, body.points, body.reason)
+
+
+@router.delete(
+    "/members/{user_id}/crew",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses=error_responses(404),
+)
+async def remove_from_crew(
+    user_id: uuid.UUID,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> None:
+    """Take a member out of their crew. The account and history stay."""
+    await admin.remove_from_crew(user, user_id)
+
+
+@router.delete(
+    "/members/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses=error_responses(404, 409),
+)
+async def delete_account(
+    user_id: uuid.UUID,
+    user: User = Depends(get_current_admin),
+    admin: AdminService = Depends(get_admin_service),
+) -> None:
+    """Delete an account and everything in it. This can't be undone."""
+    await admin.delete_account(user, user_id)
+
+
+@router.get("/actions", response_model=list[AdminActionResponse])
+async def actions(admin: AdminService = Depends(get_admin_service)) -> list[AdminActionResponse]:
+    """The audit log, newest first."""
+    return [AdminActionResponse.model_validate(row) for row in await admin.actions()]

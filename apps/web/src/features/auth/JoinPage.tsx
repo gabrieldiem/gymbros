@@ -6,16 +6,18 @@ import { FormError } from '../../components/FormError';
 import { TextField } from '../../components/TextField';
 import { useI18n } from '../../i18n/context';
 import styles from './AuthPage.module.css';
+import { forgetInvite, pendingInvite } from './pendingInvite';
 
 export function JoinPage() {
   const { t } = useI18n();
   const join = useJoinCrew();
   const logout = useLogout();
-  const [code, setCode] = useState('');
+  // Filled in when an invite link brought them here.
+  const [code, setCode] = useState(pendingInvite);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    join.mutate(code.trim());
+    join.mutate(code.trim(), { onSuccess: forgetInvite });
   }
 
   return (

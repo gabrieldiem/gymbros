@@ -11,12 +11,59 @@ type Props = {
   hideTitle?: boolean;
 };
 
+const EXIT_MS = 220;
+
+const reducedMotion = () =>
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+/**
+ * Sheets close through many paths (a button inside, Esc, the parent unmounting), so the exit is
+ * played by a brief, inert copy left on screen when the real one unmounts.
+ */
+function playExit(panel: HTMLElement, scrim: HTMLElement) {
+  if (reducedMotion() || typeof panel.animate !== 'function') return;
+  const wide = window.matchMedia?.('(min-width: 700px)').matches ?? false;
+  const panelCopy = panel.cloneNode(true) as HTMLElement;
+  const scrimCopy = scrim.cloneNode(true) as HTMLElement;
+  for (const copy of [panelCopy, scrimCopy]) {
+    copy.removeAttribute('id');
+    copy.removeAttribute('role');
+    copy.removeAttribute('aria-modal');
+    copy.removeAttribute('aria-labelledby');
+    copy.setAttribute('aria-hidden', 'true');
+    copy.setAttribute('inert', '');
+    copy.style.pointerEvents = 'none';
+    copy.style.animation = 'none';
+    document.body.append(copy);
+  }
+  panelCopy.scrollTop = panel.scrollTop;
+  const end = wide
+    ? { opacity: 0, transform: 'translate(-50%, -50%) scale(0.97)' }
+    : { transform: 'translateY(100%)' };
+  const timing = { duration: EXIT_MS, easing: 'ease-in', fill: 'forwards' } as const;
+  panelCopy.animate([{}, end], timing).onfinish = () => panelCopy.remove();
+  scrimCopy.animate([{}, { opacity: 0 }], timing).onfinish = () => scrimCopy.remove();
+}
+
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 /** Modal bottom sheet (mobile) / centered dialog (≥700px). Esc and the scrim close it. */
 export function Sheet({ title, onClose, children, hideTitle }: Props) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
+  const scrim = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const panelElement = panel.current;
+    const scrimElement = scrim.current;
+    const openedAt = performance.now();
+    return () => {
+      // React's development double-mount closes it instantly: nothing was shown, so skip it.
+      if (panelElement && scrimElement && performance.now() - openedAt > 100) {
+        playExit(panelElement, scrimElement);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Everything behind the sheet is inert: no focus, clicks or screen-reader reading leak out.
@@ -43,7 +90,7 @@ export function Sheet({ title, onClose, children, hideTitle }: Props) {
 
   return createPortal(
     <>
-      <div className={styles.scrim} onClick={onClose} aria-hidden="true" />
+      <div ref={scrim} className={styles.scrim} onClick={onClose} aria-hidden="true" />
       <div
         ref={panel}
         className={styles.sheet}

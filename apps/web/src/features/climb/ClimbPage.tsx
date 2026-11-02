@@ -9,6 +9,7 @@ import { Button } from '../../components/Button';
 import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
 import { useToast } from '../../components/toast';
+import { useShareInvite } from '../../components/useShareInvite';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
 import styles from './ClimbPage.module.css';
@@ -40,6 +41,7 @@ export function ClimbPage() {
   const [mode, setMode] = useState<ClimbMode>('all');
   const climb = useClimb(mode);
   const me = useMe().data;
+  const shareInvite = useShareInvite();
   const training = Boolean(useActiveWorkout().data);
   const catalog = useCatalog().data;
   const legEvent = catalog?.weekly_event === 'leg_day_x2';
@@ -95,6 +97,15 @@ export function ClimbPage() {
                 training={training}
                 onRecap={() => setRecapOpen(true)}
               />
+            )}
+            {climb.data.standings.length === 1 && shareInvite && (
+              <section className={styles.alone} aria-labelledby="alone-title">
+                <h2 id="alone-title">{t('invite_alone_title')}</h2>
+                <p>{t('invite_alone_sub')}</p>
+                <Button variant="ghost" wide onClick={() => void shareInvite()}>
+                  {t('invite_alone_cta')}
+                </Button>
+              </section>
             )}
             <TrainingNow myId={me?.id} />
             <div className={styles.rope}>

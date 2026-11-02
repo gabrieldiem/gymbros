@@ -4,6 +4,7 @@ import type { Standing } from '../../api/climb';
 export const SAMPLE_CAMP_STEP = 1500;
 export const SAMPLE_SUMMIT = SAMPLE_CAMP_STEP * 6;
 export const SAMPLE_WEEKLY_TARGET = 3;
+export const SAMPLE_YOU = 'alex';
 
 export const SAMPLE_CREW: Standing[] = [
   {
@@ -37,9 +38,9 @@ export const SAMPLE_CREW: Standing[] = [
     display_name: 'Alex',
     initials: 'AL',
     color: 'volt',
-    points: 3860,
+    points: 4830,
     position: 3,
-    camp: 2,
+    camp: 3,
     workouts_this_week: 2,
     goal_streak: 4,
     training_now: false,
@@ -72,3 +73,19 @@ export const SAMPLE_CREW: Standing[] = [
     is_me: false,
   },
 ];
+
+/** The sample crew after Alex gained `gained` points over `finished` workouts, re-ranked. */
+export function rankSample(gained: number, finished: number): Standing[] {
+  return SAMPLE_CREW.map((member) =>
+    member.user_id === SAMPLE_YOU
+      ? {
+          ...member,
+          points: member.points + gained,
+          workouts_this_week: member.workouts_this_week + finished,
+          camp: Math.floor((member.points + gained) / SAMPLE_CAMP_STEP),
+        }
+      : member,
+  )
+    .sort((a, b) => b.points - a.points)
+    .map((member, index) => ({ ...member, position: index + 1 }));
+}

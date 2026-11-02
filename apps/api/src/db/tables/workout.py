@@ -50,6 +50,8 @@ class Workout(Base):  # pylint: disable=too-few-public-methods
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     week_start: Mapped[date | None] = mapped_column(Date)
     volume_kg: Mapped[float | None] = mapped_column(Float)
+    # Distance in run-equivalent km (a swim km counts as 4). See training_rules.effort_km.
+    effort_km: Mapped[float | None] = mapped_column(Float)
     points: Mapped[int | None] = mapped_column(Integer)
 
     sets: Mapped[list[WorkoutSet]] = relationship(

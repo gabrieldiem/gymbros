@@ -2,6 +2,7 @@ import { Outlet } from 'react-router';
 
 import { useProfileLanguage } from '../i18n/useLanguage';
 import { ActiveWorkoutBar } from './ActiveWorkoutBar';
+import { AnimatedPage } from './AnimatedPage';
 import styles from './AppShell.module.css';
 import { HealthStatus } from './HealthStatus';
 import { InstallBanner } from './InstallBanner';
@@ -17,7 +18,9 @@ export function AppShell() {
       <main className={styles.main}>
         <TopBar />
         <InstallBanner />
-        <Outlet />
+        <AnimatedPage>
+          <Outlet />
+        </AnimatedPage>
         <footer className={styles.footer}>
           <HealthStatus />
         </footer>

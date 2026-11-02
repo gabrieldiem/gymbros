@@ -292,3 +292,15 @@
   border-radius: var(--r-control);
   text-align: left;
 }
+
+.bar i {
+  transform-origin: left;
+  transition: width var(--dur) var(--ease-out);
+  animation: grow-x 800ms var(--ease-out) backwards;
+}
+
+.stack i {
+  transform-origin: left;
+  transition: width var(--dur) var(--ease-out);
+  animation: grow-x 800ms var(--ease-out) backwards;
+}

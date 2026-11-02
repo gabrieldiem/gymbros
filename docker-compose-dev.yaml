@@ -16,6 +16,8 @@ x-api-env: &api-env
   GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
   RESEND_API_KEY: ${RESEND_API_KEY:-}
   EMAIL_FROM: ${EMAIL_FROM:-}
+  # Who can open the backoffice. The e2e crews' Gabi is an admin, so the suite can test it.
+  ADMIN_EMAILS: ${ADMIN_EMAILS:-gabi@demo.gymbros.app,gabi@mobile.e2e.gymbros.app,gabi@desktop.e2e.gymbros.app}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   POSTGRES_HOST: postgres
   POSTGRES_PORT: 5432

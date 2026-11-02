@@ -7,6 +7,7 @@ import '@fontsource/barlow-condensed/800.css';
 import '@fontsource/barlow-condensed/900-italic.css';
 import './styles/tokens.css';
 import './styles/base.css';
+import './styles/motion.css';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

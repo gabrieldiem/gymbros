@@ -22,6 +22,7 @@ os.environ["GOOGLE_CLIENT_ID"] = "test-client-id"
 os.environ["GOOGLE_CLIENT_SECRET"] = "test-client-secret"
 os.environ["RESEND_API_KEY"] = ""
 os.environ["PUBLIC_URL"] = "https://app.example.com"
+os.environ["ADMIN_EMAILS"] = "boss@example.com, Second@Example.com"
 
 # pylint: disable=wrong-import-position,redefined-outer-name
 from typing import AsyncIterator  # noqa: E402

@@ -17,7 +17,11 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Set | One entry inside a workout exercise: load + reps, or minutes + km; done or not | `set` |
 | Volume | Σ load × reps over completed sets, in kg | `volume_kg` |
 | e1RM | Estimated one-rep max, Epley: load × (1 + reps/30) | `e1rm` |
-| PR | Personal record: best e1RM ever for an exercise | `personal_record` |
+| PR | Personal record: best e1RM ever for a lift, best endurance score for cardio | `personal_record` |
+| Invite link | A crew's shareable link, `/invite/<code>` | `invite` |
+| Backoffice | The admin area at `/admin`, for accounts in `ADMIN_EMAILS` | `admin` |
+| Effort km | Cardio distance as run-equivalent km, so sports compare: a swim km counts as 4 | `effort_km` |
+| Endurance score | The cardio counterpart of e1RM: effort km^1.06 / minutes × 1000 | `endurance_score` |
 | Last time | The previous session's sets for the same exercise, used for pre-fill and comparison | `previous_sets` |
 | Overload | The pre-filled bump over last time (+2.5 kg barbell, +1 rep, +1 min) | `overload` |
 | Week | Monday 00:00 to Sunday 23:59 in crew time | `week_start` (date) |

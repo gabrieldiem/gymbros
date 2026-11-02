@@ -92,6 +92,7 @@ class WorkoutFinisher:
         workout.week_start = this_week
         workout.points = score.total
         workout.volume_kg = score.volume_kg
+        workout.effort_km = score.effort_km
         await self._rows.save(workout)
         await self._events.add_all(
             [

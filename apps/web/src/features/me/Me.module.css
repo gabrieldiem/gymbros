@@ -214,6 +214,17 @@
   margin-top: 8px;
 }
 
+.prStatic {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--steel);
+  font-weight: 600;
+}
+
 .prs button {
   display: flex;
   justify-content: space-between;
@@ -342,4 +353,70 @@
   .stats b {
     font-size: 1.35rem;
   }
+}
+
+.nameForm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.nameForm > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameForm button {
+  margin-top: 28px;
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.color {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  outline-offset: 2px;
+}
+
+.color[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 3px var(--iron),
+    0 0 0 5px var(--chalk);
+}
+
+.deleteAccount summary {
+  min-height: var(--touch);
+  padding: 12px 0;
+  color: var(--smoke);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.deleteAccount[open] > :not(summary) {
+  margin-bottom: 10px;
+}
+
+.destroy {
+  width: 100%;
+  min-height: var(--btn-h);
+  border: 1px solid var(--red);
+  border-radius: var(--r-control);
+  color: var(--red-text);
+  font-weight: 700;
+}
+
+.destroy:hover:not(:disabled) {
+  background: var(--red-tint);
+}
+
+.destroy:disabled {
+  border-color: var(--steel);
+  color: var(--smoke);
+  cursor: not-allowed;
 }

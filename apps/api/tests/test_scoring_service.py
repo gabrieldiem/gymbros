@@ -24,7 +24,8 @@ RULES = ScoringRules(
     completed_set=5,
     leg_event_set_bonus=5,
     volume_kg_per_point=100,
-    cardio_minute=3,
+    cardio_minute=2,
+    cardio_effort_km=8,
     pr=100,
     weekly_goal=150,
     goal_streak_per_week=20,
@@ -147,10 +148,124 @@ def test_volume_bodyweight_comes_from_the_rules():
 # --- Cardio -------------------------------------------------------------------------------
 
 
-def test_cardio_pays_3_per_minute():
+def session(exercise_id: str, minutes: int, km: float | None) -> LoggedExercise:
+    exercise = CATALOG.exercise(exercise_id)
+    assert exercise is not None
+    return LoggedExercise(exercise=exercise, sets=(LoggedSet(minutes=minutes, km=km, done=True),))
+
+
+def test_cardio_pays_2_per_minute():
     result = score(workout(cardio("run", 20), cardio("rower", 10)))
-    assert items(result)["ln_cardio"] == ({"minutes": 30}, 90)
+    assert items(result)["ln_cardio"] == ({"minutes": 30}, 60)
     assert result.volume_kg == 0
+
+
+def test_cardio_distance_pays_8_per_run_equivalent_km():
+    assert items(score(workout(session("outrun", 30, 5))))["ln_distance"] == ({"km": 5}, 40)
+
+
+def test_a_swim_km_counts_as_4_run_km():
+    result = score(workout(session("swim", 30, 1.25)))
+    assert items(result)["ln_distance"] == ({"km": 1.25}, 40)
+    assert result.effort_km == 5
+
+
+def test_cardio_without_a_distance_pays_only_time():
+    assert "ln_distance" not in items(score(workout(session("outrun", 30, None))))
+
+
+def test_going_further_in_the_same_time_pays_more():
+    assert (
+        score(workout(session("outrun", 40, 8))).total
+        > score(workout(session("outrun", 40, 4))).total
+    )
+
+
+def test_an_impossible_distance_is_capped_at_20_kmh():
+    capped = score(workout(session("outrun", 30, 500)))
+    assert capped.effort_km == 10
+    assert items(capped)["ln_distance"][1] == 80
+
+
+@pytest.mark.parametrize(
+    "exercises",
+    [
+        # 60 minutes of each sport, at an ordinary pace for someone training regularly.
+        (session("outrun", 60, 10),),
+        (session("swim", 60, 2.5),),
+        (session("rower", 60, 12.5),),
+    ],
+)
+def test_an_hour_of_cardio_pays_about_the_same_as_an_hour_of_lifting(exercises):
+    # 16 sets of 750 kg: a 12 tonne session, like the seeded Leg days.
+    lifting = score(workout(lift("squat", *[(75, 10)] * 16))).total
+    cardio_total = score(workout(*exercises)).total
+    assert abs(cardio_total - lifting) / lifting <= 0.1
+    assert lifting == 250
+
+
+def test_half_an_hour_of_each_sport_also_pays_about_the_same():
+    lifting = score(workout(lift("squat", *[(75, 10)] * 8))).total
+    running = score(workout(session("outrun", 30, 5))).total
+    swimming = score(workout(session("swim", 30, 1.25))).total
+    assert running == swimming
+    assert abs(running - lifting) / lifting <= 0.1
+
+
+# --- Endurance PRs and better than last time ------------------------------------------------
+
+
+def test_a_first_cardio_log_only_sets_the_baseline():
+    result = score(workout(session("outrun", 30, 5)))
+    assert "ln_pr_distance" not in items(result)
+    assert [r.exercise_id for r in result.records] == ["outrun"]
+    assert result.records[0].load_kg == 5
+    assert result.records[0].reps == 30
+
+
+def test_running_the_same_distance_faster_is_a_pr():
+    baseline = score(workout(session("outrun", 30, 5))).records[0].e1rm
+    history = replace(NO_HISTORY, personal_records={"outrun": baseline})
+    result = score(workout(session("outrun", 28, 5)), history=history)
+    assert items(result)["ln_pr_distance"] == (
+        {"exercise_id": "outrun", "km": 5, "minutes": 28},
+        100,
+    )
+
+
+def test_going_further_at_the_same_pace_is_a_pr():
+    baseline = score(workout(session("swim", 30, 1))).records[0].e1rm
+    history = replace(NO_HISTORY, personal_records={"swim": baseline})
+    assert "ln_pr_distance" in items(score(workout(session("swim", 60, 2)), history=history))
+
+
+def test_slower_over_the_same_distance_is_not_a_pr():
+    baseline = score(workout(session("outrun", 30, 5))).records[0].e1rm
+    history = replace(NO_HISTORY, personal_records={"outrun": baseline})
+    assert "ln_pr_distance" not in items(score(workout(session("outrun", 35, 5)), history=history))
+
+
+def test_a_very_short_effort_never_sets_a_pr():
+    assert score(workout(session("swim", 5, 0.2))).records == ()
+
+
+def test_cardio_without_a_distance_never_sets_a_pr():
+    assert score(workout(session("outrun", 30, None))).records == ()
+
+
+def test_better_than_last_time_counts_distance():
+    history = replace(NO_HISTORY, previous_routine_effort_km=5.0)
+    result = score(workout(session("outrun", 40, 6), routine_id="run"), history=history)
+    assert result.vs_last_pct == 20
+    assert items(result)["ln_better"] == ({"pct": 20}, 25)
+
+
+def test_cardio_without_a_distance_has_no_comparison():
+    history = replace(NO_HISTORY, previous_routine_effort_km=5.0)
+    assert (
+        score(workout(session("outrun", 40, None), routine_id="run"), history=history).vs_last_pct
+        is None
+    )
 
 
 # --- PR -----------------------------------------------------------------------------------
@@ -193,9 +308,11 @@ def test_pr_uses_bodyweight_load_for_bodyweight_exercises():
     assert items(result)["ln_pr"][0] == {"exercise_id": "pullup", "load_kg": 5, "reps": 10}
 
 
-def test_pr_is_never_paid_for_cardio():
-    history = replace(NO_HISTORY, personal_records={"run": 1.0})
-    assert "ln_pr" not in items(score(workout(cardio("run", 60)), history=history))
+def test_a_cardio_pr_is_not_a_lift_pr():
+    history = replace(NO_HISTORY, personal_records={"outrun": 1.0})
+    result = items(score(workout(session("outrun", 30, 5)), history=history))
+    assert "ln_pr" not in result
+    assert "ln_pr_distance" in result
 
 
 # --- Weekly goal, goal streak, over target -----------------------------------------------

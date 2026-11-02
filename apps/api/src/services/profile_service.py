@@ -6,6 +6,7 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.user_repository import UserRepository
 from db.tables.crew import Crew
 from db.tables.user import User
+from services.errors import DeleteNotConfirmed
 from services.profile_rules import derive_initials
 
 
@@ -15,6 +16,7 @@ class Profile:
 
     user: User
     crew: Crew | None
+    is_admin: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -31,13 +33,29 @@ class ProfileChanges:
 class ProfileService:
     """Reads and updates profiles."""
 
-    def __init__(self, users: UserRepository, crews: CrewRepository) -> None:
+    def __init__(
+        self,
+        users: UserRepository,
+        crews: CrewRepository,
+        admin_emails: frozenset[str] = frozenset(),
+    ) -> None:
         self._users = users
         self._crews = crews
+        self._admin_emails = admin_emails
 
     async def get(self, user: User) -> Profile:
         """The user with their crew."""
-        return Profile(user=user, crew=await self._crews.get_crew_of(user.id))
+        return Profile(
+            user=user,
+            crew=await self._crews.get_crew_of(user.id),
+            is_admin=user.email.lower() in self._admin_emails,
+        )
+
+    async def delete(self, user: User, confirm_email: str) -> None:
+        """Delete the account and everything in it, once its email has been typed to confirm."""
+        if confirm_email.strip().lower() != user.email.lower():
+            raise DeleteNotConfirmed(str(user.id))
+        await self._users.delete(user)
 
     async def update(self, user: User, changes: ProfileChanges) -> Profile:
         """Apply the changes. A new display name re-derives initials unless initials are given."""

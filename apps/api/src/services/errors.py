@@ -9,6 +9,26 @@ class GoogleSignInFailed(DomainError):
     """The Google sign-in couldn't be completed. The message is for the log, never the user."""
 
 
+class AdminRequired(DomainError):
+    """Only admins may do this."""
+
+
+class CrewNotFound(DomainError):
+    """No such crew."""
+
+
+class MemberHasNoCrew(DomainError):
+    """Points belong to a crew, and this member isn't in one."""
+
+
+class CannotDeleteSelf(DomainError):
+    """Admins delete their own account from their settings, not the backoffice."""
+
+
+class DeleteNotConfirmed(DomainError):
+    """The confirmation typed doesn't match the account's email."""
+
+
 class NotAuthenticated(DomainError):
     """No valid session."""
 

@@ -70,6 +70,7 @@ export function RoutinePicker({ catalog, week, starting, error, onStart }: Props
 function EarnList({ catalog, legEvent }: { catalog: Catalog; legEvent: boolean }) {
   const { t, n } = useI18n();
   const p = catalog.points;
+  const swimFactor = catalog.exercises.find((e) => e.id === 'swim')?.km_factor ?? 1;
   const rows: [string, string][] = [
     [t('e_log'), n(p.showed_up)],
     [t('e_set'), n(p.completed_set)],
@@ -80,6 +81,7 @@ function EarnList({ catalog, legEvent }: { catalog: Catalog; legEvent: boolean }
     [t('e_pr'), n(p.pr)],
     [t('e_vol', { kg: p.volume_kg_per_point }), '1'],
     [t('e_cardio'), n(p.cardio_minute)],
+    [t('e_distance', { n: swimFactor }), n(p.cardio_effort_km)],
   ];
   if (legEvent) rows.push([t('e_leg', { w: t('leg_event_name') }), `+${n(p.leg_event_set_bonus)}`]);
   return (

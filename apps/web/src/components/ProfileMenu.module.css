@@ -1,0 +1,72 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: inline-flex;
+  border-radius: 50%;
+}
+
+.trigger:hover {
+  box-shadow: 0 0 0 3px var(--steel);
+}
+
+.trigger[aria-expanded='true'] {
+  box-shadow: 0 0 0 3px var(--chalk);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  width: min(280px, calc(100vw - 36px));
+  padding: 6px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  transform-origin: top right;
+  animation: menu-in 180ms var(--ease-out);
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--steel);
+}
+
+.who span {
+  display: grid;
+  min-width: 0;
+}
+
+.who small {
+  overflow: hidden;
+  color: var(--smoke);
+  font-size: var(--fs-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0 10px;
+  border-radius: var(--r-control-sm);
+  color: var(--chalk);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+}
+
+.item:hover,
+.item:focus-visible {
+  background: var(--steel);
+}

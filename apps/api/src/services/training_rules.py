@@ -7,6 +7,11 @@ from zoneinfo import ZoneInfo
 from services.catalog import Exercise
 
 BARBELL_STEP_KG = 2.5
+# 20 km/h run-equivalent. Faster is a typo, and a typo mustn't pay or set an unbeatable PR.
+_MAX_EFFORT_KM_PER_MINUTE = 1 / 3
+# Below this (a 250 m swim) a distance is too short to compare fairly.
+_MIN_PR_EFFORT_KM = 1.0
+_RIEGEL_EXPONENT = 1.06
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +43,24 @@ def effective_load(exercise: Exercise, load_kg: float | None, bodyweight_kg: flo
 def estimated_1rm(load_kg: float, reps: int) -> float:
     """Epley: load × (1 + reps / 30)."""
     return load_kg * (1 + reps / 30)
+
+
+def effort_km(exercise: Exercise, logged: LoggedSet) -> float:
+    """The distance as run-equivalent km, so sports compare: a swim km counts as 4."""
+    distance = (logged.km or 0.0) * exercise.km_factor
+    return min(distance, (logged.minutes or 0) * _MAX_EFFORT_KM_PER_MINUTE)
+
+
+def endurance_score(exercise: Exercise, logged: LoggedSet) -> float | None:
+    """The cardio counterpart of e1RM: higher when you go further or faster.
+
+    Riegel's formula says time grows with distance^1.06, so distance^1.06 / time compares a fast
+    5 km with a slower 10 km. None when the effort is too short to count.
+    """
+    effort = effort_km(exercise, logged)
+    if effort < _MIN_PR_EFFORT_KM:
+        return None
+    return 1000 * effort**_RIEGEL_EXPONENT / (logged.minutes or 1)
 
 
 def overload(exercise: Exercise, last: LoggedSet) -> LoggedSet:

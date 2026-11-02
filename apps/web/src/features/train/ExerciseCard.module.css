@@ -150,3 +150,15 @@
     gap: 6px;
   }
 }
+
+.done .check svg {
+  animation: pop 320ms var(--ease-out);
+}
+
+.row:not(.headRow) {
+  animation: rise-in 260ms var(--ease-out) backwards;
+}
+
+.check:hover {
+  border-color: var(--smoke);
+}

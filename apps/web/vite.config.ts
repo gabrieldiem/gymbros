@@ -55,7 +55,7 @@ export default defineConfig({
         // vietnamese files stay in the font CSS and load on demand via unicode-range.
         globPatterns: ['**/*.{js,css,html,svg,png}', '**/*-latin-[0-9]*.woff2'],
         // Offline, the app's own /privacy and /terms routes show this copy.
-        globIgnores: ['privacy.html', 'terms.html'],
+        globIgnores: ['privacy.html', 'terms.html', 'og.png'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,

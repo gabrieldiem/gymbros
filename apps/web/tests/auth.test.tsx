@@ -16,13 +16,12 @@ describe('Signing in', () => {
   it('offers Google on the landing page, in the current language', async () => {
     mockApi({ 'GET /api/me': SIGNED_OUT, 'GET /api/auth/options': [...GOOGLE_ONLY] });
     renderApp('/');
-    const link = await screen.findByRole('link', { name: 'Continue with Google' });
+    const link = (await screen.findAllByRole('link', { name: 'Continue with Google' }))[0];
     expect(link).toHaveAttribute('href', '/api/auth/google/start?lang=en');
     await userEvent.click(screen.getByRole('button', { name: 'ES' }));
-    expect(await screen.findByRole('link', { name: 'Continuar con Google' })).toHaveAttribute(
-      'href',
-      '/api/auth/google/start?lang=es',
-    );
+    expect(
+      (await screen.findAllByRole('link', { name: 'Continuar con Google' }))[0],
+    ).toHaveAttribute('href', '/api/auth/google/start?lang=es');
   });
 
   it('never asks for a password', async () => {

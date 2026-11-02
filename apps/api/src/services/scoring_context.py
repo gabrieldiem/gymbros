@@ -31,14 +31,15 @@ class ScoringContextBuilder:
 
     async def history(self, member: Member, workout: Workout) -> History:
         """Stored PRs and the previous session of the same routine."""
-        previous = None
+        volume, effort = None, 0.0
         if workout.routine_id:
-            previous = await self._workouts.previous_routine_volume(
+            volume, effort = await self._workouts.previous_routine_work(
                 member.user.id, workout.routine_id
             )
         return History(
             personal_records=await self._records.best_e1rm_by_exercise(member.user.id),
-            previous_routine_volume_kg=previous,
+            previous_routine_volume_kg=volume,
+            previous_routine_effort_km=effort,
         )
 
     async def week(self, member: Member, now: datetime) -> WeekState:

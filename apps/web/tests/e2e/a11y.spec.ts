@@ -17,7 +17,14 @@ async function audit(page: Page, name: string) {
 }
 
 test('signed-out screens', async ({ page }) => {
-  for (const path of ['/', '/login', '/login?auth_error=google', '/privacy', '/terms']) {
+  for (const path of [
+    '/',
+    '/login',
+    '/login?auth_error=google',
+    '/privacy',
+    '/terms',
+    '/invite/E2EMOBILE',
+  ]) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await audit(page, path);
@@ -37,4 +44,25 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: /Settings|Ajustes/ }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await audit(page, 'settings sheet');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await expect(page.getByRole('menu')).toBeVisible();
+  await audit(page, 'profile menu');
+});
+
+test('backoffice', async ({ page }, testInfo) => {
+  await logIn(page, 'gabi', testInfo);
+  await page.goto('/admin');
+  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin overview');
+  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin accounts');
+  await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
+  await page.waitForLoadState('networkidle');
+  await audit(page, 'admin crews');
+  await page.getByRole('button', { name: /E2E/ }).first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await audit(page, 'admin crew sheet');
 });

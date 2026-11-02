@@ -22,9 +22,15 @@ def cardio(exercise_id, minutes):
     return LoggedExercise(exercise, (LoggedSet(minutes=minutes, km=1, done=True),))
 
 
-def test_quests_are_the_four_from_the_product_spec():
+def test_quests_are_the_five_from_the_product_spec():
     quests = {q.id: (q.goal, q.bonus) for q in load_quests()}
-    assert quests == {"legs2": (2, 150), "ppl": (3, 120), "tonnes": (20, 200), "cardio": (60, 100)}
+    assert quests == {
+        "legs2": (2, 150),
+        "ppl": (3, 120),
+        "tonnes": (20, 200),
+        "distance": (20, 200),
+        "cardio": (60, 100),
+    }
 
 
 def test_week_activity_counts_leg_workouts_groups_volume_and_cardio():
@@ -40,12 +46,17 @@ def test_week_activity_counts_leg_workouts_groups_volume_and_cardio():
         ppl_groups=frozenset({"legs", "push", "pull"}),
         volume_kg=100 * 5 * 2 + 60 * 5 + 70 * 8 + 20 * 10,
         cardio_minutes=25,
+        effort_km=1.0,
     )
 
 
 def test_quest_progress_per_metric():
     activity = WeekActivity(
-        leg_workouts=1, ppl_groups=frozenset({"push", "pull"}), volume_kg=21_500, cardio_minutes=45
+        leg_workouts=1,
+        ppl_groups=frozenset({"push", "pull"}),
+        volume_kg=21_500,
+        cardio_minutes=45,
+        effort_km=7.5,
     )
     progress = {q.id: quest_progress(q, activity) for q in load_quests()}
-    assert progress == {"legs2": 1, "ppl": 2, "tonnes": 21.5, "cardio": 45}
+    assert progress == {"legs2": 1, "ppl": 2, "tonnes": 21.5, "distance": 7.5, "cardio": 45}

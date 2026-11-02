@@ -4,6 +4,11 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 from services.errors import (
+    AdminRequired,
+    CannotDeleteSelf,
+    CrewNotFound,
+    DeleteNotConfirmed,
+    MemberHasNoCrew,
     AlreadyInCrew,
     CannotDuelSelf,
     DuelExists,
@@ -29,6 +34,11 @@ from services.errors import (
 
 _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     NotAuthenticated: (status.HTTP_401_UNAUTHORIZED, "not_authenticated"),
+    AdminRequired: (status.HTTP_403_FORBIDDEN, "admin_required"),
+    CrewNotFound: (status.HTTP_404_NOT_FOUND, "crew_not_found"),
+    MemberHasNoCrew: (status.HTTP_409_CONFLICT, "member_has_no_crew"),
+    CannotDeleteSelf: (status.HTTP_409_CONFLICT, "cannot_delete_self"),
+    DeleteNotConfirmed: (status.HTTP_422_UNPROCESSABLE_CONTENT, "delete_not_confirmed"),
     InviteCodeNotFound: (status.HTTP_404_NOT_FOUND, "invite_code_not_found"),
     AlreadyInCrew: (status.HTTP_409_CONFLICT, "already_in_crew"),
     InvalidTimeZone: (status.HTTP_422_UNPROCESSABLE_CONTENT, "invalid_time_zone"),

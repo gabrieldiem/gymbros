@@ -19,7 +19,10 @@ export type Me = {
   language: Language;
   rest_seconds: number;
   crew: Crew | null;
+  is_admin?: boolean;
 };
+
+export type Invite = { crew_name: string; members: number };
 
 export type AuthOptions = { google: boolean; dev_login: boolean };
 

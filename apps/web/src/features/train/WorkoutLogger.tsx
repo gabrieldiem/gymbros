@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useMe } from '../../api/me';
 import type { Catalog, SetData, Week, Workout } from '../../api/train';
+import { CountUp } from '../../components/CountUp';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { Sheet } from '../../components/Sheet';
@@ -110,7 +111,9 @@ export function WorkoutLogger(props: Props) {
               +{n(gain.gain)}
             </span>
           )}
-          <b data-testid="live-points">{n(livePoints)}</b>
+          <b data-testid="live-points">
+            <CountUp value={livePoints} format={n} durationMs={500} />
+          </b>
           <span>{t('pts_so_far')}</span>
         </div>
       </div>

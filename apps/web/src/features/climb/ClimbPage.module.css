@@ -74,3 +74,16 @@
   margin-top: 22px;
   color: var(--smoke);
 }
+
+.alone {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px dashed var(--steel);
+  border-radius: var(--r-card);
+}
+
+.alone p {
+  color: var(--smoke);
+}

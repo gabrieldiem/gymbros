@@ -26,10 +26,12 @@ class WorkoutLog:
 
 @dataclass(frozen=True, slots=True)
 class History:
-    """What came before: best e1RM per exercise, and last session's volume for this routine."""
+    """What came before: the best score per exercise (e1RM for lifts, endurance score for cardio)
+    and the last session of this routine."""
 
     personal_records: Mapping[str, float]
     previous_routine_volume_kg: float | None
+    previous_routine_effort_km: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,6 +53,7 @@ class ScoringRules:
     leg_event_set_bonus: int
     volume_kg_per_point: int
     cardio_minute: int
+    cardio_effort_km: int
     pr: int
     weekly_goal: int
     goal_streak_per_week: int
@@ -69,6 +72,7 @@ class ScoringRules:
             leg_event_set_bonus=settings.scoring_leg_event_set_bonus,
             volume_kg_per_point=settings.scoring_volume_kg_per_point,
             cardio_minute=settings.scoring_cardio_minute,
+            cardio_effort_km=settings.scoring_cardio_effort_km,
             pr=settings.scoring_pr,
             weekly_goal=settings.scoring_weekly_goal,
             goal_streak_per_week=settings.scoring_goal_streak_per_week,
@@ -111,3 +115,4 @@ class ScoreResult:
     completed_sets: int
     vs_last_pct: int | None
     records: tuple[RecordSet, ...]
+    effort_km: float = 0.0

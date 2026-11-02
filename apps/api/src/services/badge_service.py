@@ -25,6 +25,8 @@ from services.scoring_types import LineItem
 from services.training_rules import week_start
 
 BADGE_KEY = "ln_badge"
+RUN_IDS = ("run", "outrun")
+SWIM_ID = "swim"
 _ALL_TIME = timedelta(weeks=520)
 
 
@@ -59,6 +61,7 @@ class BadgeService:
         reactions, comments = await self._feed.count_by_user(user_id)
         totals = await self._events.totals_by_user(crew.id)
         leg_ids = [e.id for e in self._catalog.exercises if e.group == "Legs"]
+        distances = await self._stats.distance_by_exercise(user_id)
         return BadgeStats(
             workouts=len(times),
             better_than_last_time=await self._events.count_key(user_id, "ln_better"),
@@ -75,7 +78,17 @@ class BadgeService:
             night_workouts=night,
             comebacks=comebacks,
             total_points=totals.get(user_id, 0),
+            best_run_km=max((distances.get(i, (0.0, 0.0))[0] for i in RUN_IDS), default=0.0),
+            best_swim_km=distances.get(SWIM_ID, (0.0, 0.0))[0],
+            lifetime_effort_km=self._lifetime_effort(distances),
         )
+
+    def _lifetime_effort(self, distances: dict[str, tuple[float, float]]) -> float:
+        total = 0.0
+        for exercise_id, (_, km) in distances.items():
+            exercise = self._catalog.exercise(exercise_id)
+            total += km * (exercise.km_factor if exercise else 0.0)
+        return total
 
     async def views(self, member: Member) -> tuple[BadgeView, ...]:
         """Every badge with progress, unlock time and how many in the crew have it."""

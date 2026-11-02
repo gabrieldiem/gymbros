@@ -143,3 +143,15 @@
     background: var(--iron);
   }
 }
+
+.link svg {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.link:hover svg {
+  transform: translateY(-1px);
+}
+
+.link[aria-current='page'] svg {
+  animation: pop 380ms var(--ease-out);
+}

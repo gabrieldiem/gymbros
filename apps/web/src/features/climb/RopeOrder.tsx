@@ -1,4 +1,5 @@
 import type { Standing } from '../../api/climb';
+import { useFlip } from '../../components/useFlip';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
 import { Pips } from '../../components/Pips';
@@ -9,13 +10,15 @@ import styles from './RopeOrder.module.css';
 /** The ranked list under the map: position, avatar, pips, status and points. */
 export function RopeOrder({ standings, target }: { standings: Standing[]; target: number }) {
   const { t, n } = useI18n();
+  const list = useFlip<HTMLOListElement>(standings.map((s) => s.user_id).join());
   return (
     <section aria-labelledby="rope-title">
       <h2 id="rope-title">{t('rope_order')}</h2>
-      <ol className={styles.rope}>
+      <ol ref={list} className={styles.rope}>
         {standings.map((s, i) => (
           <li
             key={s.user_id}
+            data-flip-id={s.user_id}
             className={cx(styles.item, i === 0 && styles.first, s.is_me && styles.me)}
           >
             <span className={styles.rk}>{s.position}</span>

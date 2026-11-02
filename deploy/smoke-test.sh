@@ -50,6 +50,7 @@ check "health, database and migrations" '"database":"up"' "$BASE/api/health"
 check "home page" 'id="root"' "$BASE/"
 check "privacy policy without JavaScript" 'Google user data' "$BASE/privacy"
 check "terms without JavaScript" 'Train safely' "$BASE/terms"
+check "public rules list what the game pays" '"swim_km_factor":4' "$BASE/api/rules"
 check "Google sign-in offered, dev login off" '"google":true,"dev_login":false' "$BASE/api/auth/options"
 check "Google sign-in redirects" 'location: https://accounts.google.com' -D - -o /dev/null "$BASE/api/auth/google/start"
 check "dev login is blocked" '^404' -o /dev/null -w '%{http_code}' -X POST \

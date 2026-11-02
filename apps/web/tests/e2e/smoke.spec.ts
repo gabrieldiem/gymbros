@@ -55,7 +55,7 @@ test('Google button: starts the sign-in in the chosen language', async ({ page }
   );
   await page.goto('/');
   await page.getByRole('button', { name: 'ES', exact: true }).click();
-  const button = page.getByRole('link', { name: 'Continuar con Google' });
+  const button = page.getByRole('link', { name: 'Continuar con Google' }).first();
   await expect(button).toHaveAttribute('href', '/api/auth/google/start?lang=es');
   const box = await button.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
@@ -114,7 +114,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   for (const name of [/^ATUS Climb$/, /^Crew$/, /^Train\b/, /^Quests$/, /^You$/]) {
     await expect(nav.getByRole('link', { name })).toBeVisible();
   }
-  await expect(page.getByRole('link', { name: /Your profile/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Your profile/ })).toBeVisible();
   await expectNoSidewaysScroll(page);
   await shoot(page, 'climb-en', testInfo);
   await page.screenshot({
@@ -137,9 +137,54 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await shoot(page, 'crew-es', testInfo);
 
   await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByRole('link', { name: /Your profile/ }).click();
-  await page.getByRole('button', { name: 'Settings' }).click();
-  await page.getByRole('button', { name: 'Log out' }).click();
+  await page.getByRole('button', { name: /Your profile/ }).click();
+  await expect(page.getByRole('menu')).toBeVisible();
+  await shoot(page, 'profile-menu', testInfo);
+  await page.getByRole('menuitem', { name: 'Log out' }).click();
   await expect(page).toHaveURL(/:\d+\/$/);
   expect(errors).toEqual([]);
+});
+
+test('backoffice: an admin opens it from the menu, a member is sent away', async ({
+  page,
+}, testInfo) => {
+  const errors = collectErrors(page);
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('maxo', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.goto('/admin');
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await page.getByRole('menuitem', { name: /Log out|Salir|Cerrar/ }).click();
+  await expect(page).toHaveURL(/:\d+\/$/);
+
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
+  await page.getByRole('menuitem', { name: 'Backoffice' }).click();
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await page.waitForTimeout(1100);
+  await shoot(page, 'admin-overview', testInfo);
+  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await expect(page.getByText(`maxo@${testInfo.project.name}.e2e.gymbros.app`)).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await shoot(page, 'admin-members', testInfo);
+  expect(errors).toEqual([]);
+});
+
+test('invite link: shows the crew before signing in', async ({ page }, testInfo) => {
+  const errors = collectErrors(page);
+  const crew = testInfo.project.name === 'mobile' ? 'E2EMOBILE' : 'E2EDESKTOP';
+  await page.goto(`/invite/${crew}`);
+  await expect(page.getByRole('heading', { level: 1, name: /E2E/ })).toBeVisible();
+  await expectNoSidewaysScroll(page);
+  await shoot(page, 'invite', testInfo);
+  await page.goto('/invite/NOTACODE');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(/doesn’t work|no funciona/);
+  expect(errors.filter((e) => !e.includes('status of 404'))).toEqual([]);
 });

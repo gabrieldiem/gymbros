@@ -18,5 +18,6 @@ def to_me_response(profile: Profile) -> MeResponse:
             "language": user.language,
             "rest_seconds": user.rest_seconds,
             "crew": crew,
+            "is_admin": profile.is_admin,
         }
     )

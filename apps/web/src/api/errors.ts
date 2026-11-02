@@ -3,6 +3,12 @@ import { ApiError } from './client';
 
 /** API error codes (`{"detail": {"code": ...}}`) and the copy each one shows. */
 const CODE_MESSAGES: Record<string, MessageKey> = {
+  admin_required: 'err_admin_required',
+  invalid_time_zone: 'err_invalid_time_zone',
+  crew_not_found: 'err_crew_not_found',
+  member_has_no_crew: 'err_member_has_no_crew',
+  cannot_delete_self: 'err_cannot_delete_self',
+  delete_not_confirmed: 'err_delete_not_confirmed',
   invite_code_not_found: 'err_invite_code_not_found',
   already_in_crew: 'err_already_in_crew',
   workout_empty: 'err_workout_empty',
