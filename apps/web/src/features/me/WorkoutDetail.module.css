@@ -63,3 +63,22 @@
   background: var(--iron);
   border-radius: 999px;
 }
+
+.editRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 14px;
+  color: var(--smoke);
+}
+
+.editor {
+  display: grid;
+  gap: 12px;
+}
+
+.note {
+  color: var(--smoke);
+  font-size: var(--fs-small);
+}

@@ -1,23 +1,20 @@
-import { Flag, Plus, Trash2, X } from 'lucide-react';
+import { Flag, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useMe } from '../../api/me';
-import type { Catalog, SetData, Week, Workout } from '../../api/train';
+import type { Catalog, Week, Workout } from '../../api/train';
 import { CountUp } from '../../components/CountUp';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
-import { ExerciseCard } from './ExerciseCard';
-import { ExercisePicker } from './ExercisePicker';
 import { formatElapsed } from './format';
 import { GymSelect } from './GymSelect';
-import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
-import { StretchCard } from './StretchCard';
 import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
 import { useWorkoutDraft, type Draft } from './useWorkoutDraft';
+import { WorkoutExercises } from './WorkoutExercises';
 import { WorkoutPhoto } from './WorkoutPhoto';
 import styles from './WorkoutLogger.module.css';
 
@@ -69,39 +66,12 @@ export function WorkoutLogger(props: Props) {
   const gain = usePointsGain(livePoints);
   const rest = useRestTimer();
   const restSeconds = useMe().data?.rest_seconds;
-  const [picking, setPicking] = useState(false);
-  const [plates, setPlates] = useState<{ disks: number; bar: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const exerciseById = (id: string) => catalog.exercises.find((e) => e.id === id);
   const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
   const stretchOnly =
     draft.exercises.length > 0 &&
     draft.exercises.every((e) => exerciseById(e.exercise_id)?.type === 's');
-
-  const setSets = (index: number, sets: SetData[]) =>
-    update((d) => ({
-      ...d,
-      exercises: d.exercises.map((e, i) => (i === index ? { ...e, sets } : e)),
-    }));
-  const removeExercise = (index: number) =>
-    update((d) => ({ ...d, exercises: d.exercises.filter((_, i) => i !== index) }));
-  const addExercise = (id: string) => {
-    const exercise = exerciseById(id);
-    const single = exercise?.type === 'c' || exercise?.type === 's';
-    const empty: SetData = {
-      load_kg: null,
-      reps: null,
-      minutes: exercise?.default_minutes ?? null,
-      km: null,
-      done: false,
-    };
-    const sets = Array.from({ length: single ? 1 : 3 }, () => ({ ...empty }));
-    update((d) => ({
-      ...d,
-      exercises: [...d.exercises, { exercise_id: id, sets, previous_sets: [] }],
-    }));
-    setPicking(false);
-  };
 
   return (
     <section aria-labelledby="logger-title">
@@ -148,44 +118,13 @@ export function WorkoutLogger(props: Props) {
         </div>
       </div>
 
-      {draft.exercises.map((entry, i) => {
-        const exercise = exerciseById(entry.exercise_id);
-        if (!exercise) return null;
-        const firstSet = entry.sets[0];
-        if (exercise.type === 's' && firstSet) {
-          return (
-            <StretchCard
-              key={`${entry.exercise_id}-${i}`}
-              exercise={exercise}
-              set={firstSet}
-              onChange={(set) => setSets(i, [set])}
-              onRemove={() => removeExercise(i)}
-            />
-          );
-        }
-        return (
-          <ExerciseCard
-            key={`${entry.exercise_id}-${i}`}
-            exercise={exercise}
-            entry={entry}
-            onChange={(sets) => setSets(i, sets)}
-            onRemove={() => removeExercise(i)}
-            past={past !== null}
-            legBonus={legEvent && exercise.group === 'Legs'}
-            onPlates={(disks, bar) => setPlates({ disks, bar })}
-          />
-        );
-      })}
-      {draft.exercises.length === 0 && <p className={styles.empty}>{t('no_ex')}</p>}
-      <Button
-        icon={Plus}
-        variant="ghost"
-        wide
-        className={styles.add}
-        onClick={() => setPicking(true)}
-      >
-        {t('add_ex')}
-      </Button>
+      <WorkoutExercises
+        exercises={draft.exercises}
+        onChange={(change) => update((d) => ({ ...d, exercises: change(d.exercises) }))}
+        catalog={catalog}
+        past={past !== null}
+        legEvent={legEvent}
+      />
 
       {!workout.local && <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />}
 
@@ -210,21 +149,6 @@ export function WorkoutLogger(props: Props) {
           onStart={() => rest.start(restSeconds)}
           onAdjust={rest.adjust}
           onSkip={rest.skip}
-        />
-      )}
-      {picking && (
-        <ExercisePicker
-          exercises={catalog.exercises}
-          legBonus={legEvent}
-          onPick={addExercise}
-          onClose={() => setPicking(false)}
-        />
-      )}
-      {plates && (
-        <PlateCalculator
-          initialDisks={plates.disks}
-          barKg={plates.bar}
-          onClose={() => setPlates(null)}
         />
       )}
       {confirmDiscard && (

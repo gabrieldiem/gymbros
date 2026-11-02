@@ -56,6 +56,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
             : t('min_n', { n: v.duration_min })}
         </span>
         {v.sets > 0 && <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>}
+        {v.edited && <span>{t('feed_edited')}</span>}
         {v.volume_kg > 0 && <span>{t('kg_n', { n: n(v.volume_kg) })}</span>}
         {v.cardio_minutes > 0 && <span>{t('cardio_min', { n: v.cardio_minutes })}</span>}
         {v.vs_last_pct !== null && v.vs_last_pct > 0 && (

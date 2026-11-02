@@ -127,6 +127,8 @@ export type WorkoutDetail = {
   volume_kg: number;
   exercises: { exercise_id: string; sets: PostedSet[] }[];
   line_items: LineItem[];
+  /** Until when you can edit it. Null: you can't any more. */
+  editable_until?: string | null;
 };
 
 export type LiftPoint = { week_start: string; e1rm: number };
@@ -195,7 +197,7 @@ export function useWorkoutDetail(workoutId: string) {
   return useQuery({
     queryKey: ['me', 'workouts', workoutId],
     queryFn: ({ signal }) => apiRequest<WorkoutDetail>(`/me/workouts/${workoutId}`, { signal }),
-    staleTime: Infinity, // A finished workout doesn't change.
+    staleTime: Infinity, // A finished workout only changes through useEditWorkout, which sets it.
   });
 }
 

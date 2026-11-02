@@ -1,5 +1,6 @@
 {
   "entries": [
+    { "id": "edit-workout", "date": "2026-11-02", "link": "/me" },
     { "id": "gym-map", "date": "2026-11-02", "link": "/me" },
     { "id": "weekly-email", "date": "2026-11-02", "link": "/privacy" },
     { "id": "offline", "date": "2026-11-02", "link": "/train" },

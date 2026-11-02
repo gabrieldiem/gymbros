@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { logIn } from './members';
 
@@ -232,4 +233,91 @@ test('put a gym on a real map and friends get a link to it', async ({ page }, te
   await expect(page.getByRole('link', { name: 'Open Tolón in Google Maps' })).toBeVisible();
   await expect(page.locator('#root')).toHaveAttribute('inert', '');
   await page.screenshot({ path: `${SCREENS}/gym-saved-${testInfo.project.name}.png` });
+});
+
+test('edit a finished workout: new points, a refused edit changes nothing', async ({
+  page,
+}, testInfo) => {
+  await logIn(page, 'matex', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await page.getByRole('button', { name: /Push day/ }).click();
+  const logged = page.getByRole('article', { name: 'Bench press' });
+  await logged.getByLabel('Bench press, set 1, disks').fill('40');
+  await logged.getByLabel('Bench press, set 1, reps').fill('5');
+  await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'See ATUS Climb' }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+
+  const openDetails = async () => {
+    await page.goto('/me');
+    await page
+      .getByRole('button', { name: /^Push day/ })
+      .first()
+      .click();
+    const details = page.getByRole('dialog', { name: 'Push day' });
+    await expect(details.getByText('Total')).toBeVisible();
+    return details;
+  };
+  const total = (details: ReturnType<typeof page.getByRole>) =>
+    details.locator('li', { hasText: 'Total' }).locator('b').innerText();
+
+  let details = await openDetails();
+  const before = await total(details);
+  await details.getByRole('button', { name: 'Edit workout' }).click();
+  let editor = page.getByRole('dialog', { name: 'Edit workout' });
+  await expect(editor.getByLabel('Bench press, set 1, disks')).toHaveValue('40');
+  await editor.getByLabel('Bench press, set 1, reps').fill('20');
+  const set2 = editor.getByLabel('Bench press, set 2, reps');
+  if (await set2.count()) await set2.fill('20');
+  const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  const serious = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
+  expect(serious.map((v) => v.id)).toEqual([]);
+  await page.screenshot({ path: `${SCREENS}/edit-workout-${testInfo.project.name}.png` });
+  await editor.getByRole('button', { name: 'Save changes' }).click();
+  await expect(editor).toHaveCount(0);
+  await expect(details.locator('li', { hasText: 'Total' }).locator('b')).not.toHaveText(before);
+  const after = await total(details);
+
+  // The real server rolls back: a refused edit must leave the points where they were.
+  await details.getByRole('button', { name: 'Edit workout' }).click();
+  editor = page.getByRole('dialog', { name: 'Edit workout' });
+  await editor
+    .getByRole('button', { name: /^Remove Bench press|^Remove$/ })
+    .first()
+    .click();
+  await editor.getByRole('button', { name: 'Save changes' }).click();
+  await expect(editor.getByRole('alert')).toBeVisible();
+  await editor.getByRole('button', { name: 'Cancel' }).click();
+  details = await openDetails();
+  expect(await total(details)).toBe(after);
+
+  await page.goto('/crew');
+  await expect(page.getByText('Edited', { exact: true }).first()).toBeVisible();
+
+  // Two saves at once, as a retry could send: the second waits, so nothing is paid twice.
+  const lines = await page.evaluate(async () => {
+    const history = await (await fetch('/api/me/stats')).json();
+    const id = history.history[0].id as string;
+    const url = `/api/me/workouts/${id}`;
+    const before = await (await fetch(url)).json();
+    const save = () =>
+      fetch(`/api/workouts/${id}/edit`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exercises: before.exercises }),
+      }).then((r) => r.status);
+    const statuses = await Promise.all([save(), save(), save()]);
+    const after = await (await fetch(url)).json();
+    const keys = (d: { line_items: { key: string }[] }) => d.line_items.map((l) => l.key).sort();
+    return {
+      statuses,
+      same: JSON.stringify(keys(before)) === JSON.stringify(keys(after)),
+      total: [before.points, after.points],
+    };
+  });
+  expect(lines.statuses).toEqual([200, 200, 200]);
+  expect(lines.same).toBe(true);
+  expect(lines.total[1]).toBe(lines.total[0]);
 });

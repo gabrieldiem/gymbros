@@ -11,6 +11,7 @@ import {
   type StoredDraft,
 } from '../features/train/offlineStore';
 import { ApiError, apiRequest, isConnectionError } from './client';
+import type { WorkoutDetail } from './compete';
 import type { ClimbChange } from './climb';
 import { gymsKey } from './gyms';
 import { liveInterval } from './liveInterval';
@@ -277,6 +278,19 @@ export function refreshAfterWorkout(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: trainingNowKey });
   void queryClient.invalidateQueries({ queryKey: ['feed'] });
   void queryClient.invalidateQueries({ queryKey: ['me', 'stats'] });
+}
+
+/** Change a finished workout. The answer is the workout as it now stands, rescored. */
+export function useEditWorkout(workoutId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: SaveBody) =>
+      apiRequest<WorkoutDetail>(`/workouts/${workoutId}/edit`, { method: 'PUT', body }),
+    onSuccess: (workout) => {
+      queryClient.setQueryData(['me', 'workouts', workoutId], workout);
+      refreshAfterWorkout(queryClient);
+    },
+  });
 }
 
 export function syncWorkout(workout: QueuedWorkout) {

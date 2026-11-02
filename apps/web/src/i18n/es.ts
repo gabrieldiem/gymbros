@@ -336,6 +336,16 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  edit_workout: 'Editar entreno',
+  edit_until: 'Puedes editarlo hasta {when}.',
+  edit_hint:
+    'Los puntos se vuelven a calcular al guardar. Las bonificaciones que ya ganaste se quedan.',
+  edit_save: 'Guardar cambios',
+  feed_edited: 'Editado',
+  err_workout_edit_expired: 'Ya pasó el tiempo para editar este entreno.',
+  wn_edit_workout_title: 'Corrige un entreno después de terminarlo',
+  wn_edit_workout_body:
+    '¿Pusiste un número mal? Abre el entreno en tu perfil y edítalo hasta 2 días después. Tus puntos se vuelven a calcular.',
   gym_edit_title: 'Cambiar gimnasio',
   gym_edit: 'Cambiar {name}',
   gym_search: 'Busca un lugar o pega un enlace de Google Maps',

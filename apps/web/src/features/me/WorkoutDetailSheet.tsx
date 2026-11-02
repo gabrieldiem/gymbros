@@ -1,5 +1,9 @@
-import { useWorkoutDetail } from '../../api/compete';
+import { Pencil } from 'lucide-react';
+import { useState } from 'react';
+
+import { useWorkoutDetail, type WorkoutDetail } from '../../api/compete';
 import { useCatalog } from '../../api/train';
+import { Button } from '../../components/Button';
 import { GymLink } from '../../components/GymLink';
 import { QueryState } from '../../components/QueryState';
 import { Sheet } from '../../components/Sheet';
@@ -8,9 +12,14 @@ import { formatDay, formatMoment } from '../../i18n/formatDay';
 import { formatPostedSet } from '../crew/format';
 import { lineItemText } from '../train/format';
 import { WorkoutPhoto } from '../train/WorkoutPhoto';
+import { EditWorkoutSheet } from './EditWorkoutSheet';
 import styles from './WorkoutDetail.module.css';
 
 type Props = { workoutId: string; title: string; onClose: () => void };
+
+/** This answer can be kept a while, so it might have run out since. The server has the last word. */
+const canEdit = ({ editable_until: until }: WorkoutDetail) =>
+  Boolean(until) && Date.parse(until ?? '') > Date.now();
 
 /** One of your finished workouts: what you did and what it paid. */
 export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
@@ -18,6 +27,7 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
   const query = useWorkoutDetail(workoutId);
   const exercises = useCatalog().data?.exercises ?? [];
   const exercise = (id: string) => exercises.find((e) => e.id === id);
+  const [editing, setEditing] = useState(false);
 
   return (
     <Sheet title={title} onClose={onClose}>
@@ -29,6 +39,17 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
                 ? t('past_for', { day: formatDay(lang, workout.performed_on) })
                 : formatMoment(lang, workout.finished_at)}
             </p>
+            {canEdit(workout) && (
+              <div className={styles.editRow}>
+                <Button variant="ghost" icon={Pencil} onClick={() => setEditing(true)}>
+                  {t('edit_workout')}
+                </Button>
+                <small>
+                  {t('edit_until', { when: formatMoment(lang, workout.editable_until ?? '') })}
+                </small>
+              </div>
+            )}
+            {editing && <EditWorkoutSheet workout={workout} onClose={() => setEditing(false)} />}
             <div className={styles.chips}>
               {workout.gym && (
                 <GymLink

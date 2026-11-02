@@ -97,6 +97,18 @@ Alone, it pays only those points. It isn't a workout: it doesn't count towards t
 
 Logging a set doesn't start anything. A button in the logger starts the rest with your length from settings, and it can be adjusted or skipped. At zero the whole screen flashes three slow times and the phone vibrates, so it can be seen from a distance; with reduced motion it's one still screen. There's no rest timer when logging a past workout or stretching alone.
 
+## Editing a workout
+
+You can change a finished workout for 2 days after you logged it (`game.edit_workout_days`), from its details on your profile: the sets, exercises, name and gym. For a past day, the 2 days start when you logged it, not on the day it's for.
+
+Saving works the points out again as things stood when it was logged: the PRs, goal count and last session it was measured against then, not anything logged since. Only that workout's own lines change.
+
+- A PR moves with its set. If you lower the set that held it, the PR goes back to your next best.
+- Quests, the crew quest, the bounty and badges already paid stay, and an edit can earn ones newly reached. They aren't taken back: the crew trusts what anyone logs, as it does for a past day.
+- The crew sees the same post with the corrected numbers, marked Edited. Nobody gets a notification.
+- A workout can't be emptied. It has to keep at least one completed set.
+- A duel already settled isn't reopened.
+
 ## Past workouts
 
 Forgot to log one? From Train you can log a workout for any of the last 7 days (`game.past_workout_days`, in the crew's time zone). Today isn't one of them: that's a normal workout.
