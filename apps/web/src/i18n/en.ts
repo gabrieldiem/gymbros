@@ -329,6 +329,11 @@ export const en = {
   col_set: 'Set',
   col_last: 'Last time',
   col_repeat: 'Repeat',
+  photo_add: 'Add a gym photo',
+  photo_change: 'Change photo',
+  photo_remove: 'Remove photo',
+  photo_yours: 'Your gym photo',
+  photo_of: 'Gym photo from {name}',
   profile_edit: 'Edit profile',
   profile_characters: 'Your two characters',
   profile_characters_hint: 'Up to 2 letters or emoji, shown when you have no picture.',
@@ -568,6 +573,9 @@ export const en = {
   n_whats_new: 'New in GYMBROS: {title}.',
   n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
   n_whats_new_other: 'There’s something new in GYMBROS.',
+  wn_photos_title: 'Add a photo to your workout',
+  wn_photos_body:
+    'Show your crew your gym: add a photo while you log, or later from your page. It appears on your post.',
   wn_profile_title: 'Make your profile yours',
   wn_profile_body:
     'Upload a picture or pick any two letters or emoji, and choose any color. Tap Edit profile on your page.',

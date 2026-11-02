@@ -29,6 +29,10 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class WorkoutPhotoNotFound(DomainError):
+    """No such photo, or not one you can see."""
+
+
 class InvalidAvatarText(DomainError):
     """A profile picture can be up to two characters, and they have to be visible."""
 

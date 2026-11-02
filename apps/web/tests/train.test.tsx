@@ -126,6 +126,29 @@ describe('Train: entering sets', () => {
   });
 });
 
+describe('Train: a photo of the workout', () => {
+  it('offers to add one, and shows it with a way to remove it once there', async () => {
+    trainApi({
+      'GET /api/workouts/active': [200, makeWorkout({ photo_url: '/api/workouts/w1/photo?v=1' })],
+      'DELETE /api/workouts/w1/photo': [200, { photo_url: null }],
+    });
+    renderApp('/train');
+    expect(await screen.findByRole('img', { name: 'Your gym photo' })).toHaveAttribute(
+      'src',
+      '/api/workouts/w1/photo?v=1',
+    );
+    expect(screen.getByRole('button', { name: 'Change photo' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Remove photo' })).toBeVisible();
+  });
+
+  it('has only the add button without one', async () => {
+    trainApi({ 'GET /api/workouts/active': [200, makeWorkout()] });
+    renderApp('/train');
+    expect(await screen.findByRole('button', { name: 'Add a gym photo' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull();
+  });
+});
+
 describe('Train: gyms', () => {
   const GYMS = [
     { id: 'g1', name: 'Smart Fit', is_default: true },

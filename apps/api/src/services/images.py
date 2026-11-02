@@ -3,6 +3,7 @@
 from services.errors import ImageNotSupported, ImageTooLarge
 
 MAX_AVATAR_BYTES = 300 * 1024
+MAX_PHOTO_BYTES = 2 * 1024 * 1024
 
 
 def image_type(data: bytes) -> str | None:

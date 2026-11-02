@@ -21,6 +21,7 @@ from models.compete import (
     RecapResponse,
     WeekVolume,
 )
+from models.photos import photo_url
 from models.social_mappers import to_actor
 from models.workouts import LineItemModel, SetModel
 from db.tables.workout import Workout
@@ -146,6 +147,7 @@ def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
         id=workout.id,
         name=workout.name,
         gym=workout.gym_name,
+        photo_url=photo_url(workout.id, workout.photo_version),
         performed_on=workout.performed_on,
         finished_at=workout.finished_at,
         duration_min=_duration(workout),

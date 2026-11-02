@@ -336,6 +336,11 @@ export const es = {
   col_set: 'Set',
   col_last: 'Última vez',
   col_repeat: 'Repetir',
+  photo_add: 'Añadir una foto del gym',
+  photo_change: 'Cambiar foto',
+  photo_remove: 'Quitar foto',
+  photo_yours: 'Tu foto del gym',
+  photo_of: 'Foto del gym de {name}',
   profile_edit: 'Editar perfil',
   profile_characters: 'Tus dos caracteres',
   profile_characters_hint: 'Hasta 2 letras o emojis, que se ven cuando no tienes foto.',
@@ -575,6 +580,9 @@ export const es = {
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_photos_title: 'Añade una foto a tu entreno',
+  wn_photos_body:
+    'Muestra tu gym a tu equipo: añade una foto mientras registras, o después desde tu página. Aparece en tu publicación.',
   wn_profile_title: 'Haz tuyo tu perfil',
   wn_profile_body:
     'Sube una foto o elige dos letras o emojis, y el color que quieras. Toca Editar perfil en tu página.',

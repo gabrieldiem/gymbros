@@ -124,6 +124,9 @@ class FeedService:
             c.user_id for thread in comments.values() for c in thread
         }
         users = await self._users.get_many(authors)
+        photos = await self._workouts.photo_versions(
+            [item.workout_id for item in items if item.workout_id]
+        )
         return tuple(
             FeedEntry(
                 item=item,
@@ -132,6 +135,7 @@ class FeedService:
                     [r for r in reactions if r.feed_item_id == item.id], member.user.id
                 ),
                 comments=tuple(CommentView(c, users[c.user_id]) for c in comments.get(item.id, [])),
+                photo_version=photos.get(item.workout_id) if item.workout_id else None,
             )
             for item in items
             if item.actor_id in users

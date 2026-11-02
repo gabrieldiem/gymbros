@@ -4,6 +4,7 @@ from dataclasses import asdict
 
 from models.avatar import avatar_url
 from models.climb_mappers import to_climb_change
+from models.photos import photo_url
 from models.workouts import (
     ExerciseOutput,
     FinishResponse,
@@ -31,6 +32,7 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         routine_id=workout.routine_id,
         performed_on=workout.performed_on,
         gym=workout.gym_name,
+        photo_url=photo_url(workout.id, workout.photo_version),
         started_at=workout.started_at,
         exercises=[
             ExerciseOutput(

@@ -50,6 +50,8 @@ class Workout(Base):  # pylint: disable=too-few-public-methods
     performed_on: Mapped[date | None] = mapped_column(Date)
     # The name as it was: a gym can be renamed or deleted later.
     gym_name: Mapped[str | None] = mapped_column(String(40))
+    # Changes with each photo, so a browser never shows an old one. Null: no photo.
+    photo_version: Mapped[int | None] = mapped_column(Integer)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     week_start: Mapped[date | None] = mapped_column(Date)

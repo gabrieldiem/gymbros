@@ -6,6 +6,7 @@ import { useI18n } from '../../i18n/context';
 import { formatDay, formatMoment } from '../../i18n/formatDay';
 import { formatPostedSet } from '../crew/format';
 import { lineItemText } from '../train/format';
+import { WorkoutPhoto } from '../train/WorkoutPhoto';
 import styles from './WorkoutDetail.module.css';
 
 type Props = { workoutId: string; title: string; onClose: () => void };
@@ -33,6 +34,7 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
               <span>{workout.sets === 1 ? t('sets_1') : t('sets_n', { n: workout.sets })}</span>
               {workout.volume_kg > 0 && <span>{t('kg_n', { n: n(workout.volume_kg) })}</span>}
             </div>
+            <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />
             {workout.exercises.length > 0 && (
               <>
                 <h3>{t('detail_exercises')}</h3>

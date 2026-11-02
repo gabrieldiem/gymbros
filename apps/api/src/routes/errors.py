@@ -46,6 +46,7 @@ from services.errors import (
     WorkoutDateOutOfRange,
     WorkoutEmpty,
     WorkoutNotFound,
+    WorkoutPhotoNotFound,
 )
 
 _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
@@ -70,6 +71,7 @@ _STATUS_AND_CODE: dict[type[Exception], tuple[int, str]] = {
     WorkoutAlreadyActive: (status.HTTP_409_CONFLICT, "workout_already_active"),
     WorkoutAlreadyFinished: (status.HTTP_409_CONFLICT, "workout_finished"),
     WorkoutEmpty: (status.HTTP_409_CONFLICT, "workout_empty"),
+    WorkoutPhotoNotFound: (status.HTTP_404_NOT_FOUND, "workout_photo_not_found"),
     InvalidAvatarText: (status.HTTP_422_UNPROCESSABLE_CONTENT, "invalid_avatar_text"),
     AvatarNotFound: (status.HTTP_404_NOT_FOUND, "avatar_not_found"),
     ImageTooLarge: (status.HTTP_413_CONTENT_TOO_LARGE, "image_too_large"),

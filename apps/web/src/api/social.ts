@@ -66,6 +66,7 @@ export type FeedItem = {
   actor: Actor;
   created_at: string;
   vars: Record<string, unknown>;
+  photo_url?: string | null;
   reactions: Reactions;
   comments: Comment[];
   is_mine: boolean;

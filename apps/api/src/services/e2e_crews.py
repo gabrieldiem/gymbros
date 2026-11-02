@@ -4,14 +4,18 @@ demo crew and the two viewports never share a member."""
 import copy
 from typing import Any
 
-E2E_PROJECTS = ("mobile", "desktop")
+# The train-* crews are for specs that post workouts, so what they do can't reach the specs that
+# read the feed or the standings of the main crew.
+E2E_PROJECTS = ("mobile", "desktop", "train-mobile", "train-desktop")
+_MAX_INVITE_SUFFIX = 9
 
 
 def e2e_crew(demo: dict[str, Any], project: str) -> dict[str, Any]:
     """The demo crew data renamed for one project: own crew, invite code and member emails."""
     data = copy.deepcopy(demo)
-    data["crew"]["name"] = f"E2E {project.title()}"
-    data["crew"]["invite_code"] = f"E2E{project.upper()}"
+    data["crew"]["name"] = f"E2E {project.replace('-', ' ').title()}"
+    suffix = project.replace("-", "").upper()[:_MAX_INVITE_SUFFIX]
+    data["crew"]["invite_code"] = f"E2E{suffix}"
     for member in data["members"]:
         member["email"] = f"{member['key']}@{project}.e2e.gymbros.app"
     return data

@@ -2,7 +2,7 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from clock import utc_now
 from dependencies import (
@@ -11,9 +11,11 @@ from dependencies import (
     get_scoring_context,
     get_settings,
     get_workout_finisher,
+    get_workout_photo_service,
     get_workout_service,
 )
 from models.errors import error_responses
+from models.photos import PhotoResponse, photo_url
 from models.workout_mappers import to_finish_response, to_workout_response
 from models.workouts import (
     FinishResponse,
@@ -23,16 +25,21 @@ from models.workouts import (
     WeekResponse,
     WorkoutResponse,
 )
+from routes.uploads import read_upload
 from services.gym_service import GymService
+from services.images import MAX_PHOTO_BYTES
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.training_rules import LoggedSet, week_end
 from services.workout_finisher import WorkoutFinisher
+from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
 from services.workout_types import ExerciseEntry
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
+
+_A_YEAR = 365 * 24 * 3600
 
 
 @router.post(
@@ -116,6 +123,55 @@ async def discard_workout(
 ) -> None:
     """Throw away an in-progress workout."""
     await workouts.discard(member, workout_id)
+
+
+@router.put(
+    "/{workout_id}/photo",
+    response_model=PhotoResponse,
+    responses=error_responses(401, 403, 404, 413, 415),
+)
+async def upload_photo(
+    workout_id: uuid.UUID,
+    request: Request,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> PhotoResponse:
+    """Add or replace the photo of your workout. The body is the image itself."""
+    data = await read_upload(request, MAX_PHOTO_BYTES)
+    workout = await photos.upload(member, workout_id, data)
+    return PhotoResponse(photo_url=photo_url(workout.id, workout.photo_version))
+
+
+@router.delete(
+    "/{workout_id}/photo", response_model=PhotoResponse, responses=error_responses(401, 403, 404)
+)
+async def remove_photo(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> PhotoResponse:
+    """Remove the photo of your workout."""
+    workout = await photos.remove(member, workout_id)
+    return PhotoResponse(photo_url=photo_url(workout.id, workout.photo_version))
+
+
+@router.get("/{workout_id}/photo", responses=error_responses(401, 403, 404))
+async def get_photo(
+    workout_id: uuid.UUID,
+    member: Member = Depends(get_current_member),
+    photos: WorkoutPhotoService = Depends(get_workout_photo_service),
+) -> Response:
+    """A workout's photo, for its crew. Its URL changes with each upload, so it caches for good."""
+    photo = await photos.view(member, workout_id)
+    return Response(
+        content=photo.image,
+        media_type=photo.content_type,
+        headers={
+            "Cache-Control": f"private, max-age={_A_YEAR}, immutable",
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'none'; sandbox",
+        },
+    )
 
 
 @router.post(

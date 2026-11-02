@@ -34,6 +34,7 @@ class FeedEntry:
     actor: User
     reactions: ReactionSummary
     comments: tuple[CommentView, ...]
+    photo_version: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -110,6 +110,20 @@ describe('Crew feed', () => {
   });
 });
 
+describe('A workout post with a photo', () => {
+  it('shows it, described by who posted it', async () => {
+    crewApi({
+      'GET /api/feed': [
+        200,
+        { ...FEED, items: [{ ...WORKOUT_POST, photo_url: '/api/workouts/w9/photo?v=3' }] },
+      ],
+    });
+    renderApp('/crew');
+    const image = await screen.findByRole('img', { name: /^Gym photo from / });
+    expect(image).toHaveAttribute('src', '/api/workouts/w9/photo?v=3');
+  });
+});
+
 describe('Hall of fame', () => {
   it('shows the most improved podium and crew records', async () => {
     crewApi();

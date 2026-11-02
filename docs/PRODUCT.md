@@ -62,6 +62,10 @@ A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A worko
 
 Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. It's only a name, not a location. A workout keeps the name it was logged with, so renaming or deleting a gym doesn't change your history.
 
+## Workout photos
+
+One photo per workout, added while logging or later from its details on the You tab, and replaceable or removable by its owner. It's resized on your device (1280 px at most) before it's sent, which also drops its metadata, including where it was taken. Your crew sees it on your feed post; nobody outside the crew can open it. It's deleted with the workout or the account. Admins can't remove one yet (GYM-66).
+
 ## Stretching
 
 Add it to any workout, or log it alone from its own routine. It asks only how long (5 or 10 minutes, 5 by default) and pays fixed points, once per crew-local day, so it can't be farmed.

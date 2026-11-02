@@ -66,6 +66,7 @@ class WorkoutResponse(BaseModel):
     routine_id: str | None
     performed_on: date | None
     gym: str | None
+    photo_url: str | None
     started_at: datetime
     exercises: list[ExerciseOutput]
     live_points: int

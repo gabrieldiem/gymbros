@@ -50,6 +50,7 @@ class FeedItemModel(BaseModel):
     actor: ActorModel
     created_at: datetime
     vars: dict[str, Any]
+    photo_url: str | None = None
     reactions: ReactionsModel
     comments: list[CommentModel]
     is_mine: bool

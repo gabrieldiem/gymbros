@@ -38,6 +38,14 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         <span className={styles.pts}>+{n(v.points)}</span>
       </div>
       <h3>{v.name}</h3>
+      {item.photo_url && (
+        <img
+          className={styles.photo}
+          src={item.photo_url}
+          alt={t('photo_of', { name: item.is_mine ? t('you') : item.actor.display_name })}
+          loading="lazy"
+        />
+      )}
       <div className={styles.chips}>
         {v.gym && <span>{t('at_gym', { gym: v.gym })}</span>}
         <span>

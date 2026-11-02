@@ -115,6 +115,7 @@ export type WorkoutDetail = {
   id: string;
   name: string;
   gym: string | null;
+  photo_url: string | null;
   performed_on: string | null;
   finished_at: string;
   duration_min: number;

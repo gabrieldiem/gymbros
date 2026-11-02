@@ -16,6 +16,7 @@ from db.tables.reaction import Reaction
 from db.tables.user import User
 from db.tables.user_badge import UserBadge
 from db.tables.workout import Workout
+from db.tables.workout_photo import WorkoutPhoto
 from db.tables.workout_set import WorkoutSet
 
 __all__ = [
@@ -35,5 +36,6 @@ __all__ = [
     "User",
     "UserBadge",
     "Workout",
+    "WorkoutPhoto",
     "WorkoutSet",
 ]

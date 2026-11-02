@@ -66,6 +66,7 @@ export type Workout = {
   /** The past day this logs (a calendar day), or null for a workout happening now. */
   performed_on: string | null;
   gym: string | null;
+  photo_url: string | null;
   started_at: string;
   exercises: WorkoutExercise[];
   live_points: number;
@@ -185,6 +186,28 @@ export function useDiscardWorkout() {
       void queryClient.invalidateQueries({ queryKey: trainingNowKey });
     },
   });
+}
+
+type PhotoResult = { photo_url: string | null };
+
+/** Add, replace or remove a workout's photo, and show the new one wherever it appears. */
+export function useWorkoutPhoto(workoutId: string) {
+  const queryClient = useQueryClient();
+  const refresh = () => {
+    void queryClient.invalidateQueries({ queryKey: activeWorkoutKey });
+    void queryClient.invalidateQueries({ queryKey: ['me', 'workouts', workoutId] });
+    void queryClient.invalidateQueries({ queryKey: ['feed'] });
+  };
+  const upload = useMutation({
+    mutationFn: (file: Blob) =>
+      apiRequest<PhotoResult>(`/workouts/${workoutId}/photo`, { method: 'PUT', file }),
+    onSuccess: refresh,
+  });
+  const remove = useMutation({
+    mutationFn: () => apiRequest<PhotoResult>(`/workouts/${workoutId}/photo`, { method: 'DELETE' }),
+    onSuccess: refresh,
+  });
+  return { upload, remove };
 }
 
 export function useFinishWorkout() {

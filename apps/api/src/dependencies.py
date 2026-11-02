@@ -27,6 +27,7 @@ from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.session_repository import SessionRepository
 from db.repositories.user_repository import UserRepository
+from db.repositories.workout_photo_repository import WorkoutPhotoRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.repositories.workout_stats_repository import WorkoutStatsRepository
 from db.tables.user import User
@@ -62,6 +63,7 @@ from services.session_tokens import SessionTokens
 from services.welcome_email import EmailSender
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
+from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
 from services.whats_new import load_whats_new
 from settings import Settings
@@ -113,6 +115,11 @@ def get_avatar_service(session: AsyncSession = DB_SESSION) -> AvatarService:
         utc_now,
         admin_emails=settings.admin_emails,
     )
+
+
+def get_workout_photo_service(session: AsyncSession = DB_SESSION) -> WorkoutPhotoService:
+    """FastAPI dependency provider for WorkoutPhotoService."""
+    return WorkoutPhotoService(WorkoutPhotoRepository(session), WorkoutRepository(session), utc_now)
 
 
 def get_gym_service(session: AsyncSession = DB_SESSION) -> GymService:

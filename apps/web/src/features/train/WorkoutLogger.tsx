@@ -17,6 +17,7 @@ import { RestTimer } from './RestTimer';
 import { StretchCard } from './StretchCard';
 import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
 import { useWorkoutDraft } from './useWorkoutDraft';
+import { WorkoutPhoto } from './WorkoutPhoto';
 import styles from './WorkoutLogger.module.css';
 
 type Props = {
@@ -172,6 +173,8 @@ export function WorkoutLogger(props: Props) {
       <Button variant="ghost" wide className={styles.add} onClick={() => setPicking(true)}>
         + {t('add_ex')}
       </Button>
+
+      <WorkoutPhoto workoutId={workout.id} url={workout.photo_url} />
 
       <p className={styles.status} role="status">
         {status === 'saving' ? t('saving') : status === 'error' ? t('save_failed') : ''}

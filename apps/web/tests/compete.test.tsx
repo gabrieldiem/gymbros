@@ -110,6 +110,8 @@ describe('Workout details', () => {
         {
           id: 'w1',
           name: 'Leg day',
+          gym: 'Smart Fit',
+          photo_url: '/api/workouts/w1/photo?v=1',
           performed_on: null,
           finished_at: '2026-10-30T18:00:00Z',
           duration_min: 52,
@@ -133,6 +135,8 @@ describe('Workout details', () => {
     await userEvent.click(await screen.findByRole('button', { name: /^Leg day/ }));
     const sheet = within(await screen.findByRole('dialog', { name: 'Leg day' }));
     expect(await sheet.findByText('40+bar×5')).toBeVisible();
+    expect(sheet.getByText('At Smart Fit')).toBeVisible();
+    expect(sheet.getByRole('img', { name: 'Your gym photo' })).toBeVisible();
     expect(sheet.getByText('52 min')).toBeVisible();
     expect(sheet.getByText('Showed up')).toBeVisible();
     expect(sheet.getByText('+175')).toBeVisible();

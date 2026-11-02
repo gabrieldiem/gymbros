@@ -115,6 +115,17 @@ class WorkoutRepository:
         )
         return {week: count for week, count in result.all() if week is not None}
 
+    async def photo_versions(self, workout_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
+        """Which of these workouts have a photo, and its version."""
+        if not workout_ids:
+            return {}
+        result = await self._session.execute(
+            select(Workout.id, Workout.photo_version).where(
+                Workout.id.in_(workout_ids), Workout.photo_version.is_not(None)
+            )
+        )
+        return {workout_id: version for workout_id, version in result.all() if version is not None}
+
     async def stretched_between(self, user_id: uuid.UUID, start: datetime, end: datetime) -> bool:
         """Whether a workout that counts as finished in this window paid for stretching."""
         found = await self._session.scalar(

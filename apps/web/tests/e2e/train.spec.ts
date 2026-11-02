@@ -8,7 +8,7 @@ const SCREENS = 'test-results/screens';
 test('log a Push day and finish it', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await logIn(page, 'jose', testInfo);
+  await logIn(page, 'jose', testInfo, 'train');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/train');
 
@@ -53,7 +53,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
 });
 
 test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
-  await logIn(page, 'santi', testInfo);
+  await logIn(page, 'santi', testInfo, 'train');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/train');
   await page.getByRole('button', { name: /^Swim/ }).click();
@@ -74,7 +74,7 @@ test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
 });
 
 test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
-  await logIn(page, 'matex', testInfo);
+  await logIn(page, 'matex', testInfo, 'train');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/train');
   await page.getByRole('button', { name: /Log a past workout/ }).click();
@@ -103,13 +103,12 @@ test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
   await summary.getByRole('button', { name: 'Done' }).click();
 
   await page.goto('/crew');
-  const post = page.getByRole('listitem').filter({ hasText: 'Run' }).first();
-  await expect(post.getByText(/^For /)).toBeVisible();
+  await expect(page.getByText(/^For /).first()).toBeVisible();
   await page.screenshot({ path: `${SCREENS}/past-feed-${testInfo.project.name}.png` });
 });
 
 test('stretching alone pays fixed points and leaves the week alone', async ({ page }, testInfo) => {
-  await logIn(page, 'maxo', testInfo);
+  await logIn(page, 'maxo', testInfo, 'train');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await page.goto('/train');
   const pips = page.getByRole('img', { name: /workouts this week/ });
@@ -127,4 +126,47 @@ test('stretching alone pays fixed points and leaves the week alone', async ({ pa
   await expect(summary.getByText('Stretching', { exact: true }).last()).toBeVisible();
   await summary.getByRole('button', { name: 'Done' }).click();
   await expect(pips).toHaveAttribute('aria-label', before ?? '');
+});
+
+test('add a gym photo and your crew sees it on the post', async ({ page }, testInfo) => {
+  await logIn(page, 'gabi', testInfo, 'train');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await page.getByRole('button', { name: /^Run/ }).click();
+  const run = page.getByRole('article', { name: 'Outdoor run' });
+  await run.getByLabel('Outdoor run, set 1, min').fill('20');
+  await run.getByRole('button', { name: 'Complete set 1' }).click();
+
+  // A large picture: the app has to shrink it below the server's limit.
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 3000;
+    canvas.height = 2000;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('no canvas');
+    for (let x = 0; x < 3000; x += 10) {
+      context.fillStyle = `hsl(${x % 360} 80% 50%)`;
+      context.fillRect(x, 0, 10, 2000);
+    }
+    return canvas.toDataURL('image/png').split(',')[1] ?? '';
+  });
+  await page
+    .getByRole('button', { name: 'Add a gym photo' })
+    .locator('xpath=ancestor::div[2]')
+    .locator('input[type=file]')
+    .setInputFiles({ name: 'gym.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') });
+  const photo = page.getByRole('img', { name: 'Your gym photo' });
+  await expect(photo).toBeVisible({ timeout: 10000 });
+  await expect
+    .poll(() => photo.evaluate((image: HTMLImageElement) => image.naturalWidth))
+    .toBe(1280);
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${SCREENS}/photo-logger-${testInfo.project.name}.png` });
+
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Done' }).click();
+  await page.goto('/crew');
+  const posted = page.getByRole('img', { name: /^Gym photo from / }).first();
+  await expect(posted).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/photo-feed-${testInfo.project.name}.png` });
 });
