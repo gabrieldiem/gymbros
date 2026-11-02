@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router';
+import { NavLink, useLocation } from 'react-router';
 
 import { useActiveWorkout } from '../api/train';
 import { useI18n } from '../i18n/context';
@@ -6,36 +6,69 @@ import { Brand } from './Brand';
 import { cx } from './cx';
 import { Icon } from './Icon';
 import styles from './NavRail.module.css';
-import { TABS } from './tabs';
+import { QUEST_SECTIONS, TABS } from './tabs';
+import { useShareInvite } from './useShareInvite';
+import { useSlidingIndicator } from './useSlidingIndicator';
 
 function linkClass(primary: boolean | undefined): string {
   return cx(styles.link, primary && styles.train);
 }
 
+/** A floating dock on mobile and a side rail on desktop, with an indicator that slides between
+ * tabs. Train has its own raised button, so the indicator hides there. */
 export function NavRail() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const training = Boolean(useActiveWorkout().data);
+  const shareInvite = useShareInvite();
+  const nav = useSlidingIndicator<HTMLElement>(
+    '[data-tab][aria-current="page"]:not([data-primary])',
+    `${pathname}:${lang}`,
+  );
   return (
-    <nav className={styles.rail} aria-label={t('nav_main')}>
+    <nav ref={nav} className={styles.rail} aria-label={t('nav_main')}>
+      <span className={styles.indicator} aria-hidden="true" />
       <div className={styles.head}>
         <Brand size={34} />
         <p className={styles.tagline}>{t('tagline')}</p>
       </div>
       {TABS.map((tab) => (
-        <NavLink key={tab.to} to={tab.to} className={linkClass(tab.primary)}>
-          {tab.primary ? (
-            <span className={styles.disc}>
-              <Icon name={tab.icon} size={30} strokeWidth={2.8} />
-            </span>
-          ) : (
-            <Icon name={tab.icon} />
+        <div key={tab.to} className={cx(styles.item, tab.primary && styles.trainItem)}>
+          <NavLink
+            to={tab.to}
+            className={linkClass(tab.primary)}
+            data-tab=""
+            data-primary={tab.primary ? '' : undefined}
+          >
+            {tab.primary ? (
+              <span className={styles.disc}>
+                <Icon name={tab.icon} size={30} strokeWidth={2.8} />
+              </span>
+            ) : (
+              <Icon name={tab.icon} />
+            )}
+            <span className={styles.label}>{t(tab.label)}</span>
+            {tab.primary && training && (
+              <span className={styles.liveDot} role="img" aria-label={t('training_now')} />
+            )}
+          </NavLink>
+          {tab.to === '/quests' && (
+            <div className={styles.subs}>
+              {QUEST_SECTIONS.map((section) => (
+                <NavLink key={section.to} to={section.to} end className={cx(styles.sub)}>
+                  {t(section.label)}
+                </NavLink>
+              ))}
+            </div>
           )}
-          <span className={styles.label}>{t(tab.label)}</span>
-          {tab.primary && training && (
-            <span className={styles.liveDot} role="img" aria-label={t('training_now')} />
-          )}
-        </NavLink>
+        </div>
       ))}
+      {shareInvite && (
+        <button type="button" className={styles.invite} onClick={() => void shareInvite()}>
+          <Icon name="crew" size={20} />
+          {t('invite_friends')}
+        </button>
+      )}
     </nav>
   );
 }

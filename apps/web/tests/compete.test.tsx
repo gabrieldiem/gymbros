@@ -84,9 +84,13 @@ describe('Quests tab', () => {
   it('lists badges with progress and details', async () => {
     api();
     renderApp('/quests');
-    await userEvent.click(await screen.findByRole('button', { name: 'Badges' }));
+    await userEvent.click(
+      await within(await screen.findByRole('navigation', { name: 'Main' })).findByRole('link', {
+        name: 'Achievements',
+      }),
+    );
     expect(screen.getByText('You have 1 of 2. Each one pays out once.')).toBeVisible();
-    await userEvent.click(screen.getByRole('button', { name: 'Hundred tonnes, Locked' }));
+    await userEvent.click(screen.getByRole('button', { name: /^Hundred tonnes/ }));
     const sheet = screen.getByRole('dialog', { name: 'Hundred tonnes' });
     expect(sheet).toHaveTextContent('Move 100 tonnes in total.');
     expect(sheet).toHaveTextContent('82.4 / 100');
@@ -214,7 +218,7 @@ describe('chart helpers and new line items', () => {
       'Recompensa cobrada: pasaste a Maxo',
     );
     expect(lineItemText(item('ln_badge', { badge: 'first' }), [], t, n)).toBe(
-      'Insignia: Primeros pasos',
+      'Logro: Primeros pasos',
     );
     expect(lineItemText(item('ln_duel', { name: 'Santi' }), [], t, n)).toBe('Duelo ganado a Santi');
   });

@@ -38,7 +38,7 @@ Use these names in code (tables, classes, endpoints), API fields and UI copy. Ad
 | Duel | A 1v1 challenge until Sunday by points or bench volume, with a stake | `duel` |
 | Bounty | A bonus for passing the current all-time leader | `bounty` |
 | Weekly event | The week's twist (v1: Leg day x2) | `weekly_event` |
-| Badge | A one-time achievement with points | `badge` |
+| Badge (Achievement in the UI) | A one-time achievement with points | `badge` |
 | Stake | What the loser of a duel owes (protein shakes, racking plates…), stored as a key | `stake_key` |
 | Bonus | Points paid after a workout on top of its own score: quests, crew quest, bounty, badges | `bonus_items` |
 | Nudge | A poke at a member who hasn't trained in a few days | `nudge` |

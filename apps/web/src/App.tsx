@@ -46,6 +46,8 @@ export function App() {
           <Route path="crew" element={<CrewPage />} />
           <Route path="train" element={<TrainPage />} />
           <Route path="quests" element={<QuestsPage />} />
+          <Route path="quests/achievements" element={<QuestsPage />} />
+          <Route path="quests/points" element={<QuestsPage />} />
           <Route path="me" element={<MePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

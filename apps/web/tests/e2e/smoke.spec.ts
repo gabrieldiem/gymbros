@@ -236,3 +236,45 @@ test('invite limits: an admin sets a custom code with one use, then the link joi
   await expect(second.visitor).toHaveURL(/\/join$/);
   await second.context.close();
 });
+
+test('navbar: the indicator sits on the active tab and follows it', async ({ page }, testInfo) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('maxo', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  const nav = page.getByRole('navigation', { name: /Main|Principal/ });
+  const indicator = nav.locator('[class*="indicator"]');
+
+  const expectOnTab = async (name: RegExp) => {
+    const tab = nav.getByRole('link', { name, exact: false }).first();
+    await expect(tab).toHaveAttribute('aria-current', 'page');
+    await expect
+      .poll(async () => {
+        const [a, b] = await Promise.all([indicator.boundingBox(), tab.boundingBox()]);
+        if (!a || !b) return Number.POSITIVE_INFINITY;
+        return Math.max(
+          Math.abs(a.x - b.x),
+          Math.abs(a.y - b.y),
+          Math.abs(a.width - b.width),
+          Math.abs(a.height - b.height),
+        );
+      })
+      .toBeLessThan(2);
+  };
+
+  await expectOnTab(/^(ATUS Climb)$/);
+  await nav.getByRole('link', { name: /^(Crew|Equipo)$/ }).click();
+  await expectOnTab(/^(Crew|Equipo)$/);
+  await nav
+    .getByRole('link', { name: /^(Quests|Retos)$/ })
+    .first()
+    .click();
+  await expectOnTab(/^(Quests|Retos)$/);
+  await page.goto('/quests/achievements');
+  await expectOnTab(/^(Quests|Retos)$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Achievements|Logros/);
+
+  // Train has its own button, so the indicator hides.
+  await nav.getByRole('link', { name: /^(Train|Entrenar)/ }).click();
+  await expect(indicator).toHaveCSS('opacity', '0');
+});

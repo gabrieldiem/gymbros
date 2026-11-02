@@ -1,5 +1,6 @@
 import type { Rules, SampleSession } from '../../api/rules';
 import { BadgePatch } from '../../components/BadgePatch';
+import { cx } from '../../components/cx';
 import { useReveal } from '../../components/useReveal';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
@@ -24,12 +25,23 @@ function sessionDetail(
 }
 
 /** One hour of each sport, scored by the server. The bars make the point before the numbers do. */
-export function SportsCompare({ sessions }: { sessions: SampleSession[] }) {
+export function SportsCompare({
+  sessions,
+  embedded = false,
+}: {
+  sessions: SampleSession[];
+  embedded?: boolean;
+}) {
   const { t, n } = useI18n();
   const reveal = useReveal<HTMLElement>();
   const max = Math.max(...sessions.map((s) => s.total), 1);
   return (
-    <section ref={reveal} id="sports" className={styles.section} aria-labelledby="sports-title">
+    <section
+      ref={reveal}
+      id="sports"
+      className={cx(styles.section, embedded && styles.embedded)}
+      aria-labelledby="sports-title"
+    >
       <h2 id="sports-title" className={styles.sectionTitle}>
         {t('landing_equal_title')}
       </h2>
@@ -71,17 +83,22 @@ function RowGroup({ title, rows }: { title: string; rows: Row[] }) {
 }
 
 /** Every task and what it pays. All numbers come from the API. */
-export function PointsList({ rules }: { rules: Rules }) {
+export function PointsList({ rules, embedded = false }: { rules: Rules; embedded?: boolean }) {
   const { t, n } = useI18n();
   const reveal = useReveal<HTMLElement>();
   const p = rules.points;
   const plus = (value: number) => `+${n(value)}`;
   return (
-    <section ref={reveal} id="points" className={styles.section} aria-labelledby="points-title">
-      <h2 id="points-title" className={styles.sectionTitle}>
+    <section
+      ref={reveal}
+      id="points"
+      className={cx(styles.section, embedded && styles.embedded)}
+      aria-labelledby="points-title"
+    >
+      <h2 id="points-title" className={embedded ? 'sr-only' : styles.sectionTitle}>
         {t('landing_points_title')}
       </h2>
-      <p className={styles.sectionSub}>{t('landing_points_sub')}</p>
+      {!embedded && <p className={styles.sectionSub}>{t('landing_points_sub')}</p>}
       <div className={styles.groups}>
         <RowGroup
           title={t('landing_group_workout')}
