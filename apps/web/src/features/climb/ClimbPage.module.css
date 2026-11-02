@@ -33,18 +33,6 @@
   margin-top: 18px;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 13px;
-  border-radius: var(--r-pill);
-  font-weight: 600;
-  font-size: 0.88rem;
-  background: var(--event-tint);
-  color: var(--event-text);
-}
-
 .grid {
   display: grid;
   gap: 26px;

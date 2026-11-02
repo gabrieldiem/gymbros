@@ -9,10 +9,13 @@ import { InstallBanner } from './InstallBanner';
 import { UpdateBanner } from './UpdateBanner';
 import { NavRail } from './NavRail';
 import { NotificationToasts } from './NotificationToasts';
+import { DESKTOP_RAIL } from './tabs';
 import { TopBar } from './TopBar';
+import { useMediaQuery } from './useMediaQuery';
 
 export function AppShell() {
   useProfileLanguage();
+  const desktop = useMediaQuery(DESKTOP_RAIL);
   return (
     <div className={styles.app}>
       <NavRail />
@@ -23,9 +26,11 @@ export function AppShell() {
         <AnimatedPage>
           <Outlet />
         </AnimatedPage>
-        <footer className={styles.footer}>
-          <HealthStatus />
-        </footer>
+        {!desktop && (
+          <footer className={styles.footer}>
+            <HealthStatus />
+          </footer>
+        )}
       </main>
       <ActiveWorkoutBar />
       <NotificationToasts />

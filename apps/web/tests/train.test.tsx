@@ -126,6 +126,28 @@ describe('Train: entering sets', () => {
   });
 });
 
+describe('Train: the timed event', () => {
+  it('marks every leg exercise, in any workout, and not the others', async () => {
+    trainApi({
+      'GET /api/workouts/active': [
+        200,
+        makeWorkout({
+          routine_id: null,
+          exercises: [
+            { exercise_id: 'squat', sets: [], previous_sets: [] },
+            { exercise_id: 'bench', sets: [], previous_sets: [] },
+          ],
+        }),
+      ],
+    });
+    renderApp('/train');
+    const squat = within(await screen.findByRole('article', { name: 'Back squat' }));
+    expect(squat.getByText('x2')).toBeVisible();
+    const bench = within(screen.getByRole('article', { name: 'Bench press' }));
+    expect(bench.queryByText('x2')).toBeNull();
+  });
+});
+
 describe('Train: stretching', () => {
   const stretching = makeWorkout({
     name: 'Stretching',
@@ -284,7 +306,7 @@ describe('Train: start screen', () => {
     expect(screen.getByText('1 of 3 workouts this week. Two more to hit your goal.')).toBeVisible();
     expect(screen.getByRole('img', { name: '1 of 3 workouts this week' })).toBeVisible();
     const legDay = screen.getByRole('button', { name: /Leg day/ });
-    expect(within(legDay).getByText('Leg day x2 bonus this week')).toBeVisible();
+    expect(within(legDay).getByText('Leg sets pay double')).toBeVisible();
     expect(screen.getByRole('button', { name: /Push day/ })).toHaveTextContent(
       'Bench press, Overhead press',
     );
@@ -326,7 +348,13 @@ describe('Train: logging', () => {
       exercises: { sets: { done: boolean }[] }[];
     };
     expect(body.exercises[0]?.sets[0]?.done).toBe(true);
-    expect(screen.getByRole('timer', { name: 'Rest' })).toBeVisible();
+    // Logging a set doesn't start anything: the rest timer is yours to start.
+    expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Rest 1:30' }));
+    expect(screen.getByRole('timer', { name: 'Rest' })).toHaveTextContent('1:30');
+    await userEvent.click(screen.getByRole('button', { name: 'Skip' }));
+    expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
+    expect(screen.queryByTestId('rest-flash')).toBeNull();
   });
 
   it('finds exercises by Spanish alias and adds them', async () => {
@@ -336,8 +364,8 @@ describe('Train: logging', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Add exercise' });
     await userEvent.type(within(dialog).getByRole('searchbox'), 'sentadilla');
     expect(within(dialog).queryByRole('button', { name: 'Bench press' })).toBeNull();
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Back squat' }));
-    expect(await screen.findByRole('article', { name: 'Back squat' })).toBeVisible();
+    await userEvent.click(within(dialog).getByRole('button', { name: /^Back squat/ }));
+    expect(await screen.findByRole('article', { name: /^Back squat/ })).toBeVisible();
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 

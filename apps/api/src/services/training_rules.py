@@ -102,6 +102,12 @@ def past_days(now: datetime, time_zone: str, days: int) -> tuple[date, ...]:
     return tuple(today - timedelta(days=back) for back in range(1, days + 1))
 
 
+def week_end(moment: datetime, time_zone: str) -> datetime:
+    """When the crew-local week that contains `moment` ends: the next Monday at 00:00."""
+    monday = week_start(moment, time_zone) + timedelta(days=7)
+    return datetime.combine(monday, time(0, 0), ZoneInfo(time_zone))
+
+
 def goal_streak_before(this_week: date, workouts_by_week: dict[date, int], target: int) -> int:
     """Consecutive goal weeks (≥ target workouts) ending the week before `this_week`."""
     streak = 0

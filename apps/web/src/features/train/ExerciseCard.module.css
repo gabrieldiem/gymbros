@@ -220,6 +220,7 @@
 }
 
 .barDetail {
+  max-width: none;
   margin: -2px 0 4px;
   color: var(--smoke);
   font-size: 0.82rem;
@@ -273,4 +274,16 @@
 .stretch .check {
   width: 46px;
   flex: none;
+}
+
+.bonus {
+  margin-left: 8px;
+  padding: 1px 8px;
+  color: var(--event-text);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+  background: var(--event-tint);
+  border-radius: var(--r-pill);
 }

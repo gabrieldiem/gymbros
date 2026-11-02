@@ -284,7 +284,14 @@ export const es = {
   goal_gt: '{n} entrenos esta semana, {x} por encima de tu meta.',
   pips_label: '{n} de {target} entrenos esta semana',
   leg_event_name: 'Leg day x2',
-  leg_event_tag: 'Bonus {w} esta semana',
+  leg_event_tag: 'Los sets de piernas pagan el doble',
+  leg_bonus: 'x2',
+  event_kicker: 'Evento por tiempo limitado',
+  event_left: 'Quedan {x}',
+  dur_dh: '{d} d {h} h',
+  dur_hm: '{h} h {m} min',
+  dur_m: '{m} min',
+  rest_start: 'Descanso {x}',
   empty_title: 'Entreno vacío',
   empty_sub: 'Añade ejercicios uno a uno.',
   earn_title: 'Cómo sumas puntos',
@@ -537,6 +544,9 @@ export const es = {
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_rest_timer_title: 'Un temporizador de descanso a tu ritmo',
+  wn_rest_timer_body:
+    'Ya no arranca solo. Toca Descanso cuando quieras, y la pantalla destella cuando toca el siguiente set.',
   wn_stretching_title: 'Estirar ahora paga',
   wn_stretching_body:
     'Añade 5 o 10 minutos a un entreno, o regístralo solo en un día de descanso, por puntos fijos una vez al día. Solo, no cuenta para tu meta semanal.',
@@ -576,10 +586,8 @@ export const es = {
   quest_cardio_d: 'Correr, nadar o remar: todo cuenta.',
   unit_t: '{n} t',
   unit_min: '{n} min',
-  event_title: 'Esta semana: {w}',
-  weather_desc: 'Los sets de piernas dan el doble de puntos hasta el domingo por la noche.',
-  weather_more:
-    'Cada semana la montaña trae algo nuevo. El próximo giro llega el lunes por la mañana.',
+  weather_desc:
+    'Cada set de un ejercicio de piernas paga el doble, en cualquier entreno, hasta el domingo por la noche.',
   weather_cta: 'A hacer leg day',
   bounty_title: 'Recompensa por {name}',
   bounty_body:

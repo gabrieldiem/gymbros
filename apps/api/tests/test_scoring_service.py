@@ -422,6 +422,16 @@ def test_point_values_come_from_the_rules_not_the_code():
     assert result["ln_sets"][1] == 10
 
 
+def test_leg_day_x2_pays_every_leg_exercise_in_any_workout():
+    week = replace(FIRST_OF_WEEK, leg_event_active=True)
+    # No routine at all, and a lunge among presses: what counts is the exercise.
+    result = score(workout(lift("lunge", (20, 10), (20, 10)), lift("bench", (60, 5))), week=week)
+    assert items(result)["ln_leg_event"] == ({"n": 2}, 10)
+    for exercise_id in ("squat", "rdl", "legpress", "legcurl"):
+        one = score(workout(lift(exercise_id, (40, 5))), week=week)
+        assert items(one)["ln_leg_event"] == ({"n": 1}, 5)
+
+
 # --- Stretching ----------------------------------------------------------------------------
 
 

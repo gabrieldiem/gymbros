@@ -15,7 +15,8 @@ type Props = {
   entry: DraftExercise;
   onChange: (sets: SetData[]) => void;
   onRemove: () => void;
-  onSetDone: () => void;
+  /** A timed event pays extra for this exercise. */
+  legBonus?: boolean;
   /** Logging a past day: there's nothing to beat, it already happened. */
   past?: boolean;
   onPlates: (disksKg: number, barKg: number) => void;
@@ -48,7 +49,7 @@ const barChoices = (current: number) =>
     : [...BAR_OPTIONS_KG, current];
 
 export function ExerciseCard(props: Props) {
-  const { exercise, entry, onChange, onRemove, onSetDone, onPlates, past = false } = props;
+  const { exercise, entry, onChange, onRemove, onPlates, past = false, legBonus = false } = props;
   const { t, n } = useI18n();
   const record = useMyStats().data?.prs.find((pr) => pr.exercise_id === exercise.id);
   const [colA, colB] = COLUMNS[exercise.type];
@@ -79,7 +80,6 @@ export function ExerciseCard(props: Props) {
       return { ...s, done: !s.done, ...(emptyBar ? { load_kg: bar, bar_kg: bar } : {}) };
     });
     onChange(next);
-    if (next[index]?.done) onSetDone();
   };
 
   const addSet = () => {
@@ -99,7 +99,10 @@ export function ExerciseCard(props: Props) {
     <article className={styles.card} aria-label={exercise.name}>
       <header className={styles.head}>
         <span className={styles.title}>
-          <h3>{exercise.name}</h3>
+          <h3>
+            {exercise.name}
+            {legBonus && <span className={styles.bonus}>{t('leg_bonus')}</span>}
+          </h3>
           {record && (
             <small className={styles.record}>
               {t('pr_current', {

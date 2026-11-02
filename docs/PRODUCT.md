@@ -12,7 +12,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 |---|---|---|
 | ATUS Climb | ATUS Climb / ATUS Climb | Trail map leaderboard, your standing, weekly goal, "you vs 4 weeks ago", who is training now, rope order list |
 | Crew | Crew / Equipo | Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
-| Train | Train / Entrenar | Pick a routine or empty workout, log sets, rest timer, plate calculator, finish → points breakdown → climb animation |
+| Train | Train / Entrenar | Pick a routine or empty workout, log sets, a rest timer you start when you want, plate calculator, finish → points breakdown → climb animation |
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
 | You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
 
@@ -69,6 +69,10 @@ Alone, it pays only those points. It isn't a workout: it doesn't count towards t
 - **Repeat:** the second column of every row copies the set above it into that row, or that set from last time when the row above is empty. It fills the numbers and leaves the set unchecked.
 - **Remove a row:** the × under the set number removes it. An exercise always keeps one row; to drop it, remove the exercise.
 - **Disks and bar:** on a barbell lift you enter the total weight of the disks, the number shown everywhere you read a barbell lift ("40 kg + bar × 5"). The bar sits beside it and can be 20, 15 or 10 kg, and the row you're on shows the full weight and the kg per side. Points, PRs and badges read the whole weight, bar included, so changing how it's shown changed no scores. Reps with no disks count as the empty bar. Other lifts show plain kg.
+
+## Rest timer
+
+Logging a set doesn't start anything. A button in the logger starts the rest with your length from settings, and it can be adjusted or skipped. At zero the whole screen flashes three slow times and the phone vibrates, so it can be seen from a distance; with reduced motion it's one still screen. There's no rest timer when logging a past workout or stretching alone.
 
 ## Past workouts
 
@@ -135,7 +139,7 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **Crew quest:** the crew climbs 4,000 pts in a week → +200 each. Shown as a stacked bar per person.
 - **Duels:** a 1v1 until Sunday night, by points or by bench volume, with a stake ("Loser buys the protein shakes"). The opponent accepts or declines. The winner gets 150 once the week is over (paid into the new week); a tie pays nobody.
 - **Bounty:** every week the bounty is on the all-time leader; the first member to pass them that week takes 150 (then it's claimed until Monday). Checked after quests and the crew quest, before badges.
-- **Weekly event:** one twist per week. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). It is always on in v1 (`game.weekly_event` in settings.json).
+- **Weekly event:** one twist per week, shown as a timed event with how long it has left until Sunday night. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). Every set of a leg exercise pays the bonus, in any workout, whatever the routine: squat, RDL, leg press, lunge and leg curl (the catalog's Legs group), each marked x2 in the logger and the exercise picker. It is always on in v1 (`game.weekly_event` in settings.json).
 
 ## Badges (18)
 

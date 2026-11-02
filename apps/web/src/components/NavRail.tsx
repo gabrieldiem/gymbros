@@ -4,9 +4,11 @@ import { useActiveWorkout } from '../api/train';
 import { useI18n } from '../i18n/context';
 import { Brand } from './Brand';
 import { cx } from './cx';
+import { HealthStatus } from './HealthStatus';
 import { Icon } from './Icon';
 import styles from './NavRail.module.css';
-import { QUEST_SECTIONS, TABS } from './tabs';
+import { DESKTOP_RAIL, QUEST_SECTIONS, TABS } from './tabs';
+import { useMediaQuery } from './useMediaQuery';
 import { useShareInvite } from './useShareInvite';
 import { useSlidingIndicator } from './useSlidingIndicator';
 
@@ -21,6 +23,7 @@ export function NavRail() {
   const { pathname } = useLocation();
   const training = Boolean(useActiveWorkout().data);
   const shareInvite = useShareInvite();
+  const desktop = useMediaQuery(DESKTOP_RAIL);
   const nav = useSlidingIndicator<HTMLElement>(
     '[data-tab][aria-current="page"]:not([data-primary])',
     `${pathname}:${lang}`,
@@ -68,6 +71,11 @@ export function NavRail() {
           <Icon name="crew" size={20} />
           {t('invite_friends')}
         </button>
+      )}
+      {desktop && (
+        <div className={styles.status}>
+          <HealthStatus />
+        </div>
       )}
     </nav>
   );

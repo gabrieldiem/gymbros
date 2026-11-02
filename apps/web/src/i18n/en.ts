@@ -277,7 +277,14 @@ export const en = {
   goal_gt: '{n} workouts this week, {x} over your goal.',
   pips_label: '{n} of {target} workouts this week',
   leg_event_name: 'Leg day x2',
-  leg_event_tag: '{w} bonus this week',
+  leg_event_tag: 'Leg sets pay double',
+  leg_bonus: 'x2',
+  event_kicker: 'Timed event',
+  event_left: '{x} left',
+  dur_dh: '{d} d {h} h',
+  dur_hm: '{h} h {m} min',
+  dur_m: '{m} min',
+  rest_start: 'Rest {x}',
   empty_title: 'Empty workout',
   empty_sub: 'Add exercises one at a time.',
   earn_title: 'How you earn points',
@@ -530,6 +537,9 @@ export const en = {
   n_whats_new: 'New in GYMBROS: {title}.',
   n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
   n_whats_new_other: 'There’s something new in GYMBROS.',
+  wn_rest_timer_title: 'A rest timer you control',
+  wn_rest_timer_body:
+    'It no longer starts by itself. Tap Rest when you want it, and the screen flashes when it’s time for the next set.',
   wn_stretching_title: 'Stretching pays now',
   wn_stretching_body:
     'Add 5 or 10 minutes to a workout, or log it alone on a rest day, for fixed points once a day. Alone, it doesn’t count towards your weekly goal.',
@@ -569,10 +579,7 @@ export const en = {
   quest_cardio_d: 'Runs, swims and rows all count.',
   unit_t: '{n} t',
   unit_min: '{n} min',
-  event_title: 'This week: {w}',
-  weather_desc: 'Leg sets earn double set points until Sunday night.',
-  weather_more:
-    'Every week the mountain throws something new at the crew. The next one drops Monday morning.',
+  weather_desc: 'Every set of a leg exercise pays double, in any workout, until Sunday night.',
   weather_cta: 'Train legs',
   bounty_title: 'Bounty on {name}',
   bounty_body:

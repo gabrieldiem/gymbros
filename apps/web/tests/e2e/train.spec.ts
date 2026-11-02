@@ -34,6 +34,8 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
   if (!(await reps.inputValue())) await reps.fill('5');
   await bench.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
+  await expect(page.getByRole('timer', { name: 'Rest' })).toHaveCount(0);
+  await page.getByRole('button', { name: /^Rest \d/ }).click();
   await expect(page.getByRole('timer', { name: 'Rest' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     page.viewportSize()?.width,

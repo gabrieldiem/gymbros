@@ -1,10 +1,17 @@
 """The Train flow over HTTP: start, log, live points, finish, overload, PRs, week, discard."""
 
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import func, select
+
+from clock import utc_now
 
 from db.tables.personal_record import PersonalRecord
 from db.tables.point_event import PointEvent
 from tests.application.conftest import register_on
+
+ZONE = ZoneInfo("America/Argentina/Buenos_Aires")
 
 
 def done(load_kg, reps):
@@ -314,3 +321,10 @@ async def test_the_next_session_keeps_your_bar_with_the_overload(client, member)
     assert first["sets"][0]["load_kg"] == 62.5
     assert first["sets"][0]["bar_kg"] == 15
     assert first["previous_sets"][0]["bar_kg"] == 15
+
+
+async def test_the_week_says_when_the_timed_event_ends(client, member):
+    body = (await client.get("/api/workouts/week")).json()
+    ends = datetime.fromisoformat(body["event_ends_at"]).astimezone(ZONE)
+    assert (ends.weekday(), ends.hour, ends.minute) == (0, 0, 0)
+    assert timedelta(0) < ends - utc_now() <= timedelta(days=7)

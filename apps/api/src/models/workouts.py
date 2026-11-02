@@ -115,6 +115,7 @@ class WeekResponse(BaseModel):
     workouts: int
     target: int
     leg_event_active: bool
+    event_ends_at: datetime | None
     past_days: list[PastDayModel]
 
 

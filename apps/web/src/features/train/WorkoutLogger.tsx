@@ -14,7 +14,7 @@ import { formatElapsed } from './format';
 import { PlateCalculator } from './PlateCalculator';
 import { RestTimer } from './RestTimer';
 import { StretchCard } from './StretchCard';
-import { useRestTimer } from './useRestTimer';
+import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
 import { useWorkoutDraft } from './useWorkoutDraft';
 import styles from './WorkoutLogger.module.css';
 
@@ -70,6 +70,7 @@ export function WorkoutLogger(props: Props) {
   const [plates, setPlates] = useState<{ disks: number; bar: number } | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const exerciseById = (id: string) => catalog.exercises.find((e) => e.id === id);
+  const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
   const stretchOnly =
     draft.exercises.length > 0 &&
     draft.exercises.every((e) => exerciseById(e.exercise_id)?.type === 's');
@@ -160,9 +161,7 @@ export function WorkoutLogger(props: Props) {
             onChange={(sets) => setSets(i, sets)}
             onRemove={() => removeExercise(i)}
             past={past !== null}
-            onSetDone={() => {
-              if (!past) rest.start(restSeconds);
-            }}
+            legBonus={legEvent && exercise.group === 'Legs'}
             onPlates={(disks, bar) => setPlates({ disks, bar })}
           />
         );
@@ -185,10 +184,20 @@ export function WorkoutLogger(props: Props) {
         </Button>
       </div>
 
-      <RestTimer rest={rest.rest} leftMs={rest.leftMs} onAdjust={rest.adjust} onSkip={rest.skip} />
+      {!past && !stretchOnly && (
+        <RestTimer
+          rest={rest.rest}
+          leftMs={rest.leftMs}
+          defaultSeconds={restSeconds ?? DEFAULT_REST_S}
+          onStart={() => rest.start(restSeconds)}
+          onAdjust={rest.adjust}
+          onSkip={rest.skip}
+        />
+      )}
       {picking && (
         <ExercisePicker
           exercises={catalog.exercises}
+          legBonus={legEvent}
           onPick={addExercise}
           onClose={() => setPicking(false)}
         />

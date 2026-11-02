@@ -96,6 +96,8 @@ export type Week = {
   workouts: number;
   target: number;
   leg_event_active: boolean;
+  /** When the week's timed event ends, in crew time. */
+  event_ends_at: string | null;
   /** The days a forgotten workout can be logged for, newest first. */
   past_days: PastDay[];
 };

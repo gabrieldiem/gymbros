@@ -24,7 +24,7 @@ from models.workouts import (
 )
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
-from services.training_rules import LoggedSet
+from services.training_rules import LoggedSet, week_end
 from services.workout_finisher import WorkoutFinisher
 from services.workout_service import WorkoutService
 from services.workout_types import ExerciseEntry
@@ -67,11 +67,13 @@ async def get_week(
     settings: Settings = Depends(get_settings),
 ) -> WeekResponse:
     """Workouts finished this crew-local week against the weekly target."""
-    week = await context.week(member, utc_now())
+    now = utc_now()
+    week = await context.week(member, now)
     return WeekResponse(
         workouts=week.workouts_before,
         target=settings.game_weekly_target,
         leg_event_active=week.leg_event_active,
+        event_ends_at=week_end(now, member.crew.time_zone) if week.leg_event_active else None,
         past_days=[
             PastDayModel(day=p.day, workouts=p.workouts) for p in await workouts.past_days(member)
         ],

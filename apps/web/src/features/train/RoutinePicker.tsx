@@ -71,7 +71,7 @@ export function RoutinePicker(props: Props) {
             <h3>{routine.name}</h3>
             <p>{routine.exercise_ids.map(exerciseName).join(', ')}</p>
             {legEvent && hasLegs(routine.exercise_ids) && (
-              <span className={styles.tag}>{t('leg_event_tag', { w: t('leg_event_name') })}</span>
+              <span className={styles.tag}>{t('leg_event_tag')}</span>
             )}
           </button>
         ))}

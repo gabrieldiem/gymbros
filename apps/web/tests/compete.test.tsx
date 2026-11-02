@@ -34,7 +34,7 @@ describe('Quests tab', () => {
     const crew = await screen.findByRole('region', { name: 'Crew climbs 4,000 pts this week' });
     expect(crew).toHaveTextContent('1,345 pts to go.');
     expect(within(crew).getByText(/Maxo 620/)).toBeVisible();
-    expect(screen.getByText('This week: Leg day x2')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Leg day x2' })).toBeVisible();
     expect(screen.getByText(/Maxo leads with 4,310 pts/)).toBeVisible();
     const legs = screen.getByRole('progressbar', { name: 'Leg day, twice' });
     expect(legs).toHaveAttribute('aria-valuenow', '1');

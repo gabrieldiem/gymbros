@@ -246,6 +246,15 @@
     background: var(--plate);
     color: var(--chalk);
   }
+
+  .status {
+    margin-top: auto;
+    padding: 12px 12px 0;
+  }
+
+  .invite + .status {
+    margin-top: 0;
+  }
 }
 
 .link svg {
