@@ -25,19 +25,24 @@ async function shoot(page: Page, name: string, testInfo: TestInfo) {
   await page.screenshot({ path: `${SCREENS}/${name}-${testInfo.project.name}.png` });
 }
 
-test('signed out: welcome and login screens in both languages', async ({ page }, testInfo) => {
+test('signed out: landing and login screens in both languages', async ({ page }, testInfo) => {
   const errors = collectErrors(page);
   await page.goto('/climb');
-  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(page).toHaveURL(/:\d+\/$/);
   await page.getByRole('button', { name: 'EN', exact: true }).click();
   await expect(
     page.getByRole('heading', { level: 1, name: 'Climb with your crew.' }),
   ).toBeVisible();
   await expectNoSidewaysScroll(page);
-  await shoot(page, 'welcome-en', testInfo);
+  await page.waitForTimeout(3200); // the map's intro climb
+  await page.screenshot({
+    path: `${SCREENS}/landing-full-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  await shoot(page, 'landing-en', testInfo);
 
   await page.getByRole('button', { name: 'ES', exact: true }).click();
-  await page.getByRole('link', { name: 'Acceso de desarrollo' }).click();
+  await page.getByRole('link', { name: 'Entrar', exact: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Hola de nuevo' })).toBeVisible();
   await shoot(page, 'login-es', testInfo);
   expect(errors).toEqual([]);
@@ -48,14 +53,14 @@ test('Google button: starts the sign-in in the chosen language', async ({ page }
   await page.route('**/api/auth/options', (route) =>
     route.fulfill({ json: { google: true, dev_login: false } }),
   );
-  await page.goto('/welcome');
+  await page.goto('/');
   await page.getByRole('button', { name: 'ES', exact: true }).click();
   const button = page.getByRole('link', { name: 'Continuar con Google' });
   await expect(button).toHaveAttribute('href', '/api/auth/google/start?lang=es');
   const box = await button.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
   await expectNoSidewaysScroll(page);
-  await shoot(page, 'welcome-google-es', testInfo);
+  await shoot(page, 'landing-google-es', testInfo);
 
   await page.goto('/login?auth_error=google');
   await expect(page.getByRole('alert')).toContainText('Google');
@@ -63,7 +68,7 @@ test('Google button: starts the sign-in in the chosen language', async ({ page }
 });
 
 test('legal pages: public, in Spanish, nothing overflows', async ({ page }, testInfo) => {
-  await page.goto('/welcome');
+  await page.goto('/');
   await page.getByRole('button', { name: 'ES', exact: true }).click();
   await page.getByRole('link', { name: 'Política de privacidad' }).click();
   await expect(page).toHaveURL(/\/privacy$/);
@@ -135,6 +140,6 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await page.getByRole('link', { name: /Your profile/ }).click();
   await page.getByRole('button', { name: 'Settings' }).click();
   await page.getByRole('button', { name: 'Log out' }).click();
-  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(page).toHaveURL(/:\d+\/$/);
   expect(errors).toEqual([]);
 });
