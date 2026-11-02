@@ -39,7 +39,7 @@ resources/    → seed data: exercise catalog, routines, badge and quest definit
 - `services/scoring_service.py` is a **pure** function of (workout, history, week state, settings) → itemized points (`[{key, vars, pts}]`). It has no DB access and no clock. Pass `now` in. This is the most heavily tested file in the repo.
 - Point values come from `settings.json` → `scoring.*`. Never hard-code them.
 - Line items carry an i18n key plus variables, not prose. The web app renders them in the user's language. The same goes for feed events and notifications.
-- Points are computed and stored when a workout is finished: `workouts.points` plus `point_events` rows. Standings are a sum over `point_events`, never a counter that gets edited.
+- Points are computed and stored when a workout is finished: `workouts.points` plus `point_events` rows. Standings are a sum over `point_events`, never a counter that gets edited. Editing a workout replaces that workout's own rows (`services/workout_editor.py`).
 
 ## Migrations must survive a rollback
 

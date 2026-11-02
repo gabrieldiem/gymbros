@@ -170,6 +170,10 @@ class WorkoutService:
         workout.sets = to_rows(entries)
         return await self.view(member, await self._workouts.save(workout))
 
+    def check_exercise(self, exercise_id: str) -> None:
+        """Raises if the catalog doesn't have this exercise."""
+        self._exercise(exercise_id)
+
     async def set_gym(self, member: Member, workout: Workout, name: str | None) -> None:
         """Where this workout is. It keeps the gym's name and place as they are now, so changing
         or deleting the gym later doesn't rewrite what happened."""

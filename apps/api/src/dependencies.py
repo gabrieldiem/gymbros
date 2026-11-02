@@ -73,6 +73,7 @@ from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
 from services.welcome_email import EmailSender
+from services.workout_editor import WorkoutEditor
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
@@ -353,6 +354,27 @@ def get_workout_finisher(
     )
 
 
+def get_workout_editor(
+    session: AsyncSession = DB_SESSION,
+    workouts: WorkoutService = Depends(get_workout_service),
+) -> WorkoutEditor:
+    """FastAPI dependency provider for WorkoutEditor."""
+    return WorkoutEditor(
+        workouts=workouts,
+        climb=build_climb_service(session),
+        workout_rows=WorkoutRepository(session),
+        context=_context(session),
+        records=PersonalRecordRepository(session),
+        events=PointEventRepository(session),
+        feed=FeedRepository(session),
+        catalog=load_catalog(),
+        rules=get_scoring_rules(),
+        bonus=build_bonus_service(session),
+        window=timedelta(days=settings.game_edit_workout_days),
+        now=utc_now,
+    )
+
+
 def get_scoring_context(session: AsyncSession = DB_SESSION) -> ScoringContextBuilder:
     """FastAPI dependency provider for ScoringContextBuilder."""
     return _context(session)
@@ -549,4 +571,5 @@ def get_me_stats_service(session: AsyncSession = DB_SESSION) -> MeStatsService:
         load_catalog(),
         utc_now,
         PointEventRepository(session),
+        timedelta(days=settings.game_edit_workout_days),
     )

@@ -30,12 +30,17 @@ class ScoringContextBuilder:
         self._weekly_target = weekly_target
         self._weekly_event = weekly_event
 
-    async def history(self, member: Member, workout: Workout, moment: datetime) -> History:
-        """Stored PRs, the previous session of the same routine, and that day's stretching."""
+    async def history(
+        self, member: Member, workout: Workout, moment: datetime, before: datetime | None = None
+    ) -> History:
+        """Stored PRs, the previous session of the same routine, and that day's stretching.
+
+        `before` limits the previous session to one finished before then. A past day is limited
+        to its own date anyway.
+        """
         volume, effort = None, 0.0
         if workout.routine_id:
-            before = None
-            if workout.performed_on:
+            if before is None and workout.performed_on:
                 before = local_noon(workout.performed_on, member.crew.time_zone)
             volume, effort = await self._workouts.previous_routine_work(
                 member.user.id, workout.routine_id, before

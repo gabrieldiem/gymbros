@@ -166,6 +166,7 @@ def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
         line_items=[
             LineItemModel(key=e.key, vars=e.vars, points=e.points) for e in detail.line_items
         ],
+        editable_until=detail.editable_until,
     )
 
 

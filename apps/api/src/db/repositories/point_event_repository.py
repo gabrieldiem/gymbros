@@ -1,9 +1,9 @@
 """SQL for point events."""
 
 import uuid
-from datetime import date
+from datetime import date, datetime
 
-from sqlalchemy import func, select, text
+from sqlalchemy import delete, func, select, text
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,7 +11,8 @@ from db.tables.point_event import PointEvent
 
 
 class PointEventRepository:
-    """Appends to `point_events` and sums it. Rows are never edited."""
+    """Appends to `point_events` and sums it. Rows are never edited: changing a workout replaces
+    its rows whole."""
 
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
@@ -37,6 +38,21 @@ class PointEventRepository:
             select(PointEvent).where(PointEvent.workout_id == workout_id).order_by(PointEvent.id)
         )
         return list(result.scalars())
+
+    async def delete_for_workout(self, workout_id: uuid.UUID) -> None:
+        """Remove what a workout paid, to replace it."""
+        await self._session.execute(delete(PointEvent).where(PointEvent.workout_id == workout_id))
+
+    async def logged_times(self, workout_ids: list[uuid.UUID]) -> dict[uuid.UUID, datetime]:
+        """When each workout's points first arrived, which is when it was logged."""
+        if not workout_ids:
+            return {}
+        result = await self._session.execute(
+            select(PointEvent.workout_id, func.min(PointEvent.created_at))
+            .where(PointEvent.workout_id.in_(workout_ids))
+            .group_by(PointEvent.workout_id)
+        )
+        return {workout_id: at for workout_id, at in result.all() if workout_id is not None}
 
     async def add_all(self, events: list[PointEvent]) -> None:
         """Insert the events."""

@@ -191,6 +191,7 @@ class WorkoutDetailResponse(BaseModel):
     volume_kg: float
     exercises: list[WorkoutDetailExercise]
     line_items: list[LineItemModel]
+    editable_until: datetime | None = None
 
 
 class MeStatsResponse(BaseModel):

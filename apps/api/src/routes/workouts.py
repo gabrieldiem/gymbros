@@ -6,6 +6,8 @@ from fastapi import APIRouter, Depends, Request, Response, status
 
 from clock import utc_now
 from dependencies import (
+    get_me_stats_service,
+    get_workout_editor,
     get_current_member,
     get_gym_service,
     get_scoring_context,
@@ -14,6 +16,8 @@ from dependencies import (
     get_workout_photo_service,
     get_workout_service,
 )
+from models.compete import WorkoutDetailResponse
+from models.compete_mappers import to_workout_detail
 from models.errors import error_responses
 from models.photos import PhotoResponse, photo_url
 from models.workout_mappers import to_finish_response, to_workout_response, to_workout_template
@@ -30,9 +34,11 @@ from models.workouts import (
 from routes.uploads import read_upload
 from services.gym_service import GymService
 from services.images import MAX_PHOTO_BYTES
+from services.me_stats_service import MeStatsService
 from services.member import Member
 from services.scoring_context import ScoringContextBuilder
 from services.training_rules import LoggedSet, week_end
+from services.workout_editor import WorkoutChanges, WorkoutEditor
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
@@ -212,6 +218,29 @@ async def sync_workout(
         ),
     )
     return to_finish_response(await finisher.sync(member, logged), settings.game_weekly_target)
+
+
+@router.put(
+    "/{workout_id}/edit",
+    response_model=WorkoutDetailResponse,
+    responses=error_responses(401, 403, 404, 409),
+)
+async def edit_workout(
+    workout_id: uuid.UUID,
+    body: SaveWorkoutRequest,
+    member: Member = Depends(get_current_member),
+    editor: WorkoutEditor = Depends(get_workout_editor),
+    stats: MeStatsService = Depends(get_me_stats_service),
+) -> WorkoutDetailResponse:
+    """Change a finished workout, within the time allowed, and rescore it."""
+    entries = tuple(
+        ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+        for e in body.exercises
+    )
+    change_gym = "gym" in body.model_fields_set
+    changes = WorkoutChanges(body.name, entries, change_gym, body.gym)
+    await editor.edit(member, workout_id, changes)
+    return to_workout_detail(await stats.workout_detail(member, workout_id))
 
 
 @router.post(

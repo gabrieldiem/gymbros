@@ -149,6 +149,10 @@ class WorkoutAlreadyFinished(DomainError):
     """The workout is finished and can't change."""
 
 
+class WorkoutEditExpired(DomainError):
+    """The time for changing this workout has passed."""
+
+
 class WorkoutEmpty(DomainError):
     """A workout needs at least one completed set to be finished."""
 

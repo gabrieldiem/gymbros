@@ -24,6 +24,14 @@ class FeedRepository:
         await self._session.flush()
         return item
 
+    async def workout_post(self, workout_id: uuid.UUID) -> FeedItem | None:
+        """The post a finished workout made."""
+        return await self._session.scalar(
+            select(FeedItem)
+            .where(FeedItem.workout_id == workout_id, FeedItem.kind == "workout")
+            .limit(1)
+        )
+
     async def get(self, item_id: uuid.UUID) -> FeedItem | None:
         """The feed item, if any."""
         return await self._session.get(FeedItem, item_id)

@@ -33,6 +33,14 @@ from services.workout_types import FinishedWorkout, LoggedOffline
 _MAX_AGE = timedelta(days=7)
 
 
+def nothing_to_pay(log: WorkoutLog, workout_id: uuid.UUID) -> DomainError:
+    """Why a workout that scored nothing can't be kept."""
+    stretched = any(
+        is_completed(e.exercise, s) for e in log.exercises if e.exercise.is_stretch for s in e.sets
+    )
+    return (StretchingAlreadyLogged if stretched else WorkoutEmpty)(str(workout_id))
+
+
 class WorkoutFinisher:
     # The one place that ties finishing together, so it holds every collaborator.
     # pylint: disable=too-many-instance-attributes
@@ -125,7 +133,7 @@ class WorkoutFinisher:
         log = to_workout_log(workout, self._catalog)
         score = score_workout(log, history, week, self._rules)
         if not score.line_items:
-            raise self._nothing_to_pay(log, workout_id)
+            raise nothing_to_pay(log, workout_id)
         before = await self._climb.totals(member)
         await self._close(member, workout, score, moment)
         bonus: list[LineItem] = []
@@ -144,16 +152,6 @@ class WorkoutFinisher:
         if self._activity is not None:
             await self._activity.workout_finished(member, finished)
         return finished
-
-    @staticmethod
-    def _nothing_to_pay(log: WorkoutLog, workout_id: uuid.UUID) -> DomainError:
-        stretched = any(
-            is_completed(e.exercise, s)
-            for e in log.exercises
-            if e.exercise.is_stretch
-            for s in e.sets
-        )
-        return (StretchingAlreadyLogged if stretched else WorkoutEmpty)(str(workout_id))
 
     async def _close(
         self, member: Member, workout: Workout, score: ScoreResult, moment: datetime
