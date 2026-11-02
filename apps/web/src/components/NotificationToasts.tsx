@@ -5,7 +5,10 @@ import { notificationText } from '../features/crew/format';
 import { useI18n } from '../i18n/context';
 import { useToast } from './toast';
 
-/** Toast the newest notification that arrived since the last poll (not the ones at startup). */
+/**
+ * Toast the newest notification that arrived since the last poll (not the ones at startup).
+ * What's new stays quiet: it waits in the inbox, because it's never urgent.
+ */
 export function NotificationToasts() {
   const { t } = useI18n();
   const showToast = useToast();
@@ -18,7 +21,9 @@ export function NotificationToasts() {
       seen.current = new Set(items.map((n) => n.id));
       return;
     }
-    const fresh = items.filter((n) => !n.read && !seen.current?.has(n.id));
+    const fresh = items.filter(
+      (n) => !n.read && n.key !== 'n_whats_new' && !seen.current?.has(n.id),
+    );
     items.forEach((n) => seen.current?.add(n.id));
     const newest = fresh[0];
     if (newest) showToast(notificationText(newest, t), { alert: newest.key === 'n_passed' });

@@ -59,6 +59,7 @@ from services.welcome_email import EmailSender
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
 from services.workout_service import WorkoutService
+from services.whats_new import load_whats_new
 from settings import Settings
 
 settings: Settings = Settings.get_settings()
@@ -308,6 +309,7 @@ def get_inbox_service(session: AsyncSession = Depends(get_session)) -> InboxServ
         UserRepository(session),
         utc_now,
         keep_days=settings.social_notification_days,
+        whats_new=load_whats_new(),
     )
 
 

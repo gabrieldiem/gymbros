@@ -41,7 +41,8 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
     '/quests',
     '/quests/achievements',
     '/quests/points',
-    '/me',
+    '/whats-new',
+    '/me', // last: the settings sheet below opens from here
   ]) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

@@ -2,6 +2,7 @@ import type { Exercise } from '../../api/train';
 import type { Notification, PostedSet } from '../../api/social';
 import type { MessageKey } from '../../i18n/en';
 import type { Vars } from '../../i18n/translate';
+import { WHATS_NEW_COPY } from '../whatsnew/whatsNewCopy';
 
 type T = (key: MessageKey, vars?: Vars) => string;
 type N = (value: number) => string;
@@ -16,6 +17,13 @@ export function formatPostedSet(exercise: Exercise | undefined, set: PostedSet, 
 
 const REACTION_EMOJI: Record<string, string> = { fist: '👊', fire: '🔥' };
 
+function whatsNewText(item: Notification, t: T): string {
+  const count = Number(item.vars.n);
+  if (count > 1) return t('n_whats_new_many', { n: count });
+  const copy = WHATS_NEW_COPY[String(item.vars.feature)];
+  return copy ? t('n_whats_new', { title: t(copy.title) }) : t('n_whats_new_other');
+}
+
 /** A notification (key + vars from the API) as copy in the current language. */
 export function notificationText(item: Notification, t: T): string {
   const vars = item.vars;
@@ -25,6 +33,8 @@ export function notificationText(item: Notification, t: T): string {
         name: String(vars.name),
         emoji: REACTION_EMOJI[String(vars.kind)] ?? '👊',
       });
+    case 'n_whats_new':
+      return whatsNewText(item, t);
     case 'n_passed':
     case 'n_behind':
     case 'n_goal':

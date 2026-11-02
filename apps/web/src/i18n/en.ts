@@ -491,6 +491,22 @@ export const en = {
   n_goal: '{name} hit the weekly goal: {n} of {n}.',
   n_nudge: '{name} nudged you. Time to train.',
   n_unknown: 'Something happened in your crew.',
+  whats_new: 'What’s new',
+  whats_new_sub: 'What we’ve added to GYMBROS lately.',
+  whats_new_try: 'Try it',
+  whats_new_failed: 'Couldn’t load what’s new.',
+  n_whats_new: 'New in GYMBROS: {title}.',
+  n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
+  n_whats_new_other: 'There’s something new in GYMBROS.',
+  wn_past_workouts_title: 'Log a past workout',
+  wn_past_workouts_body:
+    'Forgot to log one? Add it from Train for any of the last 7 days. It counts for that day, so your streak stays safe.',
+  wn_achievements_menu_title: 'Achievements and points, one tap away',
+  wn_achievements_menu_body:
+    'See how close you are to each achievement and what every task pays, right from the menu.',
+  wn_runs_and_swims_title: 'Runs and swims score too',
+  wn_runs_and_swims_body:
+    'An hour of any sport pays about the same. Log your time and distance: going further pays more.',
   sets_1: '1 set',
   just_now: 'just now',
   quests_title: 'Quests',

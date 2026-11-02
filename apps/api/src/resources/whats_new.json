@@ -1,0 +1,7 @@
+{
+  "entries": [
+    { "id": "past-workouts", "date": "2026-11-02", "link": "/train" },
+    { "id": "achievements-menu", "date": "2026-11-02", "link": "/quests/achievements" },
+    { "id": "runs-and-swims", "date": "2026-11-02", "link": "/quests/points" }
+  ]
+}

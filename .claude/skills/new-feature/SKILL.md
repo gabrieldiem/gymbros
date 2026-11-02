@@ -39,6 +39,7 @@ Commit after each numbered block once it's verified. Don't wait until the end.
 
 ## 5. Verify and wrap up
 
+- [ ] If members can see it, announce it: add an entry at the top of `apps/api/src/resources/whats_new.json` (id, today's date, the screen to try it on) and its `wn_*` copy in `en.ts`, `es.ts` and `features/whatsnew/whatsNewCopy.ts`. Skip fixes and internal changes: every entry is a notification.
 - [ ] `run-stack` skill: tests, lint, build, screenshots at 390×844 and 1440×900 in EN and ES.
 - [ ] Update `docs/PRODUCT.md` if a rule changed, `docs/GLOSSARY.md` for new terms, and the Architecture section of `CLAUDE.md` if the shape changed.
 - [ ] Out-of-scope findings go to `BACKLOG.md`.

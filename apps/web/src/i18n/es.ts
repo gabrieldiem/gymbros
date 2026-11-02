@@ -498,6 +498,22 @@ export const es = {
   n_goal: '{name} cumplió la meta semanal: {n} de {n}.',
   n_nudge: '{name} te dio un toque. Toca entrenar.',
   n_unknown: 'Pasó algo en tu equipo.',
+  whats_new: 'Novedades',
+  whats_new_sub: 'Lo último que añadimos a GYMBROS.',
+  whats_new_try: 'Probarlo',
+  whats_new_failed: 'No se pudieron cargar las novedades.',
+  n_whats_new: 'Nuevo en GYMBROS: {title}.',
+  n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
+  n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
+  wn_past_workouts_title: 'Registra un entreno pasado',
+  wn_past_workouts_body:
+    '¿Se te olvidó registrar uno? Añádelo desde Entrenar, para cualquiera de los últimos 7 días. Cuenta para ese día, así que tu racha sigue a salvo.',
+  wn_achievements_menu_title: 'Logros y puntos, a un toque',
+  wn_achievements_menu_body:
+    'Mira cuánto te falta para cada logro y cuánto paga cada tarea, desde el menú.',
+  wn_runs_and_swims_title: 'Correr y nadar también puntúan',
+  wn_runs_and_swims_body:
+    'Una hora de cualquier deporte paga más o menos lo mismo. Registra tu tiempo y distancia: cuanto más lejos, más puntos.',
   sets_1: '1 set',
   just_now: 'ahora mismo',
   quests_title: 'Retos',

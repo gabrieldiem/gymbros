@@ -101,6 +101,14 @@ export function ProfileMenu() {
           >
             {t('nav_points')}
           </Link>
+          <Link
+            to="/whats-new"
+            role="menuitem"
+            className={styles.item}
+            onClick={() => setOpen(false)}
+          >
+            {t('whats_new')}
+          </Link>
           <button
             type="button"
             role="menuitem"

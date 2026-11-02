@@ -113,6 +113,7 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **Reactions:** 👊 and 🔥 (toggle), comments with quick replies.
 - **Notifications** (inbox + toast): someone passed you, someone close behind and training now, new bounty, weekly recap ready, reactions, replies, duel accepted, goal hit.
 - **Training now:** live "who's at the gym" chips with their current activity.
+- **What's new:** when a feature ships, members hear about it once, as one bell notification that opens the What's new page (also in the profile menu). Several features since your last visit roll into one notification. It never toasts, pops up or emails, and it isn't sent to someone who joined after the feature came out.
 - **Weekly recap:** story-style slides (crew total, biggest climber, heaviest PR, your week, most improved, this week's event). This is the one place where the bold, loud visual treatment is allowed.
 
 ## Competition mechanics

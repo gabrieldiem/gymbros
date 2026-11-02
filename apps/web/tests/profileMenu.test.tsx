@@ -20,6 +20,7 @@ describe('Profile menu', () => {
       'Your profile',
       'Achievements',
       'Points',
+      'What’s new',
       'Settings',
       'Invite friends',
       'Log out',

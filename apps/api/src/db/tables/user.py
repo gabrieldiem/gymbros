@@ -24,4 +24,6 @@ class User(Base):  # pylint: disable=too-few-public-methods
     color: Mapped[str] = mapped_column(String(16))
     language: Mapped[str] = mapped_column(String(2))
     rest_seconds: Mapped[int] = mapped_column(Integer, default=90, server_default="90")
+    # The newest what's new entry this account was told about.
+    whats_new_seen: Mapped[str | None] = mapped_column(String(40))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
