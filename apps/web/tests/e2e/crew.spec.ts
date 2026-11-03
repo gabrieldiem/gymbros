@@ -64,8 +64,9 @@ test('react with any emoji from the real picker, and answer with a picture', asy
   page.on('request', (r) => {
     if (r.url().includes('jsdelivr')) outside.push(r.url());
   });
-  await sheet.getByRole('searchbox').fill('rocket');
-  const cell = sheet.getByRole('gridcell', { name: /^rocket$/i });
+  // With a typo: the search forgives it.
+  await sheet.getByRole('searchbox').fill('rockt');
+  const cell = sheet.getByRole('button', { name: /^rocket$/i });
   // A mouse can read the name first. A finger has no hover: a tap just picks it.
   if (testInfo.project.name === 'desktop') {
     await cell.hover();
@@ -79,7 +80,9 @@ test('react with any emoji from the real picker, and answer with a picture', asy
   await page.screenshot({ path: `${SCREENS}/emoji-${testInfo.project.name}.png` });
   if (testInfo.project.name === 'desktop') {
     await rocket.hover();
-    await expect(post.getByRole('tooltip').filter({ hasText: 'Rocket' })).toBeVisible();
+    const tip = post.getByRole('tooltip').filter({ hasText: 'Rocket' });
+    await expect(tip).toBeVisible();
+    await expect(tip).toContainText('You');
     await page.screenshot({ path: `${SCREENS}/emoji-name-pill.png` });
   }
   await rocket.click(); // put it back

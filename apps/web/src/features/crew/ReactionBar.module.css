@@ -59,13 +59,22 @@
   padding: 5px 10px;
   color: var(--chalk);
   font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.35;
   pointer-events: none;
   background: var(--iron);
   border: 1px solid var(--steel);
   border-radius: var(--r-control-sm);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tip b {
+  display: block;
+  font-weight: 700;
+}
+
+.tip span {
+  display: block;
+  color: var(--smoke);
 }
 
 .withTip:has(.pill:focus-visible) .tip {

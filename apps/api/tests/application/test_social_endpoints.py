@@ -136,7 +136,7 @@ async def test_reactions_toggle_and_notify_the_owner(client, member, other_clien
     on = await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fire"})
     assert on.json()["fire"] == 1
     assert on.json()["mine"] == ["fire"]
-    assert on.json()["emoji"] == [{"emoji": "🔥", "count": 1, "mine": True}]
+    assert on.json()["emoji"] == [{"emoji": "🔥", "count": 1, "mine": True, "names": []}]
     off = await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fire"})
     assert off.json() == {"fist": 0, "fire": 0, "mine": [], "emoji": []}
     assert (await keys(client)).count("n_react") == 1
@@ -150,7 +150,7 @@ async def test_you_can_react_to_your_own_post_without_being_told_about_it(client
     item_id = (await client.get("/api/feed")).json()["items"][-1]["id"]
     response = await client.post(f"/api/feed/{item_id}/reactions", json={"kind": "😂"})
     assert response.status_code == 200
-    assert response.json()["emoji"] == [{"emoji": "😂", "count": 1, "mine": True}]
+    assert response.json()["emoji"] == [{"emoji": "😂", "count": 1, "mine": True, "names": []}]
     assert (await client.get("/api/notifications")).json()["unread"] == 0
 
 
@@ -392,7 +392,7 @@ async def test_the_first_two_are_the_same_whichever_way_they_are_sent(
     url = f"/api/feed/{item_id}/reactions"
     body = (await other_client.post(url, json={"kind": "fist"})).json()
     assert body["fist"] == 1
-    assert body["emoji"] == [{"emoji": "👊", "count": 1, "mine": True}]
+    assert body["emoji"] == [{"emoji": "👊", "count": 1, "mine": True, "names": []}]
     assert (await other_client.post(url, json={"kind": "👊"})).json()["fist"] == 0
 
 
@@ -423,7 +423,9 @@ async def test_comments_take_reactions_too(client, other_client, crew, member):
     url = f"/api/feed/comments/{comment['id']}/reactions"
     assert (await other_client.post(url, json={"kind": "😂"})).status_code == 200
     item = (await client.get("/api/feed")).json()["items"][0]
-    assert item["comments"][0]["reactions"]["emoji"] == [{"emoji": "😂", "count": 1, "mine": False}]
+    assert item["comments"][0]["reactions"]["emoji"] == [
+        {"emoji": "😂", "count": 1, "mine": False, "names": ["Maxo"]}
+    ]
     inbox = (await client.get("/api/notifications")).json()["items"]
     assert "n_comment_react" in [n["key"] for n in inbox]
     assert (await other_client.post(url, json={"kind": "😂"})).json()["emoji"] == []
@@ -495,3 +497,22 @@ async def test_a_picture_answer_has_to_be_a_picture(client, member):
     item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
     assert (await _answer_with(client, item_id, b"not a picture")).status_code == 415
     assert (await client.get("/api/feed")).json()["items"][0]["comments"] == []
+
+
+async def test_a_reaction_says_who_else_used_it_oldest_first(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    url = f"/api/feed/{item_id}/reactions"
+    await other_client.post(url, json={"kind": "🔥"})
+    mine = (await client.post(url, json={"kind": "🔥"})).json()["emoji"]
+    assert mine == [{"emoji": "🔥", "count": 2, "mine": True, "names": ["Maxo"]}]
+    theirs = (await other_client.get("/api/feed")).json()["items"][0]["reactions"]["emoji"]
+    assert theirs == [{"emoji": "🔥", "count": 2, "mine": True, "names": ["Gabi"]}]
+
+
+async def test_a_comment_reaction_says_who_used_it_too(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    comment = (await client.post(f"/api/feed/{item_id}/comments", json={"body": "Hi"})).json()
+    url = f"/api/feed/comments/{comment['id']}/reactions"
+    await other_client.post(url, json={"kind": "😂"})
+    body = (await client.post(url, json={"kind": "😂"})).json()
+    assert body["emoji"] == [{"emoji": "😂", "count": 2, "mine": True, "names": ["Maxo"]}]

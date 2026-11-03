@@ -6,6 +6,32 @@
   height: min(420px, 60dvh);
 }
 
+/* Browsing or searching, the same space, so the sheet doesn't jump between them. */
+.browse {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.results .emoji {
+  width: 100%;
+}
+
+.results .emoji:hover,
+.results .emoji:focus-visible {
+  background: var(--steel);
+}
+
 .search {
   width: 100%;
   min-height: var(--touch);
@@ -19,6 +45,8 @@
 .viewport {
   position: relative;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   outline: none;
 }
 

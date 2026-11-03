@@ -17,7 +17,13 @@ export type Actor = {
   avatar_url?: string | null;
   color: CrewColor;
 };
-export type EmojiCount = { emoji: string; count: number; mine: boolean };
+export type EmojiCount = {
+  emoji: string;
+  count: number;
+  mine: boolean;
+  /** Who else used it, oldest first. */
+  names?: string[];
+};
 export type Reactions = { emoji: EmojiCount[] };
 export type QuickReply = 'q_light' | 'q_beast' | 'q_form' | 'q_six' | 'q_spot' | 'q_respect';
 export const QUICK_REPLIES: QuickReply[] = [

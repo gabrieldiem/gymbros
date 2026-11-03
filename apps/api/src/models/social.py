@@ -30,6 +30,8 @@ class EmojiCountModel(BaseModel):
     emoji: str
     count: int
     mine: bool
+    # Who else used it, oldest first. You're in `mine`.
+    names: list[str] = []
 
 
 class ReactionsModel(BaseModel):
