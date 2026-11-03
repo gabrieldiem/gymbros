@@ -53,6 +53,14 @@ export type PostedSet = {
   km: number | null;
 };
 
+export type StepsPostVars = {
+  steps: number;
+  points: number;
+  days: number;
+  start_date: string;
+  end_date: string;
+};
+
 export type WorkoutPostVars = {
   name: string;
   gym?: string | null;

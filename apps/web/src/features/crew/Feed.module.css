@@ -255,3 +255,14 @@ button[aria-pressed='true'] > .emoji {
   align-items: center;
   gap: 6px;
 }
+
+.stepsTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepsTitle svg {
+  flex: none;
+  color: var(--smoke);
+}

@@ -38,6 +38,8 @@ describe('static legal pages', () => {
     ['server logs', 'including your IP address'],
     ['workout photos and gyms', 'where they are if you put them on the map, a photo of a workout'],
     ['the map provider', 'OpenStreetMap (receives what you search for'],
+    ['steps, and that the crew sees them', 'the steps you log'],
+    ['who sees steps', 'workouts, steps,'],
     ['what a picture loses', 'removes their metadata'],
     ['the weekly digest and how to stop it', 'a weekly digest of your week'],
     ['what Resend receives', 'what’s in each email'],

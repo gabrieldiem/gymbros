@@ -93,7 +93,6 @@ async def test_the_cap_is_enforced_by_the_server(client, member):
 async def test_steps_arent_a_workout(client, member):
     await log(client, steps=20_000)
     assert (await client.get("/api/workouts/week")).json()["workouts"] == 0
-    assert (await client.get("/api/feed")).json()["items"] == []
     stats = (await client.get("/api/me/stats")).json()
     assert stats["workouts_total"] == 0
 
@@ -177,3 +176,66 @@ async def test_another_crew_doesnt_see_it(client, other_client, member, db_sessi
 
 async def test_it_needs_signing_in(other_client):
     assert (await other_client.get("/api/steps")).status_code == 401
+
+
+async def test_the_crew_sees_it_on_the_feed(client, other_client, crew, member):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    await log(client, start=2, end=0, steps=30_000)
+    [post] = (await other_client.get("/api/feed")).json()["items"]
+    assert post["kind"] == "steps"
+    assert post["actor"]["display_name"] == "Gabi"
+    assert post["is_mine"] is False
+    assert post["vars"] == {
+        "steps": 30_000,
+        "points": 120,
+        "days": 3,
+        "start_date": ago(2),
+        "end_date": ago(0),
+    }
+
+
+async def test_the_crew_can_react_and_comment_on_it(client, other_client, crew, member):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    await log(client)
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    assert (
+        await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "🔥"})
+    ).status_code == 200
+    assert (
+        await other_client.post(f"/api/feed/{item_id}/comments", json={"body": "Nice walk"})
+    ).status_code == 201
+    inbox = (await client.get("/api/notifications")).json()["items"]
+    assert {n["vars"].get("item") for n in inbox if n["key"] in ("n_react", "n_comment")} == {
+        "steps"
+    }
+
+
+async def test_logging_steps_tells_nobody(client, other_client, crew, member):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    await log(client)
+    assert (await other_client.get("/api/notifications")).json()["unread"] == 0
+
+
+async def test_taking_it_back_takes_the_post_and_whats_under_it(client, other_client, crew, member):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    entry = (await log(client)).json()
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    await other_client.post(f"/api/feed/{item_id}/comments", json={"body": "Nice walk"})
+    assert (await client.delete(f"/api/steps/{entry['id']}")).status_code == 204
+    assert (await client.get("/api/feed")).json()["items"] == []
+
+
+async def test_a_refused_entry_posts_nothing(client, member):
+    await log(client)
+    assert (await log(client)).status_code == 409
+    assert len((await client.get("/api/feed")).json()["items"]) == 1
+
+
+async def test_another_crew_doesnt_see_the_post(client, other_client, member, db_session):
+    from db.repositories.crew_repository import CrewRepository
+    from services.crew_service import CrewService
+
+    await log(client)
+    await CrewService(CrewRepository(db_session)).create("Other", "UTC", "OTHERCREW")
+    await register_on(other_client, "stranger@example.com", "OTHERCREW")
+    assert (await other_client.get("/api/feed")).json()["items"] == []

@@ -8,8 +8,10 @@ from typing import Literal
 from zoneinfo import ZoneInfo
 
 from db.repositories.crew_repository import CrewRepository
+from db.repositories.feed_repository import FeedRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.step_repository import StepRepository
+from db.tables.feed_item import FeedItem
 from db.tables.point_event import PointEvent
 from db.tables.step_entry import StepEntry
 from db.tables.user import User
@@ -91,12 +93,14 @@ class StepsService:
         steps: StepRepository,
         events: PointEventRepository,
         crews: CrewRepository,
+        feed: FeedRepository,
         rules: StepRules,
         now: Callable[[], datetime],
     ) -> None:
         self._steps = steps
         self._events = events
         self._crews = crews
+        self._feed = feed
         self._rules = rules
         self._now = now
 
@@ -134,7 +138,27 @@ class StepsService:
             )
         )
         await self._pay(member, entry, days, now)
+        await self._post(member, entry, len(days), now)
         return entry
+
+    async def _post(self, member: Member, entry: StepEntry, days: int, now: datetime) -> None:
+        """The crew sees it, with nobody notified: a step count isn't worth a ping."""
+        await self._feed.add(
+            FeedItem(
+                crew_id=member.crew.id,
+                actor_id=member.user.id,
+                kind="steps",
+                step_entry_id=entry.id,
+                vars={
+                    "steps": entry.steps,
+                    "points": entry.points,
+                    "days": days,
+                    "start_date": entry.start_date.isoformat(),
+                    "end_date": entry.end_date.isoformat(),
+                },
+                created_at=now,
+            )
+        )
 
     async def _pay(
         self, member: Member, entry: StepEntry, days: tuple[date, ...], now: datetime

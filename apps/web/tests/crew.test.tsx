@@ -6,6 +6,7 @@ import { inboxKey, type Inbox } from '../src/api/social';
 import { FEED, HOF, INBOX, WORKOUT_POST } from './crewFixtures';
 import { makeMe, mockApi, renderApp } from './renderApp';
 import { CATALOG } from './trainFixtures';
+import { notificationText } from '../src/features/crew/format';
 
 function crewApi(extra: Parameters<typeof mockApi>[0] = {}) {
   return mockApi({
@@ -176,5 +177,64 @@ describe('Notifications', () => {
     await waitFor(() => expect(client.getQueryData(inboxKey)).toBeDefined());
     act(() => client.setQueryData<Inbox>(inboxKey, INBOX));
     expect(await screen.findByText('Maxo passed you on ATUS Climb. Go get it back.')).toBeVisible();
+  });
+});
+
+describe('Steps on the feed', () => {
+  const STEPS_POST = {
+    ...WORKOUT_POST,
+    id: 's1',
+    kind: 'steps',
+    photo_url: null,
+    comments: [],
+    vars: { steps: 30000, points: 120, days: 3, start_date: '2026-11-01', end_date: '2026-11-03' },
+  };
+  const open = (post: object, routes = {}) => {
+    const fetchMock = crewApi({ 'GET /api/feed': [200, { ...FEED, items: [post] }], ...routes });
+    renderApp('/crew');
+    return fetchMock;
+  };
+
+  it('shows who, how many, which days and what it paid', async () => {
+    open(STEPS_POST);
+    const title = await screen.findByRole('heading', { name: '30,000 steps' });
+    const post = title.closest('li') as HTMLElement;
+    expect(post).toHaveTextContent('+120');
+    expect(post).toHaveTextContent(/3 days/);
+    expect(post).toHaveTextContent(WORKOUT_POST.actor.display_name);
+  });
+
+  it('says a single day plainly', async () => {
+    open({
+      ...STEPS_POST,
+      vars: { steps: 9000, points: 36, days: 1, start_date: '2026-11-03', end_date: '2026-11-03' },
+    });
+    const title = await screen.findByRole('heading', { name: '9,000 steps' });
+    expect(title.closest('li')).not.toHaveTextContent(/days/);
+  });
+
+  it('can be reacted to and commented on, like any post', async () => {
+    const fetchMock = open(STEPS_POST, {
+      'POST /api/feed/s1/reactions': [200, { emoji: [{ emoji: '🔥', count: 1, mine: true }] }],
+    });
+    const post = (await screen.findByRole('heading', { name: '30,000 steps' })).closest(
+      'li',
+    ) as HTMLElement;
+    await userEvent.click(within(post).getByRole('button', { name: /^Fire/ }));
+    expect(lastBody(fetchMock, '/api/feed/s1/reactions')).toEqual({ kind: '🔥' });
+    await userEvent.click(within(post).getByRole('button', { name: /comments?$/i }));
+    expect(within(post).getByRole('textbox')).toBeVisible();
+  });
+});
+
+describe('Notifications about steps', () => {
+  const text = (key: string, vars: object) =>
+    notificationText({ key, vars } as never, (k, v) => `${k}:${JSON.stringify(v)}`);
+
+  it('don’t call them a workout', () => {
+    expect(text('n_comment', { name: 'Maxo', item: 'steps' })).toContain('n_comment_steps');
+    expect(text('n_react', { name: 'Maxo', kind: '🔥', item: 'steps' })).toContain('n_react_steps');
+    expect(text('n_comment', { name: 'Maxo', item: 'workout' })).toContain('n_comment:');
+    expect(text('n_react', { name: 'Maxo', kind: '🔥', item: 'workout' })).toContain('n_react:');
   });
 });
