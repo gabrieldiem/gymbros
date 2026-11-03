@@ -321,3 +321,41 @@ test('edit a finished workout: new points, a refused edit changes nothing', asyn
   expect(lines.same).toBe(true);
   expect(lines.total[1]).toBe(lines.total[0]);
 });
+
+test('log steps on the real calendar and climb by them', async ({ page }, testInfo) => {
+  await logIn(page, 'jose', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  const discard = page.getByRole('button', { name: 'Discard', exact: true });
+  if (await discard.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await discard.click();
+    await page.getByRole('button', { name: 'Discard workout' }).click();
+  }
+  await page.getByRole('link', { name: /^Steps/ }).click();
+  await expect(page).toHaveURL(/\/steps$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
+  await expect(page.locator('svg text', { hasText: /steps$/ }).first()).toBeVisible();
+  const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  const serious = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
+  expect(serious.map((v) => `${v.id} ${v.nodes[0]?.target.join(' ')}`)).toEqual([]);
+
+  // A period on the real calendar: two taps.
+  const days = page.locator('table[role="grid"] button:not([disabled])');
+  await expect(days.first()).toBeVisible();
+  const count = await days.count();
+  await days.nth(count - 3).click();
+  await days.nth(count - 1).click();
+  await expect(page.getByRole('status').filter({ hasText: /3 days/ })).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/steps-${testInfo.project.name}.png`, fullPage: true });
+  await page.getByLabel('Steps in total').fill('30000');
+  await page.getByRole('button', { name: 'Save steps' }).click();
+  await expect(page.getByText('Steps saved: +120 pts')).toBeVisible();
+
+  // Those days are now taken, and the entry can be taken back.
+  await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: 'Remove 30,000 steps' }).click();
+  await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeEnabled();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    page.viewportSize()?.width,
+  );
+});

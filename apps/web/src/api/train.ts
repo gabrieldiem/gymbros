@@ -40,6 +40,8 @@ export type Exercise = {
 export type Routine = { id: string; name: string; exercise_ids: string[] };
 
 export type PointsTable = {
+  steps_per_point: number;
+  steps_daily_cap: number;
   showed_up: number;
   completed_set: number;
   leg_event_set_bonus: number;

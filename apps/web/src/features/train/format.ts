@@ -76,6 +76,8 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
       return t('ln_intensity', { minutes: Number(vars.minutes) });
     case 'ln_custom':
       return t('ln_custom');
+    case 'ln_steps':
+      return t('ln_steps', { n: n(Number(vars.steps)) });
     case 'ln_stretch':
     case 'ln_show':
     case 'ln_vol':

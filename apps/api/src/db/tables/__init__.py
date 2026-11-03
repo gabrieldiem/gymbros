@@ -18,6 +18,7 @@ from db.tables.notification import Notification
 from db.tables.personal_record import PersonalRecord
 from db.tables.point_event import PointEvent
 from db.tables.reaction import Reaction
+from db.tables.step_entry import StepEntry
 from db.tables.user import User
 from db.tables.user_badge import UserBadge
 from db.tables.workout import Workout
@@ -43,6 +44,7 @@ __all__ = [
     "PersonalRecord",
     "PointEvent",
     "Reaction",
+    "StepEntry",
     "User",
     "UserBadge",
     "Workout",

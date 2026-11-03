@@ -15,6 +15,7 @@ import { AdminPage } from './features/admin/AdminPage';
 import { LandingPage } from './features/landing/LandingPage';
 import { PrivacyPage, TermsPage } from './features/legal/LegalPages';
 import { QuestsPage } from './features/quests/QuestsPage';
+import { StepsPage } from './features/steps/StepsPage';
 import { TrainPage } from './features/train/TrainPage';
 import { ApplyUpdateOnOpen } from './pwa/ApplyUpdateOnOpen';
 import { WhatsNewPage } from './features/whatsnew/WhatsNewPage';
@@ -52,6 +53,7 @@ export function App() {
             <Route path="climb" element={<ClimbPage />} />
             <Route path="crew" element={<CrewPage />} />
             <Route path="train" element={<TrainPage />} />
+            <Route path="steps" element={<StepsPage />} />
             <Route path="quests" element={<QuestsPage />} />
             <Route path="quests/achievements" element={<QuestsPage />} />
             <Route path="quests/points" element={<QuestsPage />} />

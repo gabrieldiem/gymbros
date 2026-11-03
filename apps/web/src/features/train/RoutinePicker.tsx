@@ -11,6 +11,7 @@ import {
   Weight,
   type LucideIcon,
 } from 'lucide-react';
+import { Link } from 'react-router';
 import type { Catalog, Week } from '../../api/train';
 import { FormError } from '../../components/FormError';
 import { Pips } from '../../components/Pips';
@@ -126,6 +127,13 @@ export function RoutinePicker(props: Props) {
           </h3>
           <p>{t('empty_sub')}</p>
         </button>
+        <Link to="/steps" className={`${styles.routine} ${styles.empty}`}>
+          <h3 className={styles.routineTitle}>
+            <Footprints size={20} aria-hidden="true" />
+            {t('steps_title')}
+          </h3>
+          <p>{t('steps_card')}</p>
+        </Link>
       </div>
       <EarnList catalog={catalog} legEvent={legEvent} />
     </section>
@@ -144,6 +152,7 @@ function EarnList({ catalog, legEvent }: { catalog: Catalog; legEvent: boolean }
     [t('e_streak'), t('up_to', { per: p.goal_streak_per_week, max: p.goal_streak_max })],
     [t('e_better'), `+${n(p.better_than_last_time)}`],
     [t('e_stretch'), `+${n(p.stretching)}`],
+    [t('e_steps', { n: n(p.steps_per_point), cap: n(p.steps_daily_cap) }), '1'],
     [t('e_pr'), n(p.pr)],
     [t('e_vol', { kg: p.volume_kg_per_point }), '1'],
     [t('e_cardio'), n(p.cardio_minute)],

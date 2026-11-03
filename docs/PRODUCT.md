@@ -203,6 +203,19 @@ Every uploaded image is rebuilt from its pixels on the server, so location, came
 | Comeback | Return after 14 days away | 100 |
 | Unstoppable | Reach 9,000 pts | 300 |
 
+## Steps
+
+Log steps for a day, or a total for a period such as the last 3 days, on a calendar, from today back as far as a past workout can go (`game.past_workout_days`).
+
+The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 steps a day (`scoring.steps_daily_cap`), so a 10,000 step day pays 40 and a week of them about what one solid workout pays. Steps add to training and never replace it:
+
+- A day counts once. A period can't overlap days already logged.
+- Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
+- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests, badges or the feed.
+- Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
+
+`/steps` has the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
+
 ## Timed sports, no weight and custom exercises
 
 Point balance rules for anything that isn't a lift with a weight or a distance:

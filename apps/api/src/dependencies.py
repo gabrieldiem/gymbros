@@ -34,6 +34,7 @@ from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.session_repository import SessionRepository
+from db.repositories.step_repository import StepRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_photo_repository import WorkoutPhotoRepository
 from db.repositories.workout_repository import WorkoutRepository
@@ -73,6 +74,7 @@ from services.recap_service import RecapService
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
+from services.steps_service import StepRules, StepsService
 from services.welcome_email import EmailSender, GameNumbers
 from services.workout_editor import WorkoutEditor
 from services.training_now_service import TrainingNowService
@@ -373,6 +375,24 @@ def get_workout_editor(
         bonus=build_bonus_service(session),
         window=timedelta(days=settings.game_edit_workout_days),
         now=utc_now,
+    )
+
+
+def get_steps_service(session: AsyncSession = DB_SESSION) -> StepsService:
+    """FastAPI dependency provider for StepsService."""
+    return StepsService(
+        StepRepository(session),
+        PointEventRepository(session),
+        CrewRepository(session),
+        StepRules(
+            per_point=settings.scoring_steps_per_point,
+            daily_cap=settings.scoring_steps_daily_cap,
+            back_days=settings.game_past_workout_days,
+            remove_window=timedelta(days=settings.game_edit_workout_days),
+            week_summit=settings.game_steps_week_summit,
+            all_summit=settings.game_steps_all_summit,
+        ),
+        utc_now,
     )
 
 

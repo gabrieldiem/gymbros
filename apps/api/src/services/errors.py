@@ -207,3 +207,23 @@ class DuelNotPending(DomainError):
 
 class UnknownExerciseForHistory(DomainError):
     """PR history is only for catalog lifts."""
+
+
+class StepsDayTaken(DomainError):
+    """One of these days already has steps."""
+
+
+class StepsDayOutOfRange(DomainError):
+    """A day in the future, or too long ago."""
+
+
+class StepsTooMany(DomainError):
+    """More steps a day than anyone walks: a typo."""
+
+
+class StepEntryNotFound(DomainError):
+    """No such entry of yours."""
+
+
+class StepsEditExpired(DomainError):
+    """It's too late to remove this entry."""

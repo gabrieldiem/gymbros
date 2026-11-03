@@ -1,0 +1,131 @@
+/* The trail, not a form control: a period is a stretch of volt with a stop at each end. */
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.months,
+.month {
+  width: 100%;
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0 4px;
+}
+
+.captionLabel {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.nav {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.navButton {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  color: var(--chalk);
+  background: var(--iron);
+  border-radius: var(--r-control-sm);
+}
+
+.navButton:disabled {
+  color: var(--steel);
+}
+
+.grid {
+  width: 100%;
+  margin-top: 6px;
+  border-spacing: 0 4px;
+  border-collapse: separate;
+}
+
+.weekday {
+  padding-bottom: 6px;
+  color: var(--smoke);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.day {
+  position: relative;
+  padding: 0;
+  text-align: center;
+}
+
+.dayButton {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 46px;
+  height: 44px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border-radius: 12px;
+}
+
+.day:not(.selected) .dayButton:hover:not(:disabled) {
+  background: var(--steel);
+}
+
+.today .dayButton {
+  box-shadow: inset 0 0 0 1.5px var(--smoke);
+}
+
+.outside .dayButton {
+  color: var(--smoke);
+}
+
+.disabled .dayButton {
+  color: #5c5c58;
+  cursor: not-allowed;
+}
+
+/* Already logged: a small stop on the trail. */
+.logged .dayButton::after {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  content: '';
+  background: var(--volt);
+  border-radius: 50%;
+}
+
+.selected .dayButton {
+  color: var(--iron);
+  font-weight: 800;
+  background: var(--volt);
+}
+
+.rangeMiddle {
+  background: var(--volt-tint);
+}
+
+.rangeMiddle .dayButton {
+  color: var(--volt);
+  background: transparent;
+}
+
+.rangeStart:not(.rangeEnd) {
+  background: linear-gradient(90deg, transparent 50%, var(--volt-tint) 50%);
+}
+
+.rangeEnd:not(.rangeStart) {
+  background: linear-gradient(90deg, var(--volt-tint) 50%, transparent 50%);
+}

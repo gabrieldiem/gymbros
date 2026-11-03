@@ -8,6 +8,7 @@ export const WHATS_NEW_COPY: Record<
   string,
   { title: MessageKey; body: MessageKey; points: MessageKey }
 > = {
+  steps: { title: 'wn_steps_title', body: 'wn_steps_body', points: 'wn_steps_points' },
   'emoji-and-photos': {
     title: 'wn_emoji_photos_title',
     body: 'wn_emoji_photos_body',
