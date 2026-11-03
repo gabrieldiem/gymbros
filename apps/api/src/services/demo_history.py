@@ -17,6 +17,10 @@ BASE_LIFTS: dict[str, tuple[float, float]] = {
 WORKOUT_DAYS = (0, 2, 4, 5)  # Mon, Wed, Fri, Sat
 EVENING = time(18, 30)
 SETS_PER_EXERCISE = 3
+# How steps get logged: mostly a day at a time, sometimes a total for a few.
+STEP_PERIODS = (1, 1, 3, 1, 2)
+STEP_EFFORT = (1.0, 0.8, 1.15, 0.9, 1.3, 0.7)
+STEP_WEEKS = 8
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +42,15 @@ class PlannedWorkout:
     finished_at: datetime
     points: int
     exercises: tuple[tuple[str, tuple[LoggedSet, ...]], ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PlannedSteps:
+    """One seeded steps entry."""
+
+    start: date
+    end: date
+    steps: int
 
 
 def split_points(total: int, parts: int) -> list[int]:
@@ -125,3 +138,23 @@ def plan_history(
         )
         plans.append(PlannedWorkout(routine.id, finished_at, points[index], exercises))
     return plans
+
+
+def plan_steps(
+    today: date, per_day: int, free_days: int, weeks: int = STEP_WEEKS
+) -> tuple[PlannedSteps, ...]:
+    """A member's steps going back from the last `free_days`, which stay open to log. A mix of
+    single days and periods, each day in one entry, so the calendar and chart look used."""
+    planned = []
+    end = today - timedelta(days=free_days)
+    oldest = today - timedelta(weeks=weeks)
+    index = 0
+    while end > oldest:
+        length = STEP_PERIODS[index % len(STEP_PERIODS)]
+        start = end - timedelta(days=length - 1)
+        effort = STEP_EFFORT[index % len(STEP_EFFORT)]
+        steps = round(per_day * length * effort, -1)
+        planned.append(PlannedSteps(start, end, int(steps)))
+        end = start - timedelta(days=1)
+        index += 1
+    return tuple(planned)

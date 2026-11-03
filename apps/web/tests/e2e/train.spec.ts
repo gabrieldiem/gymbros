@@ -331,7 +331,10 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
     await discard.click();
     await page.getByRole('button', { name: 'Discard workout' }).click();
   }
-  await page.getByRole('link', { name: /^Steps/ }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: /^Steps/ })
+    .click();
   await expect(page).toHaveURL(/\/climb\/steps$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
   await expect(page.locator('svg text', { hasText: /steps$/ }).first()).toBeVisible();

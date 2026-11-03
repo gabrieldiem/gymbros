@@ -6,7 +6,7 @@ import cli
 from cli import build_demo_seed
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.user_repository import UserRepository
-from services.demo_seed_service import DEMO_CREW_PATH
+from services.demo_seed_service import DEMO_CREW_PATH, load_demo_crew
 from services.e2e_crews import E2E_PROJECTS, e2e_crew
 
 
@@ -28,6 +28,7 @@ def test_members_keep_the_demo_history_under_project_emails():
         "name": "E2E Mobile",
         "time_zone": demo["crew"]["time_zone"],
         "invite_code": "E2EMOBILE",
+        "steps_free_days": 3,
     }
     assert [m["email"] for m in crew["members"]][0] == "gabi@mobile.e2e.gymbros.app"
     assert [m["history"] for m in crew["members"]] == [m["history"] for m in demo["members"]]
@@ -59,3 +60,9 @@ def test_seed_e2e_refuses_to_run_in_production(monkeypatch, capsys):
     monkeypatch.setattr(cli.settings, "app_env", "production")
     assert cli.main(["seed-e2e"]) == 1
     assert "Refusing" in capsys.readouterr().err
+
+
+def test_the_e2e_crews_keep_the_last_days_open_for_logging_steps():
+    data = e2e_crew(load_demo_crew(), "mobile")
+    assert data["crew"]["steps_free_days"] == 3
+    assert load_demo_crew()["crew"]["steps_free_days"] == 1
