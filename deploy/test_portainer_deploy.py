@@ -144,6 +144,25 @@ class DeployTest(unittest.TestCase):
                 [SCRIPT, NEW], env=env, capture_output=True, text=True, timeout=60, check=False
             )
 
+    def test_a_new_merge_cancels_the_pipeline_but_never_a_deploy_under_way(self):
+        """Only GitHub can run this for real, so this guards the settings it relies on."""
+        workflows = os.path.join(os.path.dirname(SCRIPT), "..", ".github", "workflows")
+        with open(os.path.join(workflows, "deploy.yml"), encoding="utf-8") as file:
+            deploy = file.read()
+        with open(os.path.join(workflows, "redeploy.yml"), encoding="utf-8") as file:
+            redeploy = file.read()
+        pipeline, job = deploy.split("\n  deploy:\n")
+        self.assertIn("cancel-in-progress: true", pipeline)
+        self.assertNotIn("cancel-in-progress: false", pipeline)
+        # Without always() on the job, GitHub cancels it, whatever its steps say.
+        self.assertIn("if: >-\n      ${{ always() && needs.test.result == 'success'", job)
+        self.assertIn("needs.images.result == 'success'", job)
+        self.assertIn("needs.smoke.result == 'success'", job)
+        self.assertIn("if: ${{ always() && steps.checkout.outcome == 'success' }}", job)
+        for text in (job, redeploy):
+            self.assertIn("group: prod-deploy\n      cancel-in-progress: false", text)
+        self.assertNotIn("cancel-in-progress: true", job + redeploy)
+
     def test_the_deploy_scripts_are_executable(self):
         """CI runs them directly. On a checkout this reads the mode stored in git."""
         for name in ("portainer-deploy.sh", "smoke-test.sh"):
