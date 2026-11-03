@@ -45,7 +45,12 @@ def to_reactions(summary: ReactionSummary) -> ReactionsModel:
     """Reaction counts plus your own."""
     # Oldest first, like a chat: an emoji doesn't jump around as others add theirs.
     emoji = [
-        EmojiCountModel(emoji=shown_emoji(kind), count=count, mine=kind in summary.mine)
+        EmojiCountModel(
+            emoji=shown_emoji(kind),
+            count=count,
+            mine=kind in summary.mine,
+            names=list(summary.names.get(kind, ())),
+        )
         for kind, count in summary.counts.items()
     ]
     return ReactionsModel(

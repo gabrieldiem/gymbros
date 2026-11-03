@@ -21,10 +21,11 @@ class CommentView:
 
 @dataclass(frozen=True, slots=True)
 class ReactionSummary:
-    """Counts per reaction kind and the kinds the reader added."""
+    """Counts per reaction kind, the kinds the reader added, and who else added each."""
 
     counts: dict[str, int]
     mine: frozenset[str]
+    names: dict[str, tuple[str, ...]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)

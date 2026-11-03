@@ -1,7 +1,6 @@
-import { ListChecks, MessageCircle } from 'lucide-react';
-import { useState } from 'react';
+import { ListChecks } from 'lucide-react';
 
-import { useReact, type FeedItem, type WorkoutPostVars } from '../../api/social';
+import type { FeedItem, WorkoutPostVars } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
@@ -13,14 +12,11 @@ import { formatLift } from '../train/format';
 import { EditedTag } from './EditedTag';
 import styles from './Feed.module.css';
 import { formatPostedSet } from './format';
-import { ReactionBar } from './ReactionBar';
-import { Thread } from './Thread';
+import { PostActions } from './PostActions';
 
 /** A finished workout in the feed: stats, PRs, exercises, reactions and comments. */
 export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exercise[] }) {
   const { t, n, lang } = useI18n();
-  const react = useReact();
-  const [open, setOpen] = useState(false);
   const v = item.vars as unknown as WorkoutPostVars;
   const exercise = (id: string) => exercises.find((e) => e.id === id);
 
@@ -86,22 +82,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
           ))}
         </ul>
       </details>
-      <ReactionBar
-        reactions={item.reactions.emoji ?? []}
-        always={['👊', '🔥']}
-        onToggle={(emoji) => react.mutate({ itemId: item.id, kind: emoji })}
-      >
-        <button
-          type="button"
-          className={styles.commentsButton}
-          aria-expanded={open}
-          aria-label={t('comments_n', { n: item.comments.length })}
-          onClick={() => setOpen((o) => !o)}
-        >
-          <MessageCircle size={16} aria-hidden="true" /> <span>{item.comments.length}</span>
-        </button>
-      </ReactionBar>
-      {open && <Thread itemId={item.id} comments={item.comments} />}
+      <PostActions item={item} />
     </li>
   );
 }

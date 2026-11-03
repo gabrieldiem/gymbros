@@ -384,6 +384,7 @@ def get_steps_service(session: AsyncSession = DB_SESSION) -> StepsService:
         StepRepository(session),
         PointEventRepository(session),
         CrewRepository(session),
+        FeedRepository(session),
         StepRules(
             per_point=settings.scoring_steps_per_point,
             daily_cap=settings.scoring_steps_daily_cap,

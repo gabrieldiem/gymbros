@@ -34,6 +34,7 @@ export function ReactionBar({ reactions, onToggle, always = [], small = false, c
   const [wantNames, setWantNames] = useState(false);
   const allNames = useEmojiNames(lang, wantNames);
   const tipPrefix = useId();
+  const list = new Intl.ListFormat(lang === 'es' ? 'es-ES' : 'en-GB', { type: 'conjunction' });
   const handlePointerEnter = (event: PointerEvent) => {
     if (event.pointerType === 'mouse') setWantNames(true);
   };
@@ -49,8 +50,9 @@ export function ReactionBar({ reactions, onToggle, always = [], small = false, c
   ];
   return (
     <div className={cx(styles.bar, small && styles.small)}>
-      {shown.map(({ emoji, count, mine }, index) => {
+      {shown.map(({ emoji, count, mine, names: others = [] }, index) => {
         const name = names[emoji] ?? emojiName(allNames, emoji);
+        const people = [...(mine ? [t('you')] : []), ...others];
         const tipId = `${tipPrefix}-${index}`;
         return (
           <span key={emoji} className={styles.withTip}>
@@ -59,7 +61,7 @@ export function ReactionBar({ reactions, onToggle, always = [], small = false, c
               className={styles.pill}
               aria-pressed={mine}
               aria-label={`${names[emoji] ?? emoji}, ${count}`}
-              aria-describedby={name ? tipId : undefined}
+              aria-describedby={name || people.length ? tipId : undefined}
               onPointerEnter={handlePointerEnter}
               onFocus={handleFocus}
               onClick={() => onToggle(emoji)}
@@ -71,9 +73,9 @@ export function ReactionBar({ reactions, onToggle, always = [], small = false, c
                 </span>
               )}
             </button>
-            {name && (
+            {(name || people.length > 0) && (
               <span id={tipId} role="tooltip" className={styles.tip}>
-                {name}
+                {name && <b>{name}</b>} {people.length > 0 && <span>{list.format(people)}</span>}
               </span>
             )}
           </span>

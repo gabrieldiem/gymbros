@@ -45,10 +45,12 @@ export function notificationText(item: Notification, t: T): string {
   const vars = item.vars;
   switch (item.key) {
     case 'n_react':
-      return t('n_react', {
+      return t(vars.item === 'steps' ? 'n_react_steps' : 'n_react', {
         name: String(vars.name),
         emoji: REACTION_EMOJI[String(vars.kind)] ?? String(vars.kind),
       });
+    case 'n_comment':
+      return t(vars.item === 'steps' ? 'n_comment_steps' : 'n_comment', vars);
     case 'n_comment_react':
       return t('n_comment_react', { name: String(vars.name), emoji: String(vars.kind) });
     case 'n_whats_new':
@@ -64,7 +66,6 @@ export function notificationText(item: Notification, t: T): string {
     case 'n_passed':
     case 'n_behind':
     case 'n_goal':
-    case 'n_comment':
     case 'n_nudge':
     case 'n_duel_invite':
     case 'n_duel_accepted':

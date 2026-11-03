@@ -18,6 +18,7 @@ from db.repositories.crew_repository import CrewRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
+from db.repositories.step_repository import StepRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.migrate import run_migrations
@@ -38,12 +39,14 @@ def build_demo_seed(session: AsyncSession, data: dict[str, Any] | None = None) -
         events=PointEventRepository(session),
         records=PersonalRecordRepository(session),
         feed=FeedRepository(session),
+        steps=StepRepository(session),
     )
     return DemoSeedService(
         repos,
         utc_now,
         weekly_target=settings.game_weekly_target,
         bodyweight_kg=settings.game_bodyweight_kg,
+        steps_pay=(settings.scoring_steps_per_point, settings.scoring_steps_daily_cap),
         data=data,
         badges=(build_badge_service(session), BadgeRepository(session)),
     )

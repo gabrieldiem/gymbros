@@ -13,7 +13,7 @@ from db.base import Base
 
 
 class FeedItem(Base):  # pylint: disable=too-few-public-methods
-    """A finished workout, a rank-up or a badge, posted by `actor_id` to the crew."""
+    """A finished workout, steps, a rank-up or a badge, posted by `actor_id` to the crew."""
 
     __tablename__ = "feed_items"
     __table_args__ = (Index("ix_feed_items_crew_id_created_at", "crew_id", "created_at"),)
@@ -24,6 +24,10 @@ class FeedItem(Base):  # pylint: disable=too-few-public-methods
     kind: Mapped[str] = mapped_column(String(16))
     workout_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("workouts.id", ondelete="SET NULL")
+    )
+    # Steps taken back take their post with them, and whatever was said under it.
+    step_entry_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("step_entries.id", ondelete="CASCADE"), index=True
     )
     vars: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

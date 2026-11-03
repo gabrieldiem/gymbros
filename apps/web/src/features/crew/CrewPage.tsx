@@ -13,6 +13,7 @@ import styles from './CrewPage.module.css';
 import { EventRow } from './EventRow';
 import feedStyles from './Feed.module.css';
 import { FeedCard } from './FeedCard';
+import { StepsCard } from './StepsCard';
 import { HallOfFame } from './HallOfFame';
 import { NudgePrompt } from './NudgePrompt';
 
@@ -47,6 +48,8 @@ function Feed() {
         {items.map((item) =>
           item.kind === 'workout' ? (
             <FeedCard key={item.id} item={item} exercises={exercises} />
+          ) : item.kind === 'steps' ? (
+            <StepsCard key={item.id} item={item} />
           ) : (
             <EventRow key={item.id} item={item} />
           ),

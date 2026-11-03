@@ -14,6 +14,7 @@ from db.repositories.workout_repository import WorkoutRepository
 from db.tables.comment import Comment
 from db.tables.comment_photo import CommentPhoto
 from db.tables.feed_item import FeedItem
+from db.tables.user import User
 from services.badge_service import BadgeService
 from services.emoji_text import shown_emoji, stored_kind
 from services.errors import CommentNotFound, FeedItemNotFound
@@ -79,7 +80,14 @@ class FeedService:
                 "/crew",
             )
             await self._check_badges(member)
-        return self._summary(await self._feed.reactions([item.id]), member.user.id)
+        rows = [(r.kind, r.user_id) for r in await self._feed.reactions([item.id])]
+        return await self._named_summary(rows, member.user.id)
+
+    async def _named_summary(
+        self, rows: list[tuple[str, uuid.UUID]], reader_id: uuid.UUID
+    ) -> ReactionSummary:
+        users = await self._users.get_many({user_id for _, user_id in rows})
+        return self._summary_of(rows, reader_id, users)
 
     async def react_to_comment(
         self, member: Member, comment_id: uuid.UUID, emoji: str
@@ -97,7 +105,7 @@ class FeedService:
                 "/crew",
             )
         rows = await self._feed.comment_reactions([comment.id])
-        return self._summary_of([(r.emoji, r.user_id) for r in rows], member.user.id)
+        return await self._named_summary([(r.emoji, r.user_id) for r in rows], member.user.id)
 
     async def _comment_in_crew(self, member: Member, comment_id: uuid.UUID) -> Comment:
         comment = await self._feed.get_comment(comment_id)
@@ -199,9 +207,12 @@ class FeedService:
         comment_ids = [c.id for thread in comments.values() for c in thread]
         for row in await self._feed.comment_reactions(comment_ids):
             on_comments.setdefault(row.comment_id, []).append((row.emoji, row.user_id))
-        authors = {item.actor_id for item in items} | {
-            c.user_id for thread in comments.values() for c in thread
-        }
+        authors = (
+            {item.actor_id for item in items}
+            | {c.user_id for thread in comments.values() for c in thread}
+            | {r.user_id for r in reactions}
+            | {user_id for rows in on_comments.values() for _, user_id in rows}
+        )
         users = await self._users.get_many(authors)
         photos = await self._workouts.photo_versions(
             [item.workout_id for item in items if item.workout_id]
@@ -210,14 +221,16 @@ class FeedService:
             FeedEntry(
                 item=item,
                 actor=users[item.actor_id],
-                reactions=self._summary(
-                    [r for r in reactions if r.feed_item_id == item.id], member.user.id
+                reactions=self._summary_of(
+                    [(r.kind, r.user_id) for r in reactions if r.feed_item_id == item.id],
+                    member.user.id,
+                    users,
                 ),
                 comments=tuple(
                     CommentView(
                         c,
                         users[c.user_id],
-                        self._summary_of(on_comments.get(c.id, []), member.user.id),
+                        self._summary_of(on_comments.get(c.id, []), member.user.id, users),
                     )
                     for c in comments.get(item.id, [])
                 ),
@@ -228,16 +241,20 @@ class FeedService:
         )
 
     @staticmethod
-    def _summary(reactions: list, reader_id: uuid.UUID) -> ReactionSummary:
-        return FeedService._summary_of([(r.kind, r.user_id) for r in reactions], reader_id)
-
-    @staticmethod
     def _summary_of(
-        reactions: list[tuple[str, uuid.UUID]], reader_id: uuid.UUID
+        reactions: list[tuple[str, uuid.UUID]], reader_id: uuid.UUID, users: dict[uuid.UUID, User]
     ) -> ReactionSummary:
         counts = Counter(kind for kind, _ in reactions)
         mine = frozenset(kind for kind, user_id in reactions if user_id == reader_id)
-        return ReactionSummary(counts=dict(counts), mine=mine)
+        names: dict[str, list[str]] = {}
+        for kind, user_id in reactions:
+            if user_id != reader_id and user_id in users:
+                names.setdefault(kind, []).append(users[user_id].display_name)
+        return ReactionSummary(
+            counts=dict(counts),
+            mine=mine,
+            names={kind: tuple(people) for kind, people in names.items()},
+        )
 
     async def _inactive(self, member: Member) -> tuple[InactiveMember, ...]:
         """Other members whose last workout is `inactive_days` or more ago."""

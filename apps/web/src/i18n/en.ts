@@ -205,13 +205,13 @@ export const en = {
     'When you sign in with Google, GYMBROS asks only for your basic profile and email (the openid, email and profile permissions). From that we keep your name, your email address and your Google account ID. We don’t keep your Google profile picture, we never see your Google password, and we have no access to your Gmail, Drive, Contacts, Calendar or anything else in your Google account.',
   privacy_collect_h: 'Other data we store',
   privacy_collect:
-    'What you add: your workouts, sets, weights, times, distances, the names of your gyms and where they are if you put them on the map, a photo of a workout, a profile picture, comments, pictures you answer posts with, reactions, duels, feedback you send us and settings, if you choose to add them. What the app works out from that: your points, ranks, PRs, achievements and notifications. If an admin invites you by email, your address is used to send that one email and isn’t stored until you sign in. Like most websites, our servers also keep technical logs of requests, including your IP address and browser type, to keep the service running and fix problems.',
+    'What you add: your workouts, sets, weights, times, distances, the names of your gyms and where they are if you put them on the map, a photo of a workout, the steps you log, a profile picture, comments, pictures you answer posts with, reactions, duels, feedback you send us and settings, if you choose to add them. What the app works out from that: your points, ranks, PRs, achievements and notifications. If an admin invites you by email, your address is used to send that one email and isn’t stored until you sign in. Like most websites, our servers also keep technical logs of requests, including your IP address and browser type, to keep the service running and fix problems.',
   privacy_use_h: 'How we use your data',
   privacy_use:
     'Only to provide and improve the features of GYMBROS. Your Google account ID and email sign you in to the same account each time. Your name is shown to your crew on the leaderboard, feed and notifications. Your email is also used to send your welcome email and, unless you turn them off in settings or with the link in each one, a weekly digest of your week and messages from the people running GYMBROS. Your workouts are used to score them, rank your crew, show your progress and post to your crew’s feed. Feedback you send is read to improve the app. There are no ads and no analytics tools.',
   privacy_who_h: 'Who we share it with',
   privacy_who:
-    'Your crew sees your name, picture, workouts, gyms and where they are on the map, workout photos and pictures in comments, points, ranks, PRs, achievements, comments and reactions, but not your email address. The admins who run GYMBROS can see account details, including your email address, your profile picture and any feedback you send. Four providers handle data for us, only to run the service: Google (sign-in), OpenStreetMap (receives what you search for when placing a gym, through our server so not who searched, and your browser loads its map images directly, which shows it your IP address), Resend (receives your name, your email address and what’s in each email, which can include the names and weekly numbers of your crew, to deliver it) and Amazon Web Services (hosts the servers and database, in Brazil). If you open a gym in Google Maps, Google’s own policy applies to that visit. We don’t sell your data or transfer it to anyone else, unless the law requires it.',
+    'Your crew sees your name, picture, workouts, steps, gyms and where they are on the map, workout photos and pictures in comments, points, ranks, PRs, achievements, comments and reactions, but not your email address. The admins who run GYMBROS can see account details, including your email address, your profile picture and any feedback you send. Four providers handle data for us, only to run the service: Google (sign-in), OpenStreetMap (receives what you search for when placing a gym, through our server so not who searched, and your browser loads its map images directly, which shows it your IP address), Resend (receives your name, your email address and what’s in each email, which can include the names and weekly numbers of your crew, to deliver it) and Amazon Web Services (hosts the servers and database, in Brazil). If you open a gym in Google Maps, Google’s own policy applies to that visit. We don’t sell your data or transfer it to anyone else, unless the law requires it.',
   privacy_protect_h: 'How we protect your data',
   privacy_protect:
     'All traffic to GYMBROS is encrypted with HTTPS. The database isn’t reachable from the internet: only the app’s own server can connect to it. The cookie that keeps you signed in can’t be read by scripts and is only sent over HTTPS, and the server stores only a keyed hash of it, not the value itself. GYMBROS doesn’t ask you for a password. Pictures you upload are resized on your device first, which removes their metadata, such as where they were taken, and only signed-in members of your crew can open them. Only the admins listed in the server’s settings can open the admin area, and every change they make there is recorded in a log.',
@@ -394,7 +394,7 @@ export const en = {
   wn_steps_title: 'Your steps count now',
   wn_steps_body: 'Log your steps for a day or a few at once, and climb with your crew.',
   wn_steps_points:
-    'Find Steps on ATUS Climb or Train\nChoose a day on the calendar, or a period like the last 3 days\n1 point every 250 steps, up to 20,000 a day\nThe crew has its own climb by steps, this week and all time',
+    'Find Steps on ATUS Climb or Train\nChoose a day on the calendar, or a period like the last 3 days\n1 point every 250 steps, up to 20,000 a day\nYour crew sees them on the Crew tab, and has its own climb by steps',
   wn_emoji_photos_title: 'Any emoji, and answers with a photo',
   wn_emoji_photos_body: 'Reacting and replying on the Crew tab now works like a chat.',
   wn_emoji_photos_points:
@@ -766,6 +766,8 @@ export const en = {
   inbox_empty: 'Nothing new. Go train and stir things up.',
   n_react: '{name} reacted {emoji} to your workout.',
   n_comment: '{name} commented on your workout.',
+  n_comment_steps: '{name} commented on your steps.',
+  n_react_steps: '{name} reacted {emoji} to your steps.',
   emoji_pick: 'Pick an emoji',
   emoji_search: 'Search emoji',
   emoji_none: 'No emoji found.',

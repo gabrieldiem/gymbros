@@ -168,7 +168,7 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **What's new:** when a feature ships, members hear about it once, as one bell notification that opens the What's new page (also in the profile menu). Several features since your last visit roll into one notification. It never toasts, pops up or emails, and it isn't sent to someone who joined after the feature came out.
 - **Weekly recap:** story-style slides (crew total, biggest climber, heaviest PR, your week, most improved, this week's event). This is the one place where the bold, loud visual treatment is allowed.
 
-Reactions work like a chat: any emoji, on posts and comments, on your own too. The picker's data comes from this server, not a CDN. A post can be answered with a picture. The Hype crew badge counts posts of others you reacted to, not emoji, so piling them on earns nothing.
+Reactions work like a chat: any emoji, on posts and comments, on your own too. Hovering one shows its name and who used it, and the picker's search forgives typos. The picker's data comes from this server, not a CDN. A post can be answered with a picture. The Hype crew badge counts posts of others you reacted to, not emoji, so piling them on earns nothing.
 
 Every uploaded image is rebuilt from its pixels on the server, so location, camera, dates and anything else in the file are gone whatever the client sends. Images are stored without a file name and served as `gymbros-<hash>.jpg`.
 
@@ -211,7 +211,8 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 
 - A day counts once. A period can't overlap days already logged.
 - Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
-- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests, badges or the feed.
+- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or badges.
+- The crew sees each entry on the Crew tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 
 `/climb/steps` is a section of ATUS Climb, one tap from the points climb, with the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.

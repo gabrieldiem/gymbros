@@ -331,7 +331,10 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
     await discard.click();
     await page.getByRole('button', { name: 'Discard workout' }).click();
   }
-  await page.getByRole('link', { name: /^Steps/ }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: /^Steps/ })
+    .click();
   await expect(page).toHaveURL(/\/climb\/steps$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
   await expect(page.locator('svg text', { hasText: /steps$/ }).first()).toBeVisible();
@@ -366,10 +369,21 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
   await page.getByRole('button', { name: 'Save steps' }).click();
   await expect(page.getByText('Steps saved: +120 pts')).toBeVisible();
 
+  // The crew sees it, and it goes when it's taken back.
+  await page.goto('/crew');
+  const post = page.locator('main li').filter({ hasText: '30,000 steps' });
+  await expect(post).toBeVisible();
+  await expect(post.getByRole('button', { name: /^Fist bump/ })).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/steps-post-${testInfo.project.name}.png` });
+  await page.goto('/climb/steps');
+
   // Those days are now taken, and the entry can be taken back.
   await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Remove 30,000 steps' }).click();
   await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeEnabled();
+  await page.goto('/crew');
+  await expect(page.getByRole('heading', { level: 1, name: 'Crew' })).toBeVisible();
+  await expect(page.locator('main li').filter({ hasText: '30,000 steps' })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     page.viewportSize()?.width,
   );

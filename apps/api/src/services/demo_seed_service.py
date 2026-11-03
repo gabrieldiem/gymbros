@@ -3,20 +3,23 @@
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from db.repositories.badge_repository import BadgeRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
+from db.repositories.step_repository import StepRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.crew import Crew
 from db.tables.feed_item import FeedItem
 from db.tables.point_event import PointEvent
+from db.tables.step_entry import StepEntry
 from db.tables.user import User
 from db.tables.workout import Workout
 from services.activity_service import workout_post_vars
@@ -25,8 +28,9 @@ from services.badges import is_unlocked, load_badges
 from services.catalog import load_catalog
 from services.crew_service import CrewService
 from services.member import Member
-from services.demo_history import MemberStats, PlannedWorkout, plan_history
+from services.demo_history import MemberStats, PlannedWorkout, plan_history, plan_steps
 from services.scoring_types import RecordSet
+from services.steps_rules import days_in, steps_points
 from services.training_rules import effective_load, estimated_1rm, week_start
 from services.workout_mapping import to_rows
 from services.workout_types import ExerciseEntry
@@ -35,6 +39,9 @@ DEMO_CREW_PATH = Path(__file__).resolve().parent.parent / "resources" / "demo_cr
 HISTORY_KEY = "ln_history"
 # Seeded workouts this recent also get a feed post, so the Crew tab starts populated.
 FEED_WINDOW = timedelta(days=10)
+# Steps only this recent, or a week of them would push the workouts off the first page.
+STEPS_FEED_DAYS = 3
+STEPS_LOGGED_AT = time(20, 0)
 
 
 def load_demo_crew() -> dict[str, Any]:
@@ -60,6 +67,7 @@ class SeedRepositories:
     events: PointEventRepository
     records: PersonalRecordRepository
     feed: FeedRepository
+    steps: StepRepository
 
 
 class DemoSeedService:
@@ -71,6 +79,7 @@ class DemoSeedService:
         now: Callable[[], datetime],
         weekly_target: int,
         bodyweight_kg: float,
+        steps_pay: tuple[int, int],
         data: dict[str, Any] | None = None,
         badges: tuple[BadgeService, BadgeRepository] | None = None,
     ) -> None:
@@ -79,6 +88,7 @@ class DemoSeedService:
         self._now = now
         self._weekly_target = weekly_target
         self._bodyweight_kg = bodyweight_kg
+        self._steps_pay = steps_pay
         self._data = data or load_demo_crew()
         self._badges: BadgeService | None = badges[0] if badges else None
         self._badge_rows: BadgeRepository | None = badges[1] if badges else None
@@ -91,6 +101,7 @@ class DemoSeedService:
             if await self._repos.users.get_by_email(member["email"]) is None:
                 user = await self._add_member(crew, member)
                 await self._add_history(crew, user, member)
+                await self._add_steps(crew, user, member)
                 await self._mark_earned_badges(crew, user)
                 created.append(member["key"])
         return SeedResult(crew=crew, created_members=tuple(created))
@@ -159,6 +170,47 @@ class DemoSeedService:
             await self._repos.events.add_all([self._event(crew, user, workout, planned)])
         for record in best.values():
             await self._repos.records.store(user.id, record, None, self._now())
+
+    async def _add_steps(self, crew: Crew, user: User, member: dict[str, Any]) -> None:
+        """Steps with no point events: like badges here, the prototype's totals include them, so
+        `points` only says what each entry was worth."""
+        zone = ZoneInfo(crew.time_zone)
+        today = self._now().astimezone(zone).date()
+        free_days = self._data["crew"]["steps_free_days"]
+        per_point, daily_cap = self._steps_pay
+        for planned in plan_steps(today, member["steps_per_day"], free_days):
+            days = len(days_in(planned.start, planned.end))
+            logged_at = datetime.combine(planned.end, STEPS_LOGGED_AT, zone)
+            entry = await self._repos.steps.add(
+                StepEntry(
+                    user_id=user.id,
+                    crew_id=crew.id,
+                    start_date=planned.start,
+                    end_date=planned.end,
+                    steps=planned.steps,
+                    points=steps_points(days, planned.steps, per_point, daily_cap),
+                    created_at=logged_at,
+                )
+            )
+            if (today - planned.end).days <= STEPS_FEED_DAYS:
+                await self._repos.feed.add(self._steps_post(crew, user, entry, days))
+
+    @staticmethod
+    def _steps_post(crew: Crew, user: User, entry: StepEntry, days: int) -> FeedItem:
+        return FeedItem(
+            crew_id=crew.id,
+            actor_id=user.id,
+            kind="steps",
+            step_entry_id=entry.id,
+            vars={
+                "steps": entry.steps,
+                "points": entry.points,
+                "days": days,
+                "start_date": entry.start_date.isoformat(),
+                "end_date": entry.end_date.isoformat(),
+            },
+            created_at=entry.created_at,
+        )
 
     async def _add_workout(self, crew: Crew, user: User, planned: PlannedWorkout) -> Workout:
         entries = tuple(ExerciseEntry(ex_id, sets) for ex_id, sets in planned.exercises)

@@ -1,18 +1,20 @@
 """The planned demo history reproduces the prototype's numbers exactly."""
 
 from collections import Counter
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
 from services.catalog import load_catalog
 from services.climb_rules import current_goal_streak
 from services.demo_history import (
+    plan_steps,
     MemberStats,
     past_weeks_layout,
     plan_history,
     split_points,
 )
+from services.steps_rules import days_in
 from services.training_rules import week_start
 
 TZ = "America/Argentina/Buenos_Aires"
@@ -70,3 +72,30 @@ def test_loads_progress_over_time():
     assert first_bench is not None and last_bench is not None
     assert last_bench > first_bench
     assert last_bench % 2.5 == 0
+
+
+TODAY = date(2026, 11, 3)
+
+
+def test_seeded_steps_leave_the_open_days_free():
+    plan = plan_steps(TODAY, 10_000, free_days=3)
+    assert max(p.end for p in plan) == TODAY - timedelta(days=3)
+
+
+def test_each_seeded_day_is_in_one_entry_with_no_gaps():
+    plan = plan_steps(TODAY, 10_000, free_days=1)
+    days = sorted(day for p in plan for day in days_in(p.start, p.end))
+    assert len(days) == len(set(days))
+    assert days == [days[0] + timedelta(days=i) for i in range(len(days))]
+
+
+def test_seeded_steps_mix_single_days_and_periods():
+    plan = plan_steps(TODAY, 10_000, free_days=1)
+    lengths = {len(days_in(p.start, p.end)) for p in plan}
+    assert {1, 2, 3} <= lengths
+
+
+def test_seeded_steps_scale_with_the_member_and_stay_believable():
+    for p in plan_steps(TODAY, 10_000, free_days=1):
+        per_day = p.steps / len(days_in(p.start, p.end))
+        assert 5_000 <= per_day <= 15_000

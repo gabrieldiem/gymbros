@@ -2,9 +2,13 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { emojiName, toNames } from '../src/api/emojiNames';
+import enData from 'emojibase-data/en/data.json';
+import esData from 'emojibase-data/es/data.json';
+
+import { emojiName, toNames, type EmojiEntry } from '../src/api/emojiNames';
 import { createQueryClient } from '../src/api/queryClient';
-import { toggledReactions } from '../src/api/social';
+import { toggledReactions, type EmojiCount } from '../src/api/social';
+import { buildEmojiSearch, searchEmoji } from '../src/features/crew/emojiSearch';
 import { ReactionBar } from '../src/features/crew/ReactionBar';
 import { Thread } from '../src/features/crew/Thread';
 import { Providers } from '../src/Providers';
@@ -153,6 +157,86 @@ describe('An emoji’s name', () => {
     fireEvent.pointerEnter(pill, { pointerType: 'mouse' });
     await screen.findByText('Face with tears of joy');
     expect(pill).not.toHaveAccessibleDescription();
+  });
+});
+
+describe('Who reacted', () => {
+  const pill = async (reaction: EmojiCount) => {
+    mockApi({ 'GET /api/me': [200, makeMe()] });
+    render(
+      <Providers client={createQueryClient()}>
+        <ReactionBar reactions={[reaction]} onToggle={vi.fn()} />
+      </Providers>,
+    );
+    return screen.findByRole('button', { name: new RegExp(`^${reaction.emoji}`) });
+  };
+
+  it('names everyone, you first, without needing the emoji names', async () => {
+    const button = await pill({ emoji: '🛸', count: 3, mine: true, names: ['Maxo', 'Santi'] });
+    expect(button).toHaveAccessibleDescription('You, Maxo and Santi');
+  });
+
+  it('names others when you didn’t react', async () => {
+    const button = await pill({ emoji: '🛸', count: 1, mine: false, names: ['Maxo'] });
+    expect(button).toHaveAccessibleDescription('Maxo');
+  });
+
+  it('says just you', async () => {
+    const button = await pill({ emoji: '🛸', count: 1, mine: true, names: [] });
+    expect(button).toHaveAccessibleDescription('You');
+  });
+
+  it('has nothing to say from a server that doesn’t send names yet', async () => {
+    const button = await pill({ emoji: '🛸', count: 1, mine: false });
+    expect(button).not.toHaveAccessibleDescription();
+  });
+});
+
+describe('Searching for an emoji, with the real data', () => {
+  // The first row of the results: what you see without looking for it.
+  const first = (data: EmojiEntry[], query: string, count = 8) =>
+    searchEmoji(buildEmojiSearch(data), query)
+      .slice(0, count)
+      .map((e) => e.emoji);
+  const SPANISH = esData as EmojiEntry[];
+  const ENGLISH = enData as EmojiEntry[];
+
+  it.each([
+    ['cohete', '🚀'],
+    ['cohte', '🚀'],
+    ['chete', '🚀'],
+    ['corazón', '❤️'],
+    ['corazon', '❤️'],
+    ['corason', '❤️'],
+    ['risa', '😂'],
+    ['fuego', '🔥'],
+    ['fugo', '🔥'],
+  ])('finds “%s” in Spanish', (query, emoji) => {
+    expect(first(SPANISH, query)).toContain(emoji);
+  });
+
+  it.each([
+    ['rocket', '🚀'],
+    ['rcoket', '🚀'],
+    ['rockt', '🚀'],
+    ['fire', '🔥'],
+    ['fiire', '🔥'],
+    ['lauhg', '😂'],
+  ])('finds “%s” in English', (query, emoji) => {
+    expect(first(ENGLISH, query)).toContain(emoji);
+  });
+
+  it('finds nothing in nonsense, rather than everything', () => {
+    expect(first(ENGLISH, 'qqzzxx')).toEqual([]);
+  });
+
+  it('leaves out what isn’t an emoji to pick, and what many phones can’t draw', () => {
+    const data = [
+      { emoji: '🚀', label: 'rocket', group: 5, version: 1 },
+      { emoji: 'R', label: 'rocket part', version: 1 },
+      { emoji: '🪄', label: 'rocket new', group: 5, version: 99 },
+    ];
+    expect(first(data, 'rocket')).toEqual(['🚀']);
   });
 });
 
