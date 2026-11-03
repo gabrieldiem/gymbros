@@ -359,6 +359,8 @@ export const en = {
   custom_ex_add: 'Add it',
   no_weight: 'No weight',
   cancel_workout: 'Cancel workout',
+  climb_view: 'Climb view',
+  climb_section: 'Climb',
   steps_title: 'Steps',
   steps_card: 'Log your steps for a day or a few. They add to your climb.',
   steps_failed: 'Steps couldn’t load.',

@@ -96,7 +96,7 @@ const open = (routes = {}) => {
     'GET /api/steps?mode=all': [200, { ...PAGE, mode: 'all', summit: 1500000 }],
     ...routes,
   });
-  renderApp('/steps');
+  renderApp('/climb/steps');
   return fetchMock;
 };
 const bodyOf = (fetchMock: ReturnType<typeof mockApi>) =>
@@ -222,5 +222,59 @@ describe('The steps chart', () => {
     const table = await screen.findByRole('table');
     expect(within(table).getAllByRole('row')).toHaveLength(14);
     expect(within(table).getByText('13,000')).toBeInTheDocument();
+  });
+});
+
+describe('Switching between the climb and steps', () => {
+  const climb = {
+    mode: 'all',
+    camp_step: 1500,
+    summit: 9000,
+    weekly_target: 3,
+    standings: [],
+    me: {
+      points: 0,
+      position: 1,
+      camp: 0,
+      workouts_this_week: 0,
+      goal_streak: 0,
+      to_next_camp: 1500,
+      gap_above: null,
+      lead_below: null,
+      above: null,
+      below: null,
+    },
+    improvement: { strength_pct: null, volume_pct: null, workouts: 0, workouts_before: 0 },
+  };
+
+  it('goes both ways in one tap, keeping the Climb tab lit', async () => {
+    open({
+      'GET /api/climb?mode=all': [200, climb],
+      'GET /api/climb?mode=week': [200, climb],
+    });
+    const views = within(await screen.findByRole('navigation', { name: 'Climb view' }));
+    expect(views.getByRole('link', { name: 'Steps' })).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Main' })).getByRole('link', {
+        name: 'ATUS Climb',
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+
+    await userEvent.click(views.getByRole('link', { name: 'Climb' }));
+    const back = within(await screen.findByRole('navigation', { name: 'Climb view' }));
+    expect(back.getByRole('link', { name: 'Climb' })).toHaveAttribute('aria-current', 'page');
+    expect(back.getByRole('link', { name: 'Climb' })).toHaveAttribute('href', '/climb');
+
+    await userEvent.click(back.getByRole('link', { name: 'Steps' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
+  });
+
+  it('still answers at the old address', async () => {
+    mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /api/steps?mode=week': [200, PAGE],
+    });
+    renderApp('/steps');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
   });
 });

@@ -19,6 +19,7 @@ import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
+import { ClimbNav } from '../climb/ClimbNav';
 import { TrailMap } from '../climb/TrailMap';
 import { addDays, rangeIsFree, type DayRange } from './stepDates';
 import styles from './Steps.module.css';
@@ -179,6 +180,7 @@ export function StepsPage() {
   const query = useSteps(mode);
   return (
     <section aria-labelledby="page-title">
+      <ClimbNav />
       <div className={styles.head}>
         <h1 id="page-title">{t('steps_title')}</h1>
         <Segmented

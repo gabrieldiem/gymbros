@@ -368,6 +368,8 @@ export const es = {
   custom_ex_add: 'Añadirlo',
   no_weight: 'Sin peso',
   cancel_workout: 'Cancelar entreno',
+  climb_view: 'Vista de la subida',
+  climb_section: 'Subida',
   steps_title: 'Pasos',
   steps_card: 'Registra tus pasos de un día o de varios. Suman a tu subida.',
   steps_failed: 'No se pudieron cargar los pasos.',

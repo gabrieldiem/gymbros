@@ -1,4 +1,4 @@
-import { CalendarDays, Coins, Trophy, type LucideIcon } from 'lucide-react';
+import { CalendarDays, Coins, Footprints, Mountain, Trophy, type LucideIcon } from 'lucide-react';
 
 import type { MessageKey } from '../i18n/en';
 import type { IconName } from './Icon';
@@ -6,6 +6,11 @@ import type { IconName } from './Icon';
 export type Tab = { to: string; icon: IconName; label: MessageKey; primary?: boolean };
 
 /** Inside Quests: what stays useful every week. Deep links, so the nav can go straight to them. */
+export const CLIMB_SECTIONS: readonly { to: string; label: MessageKey; icon: LucideIcon }[] = [
+  { to: '/climb', label: 'climb_section', icon: Mountain },
+  { to: '/climb/steps', label: 'steps_title', icon: Footprints },
+];
+
 export const QUEST_SECTIONS: readonly { to: string; label: MessageKey; icon: LucideIcon }[] = [
   { to: '/quests', label: 'nav_weekly', icon: CalendarDays },
   { to: '/quests/achievements', label: 'nav_achievements', icon: Trophy },

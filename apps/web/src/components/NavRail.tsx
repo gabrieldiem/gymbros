@@ -7,7 +7,7 @@ import { cx } from './cx';
 import { HealthStatus } from './HealthStatus';
 import { Icon } from './Icon';
 import styles from './NavRail.module.css';
-import { DESKTOP_RAIL, QUEST_SECTIONS, TABS } from './tabs';
+import { CLIMB_SECTIONS, DESKTOP_RAIL, QUEST_SECTIONS, TABS } from './tabs';
 import { useMediaQuery } from './useMediaQuery';
 import { useShareInvite } from './useShareInvite';
 import { useSlidingIndicator } from './useSlidingIndicator';
@@ -55,9 +55,9 @@ export function NavRail() {
               <span className={styles.liveDot} role="img" aria-label={t('training_now')} />
             )}
           </NavLink>
-          {tab.to === '/quests' && (
+          {(tab.to === '/climb' || tab.to === '/quests') && (
             <div className={styles.subs}>
-              {QUEST_SECTIONS.map((section) => (
+              {(tab.to === '/climb' ? CLIMB_SECTIONS : QUEST_SECTIONS).map((section) => (
                 <NavLink key={section.to} to={section.to} end className={cx(styles.sub)}>
                   <section.icon size={15} aria-hidden="true" />
                   {t(section.label)}
