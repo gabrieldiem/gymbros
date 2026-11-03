@@ -10,12 +10,12 @@ on:
         description: "Image tag to deploy (a commit SHA from a previous deploy)"
         required: true
 
-concurrency:
-  group: Deploy-refs/heads/main
-  cancel-in-progress: false
-
 jobs:
   redeploy:
+    # Takes turns with a normal deploy, and is never cancelled by one.
+    concurrency:
+      group: prod-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment:

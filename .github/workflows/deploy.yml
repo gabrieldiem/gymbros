@@ -6,10 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+# The latest merge wins: a new push cancels the run in progress and whatever was waiting. The one
+# exception is the `deploy` job, once it has started: see the comment there.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Never cancel a deploy half-way through.
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -84,8 +85,20 @@ jobs:
   # Point the Portainer stack on gd-edge-br at the new images and wait until they are live: the job is
   # green only when both containers run this commit, are healthy, and /api/health reports the
   # database up. Env vars are managed in Portainer (Stacks → gymbros), not here.
+  #
+  # Cancelling mid-update would leave production half-replaced with nothing left to restore it, and
+  # Portainer keeps working after we stop listening, so the next deploy could land on a stack in the
+  # error state, which takes the site down. So this job is never cancelled once it has started:
+  # always() keeps it and its steps alive through a cancellation, and the next run's deploy waits for
+  # it in `prod-deploy`. A run cancelled earlier never gets here, because its needs aren't successes.
   deploy:
     needs: [test, images, smoke]
+    if: >-
+      ${{ always() && needs.test.result == 'success' && needs.images.result == 'success' &&
+      needs.smoke.result == 'success' }}
+    concurrency:
+      group: prod-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment:
@@ -93,7 +106,10 @@ jobs:
       url: https://gymbros.gabrieldiem.com
     steps:
       - uses: actions/checkout@v7
+        id: checkout
+        if: always()
       - name: Deploy to gd-edge-br via Portainer
+        if: ${{ always() && steps.checkout.outcome == 'success' }}
         env:
           PORTAINER_URL: ${{ vars.PORTAINER_URL }}
           PORTAINER_STACK_ID: ${{ vars.PORTAINER_STACK_ID }}
