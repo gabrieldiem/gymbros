@@ -14,7 +14,16 @@ type Props = {
   legBonus?: boolean;
 };
 
-const GROUPS: MuscleGroup[] = ['Chest', 'Legs', 'Back', 'Shoulders', 'Arms', 'Cardio', 'Mobility'];
+const GROUPS: MuscleGroup[] = [
+  'Chest',
+  'Legs',
+  'Back',
+  'Shoulders',
+  'Arms',
+  'Core',
+  'Cardio',
+  'Mobility',
+];
 
 /** Search the catalog by English name or Spanish alias ("sentadilla" finds Back squat). */
 export function ExercisePicker({ exercises, legBonus = false, onPick, onClose }: Props) {

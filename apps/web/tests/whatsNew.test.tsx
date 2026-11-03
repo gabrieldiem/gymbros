@@ -69,12 +69,18 @@ describe('What’s new', () => {
     );
   });
 
-  it('lists what’s new with a way to try it', async () => {
+  it('lists what’s new as a notice with bullet points, and nothing to press', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()], 'GET /api/whats-new': [200, ENTRIES] });
     renderApp('/whats-new');
     expect(await screen.findByRole('heading', { level: 1, name: 'What’s new' })).toBeVisible();
     expect(await screen.findByRole('heading', { name: 'Log a past workout' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Try it' })).toHaveAttribute('href', '/train');
+    const notice = screen.getByRole('heading', { name: 'Log a past workout' }).closest('li');
+    const points = within(notice as HTMLElement).getAllByRole('listitem');
+    expect(points.map((point) => point.textContent)).toEqual([
+      'Start it from Train and choose the day',
+      'It counts for that day, so your streak stays safe',
+    ]);
+    expect(screen.queryByRole('link', { name: 'Try it' })).toBeNull();
   });
 
   it('skips an entry this copy of the app has no words for', async () => {
@@ -85,7 +91,6 @@ describe('What’s new', () => {
     renderApp('/whats-new');
     await screen.findByRole('heading', { level: 1, name: 'What’s new' });
     await waitFor(() => expect(screen.getByRole('list', { name: '' })).toBeEmptyDOMElement());
-    expect(screen.queryByRole('link', { name: 'Try it' })).toBeNull();
   });
 
   it('never toasts, even when other notifications do', async () => {

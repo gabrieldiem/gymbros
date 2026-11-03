@@ -1,6 +1,4 @@
-import { ArrowRight } from 'lucide-react';
 import { useWhatsNew } from '../../api/whatsNew';
-import { ButtonLink } from '../../components/Button';
 import { QueryState } from '../../components/QueryState';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
@@ -26,9 +24,13 @@ export function WhatsNewPage() {
                   <time dateTime={entry.date}>{formatDay(lang, entry.date)}</time>
                   <h2>{t(copy.title)}</h2>
                   <p>{t(copy.body)}</p>
-                  <ButtonLink icon={ArrowRight} variant="ghost" to={entry.link}>
-                    {t('whats_new_try')}
-                  </ButtonLink>
+                  <ul className={styles.points}>
+                    {t(copy.points)
+                      .split('\n')
+                      .map((point) => (
+                        <li key={point}>{point}</li>
+                      ))}
+                  </ul>
                 </li>
               );
             })}

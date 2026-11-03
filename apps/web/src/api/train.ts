@@ -18,7 +18,8 @@ import { liveInterval } from './liveInterval';
 import type { CrewColor } from './types';
 
 export type ExerciseType = 'w' | 'bw' | 'c' | 's';
-export type MuscleGroup = 'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Cardio' | 'Mobility';
+export type MuscleGroup =
+  'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Core' | 'Cardio' | 'Mobility';
 
 export type Exercise = {
   id: string;

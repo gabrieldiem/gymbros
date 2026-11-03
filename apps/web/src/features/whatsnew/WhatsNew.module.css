@@ -12,7 +12,7 @@
   list-style: none;
 }
 
-.list li {
+.list > li {
   padding: 18px;
   background: var(--plate);
   border: 1px solid var(--steel);
@@ -29,6 +29,31 @@
 }
 
 .list p {
-  margin-bottom: 14px;
+  color: var(--chalk);
+}
+
+.points {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
   color: var(--smoke);
+  list-style: none;
+}
+
+.points li {
+  position: relative;
+  padding-left: 18px;
+}
+
+/* A small volt tick of the trail, not the default bullet. */
+.points li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 2px;
+  width: 7px;
+  height: 7px;
+  content: '';
+  background: var(--volt);
+  border-radius: 50%;
 }

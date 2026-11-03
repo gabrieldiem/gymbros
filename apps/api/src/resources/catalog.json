@@ -1,5 +1,5 @@
 {
-  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km. ppl: push/pull/legs class (null for cardio).",
+  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km. ppl: push/pull/legs class (null for cardio and core).",
   "exercises": [
     {
       "id": "bench",
@@ -36,6 +36,80 @@
         "aperturas en polea",
         "aperturas",
         "cruce de poleas"
+      ]
+    },
+    {
+      "id": "inclinebb",
+      "name": "Incline bench press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press inclinado con barra",
+        "press banca inclinado"
+      ]
+    },
+    {
+      "id": "decline",
+      "name": "Decline bench press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press declinado",
+        "press banca declinado"
+      ]
+    },
+    {
+      "id": "dbbench",
+      "name": "Dumbbell bench press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "press con mancuernas",
+        "press plano con mancuernas"
+      ]
+    },
+    {
+      "id": "chestpress",
+      "name": "Machine chest press",
+      "group": "Chest",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "press de pecho en máquina",
+        "press pecho maquina"
+      ]
+    },
+    {
+      "id": "pecdeck",
+      "name": "Pec deck",
+      "group": "Chest",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "peck deck",
+        "mariposa",
+        "contractor de pecho"
+      ]
+    },
+    {
+      "id": "pushup",
+      "name": "Push-up",
+      "group": "Chest",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "flexiones",
+        "flexión",
+        "lagartijas"
       ]
     },
     {
@@ -100,6 +174,176 @@
       ]
     },
     {
+      "id": "frontsquat",
+      "name": "Front squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": true,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla frontal"
+      ]
+    },
+    {
+      "id": "goblet",
+      "name": "Goblet squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla goblet",
+        "sentadilla con mancuerna"
+      ]
+    },
+    {
+      "id": "hacksquat",
+      "name": "Hack squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla hack",
+        "prensa hack"
+      ]
+    },
+    {
+      "id": "smithsquat",
+      "name": "Smith machine squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": true,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla en multipower",
+        "sentadilla smith"
+      ]
+    },
+    {
+      "id": "bulgarian",
+      "name": "Bulgarian split squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla búlgara",
+        "sentadilla bulgara",
+        "zancada búlgara"
+      ]
+    },
+    {
+      "id": "legext",
+      "name": "Leg extension",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "extensión de piernas",
+        "extension de cuadriceps",
+        "sillón de cuádriceps"
+      ]
+    },
+    {
+      "id": "seatedcurl",
+      "name": "Seated leg curl",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "curl femoral sentado",
+        "isquios sentado"
+      ]
+    },
+    {
+      "id": "hipthrust",
+      "name": "Hip thrust",
+      "group": "Legs",
+      "type": "w",
+      "barbell": true,
+      "ppl": "legs",
+      "aliases_es": [
+        "empuje de cadera",
+        "puente de glúteos con barra"
+      ]
+    },
+    {
+      "id": "abductor",
+      "name": "Hip abductor machine",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "abductores",
+        "máquina de abductores"
+      ]
+    },
+    {
+      "id": "adductor",
+      "name": "Hip adductor machine",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "aductores",
+        "máquina de aductores"
+      ]
+    },
+    {
+      "id": "calf",
+      "name": "Standing calf raise",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "gemelos de pie",
+        "pantorrillas",
+        "elevación de talones"
+      ]
+    },
+    {
+      "id": "seatedcalf",
+      "name": "Seated calf raise",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "gemelos sentado",
+        "pantorrillas sentado"
+      ]
+    },
+    {
+      "id": "stepup",
+      "name": "Step-up",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "subida al cajón",
+        "subida al banco"
+      ]
+    },
+    {
+      "id": "kbswing",
+      "name": "Kettlebell swing",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "swing con pesa rusa",
+        "swing kettlebell"
+      ]
+    },
+    {
       "id": "deadlift",
       "name": "Deadlift",
       "group": "Back",
@@ -148,6 +392,104 @@
       ]
     },
     {
+      "id": "cablerow",
+      "name": "Seated cable row",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo en polea",
+        "remo sentado",
+        "remo gironda"
+      ]
+    },
+    {
+      "id": "dbrow",
+      "name": "Dumbbell row",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo con mancuerna",
+        "serrucho"
+      ]
+    },
+    {
+      "id": "tbar",
+      "name": "T-bar row",
+      "group": "Back",
+      "type": "w",
+      "barbell": true,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo en T",
+        "remo barra T"
+      ]
+    },
+    {
+      "id": "machinerow",
+      "name": "Machine row",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo en máquina"
+      ]
+    },
+    {
+      "id": "chinup",
+      "name": "Chin-up",
+      "group": "Back",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "dominadas supinas",
+        "dominadas agarre supino"
+      ]
+    },
+    {
+      "id": "straightarm",
+      "name": "Straight-arm pulldown",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "jalón con brazos rectos",
+        "pullover en polea"
+      ]
+    },
+    {
+      "id": "backext",
+      "name": "Back extension",
+      "group": "Back",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "extensión lumbar",
+        "hiperextensiones",
+        "lumbares"
+      ]
+    },
+    {
+      "id": "shrug",
+      "name": "Dumbbell shrug",
+      "group": "Back",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "encogimientos",
+        "encogimiento de hombros",
+        "trapecios"
+      ]
+    },
+    {
       "id": "ohp",
       "name": "Overhead press",
       "group": "Shoulders",
@@ -169,6 +511,78 @@
       "aliases_es": [
         "elevaciones laterales",
         "vuelos laterales"
+      ]
+    },
+    {
+      "id": "dbpress",
+      "name": "Dumbbell shoulder press",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "press de hombros con mancuernas",
+        "press militar con mancuernas"
+      ]
+    },
+    {
+      "id": "machinepress",
+      "name": "Machine shoulder press",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "press de hombros en máquina"
+      ]
+    },
+    {
+      "id": "frontraise",
+      "name": "Front raise",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "elevaciones frontales",
+        "elevación frontal"
+      ]
+    },
+    {
+      "id": "reardelt",
+      "name": "Rear delt fly",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "pájaros",
+        "vuelos posteriores",
+        "deltoides posterior"
+      ]
+    },
+    {
+      "id": "facepull",
+      "name": "Face pull",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "jalón a la cara",
+        "tirón a la cara"
+      ]
+    },
+    {
+      "id": "uprightrow",
+      "name": "Upright row",
+      "group": "Shoulders",
+      "type": "w",
+      "barbell": true,
+      "ppl": "pull",
+      "aliases_es": [
+        "remo al mentón",
+        "remo al cuello"
       ]
     },
     {
@@ -194,6 +608,160 @@
       "aliases_es": [
         "fondos",
         "fondos en paralelas"
+      ]
+    },
+    {
+      "id": "dbcurl",
+      "name": "Dumbbell curl",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "curl con mancuernas",
+        "bíceps con mancuernas"
+      ]
+    },
+    {
+      "id": "hammer",
+      "name": "Hammer curl",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "curl martillo"
+      ]
+    },
+    {
+      "id": "preacher",
+      "name": "Preacher curl",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "curl scott",
+        "curl predicador"
+      ]
+    },
+    {
+      "id": "cablecurl",
+      "name": "Cable curl",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "curl en polea",
+        "bíceps en polea"
+      ]
+    },
+    {
+      "id": "pushdown",
+      "name": "Triceps pushdown",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "tríceps en polea",
+        "extensión de tríceps en polea"
+      ]
+    },
+    {
+      "id": "skull",
+      "name": "Skull crusher",
+      "group": "Arms",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press francés",
+        "rompecráneos"
+      ]
+    },
+    {
+      "id": "overheadext",
+      "name": "Overhead triceps extension",
+      "group": "Arms",
+      "type": "w",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "extensión de tríceps sobre la cabeza",
+        "tríceps copa"
+      ]
+    },
+    {
+      "id": "closebench",
+      "name": "Close-grip bench press",
+      "group": "Arms",
+      "type": "w",
+      "barbell": true,
+      "ppl": "push",
+      "aliases_es": [
+        "press de banca agarre cerrado",
+        "press cerrado"
+      ]
+    },
+    {
+      "id": "crunch",
+      "name": "Crunch",
+      "group": "Core",
+      "type": "bw",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "abdominales",
+        "encogimientos abdominales"
+      ]
+    },
+    {
+      "id": "cablecrunch",
+      "name": "Cable crunch",
+      "group": "Core",
+      "type": "w",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "abdominales en polea"
+      ]
+    },
+    {
+      "id": "legraise",
+      "name": "Hanging leg raise",
+      "group": "Core",
+      "type": "bw",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "elevación de piernas colgado",
+        "elevaciones de piernas"
+      ]
+    },
+    {
+      "id": "russian",
+      "name": "Russian twist",
+      "group": "Core",
+      "type": "bw",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "giros rusos",
+        "giro ruso"
+      ]
+    },
+    {
+      "id": "abwheel",
+      "name": "Ab wheel rollout",
+      "group": "Core",
+      "type": "bw",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "rueda abdominal",
+        "rodillo abdominal"
       ]
     },
     {
@@ -254,6 +822,102 @@
         "piscina"
       ],
       "km_factor": 4.0
+    },
+    {
+      "id": "bike",
+      "name": "Stationary bike",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "bici fija",
+        "bicicleta fija",
+        "spinning"
+      ],
+      "km_factor": 0.33
+    },
+    {
+      "id": "cycling",
+      "name": "Outdoor cycling",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "ciclismo",
+        "bici",
+        "bicicleta"
+      ],
+      "km_factor": 0.33
+    },
+    {
+      "id": "elliptical",
+      "name": "Elliptical",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "elíptica",
+        "eliptico"
+      ],
+      "km_factor": 1.0
+    },
+    {
+      "id": "stairs",
+      "name": "Stair climber",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "escaladora",
+        "escaleras"
+      ],
+      "km_factor": 2.0
+    },
+    {
+      "id": "walk",
+      "name": "Incline walk",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "caminata",
+        "caminar",
+        "caminata inclinada"
+      ],
+      "km_factor": 0.7
+    },
+    {
+      "id": "jumprope",
+      "name": "Jump rope",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "saltar la cuerda",
+        "soga",
+        "comba"
+      ],
+      "km_factor": 1.0
+    },
+    {
+      "id": "hiit",
+      "name": "HIIT session",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "hiit",
+        "intervalos",
+        "funcional"
+      ],
+      "km_factor": 1.0
     },
     {
       "id": "stretch",
