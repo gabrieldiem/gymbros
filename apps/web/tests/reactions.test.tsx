@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { emojiName, toNames } from '../src/api/emojiNames';
 import { createQueryClient } from '../src/api/queryClient';
 import { toggledReactions } from '../src/api/social';
 import { ReactionBar } from '../src/features/crew/ReactionBar';
@@ -69,6 +70,89 @@ describe('The reaction bar', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Add a reaction' }));
     await userEvent.click(await screen.findByRole('button', { name: 'pick a flag' }));
     expect(onToggle).toHaveBeenCalledWith('🇦🇷');
+  });
+});
+
+describe('An emoji’s name', () => {
+  const DATA = [
+    {
+      emoji: '😂',
+      label: 'face with tears of joy',
+      skins: [],
+    },
+    {
+      emoji: '❤️',
+      label: 'red heart',
+    },
+    {
+      emoji: '👋',
+      label: 'waving hand',
+      skins: [{ emoji: '👋🏽', label: 'waving hand: medium skin tone' }],
+    },
+  ];
+
+  it('is found with or without the invisible selector, and for skin tones', () => {
+    const names = toNames(DATA, 'en');
+    expect(emojiName(names, '😂')).toBe('Face with tears of joy');
+    expect(emojiName(names, '❤️')).toBe('Red heart');
+    expect(emojiName(names, '❤')).toBe('Red heart');
+    expect(emojiName(names, '👋🏽')).toBe('Waving hand: medium skin tone');
+    expect(emojiName(names, '🛸')).toBeUndefined();
+    expect(emojiName(undefined, '😂')).toBeUndefined();
+  });
+
+  const bar = () => {
+    const fetchMock = mockApi({
+      'GET /api/me': [200, makeMe()],
+      'GET /emoji/en/data.json': [200, DATA],
+    });
+    render(
+      <Providers client={createQueryClient()}>
+        <ReactionBar
+          reactions={[
+            { emoji: '😂', count: 1, mine: false },
+            { emoji: '🛸', count: 1, mine: false },
+          ]}
+          always={['👊']}
+          onToggle={vi.fn()}
+        />
+      </Providers>,
+    );
+    return fetchMock;
+  };
+  const asked = (fetchMock: ReturnType<typeof mockApi>) =>
+    fetchMock.mock.calls.some(([url]) => String(url).includes('/emoji/'));
+
+  it('shows on hover, loading the names only then', async () => {
+    const fetchMock = bar();
+    const pill = await screen.findByRole('button', { name: '😂, 1' });
+    expect(asked(fetchMock)).toBe(false);
+    expect(screen.queryByText('Face with tears of joy')).toBeNull();
+    fireEvent.pointerEnter(pill, { pointerType: 'mouse' });
+    expect(await screen.findByText('Face with tears of joy')).toBeInTheDocument();
+    expect(pill).toHaveAccessibleDescription('Face with tears of joy');
+    expect(asked(fetchMock)).toBe(true);
+  });
+
+  it('doesn’t make a phone download every name for a tap', async () => {
+    const fetchMock = bar();
+    const pill = await screen.findByRole('button', { name: '😂, 1' });
+    fireEvent.pointerEnter(pill, { pointerType: 'touch' });
+    await act(() => new Promise((done) => setTimeout(done, 20)));
+    expect(asked(fetchMock)).toBe(false);
+  });
+
+  it('already knows the name of the usual ones, in our own words', async () => {
+    bar();
+    expect(await screen.findByText('Fist bump')).toBeInTheDocument();
+  });
+
+  it('shows nothing, not a blank tip, for an emoji it can’t name', async () => {
+    bar();
+    const pill = await screen.findByRole('button', { name: '🛸, 1' });
+    fireEvent.pointerEnter(pill, { pointerType: 'mouse' });
+    await screen.findByText('Face with tears of joy');
+    expect(pill).not.toHaveAccessibleDescription();
   });
 });
 

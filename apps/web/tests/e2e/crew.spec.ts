@@ -65,11 +65,23 @@ test('react with any emoji from the real picker, and answer with a picture', asy
     if (r.url().includes('jsdelivr')) outside.push(r.url());
   });
   await sheet.getByRole('searchbox').fill('rocket');
-  await sheet.getByRole('gridcell', { name: /^rocket$/i }).click();
+  const cell = sheet.getByRole('gridcell', { name: /^rocket$/i });
+  // A mouse can read the name first. A finger has no hover: a tap just picks it.
+  if (testInfo.project.name === 'desktop') {
+    await cell.hover();
+    await expect(sheet.locator('[class*="activeName"]')).toHaveText('Rocket');
+    await page.screenshot({ path: `${SCREENS}/emoji-name-picker.png` });
+  }
+  await cell.click();
   await expect(sheet).toHaveCount(0);
   const rocket = post.getByRole('button', { name: /^🚀, \d+$/ });
   await expect(rocket).toHaveAttribute('aria-pressed', 'true');
   await page.screenshot({ path: `${SCREENS}/emoji-${testInfo.project.name}.png` });
+  if (testInfo.project.name === 'desktop') {
+    await rocket.hover();
+    await expect(post.getByRole('tooltip').filter({ hasText: 'Rocket' })).toBeVisible();
+    await page.screenshot({ path: `${SCREENS}/emoji-name-pill.png` });
+  }
   await rocket.click(); // put it back
   await expect(post.getByRole('button', { name: /^🚀/ })).toHaveCount(0);
   expect(outside).toEqual([]);
