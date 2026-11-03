@@ -58,6 +58,13 @@ export type WorkoutPostVars = {
   gym_lon?: number | null;
   /** Changed after it was posted. */
   edited?: boolean;
+  /** How it was first posted. Missing on posts edited before this was kept. */
+  original?: {
+    name: string;
+    gym?: string | null;
+    points: number;
+    exercises: PostedExercise[];
+  };
   /** The past day this was logged for. Missing on posts from before past workouts existed. */
   performed_on?: string | null;
   routine_id: string | null;

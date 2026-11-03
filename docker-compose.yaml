@@ -65,6 +65,8 @@ services:
     image: gymbros-web
     build:
       context: ./apps/web
+      args:
+        VITE_CONTACT_EMAIL: ${VITE_CONTACT_EMAIL:-}
     restart: unless-stopped
     depends_on:
       api:

@@ -50,6 +50,7 @@
 }
 
 .chips {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -62,6 +63,58 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--smoke);
+}
+
+/* It opens under the whole row of chips, so it fits on a phone wherever the tag lands. */
+.chips .editedWrap {
+  padding: 0;
+  background: none;
+}
+
+.edited {
+  padding: 4px 10px;
+  color: var(--smoke);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--iron);
+  border-radius: var(--r-pill);
+  cursor: help;
+}
+
+.editedWrap:hover .edited,
+.editedWrap[data-open] .edited {
+  color: var(--chalk);
+}
+
+.editedInfo {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 3;
+  display: none;
+  padding: 12px 14px;
+  color: var(--chalk);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.editedInfo ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.editedWrap:hover .editedInfo,
+.editedWrap:focus-within .editedInfo,
+.editedWrap[data-open] .editedInfo {
+  display: block;
 }
 
 .chips .up {

@@ -1,4 +1,5 @@
-import { Camera, Check, ImageIcon, Palette, Trash2 } from 'lucide-react';
+import { Camera, Check, ImageIcon, Palette, Pipette, Trash2 } from 'lucide-react';
+import { HexColorInput, HexColorPicker } from 'react-colorful';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 
 import { useMe, useRemoveAvatar, useUpdateMe, useUploadAvatar } from '../../api/me';
@@ -6,7 +7,7 @@ import type { CrewColor } from '../../api/types';
 import { Avatar } from '../../components/Avatar';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
-import { memberColorHex } from '../../components/memberColor';
+import { inkOn, memberColorHex } from '../../components/memberColor';
 import { resizeImage } from '../../components/resizeImage';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
@@ -157,6 +158,8 @@ function ColorPicker() {
   const me = useMe().data;
   const updateMe = useUpdateMe();
   const isPreset = COLORS.some(({ value }) => value === me?.color);
+  const [picking, setPicking] = useState(false);
+  const [draft, setDraft] = useState('#3d8bff');
   return (
     <div>
       <h3 className={styles.iconTitle}>
@@ -175,19 +178,60 @@ function ColorPicker() {
             onClick={() => updateMe.mutate({ color: value })}
           />
         ))}
-        <label
+        <button
+          type="button"
           className={styles.customColor}
-          data-selected={me && !isPreset ? '' : undefined}
           style={me && !isPreset ? { background: me.color } : undefined}
+          aria-pressed={Boolean(me) && !isPreset}
+          aria-expanded={picking}
+          aria-label={t('color_custom')}
+          title={t('color_custom')}
+          onClick={() => {
+            setDraft(me ? memberColorHex(me.color) : '#3d8bff');
+            setPicking((open) => !open);
+          }}
         >
-          <span className="sr-only">{t('color_custom')}</span>
-          <input
-            type="color"
-            value={me ? memberColorHex(me.color) : '#ffffff'}
-            onChange={(e) => updateMe.mutate({ color: e.target.value as CrewColor })}
+          <Pipette
+            size={18}
+            aria-hidden="true"
+            color={me && !isPreset ? inkOn(me.color) : '#0D0D0D'}
           />
-        </label>
+        </button>
       </div>
+      {me && !isPreset && !picking && (
+        <p className={styles.customNote}>{t('color_custom_is', { hex: me.color })}</p>
+      )}
+      {picking && (
+        <div className={styles.picker}>
+          <HexColorPicker color={draft} onChange={setDraft} />
+          <div className={styles.pickerRow}>
+            <span className={styles.pickerSwatch} style={{ background: draft }} />
+            <label className={styles.pickerHex}>
+              <span className="sr-only">{t('color_hex')}</span>
+              <HexColorInput
+                color={draft}
+                onChange={setDraft}
+                prefixed
+                aria-label={t('color_hex')}
+              />
+            </label>
+            <Button
+              type="button"
+              variant="ghost"
+              icon={Check}
+              disabled={updateMe.isPending || !/^#[0-9a-f]{6}$/i.test(draft)}
+              onClick={() =>
+                updateMe.mutate(
+                  { color: draft.toLowerCase() as CrewColor },
+                  { onSuccess: () => setPicking(false) },
+                )
+              }
+            >
+              {t('color_use')}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

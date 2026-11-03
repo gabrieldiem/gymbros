@@ -26,6 +26,7 @@ from services.workout_mapping import to_rows, to_workout_log
 from services.workout_service import WorkoutService
 from services.workout_types import ExerciseEntry, FinishedWorkout
 
+_COMPARED = ("name", "gym", "points", "exercises")
 # Paid on top of the workout, and not taken back when it changes.
 _KEPT_KEYS = frozenset({"ln_quest", "ln_crew_quest", "ln_bounty", "ln_badge", "ln_duel"})
 
@@ -239,4 +240,7 @@ class WorkoutEditor:
         after = await self._climb.totals(member)
         climb = await self._climb.change(member, before, after)
         finished = FinishedWorkout(workout, score, count, climb, tuple(bonus))
-        post.vars = {**workout_post_vars(workout, finished), "edited": True}
+        # How it was first posted, however many edits later: what the crew can compare with.
+        was = post.vars
+        original = was.get("original") or {key: was.get(key) for key in _COMPARED}
+        post.vars = {**workout_post_vars(workout, finished), "edited": True, "original": original}

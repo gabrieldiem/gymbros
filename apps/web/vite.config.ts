@@ -79,6 +79,7 @@ export default defineConfig({
   },
   build: { sourcemap: true },
   test: {
+    env: { VITE_CONTACT_EMAIL: 'hello@example.test' },
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}'],

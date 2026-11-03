@@ -3,6 +3,11 @@
   min-height: 100dvh;
 }
 
+/* Only where columns sit side by side. */
+.handle {
+  display: none;
+}
+
 .rail {
   display: flex;
   flex-wrap: wrap;
@@ -112,9 +117,56 @@
 }
 
 @media (min-width: 960px) {
+  .shell > .handle {
+    left: var(--rail-w, 232px);
+  }
+
+  .split > .handle {
+    left: var(--list-w, 400px);
+  }
+
+  .handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 5;
+    display: block;
+    width: 9px;
+    margin-left: -5px;
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .handle::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4px;
+    width: 1px;
+    content: '';
+    transition: background var(--dur-fast);
+  }
+
+  .handle:hover::after,
+  .handle:focus-visible::after,
+  .handle:active::after {
+    left: 3px;
+    width: 3px;
+    background: var(--volt);
+  }
+
+  .handle:focus-visible {
+    outline: none;
+  }
+
+  .shell,
+  .split {
+    position: relative;
+  }
+
   .shell {
     display: grid;
-    grid-template-columns: 232px minmax(0, 1fr);
+    grid-template-columns: var(--rail-w, 232px) minmax(0, 1fr);
     height: 100dvh;
     overflow: hidden;
   }
@@ -158,7 +210,7 @@
 
   .split {
     display: grid;
-    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    grid-template-columns: var(--list-w, 400px) minmax(0, 1fr);
     height: 100%;
   }
 

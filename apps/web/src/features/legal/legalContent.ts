@@ -1,7 +1,17 @@
 import type { MessageKey } from '../../i18n/en';
 
-/** Where people write about their data. It has to be an address that really receives mail. */
-export const CONTACT_EMAIL = 'contact@gabrieldiem.com';
+type Env = { env?: Record<string, string | undefined> };
+type Node = { process?: Env };
+
+/**
+ * Where people write about their data, set when building (VITE_CONTACT_EMAIL) by whoever runs this
+ * copy of GYMBROS. This code can be cloned and run by anyone, so it never names anyone itself. It's
+ * read two ways because vite.config.ts imports this file too, before Vite's own variables exist.
+ */
+export const CONTACT_EMAIL: string =
+  (import.meta as unknown as Env).env?.VITE_CONTACT_EMAIL ??
+  (globalThis as unknown as Node).process?.env?.VITE_CONTACT_EMAIL ??
+  '';
 
 type Section = { heading: MessageKey; body: MessageKey };
 export type LegalContent = { title: MessageKey; intro: MessageKey; sections: Section[] };

@@ -243,6 +243,8 @@ Sent through Resend. Nothing goes out without `RESEND_API_KEY` on the server, an
 
 ## Privacy policy
 
+The code is open and anyone can run a copy, so the legal pages never name a person. “We” means whoever runs that copy, and the contact address is set when building (`VITE_CONTACT_EMAIL`).
+
 `/privacy` follows Google's OAuth verification requirements (support.google.com/cloud/answer/13806988): what Google data is accessed, how it's used, who it's shared with, how it's protected, retention and deletion, and a Limited Use statement. It's plain HTML, linked from the home page and from settings. Everything it says has to be true of the code: when data handling changes, change the policy and tell members in the app before the change applies.
 
 ## Your account

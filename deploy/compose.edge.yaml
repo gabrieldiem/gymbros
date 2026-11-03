@@ -61,7 +61,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?set GOOGLE_CLIENT_SECRET in Portainer}
       # Without a key the api skips email and logs that it did.
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_FROM: ${EMAIL_FROM:-GYMBROS <contact@gabrieldiem.com>}
       # Comma-separated. Empty means nobody can open the backoffice.
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     healthcheck:

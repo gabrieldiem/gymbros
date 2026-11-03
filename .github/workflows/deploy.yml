@@ -38,6 +38,8 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:latest
+          # This deployment's contact, on its legal pages. A clone sets its own.
+          build-args: VITE_CONTACT_EMAIL=contact@gabrieldiem.com
           cache-from: type=gha,scope=${{ matrix.app }}
           cache-to: type=gha,mode=max,scope=${{ matrix.app }}
       - name: Install Trivy
