@@ -50,6 +50,7 @@
 }
 
 .chips {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -62,6 +63,58 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--smoke);
+}
+
+/* It opens under the whole row of chips, so it fits on a phone wherever the tag lands. */
+.chips .editedWrap {
+  padding: 0;
+  background: none;
+}
+
+.edited {
+  padding: 4px 10px;
+  color: var(--smoke);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--iron);
+  border-radius: var(--r-pill);
+  cursor: help;
+}
+
+.editedWrap:hover .edited,
+.editedWrap[data-open] .edited {
+  color: var(--chalk);
+}
+
+.editedInfo {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 3;
+  display: none;
+  padding: 12px 14px;
+  color: var(--chalk);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  background: var(--iron);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.editedInfo ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.editedWrap:hover .editedInfo,
+.editedWrap:focus-within .editedInfo,
+.editedWrap[data-open] .editedInfo {
+  display: block;
 }
 
 .chips .up {
@@ -125,34 +178,16 @@
   text-align: right;
 }
 
-.reacts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 14px;
-}
-
-.reacts button,
-.counts {
+.commentsButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: var(--touch);
   padding: 0 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
   background: var(--iron);
   border-radius: var(--r-pill);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.counts {
-  color: var(--smoke);
-  font-weight: 600;
-}
-
-.reacts button[aria-pressed='true'] {
-  background: var(--volt-tint);
-  color: var(--volt);
 }
 
 .event {

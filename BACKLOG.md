@@ -93,3 +93,16 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-29` **Offline logging**: closed 2026-11-02 in f48399e.
 - [x] `GYM-58` **Which emails should GYMBROS send**: answered 2026-11-02: welcome, weekly digest and messages from admins, in 06a8909.
 - [x] `GYM-70` **Skipped exercises wipe last time and the pre-fill**: closed 2026-11-02 in d32999d.
+- [x] `GYM-75` **Log steps by day or period, with a calendar and a steps climb**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-76` **Muay Thai and other timed sports**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-77` **Log a set with no weight**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-78` **Add the exercises a member couldn't find**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-79` **Custom exercises by name, with no points**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-80` **Cancel a workout from the banner**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-81` **React with any emoji on posts and comments**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-82` **Answer a post with an image**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-83` **Strip metadata from every uploaded image and give it a standard name**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-84` **Colour picker from a package, showing a custom colour**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-85` **Edited tag last, showing what changed**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-86` **Don't name who runs GYMBROS in the legal pages**: closed 2026-11-03 on feat/steps (f770543).
+- [x] `GYM-87` **Adjustable width for backoffice columns**: closed 2026-11-03 on feat/steps (f770543).

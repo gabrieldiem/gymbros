@@ -12,13 +12,16 @@ class ExerciseModel(BaseModel):
 
     id: str
     name: str
-    group: Literal["Chest", "Legs", "Back", "Shoulders", "Arms", "Core", "Cardio", "Mobility"]
-    type: Literal["w", "bw", "c", "s"]
+    group: Literal[
+        "Chest", "Legs", "Back", "Shoulders", "Arms", "Core", "Cardio", "Mobility", "Custom"
+    ]
+    type: Literal["w", "bw", "c", "s", "x"]
     barbell: bool
     ppl: Literal["push", "pull", "legs"] | None
     aliases_es: list[str]
     km_factor: float
     default_minutes: int | None = None
+    minute_effort_km: float = 0.0
 
 
 class RoutineModel(BaseModel):

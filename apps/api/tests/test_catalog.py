@@ -5,8 +5,8 @@ from services.catalog import load_catalog
 
 def test_catalog_has_every_exercise_once():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 75
-    assert len({ex.id for ex in catalog.exercises}) == 75
+    assert len(catalog.exercises) == 80
+    assert len({ex.id for ex in catalog.exercises}) == 80
 
 
 def test_every_routine_uses_known_exercises():
@@ -63,7 +63,25 @@ def test_cardio_distance_is_weighed_for_every_sport():
 
 def test_only_lifts_have_a_push_pull_or_legs_day():
     for exercise in load_catalog().exercises:
-        if exercise.is_cardio or exercise.is_stretch or exercise.group == "Core":
+        if exercise.is_cardio or exercise.is_stretch or exercise.group in {"Core", "Custom"}:
             assert exercise.ppl is None
         else:
             assert exercise.ppl in {"push", "pull", "legs"}
+
+
+def test_the_names_a_member_asked_for_can_be_found():
+    wanted = {
+        "sentadilla hack": "hacksquat",
+        "sentadilla zumo": "sumosquat",
+        "aductories con maquina": "adductor",
+        "prensa": "legpress",
+        "estocadas": "lunge",
+        "patada de gluteos": "kickback",
+        "extension de cuatriceps": "legext",
+        "camilla de isotobiales": "legcurl",
+        "hip trust": "hipthrust",
+        "muai tai": "muaythai",
+    }
+    by_id = {e.id: e for e in load_catalog().exercises}
+    for name, exercise_id in wanted.items():
+        assert name in by_id[exercise_id].aliases_es, name

@@ -250,7 +250,9 @@ describe('Profile menu', () => {
     const menu = within(await openMenu());
     await userEvent.click(menu.getByRole('menuitem', { name: 'Profile and settings' }));
     const dialog = within(await screen.findByRole('dialog', { name: 'Profile and settings' }));
-    fireEvent.change(dialog.getByLabelText('Pick any color'), { target: { value: '#123456' } });
+    await userEvent.click(dialog.getByRole('button', { name: 'Pick any color' }));
+    fireEvent.change(dialog.getByLabelText('Color code'), { target: { value: '#123456' } });
+    await userEvent.click(dialog.getByRole('button', { name: 'Use this color' }));
     await waitFor(() => {
       const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PATCH');
       expect(JSON.parse(String(call?.[1]?.body))).toEqual({ color: '#123456' });

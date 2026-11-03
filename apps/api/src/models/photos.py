@@ -16,3 +16,10 @@ def photo_url(workout_id: uuid.UUID, version: int | None) -> str | None:
     if version is None:
         return None
     return f"/api/workouts/{workout_id}/photo?v={version}"
+
+
+def comment_photo_url(comment_id: uuid.UUID, version: int | None) -> str | None:
+    """The URL of a picture someone answered a post with."""
+    if version is None:
+        return None
+    return f"/api/feed/comments/{comment_id}/photo?v={version}"

@@ -20,12 +20,17 @@ export function formatPostedSet(
     return t('posted_disks', { kg: n(disks), reps: set.reps ?? 0 });
   }
   if (exercise?.type === 's') return `${set.minutes ?? 0} min`;
-  if (exercise?.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
+  if (exercise?.type === 'c') {
+    const km = set.km ?? 0;
+    return km > 0 ? `${set.minutes ?? 0} min, ${n(km)} km` : `${set.minutes ?? 0} min`;
+  }
   const load = set.load_kg ?? 0;
-  if (exercise?.type === 'bw') return `${load > 0 ? `+${n(load)}` : 'BW'}×${set.reps ?? 0}`;
+  if (load === 0) return `BW×${set.reps ?? 0}`;
+  if (exercise?.type === 'bw') return `+${n(load)}×${set.reps ?? 0}`;
   return `${n(load)}×${set.reps ?? 0}`;
 }
 
+/** Notifications from before any emoji could be used still name the first two. */
 const REACTION_EMOJI: Record<string, string> = { fist: '👊', fire: '🔥' };
 
 function whatsNewText(item: Notification, t: T): string {
@@ -42,8 +47,10 @@ export function notificationText(item: Notification, t: T): string {
     case 'n_react':
       return t('n_react', {
         name: String(vars.name),
-        emoji: REACTION_EMOJI[String(vars.kind)] ?? '👊',
+        emoji: REACTION_EMOJI[String(vars.kind)] ?? String(vars.kind),
       });
+    case 'n_comment_react':
+      return t('n_comment_react', { name: String(vars.name), emoji: String(vars.kind) });
     case 'n_whats_new':
       return whatsNewText(item, t);
     case 'n_points_adjusted': {

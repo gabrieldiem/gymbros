@@ -14,7 +14,9 @@ function escapeHtml(text: string): string {
 
 function renderLanguage(page: LegalContent, lang: Language): string {
   const text = (key: Parameters<typeof translate>[1]) =>
-    escapeHtml(translate(lang, key, { email: CONTACT_EMAIL }));
+    escapeHtml(
+      translate(lang, key, { email: CONTACT_EMAIL || translate(lang, 'legal_contact_fallback') }),
+    );
   const sections = page.sections
     .map(({ heading, body }) => `<h2>${text(heading)}</h2><p>${text(body)}</p>`)
     .join('');

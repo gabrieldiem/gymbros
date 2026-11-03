@@ -26,6 +26,10 @@ class PointEvent(Base):  # pylint: disable=too-few-public-methods
     workout_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("workouts.id", ondelete="SET NULL"), index=True
     )
+    # Steps pay points too. Removing the entry takes its points with it.
+    step_entry_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("step_entries.id", ondelete="CASCADE"), index=True
+    )
     key: Mapped[str] = mapped_column(String(40))
     vars: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     points: Mapped[int] = mapped_column(Integer)

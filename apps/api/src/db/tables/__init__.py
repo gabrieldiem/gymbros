@@ -4,6 +4,8 @@ from db.tables.admin_action import AdminAction
 from db.tables.auth_session import AuthSession
 from db.tables.avatar import Avatar
 from db.tables.comment import Comment
+from db.tables.comment_photo import CommentPhoto
+from db.tables.comment_reaction import CommentReaction
 from db.tables.crew import Crew
 from db.tables.digest_send import DigestSend
 from db.tables.duel import Duel
@@ -16,6 +18,7 @@ from db.tables.notification import Notification
 from db.tables.personal_record import PersonalRecord
 from db.tables.point_event import PointEvent
 from db.tables.reaction import Reaction
+from db.tables.step_entry import StepEntry
 from db.tables.user import User
 from db.tables.user_badge import UserBadge
 from db.tables.workout import Workout
@@ -27,6 +30,8 @@ __all__ = [
     "AuthSession",
     "Avatar",
     "Comment",
+    "CommentPhoto",
+    "CommentReaction",
     "Crew",
     "DigestSend",
     "Duel",
@@ -39,6 +44,7 @@ __all__ = [
     "PersonalRecord",
     "PointEvent",
     "Reaction",
+    "StepEntry",
     "User",
     "UserBadge",
     "Workout",

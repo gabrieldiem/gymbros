@@ -160,6 +160,7 @@ def to_workout_detail(detail: WorkoutDetail) -> WorkoutDetailResponse:
             WorkoutDetailExercise(
                 exercise_id=entry.exercise_id,
                 sets=[SetModel(**asdict(logged)) for logged in entry.sets],
+                custom_name=entry.custom_name,
             )
             for entry in detail.exercises
         ],

@@ -16,6 +16,7 @@ class ExerciseEntry:
 
     exercise_id: str
     sets: tuple[LoggedSet, ...]
+    custom_name: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,6 +26,7 @@ class ExerciseView:
     exercise_id: str
     sets: tuple[LoggedSet, ...]
     previous_sets: tuple[LoggedSet, ...]
+    custom_name: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

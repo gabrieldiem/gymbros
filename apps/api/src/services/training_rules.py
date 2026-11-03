@@ -49,6 +49,8 @@ def estimated_1rm(load_kg: float, reps: int) -> float:
 
 def effort_km(exercise: Exercise, logged: LoggedSet) -> float:
     """The distance as run-equivalent km, so sports compare: a swim km counts as 4."""
+    if exercise.is_timed:
+        return (logged.minutes or 0) * exercise.minute_effort_km
     distance = (logged.km or 0.0) * exercise.km_factor
     return min(distance, (logged.minutes or 0) * _MAX_EFFORT_KM_PER_MINUTE)
 
@@ -59,6 +61,8 @@ def endurance_score(exercise: Exercise, logged: LoggedSet) -> float | None:
     Riegel's formula says time grows with distance^1.06, so distance^1.06 / time compares a fast
     5 km with a slower 10 km. None when the effort is too short to count.
     """
+    if exercise.is_timed:
+        return None  # Nothing to beat but the clock, and longer isn't a record.
     effort = effort_km(exercise, logged)
     if effort < _MIN_PR_EFFORT_KM:
         return None
@@ -74,7 +78,7 @@ def overload(exercise: Exercise, last: LoggedSet) -> LoggedSet:
         return LoggedSet(minutes=last.minutes)
     if exercise.is_cardio:
         return LoggedSet(minutes=(last.minutes or 0) + 1, km=last.km)
-    if exercise.barbell and last.load_kg is not None:
+    if exercise.barbell and last.load_kg:
         return LoggedSet(load_kg=last.load_kg + BARBELL_STEP_KG, reps=last.reps, bar_kg=last.bar_kg)
     return replace(last, reps=(last.reps or 0) + 1, done=False, minutes=None, km=None)
 

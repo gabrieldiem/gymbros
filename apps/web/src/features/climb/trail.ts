@@ -104,7 +104,8 @@ export function buildTrail(d: string = TRAIL_D, samplesPerSegment = 120): Trail 
 
 const MIN_GAP = 34;
 const STEP = 32;
-const MAX_TRIES = 6;
+const MAX_TRIES = 24;
+const EDGE = 26;
 
 /**
  * Offsets along each marker's normal so markers at similar points don't overlap. Markers are
@@ -115,7 +116,14 @@ export function markerOffsets(trail: Trail, fractions: number[]): number[] {
   return fractions.map((f) => {
     const p = trail.pointAt(f);
     const n = trail.normalAt(f);
+    // A place off the map is no place: on a new crew everyone starts on the same spot, at the edge.
+    const outside = (o: number) => {
+      const x = p.x + n.x * o;
+      const y = p.y + n.y * o;
+      return x < EDGE || x > VIEW_W - EDGE || y < EDGE || y > VIEW_H - EDGE;
+    };
     const clash = (o: number) =>
+      outside(o) ||
       placed.some((q) => Math.hypot(q.x - (p.x + n.x * o), q.y - (p.y + n.y * o)) < MIN_GAP);
     let offset = 0;
     for (let tries = 1; clash(offset) && tries <= MAX_TRIES; tries++) {

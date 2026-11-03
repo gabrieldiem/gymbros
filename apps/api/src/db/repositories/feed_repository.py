@@ -8,6 +8,7 @@ from sqlalchemy import delete, func, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.comment import Comment
+from db.tables.comment_reaction import CommentReaction
 from db.tables.feed_item import FeedItem
 from db.tables.reaction import Reaction
 
@@ -87,6 +88,35 @@ class FeedRepository:
             grouped[comment.feed_item_id].append(comment)
         return dict(grouped)
 
+    async def comment_reactions(self, comment_ids: list[uuid.UUID]) -> list[CommentReaction]:
+        """Every emoji on these comments, oldest first."""
+        if not comment_ids:
+            return []
+        result = await self._session.scalars(
+            select(CommentReaction)
+            .where(CommentReaction.comment_id.in_(comment_ids))
+            .order_by(CommentReaction.created_at)
+        )
+        return list(result)
+
+    async def toggle_comment_reaction(
+        self, comment_id: uuid.UUID, user_id: uuid.UUID, emoji: str
+    ) -> bool:
+        """Add it, or take it off if it's there. Says whether it was added."""
+        key = (comment_id, user_id, emoji)
+        existing = await self._session.get(CommentReaction, key)
+        if existing is not None:
+            await self._session.delete(existing)
+            await self._session.flush()
+            return False
+        self._session.add(CommentReaction(comment_id=comment_id, user_id=user_id, emoji=emoji))
+        await self._session.flush()
+        return True
+
+    async def get_comment(self, comment_id: uuid.UUID) -> Comment | None:
+        """A comment, if there is one."""
+        return await self._session.get(Comment, comment_id)
+
     async def add_comment(self, comment: Comment) -> Comment:
         """Insert a comment."""
         self._session.add(comment)
@@ -95,8 +125,12 @@ class FeedRepository:
 
     async def count_by_user(self, user_id: uuid.UUID) -> tuple[int, int]:
         """(reactions given, comments written) by the user. Used by badges."""
+        # Posts of others, not emoji: you can add as many as you like, and to your own, which
+        # shouldn't earn a badge.
         reactions = await self._session.scalar(
-            select(func.count()).select_from(Reaction).where(Reaction.user_id == user_id)
+            select(func.count(func.distinct(Reaction.feed_item_id)))
+            .join(FeedItem, FeedItem.id == Reaction.feed_item_id)
+            .where(Reaction.user_id == user_id, FeedItem.actor_id != user_id)
         )
         comments = await self._session.scalar(
             select(func.count()).select_from(Comment).where(Comment.user_id == user_id)

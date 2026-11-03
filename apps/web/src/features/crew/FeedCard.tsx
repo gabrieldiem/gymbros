@@ -1,7 +1,7 @@
 import { ListChecks, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
-import { useReact, type FeedItem, type ReactionKind, type WorkoutPostVars } from '../../api/social';
+import { useReact, type FeedItem, type WorkoutPostVars } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
@@ -10,11 +10,11 @@ import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
+import { EditedTag } from './EditedTag';
 import styles from './Feed.module.css';
 import { formatPostedSet } from './format';
+import { ReactionBar } from './ReactionBar';
 import { Thread } from './Thread';
-
-const EMOJI: Record<ReactionKind, string> = { fist: '👊', fire: '🔥' };
 
 /** A finished workout in the feed: stats, PRs, exercises, reactions and comments. */
 export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exercise[] }) {
@@ -56,12 +56,12 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
             : t('min_n', { n: v.duration_min })}
         </span>
         {v.sets > 0 && <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>}
-        {v.edited && <span>{t('feed_edited')}</span>}
         {v.volume_kg > 0 && <span>{t('kg_n', { n: n(v.volume_kg) })}</span>}
         {v.cardio_minutes > 0 && <span>{t('cardio_min', { n: v.cardio_minutes })}</span>}
         {v.vs_last_pct !== null && v.vs_last_pct > 0 && (
           <span className={styles.up}>{t('vol_vs', { n: v.vs_last_pct })}</span>
         )}
+        {v.edited && <EditedTag post={v} exercises={exercises} />}
       </div>
       {v.prs.map((pr) => (
         <p key={pr.exercise_id} className={styles.pr}>
@@ -77,8 +77,8 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         </summary>
         <ul className={styles.exercises}>
           {v.exercises.map((e) => (
-            <li key={e.exercise_id}>
-              <span>{exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
+            <li key={`${e.exercise_id}-${e.custom_name ?? ''}`}>
+              <span>{e.custom_name ?? exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
               <span>
                 {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n, t)).join(', ')}
               </span>
@@ -86,36 +86,21 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
           ))}
         </ul>
       </details>
-      <div className={styles.reacts}>
-        {item.is_mine ? (
-          <span className={styles.counts}>
-            👊 {item.reactions.fist} &nbsp; 🔥 {item.reactions.fire}
-          </span>
-        ) : (
-          (['fist', 'fire'] as const).map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              aria-pressed={item.reactions.mine.includes(kind)}
-              aria-label={`${t(kind)}, ${item.reactions[kind]}`}
-              onClick={() => react.mutate({ itemId: item.id, kind })}
-            >
-              <i className={styles.emoji}>{EMOJI[kind]}</i>{' '}
-              <span key={item.reactions[kind]} className={styles.count}>
-                {item.reactions[kind]}
-              </span>
-            </button>
-          ))
-        )}
+      <ReactionBar
+        reactions={item.reactions.emoji ?? []}
+        always={['👊', '🔥']}
+        onToggle={(emoji) => react.mutate({ itemId: item.id, kind: emoji })}
+      >
         <button
           type="button"
+          className={styles.commentsButton}
           aria-expanded={open}
           aria-label={t('comments_n', { n: item.comments.length })}
           onClick={() => setOpen((o) => !o)}
         >
           <MessageCircle size={16} aria-hidden="true" /> <span>{item.comments.length}</span>
         </button>
-      </div>
+      </ReactionBar>
       {open && <Thread itemId={item.id} comments={item.comments} />}
     </li>
   );

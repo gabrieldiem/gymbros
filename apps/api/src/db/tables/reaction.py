@@ -20,5 +20,6 @@ class Reaction(Base):  # pylint: disable=too-few-public-methods
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    kind: Mapped[str] = mapped_column(String(8), primary_key=True)
+    # An emoji, or `fist` and `fire` as the first two were always stored.
+    kind: Mapped[str] = mapped_column(String(32), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

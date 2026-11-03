@@ -43,6 +43,7 @@ _PR_EPSILON = 0.01
 
 @dataclass(frozen=True, slots=True)
 class _Tally:
+    # pylint: disable=too-many-instance-attributes
     completed_sets: int
     leg_sets: int
     volume_kg: float
@@ -51,6 +52,9 @@ class _Tally:
     effort_km: float
     bests: tuple[RecordSet, ...]
     stretched: bool
+    timed_minutes: int = 0
+    timed_effort_km: float = 0.0
+    custom_sets: int = 0
 
 
 def score_workout(
@@ -58,7 +62,7 @@ def score_workout(
 ) -> ScoreResult:
     """Score a finished (or in-progress, for the live preview) workout."""
     tally = _tally(log, rules)
-    stretch = _stretch_items(tally, history, rules)
+    stretch = _stretch_items(tally, history, rules) + _custom_items(tally)
     if tally.completed_sets == 0:
         return ScoreResult(stretch, sum(item.points for item in stretch), 0.0, 0, 0, None, ())
     records = _records(tally.bests, history)
@@ -92,8 +96,13 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
     volume = km = effort = 0.0
     bests: list[RecordSet] = []
     stretched = False
+    timed_minutes = custom_sets = 0
+    timed_effort = 0.0
     for logged in log.exercises:
         done = [s for s in logged.sets if is_completed(logged.exercise, s)]
+        if logged.exercise.is_custom:
+            custom_sets += len(done)
+            continue
         if logged.exercise.is_stretch:
             stretched = stretched or bool(done)
             continue
@@ -103,13 +112,28 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
             minutes += sum(s.minutes or 0 for s in done)
             km += sum(s.km or 0 for s in done)
             effort += sum(effort_km(logged.exercise, s) for s in done)
+            if logged.exercise.is_timed:
+                timed_minutes += sum(s.minutes or 0 for s in done)
+                timed_effort += sum(effort_km(logged.exercise, s) for s in done)
             best = _best_cardio(logged, done)
         else:
             volume += sum(_set_volume(logged, s, rules) for s in done)
             best = _best_set(logged, done, rules)
         if best is not None:
             bests.append(best)
-    return _Tally(sets, legs, volume, minutes, km, effort, tuple(bests), stretched)
+    return _Tally(
+        sets,
+        legs,
+        volume,
+        minutes,
+        km,
+        effort,
+        tuple(bests),
+        stretched,
+        timed_minutes,
+        timed_effort,
+        custom_sets,
+    )
 
 
 def _set_volume(logged: LoggedExercise, logged_set: LoggedSet, rules: ScoringRules) -> float:
@@ -123,6 +147,8 @@ def _best_set(
     best: RecordSet | None = None
     for logged_set in done:
         load = effective_load(logged.exercise, logged_set.load_kg, rules.bodyweight_kg)
+        if load <= 0:
+            continue  # With no weight there's nothing to beat, and no record to hold.
         e1rm = estimated_1rm(load, logged_set.reps or 0)
         if best is None or e1rm > best.e1rm:
             best = RecordSet(
@@ -195,10 +221,14 @@ def _base_items(tally: _Tally, week: WeekState, rules: ScoringRules) -> tuple[Li
     if tally.cardio_minutes:
         minutes = tally.cardio_minutes
         items.append(LineItem("ln_cardio", {"minutes": minutes}, minutes * rules.cardio_minute))
-    distance_points = math.floor(tally.effort_km * rules.cardio_effort_km)
+    distance_effort = tally.effort_km - tally.timed_effort_km
+    distance_points = math.floor(distance_effort * rules.cardio_effort_km)
     if distance_points > 0:
         km = _number(round(tally.cardio_km, 2))
         items.append(LineItem("ln_distance", {"km": km}, distance_points))
+    timed_points = math.floor(tally.timed_effort_km * rules.cardio_effort_km)
+    if timed_points > 0:
+        items.append(LineItem("ln_intensity", {"minutes": tally.timed_minutes}, timed_points))
     return tuple(items)
 
 
@@ -241,6 +271,11 @@ def _week_items(week: WeekState, rules: ScoringRules) -> tuple[LineItem, ...]:
         LineItem("ln_goal", {"n": rules.weekly_target}, rules.weekly_goal),
         LineItem("ln_streak", {"weeks": streak}, streak_points),
     )
+
+
+def _custom_items(tally: _Tally) -> tuple[LineItem, ...]:
+    """Says it was logged, and that it pays nothing: a name anyone can type can't be balanced."""
+    return (LineItem("ln_custom", {"n": tally.custom_sets}, 0),) if tally.custom_sets else ()
 
 
 def _stretch_items(tally: _Tally, history: History, rules: ScoringRules) -> tuple[LineItem, ...]:

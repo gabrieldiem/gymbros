@@ -1,5 +1,11 @@
 """The Crew tab over HTTP: feed, reactions, comments, nudges, notifications, hall of fame."""
 
+import re
+import uuid
+
+from PIL import Image
+
+from db.repositories.feed_repository import FeedRepository
 import uuid
 from datetime import UTC, datetime, timedelta
 
@@ -12,6 +18,7 @@ from services.crew_service import CrewService
 from services.training_rules import week_start
 from main import app
 from tests.application.conftest import register_on
+from tests.images import JPEG, picture
 from tests.application.test_climb_endpoints import give_points
 
 TZ = "America/Argentina/Buenos_Aires"
@@ -62,7 +69,7 @@ async def test_a_finished_workout_is_posted_to_the_crew(client, member, other_cl
             ],
         }
     ]
-    assert item["reactions"] == {"fist": 0, "fire": 0, "mine": []}
+    assert item["reactions"] == {"fist": 0, "fire": 0, "mine": [], "emoji": []}
     assert (await client.get("/api/feed")).json()["items"][0]["is_mine"] is True
 
 
@@ -127,21 +134,24 @@ async def test_reactions_toggle_and_notify_the_owner(client, member, other_clien
     item_id = next(i["id"] for i in items if i["kind"] == "workout")
 
     on = await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fire"})
-    assert on.json() == {"fist": 0, "fire": 1, "mine": ["fire"]}
+    assert on.json()["fire"] == 1
+    assert on.json()["mine"] == ["fire"]
+    assert on.json()["emoji"] == [{"emoji": "🔥", "count": 1, "mine": True}]
     off = await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fire"})
-    assert off.json() == {"fist": 0, "fire": 0, "mine": []}
+    assert off.json() == {"fist": 0, "fire": 0, "mine": [], "emoji": []}
     assert (await keys(client)).count("n_react") == 1
     react = next(n for n in (await inbox(client))["items"] if n["key"] == "n_react")
-    assert react["vars"] == {"name": "Maxo", "kind": "fire", "item": "workout"}
+    assert react["vars"] == {"name": "Maxo", "kind": "🔥", "item": "workout"}
     assert react["actor"]["display_name"] == "Maxo"
 
 
-async def test_you_cannot_react_to_your_own_post(client, member):
+async def test_you_can_react_to_your_own_post_without_being_told_about_it(client, member):
     await finish(client)
     item_id = (await client.get("/api/feed")).json()["items"][-1]["id"]
-    response = await client.post(f"/api/feed/{item_id}/reactions", json={"kind": "fist"})
-    assert response.status_code == 409
-    assert response.json() == {"detail": {"code": "own_feed_item"}}
+    response = await client.post(f"/api/feed/{item_id}/reactions", json={"kind": "😂"})
+    assert response.status_code == 200
+    assert response.json()["emoji"] == [{"emoji": "😂", "count": 1, "mine": True}]
+    assert (await client.get("/api/notifications")).json()["unread"] == 0
 
 
 async def test_reactions_validate_and_scope(client, member, other_client, db_session):
@@ -348,3 +358,140 @@ async def test_a_comment_tells_everyone_in_the_thread_once(client, member, other
         assert "n_reply" not in await keys(client)
         # Nobody is told about their own comment.
         assert "n_reply" not in await keys(third)
+
+
+async def _post_by_gabi_with_maxo_watching(client, other_client, crew):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    await finish(client)
+    return (await client.get("/api/feed")).json()["items"][0]["id"]
+
+
+async def test_any_emoji_can_be_added_and_taken_off(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    url = f"/api/feed/{item_id}/reactions"
+    await other_client.post(url, json={"kind": "🇦🇷"})
+    both = (await other_client.post(url, json={"kind": "👨‍👩‍👧‍👦"})).json()
+    assert [e["emoji"] for e in both["emoji"]] == ["🇦🇷", "👨‍👩‍👧‍👦"]
+    assert all(e["mine"] for e in both["emoji"])
+    left = (await other_client.post(url, json={"kind": "🇦🇷"})).json()
+    assert [e["emoji"] for e in left["emoji"]] == ["👨‍👩‍👧‍👦"]
+
+
+async def test_only_an_emoji_is_a_reaction(client, member):
+    await finish(client)
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    for bad in ("<b>", "hi", "🔥🔥"):
+        response = await client.post(f"/api/feed/{item_id}/reactions", json={"kind": bad})
+        assert response.status_code == 422, bad
+
+
+async def test_the_first_two_are_the_same_whichever_way_they_are_sent(
+    client, other_client, crew, member
+):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    url = f"/api/feed/{item_id}/reactions"
+    body = (await other_client.post(url, json={"kind": "fist"})).json()
+    assert body["fist"] == 1
+    assert body["emoji"] == [{"emoji": "👊", "count": 1, "mine": True}]
+    assert (await other_client.post(url, json={"kind": "👊"})).json()["fist"] == 0
+
+
+async def test_a_reaction_tells_the_owner_which_emoji(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": "😂"})
+    inbox = (await client.get("/api/notifications")).json()["items"]
+    assert [n["vars"]["kind"] for n in inbox if n["key"] == "n_react"] == ["😂"]
+
+
+async def test_piling_on_emoji_doesnt_earn_the_hype_badge(
+    client, other_client, crew, member, db_session
+):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    for emoji in ("😂", "🔥", "👊", "💪", "❤️"):
+        await other_client.post(f"/api/feed/{item_id}/reactions", json={"kind": emoji})
+    # Maxo reacted to one post, whatever the number of emoji. Their own don't count either.
+    maxo = (await other_client.get("/api/me")).json()["id"]
+    given, _ = await FeedRepository(db_session).count_by_user(uuid.UUID(maxo))
+    assert given == 1
+
+
+async def test_comments_take_reactions_too(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    comment = (
+        await client.post(f"/api/feed/{item_id}/comments", json={"body": "Light weight"})
+    ).json()
+    url = f"/api/feed/comments/{comment['id']}/reactions"
+    assert (await other_client.post(url, json={"kind": "😂"})).status_code == 200
+    item = (await client.get("/api/feed")).json()["items"][0]
+    assert item["comments"][0]["reactions"]["emoji"] == [{"emoji": "😂", "count": 1, "mine": False}]
+    inbox = (await client.get("/api/notifications")).json()["items"]
+    assert "n_comment_react" in [n["key"] for n in inbox]
+    assert (await other_client.post(url, json={"kind": "😂"})).json()["emoji"] == []
+
+
+async def _someone_in_another_crew(other_client, db_session):
+    await CrewService(CrewRepository(db_session)).create("Other", "UTC", "OTHERCREW")
+    await register_on(other_client, "stranger@example.com", "OTHERCREW")
+
+
+async def test_a_comment_in_another_crew_cant_be_reached(client, other_client, member, db_session):
+    await finish(client)
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    comment = (await client.post(f"/api/feed/{item_id}/comments", json={"body": "Hi"})).json()
+    await _someone_in_another_crew(other_client, db_session)
+    url = f"/api/feed/comments/{comment['id']}/reactions"
+    assert (await other_client.post(url, json={"kind": "😂"})).status_code == 404
+
+
+async def _answer_with(client, item_id, data, caption=None):
+    query = {"caption": caption} if caption else {}
+    return await client.post(
+        f"/api/feed/{item_id}/comments/photo",
+        content=data,
+        headers={"Content-Type": "image/jpeg"},
+        params=query,
+    )
+
+
+async def test_a_post_can_be_answered_with_a_picture(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    response = await _answer_with(other_client, item_id, JPEG, "Look at this")
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["body"] == "Look at this"
+    picture = await client.get(body["photo_url"])
+    assert picture.status_code == 200
+    assert picture.headers["content-type"] == "image/jpeg"
+    assert picture.content.startswith(b"\xff\xd8\xff")
+    item = (await client.get("/api/feed")).json()["items"][0]
+    assert item["comments"][0]["photo_url"] == body["photo_url"]
+    inbox = (await client.get("/api/notifications")).json()["items"]
+    assert "n_comment" in [n["key"] for n in inbox]
+
+
+async def test_a_picture_answer_is_cleaned_and_named_neutrally(client, other_client, crew, member):
+    item_id = await _post_by_gabi_with_maxo_watching(client, other_client, crew)
+    exif = Image.Exif()
+    exif[0x013B] = "Secret author"
+    body = (await _answer_with(other_client, item_id, picture(exif=exif))).json()
+    served = await client.get(body["photo_url"])
+    assert b"Secret author" not in served.content
+    assert re.fullmatch(
+        r'inline; filename="gymbros-[0-9a-f]{24}\.jpg"', served.headers["content-disposition"]
+    )
+
+
+async def test_only_the_crew_sees_a_picture_answer(client, other_client, member, db_session):
+    await finish(client)
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    url = (await _answer_with(client, item_id, JPEG)).json()["photo_url"]
+    await _someone_in_another_crew(other_client, db_session)
+    assert (await other_client.get(url)).status_code == 404
+    assert (await _answer_with(other_client, item_id, JPEG)).status_code == 404
+
+
+async def test_a_picture_answer_has_to_be_a_picture(client, member):
+    await finish(client)
+    item_id = (await client.get("/api/feed")).json()["items"][0]["id"]
+    assert (await _answer_with(client, item_id, b"not a picture")).status_code == 415
+    assert (await client.get("/api/feed")).json()["items"][0]["comments"] == []

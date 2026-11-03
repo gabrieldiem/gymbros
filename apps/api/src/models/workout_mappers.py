@@ -40,6 +40,7 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         exercises=[
             ExerciseOutput(
                 exercise_id=e.exercise_id,
+                custom_name=e.custom_name,
                 sets=[_set(s) for s in e.sets],
                 previous_sets=[_set(s) for s in e.previous_sets],
             )
@@ -57,6 +58,7 @@ def to_workout_template(template: WorkoutTemplateView) -> WorkoutTemplate:
         exercises=[
             ExerciseOutput(
                 exercise_id=e.exercise_id,
+                custom_name=e.custom_name,
                 sets=[_set(s) for s in e.sets],
                 previous_sets=[_set(s) for s in e.previous_sets],
             )

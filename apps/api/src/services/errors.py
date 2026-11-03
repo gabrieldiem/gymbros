@@ -169,8 +169,12 @@ class FeedItemNotFound(DomainError):
     """No such feed item in the member's crew."""
 
 
-class OwnFeedItem(DomainError):
-    """Members can't react to their own posts."""
+class InvalidReaction(DomainError):
+    """A reaction has to be one emoji."""
+
+
+class CommentNotFound(DomainError):
+    """No such comment, or it's in another crew."""
 
 
 class MemberNotFound(DomainError):
@@ -203,3 +207,23 @@ class DuelNotPending(DomainError):
 
 class UnknownExerciseForHistory(DomainError):
     """PR history is only for catalog lifts."""
+
+
+class StepsDayTaken(DomainError):
+    """One of these days already has steps."""
+
+
+class StepsDayOutOfRange(DomainError):
+    """A day in the future, or too long ago."""
+
+
+class StepsTooMany(DomainError):
+    """More steps a day than anyone walks: a typo."""
+
+
+class StepEntryNotFound(DomainError):
+    """No such entry of yours."""
+
+
+class StepsEditExpired(DomainError):
+    """It's too late to remove this entry."""

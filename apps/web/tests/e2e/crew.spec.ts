@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
+
 import { expect, test } from '@playwright/test';
-import { memberEmail } from './members';
+import { logIn, memberEmail } from './members';
 
 // Run through `make e2e` (the e2e crews are seeded with the last 10 days of workouts).
 const SCREENS = 'test-results/screens';
@@ -43,4 +45,46 @@ test('crew feed, a reaction, hall of fame and the inbox', async ({ page }, testI
   await expect(page.getByRole('dialog', { name: 'Alerts' })).toBeVisible();
   await page.screenshot({ path: `${SCREENS}/inbox-${testInfo.project.name}.png` });
   expect(errors).toEqual([]);
+});
+
+test('react with any emoji from the real picker, and answer with a picture', async ({
+  page,
+}, testInfo) => {
+  await logIn(page, 'santi', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/crew');
+  const post = page
+    .locator('main li')
+    .filter({ has: page.getByRole('button', { name: /^Fist bump/ }) })
+    .last();
+  await post.getByRole('button', { name: 'Add a reaction' }).first().click();
+  const sheet = page.getByRole('dialog', { name: 'Pick an emoji' });
+  // Served by this site: nothing goes to a CDN.
+  const outside: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().includes('jsdelivr')) outside.push(r.url());
+  });
+  await sheet.getByRole('searchbox').fill('rocket');
+  await sheet.getByRole('gridcell', { name: /^rocket$/i }).click();
+  await expect(sheet).toHaveCount(0);
+  const rocket = post.getByRole('button', { name: /^🚀, \d+$/ });
+  await expect(rocket).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: `${SCREENS}/emoji-${testInfo.project.name}.png` });
+  await rocket.click(); // put it back
+  await expect(post.getByRole('button', { name: /^🚀/ })).toHaveCount(0);
+  expect(outside).toEqual([]);
+
+  await post.getByRole('button', { name: /comments?|comentarios?/i }).click();
+  await post.locator('input[type="file"]').setInputFiles({
+    name: 'my-holiday-in-paris.png',
+    mimeType: 'image/png',
+    buffer: readFileSync('public/icon-192.png'),
+  });
+  const image = post.getByRole('img', { name: /from Santi/ }).last();
+  await expect(image).toBeVisible();
+  const src = await image.getAttribute('src');
+  expect(src).not.toContain('paris');
+  const served = await page.request.get(src ?? '');
+  expect(served.headers()['content-disposition']).toMatch(/gymbros-[0-9a-f]+\./);
+  expect(served.headers()['content-disposition']).not.toContain('paris');
 });

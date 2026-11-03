@@ -168,6 +168,10 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **What's new:** when a feature ships, members hear about it once, as one bell notification that opens the What's new page (also in the profile menu). Several features since your last visit roll into one notification. It never toasts, pops up or emails, and it isn't sent to someone who joined after the feature came out.
 - **Weekly recap:** story-style slides (crew total, biggest climber, heaviest PR, your week, most improved, this week's event). This is the one place where the bold, loud visual treatment is allowed.
 
+Reactions work like a chat: any emoji, on posts and comments, on your own too. The picker's data comes from this server, not a CDN. A post can be answered with a picture. The Hype crew badge counts posts of others you reacted to, not emoji, so piling them on earns nothing.
+
+Every uploaded image is rebuilt from its pixels on the server, so location, camera, dates and anything else in the file are gone whatever the client sends. Images are stored without a file name and served as `gymbros-<hash>.jpg`.
+
 ## Competition mechanics
 
 - **Weekly quests** (reset Monday): Leg day twice (150), Push, pull and legs (120), Move 20 tonnes (200), Run 20 km or swim 5 km (200), Sixty cardio minutes (100).
@@ -198,6 +202,27 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 | Night owl | Finish a workout after 22:00 | 75 |
 | Comeback | Return after 14 days away | 100 |
 | Unstoppable | Reach 9,000 pts | 300 |
+
+## Steps
+
+Log steps for a day, or a total for a period such as the last 3 days, on a calendar, from today back as far as a past workout can go (`game.past_workout_days`).
+
+The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 steps a day (`scoring.steps_daily_cap`), so a 10,000 step day pays 40 and a week of them about what one solid workout pays. Steps add to training and never replace it:
+
+- A day counts once. A period can't overlap days already logged.
+- Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
+- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests, badges or the feed.
+- Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
+
+`/steps` has the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
+
+## Timed sports, no weight and custom exercises
+
+Point balance rules for anything that isn't a lift with a weight or a distance:
+
+- **Timed sports** (Muay Thai, boxing, HIIT, jump rope, stair climber) log minutes only. Each minute pays like cardio, plus an effort credit (`minute_effort_km` in the catalog, 8 km an hour), so an hour pays about 232 points, in line with a 10 km run at about 250. They count as a workout towards the weekly goal, and have no PR: longer isn't a record.
+- **No weight**: any weighted exercise can be done with just your body (`load_kg` 0, no bar). Sets pay as usual, with no volume and no PR, because there's no weight to measure.
+- **Custom exercises** have a name the member types, stored on the sets (`custom_name`). They pay nothing, because a name anyone can type can't be balanced. A workout of only custom exercises can be finished and appears on the feed, but pays nothing, unlocks nothing and doesn't count towards the weekly goal.
 
 ## Exercise catalog (v1)
 
@@ -234,6 +259,8 @@ Sent through Resend. Nothing goes out without `RESEND_API_KEY` on the server, an
 - **Stopping them:** the digest and messages from admins can be turned off in settings or from the link in each email, without signing in. Mail apps can offer one-click unsubscribe. People who stopped them are skipped. The welcome email and invites aren't affected.
 
 ## Privacy policy
+
+The code is open and anyone can run a copy, so the legal pages never name a person. “We” means whoever runs that copy, and the contact address is set when building (`VITE_CONTACT_EMAIL`).
 
 `/privacy` follows Google's OAuth verification requirements (support.google.com/cloud/answer/13806988): what Google data is accessed, how it's used, who it's shared with, how it's protected, retention and deletion, and a Limited Use statement. It's plain HTML, linked from the home page and from settings. Everything it says has to be true of the code: when data handling changes, change the policy and tell members in the app before the change applies.
 

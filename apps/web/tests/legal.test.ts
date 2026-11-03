@@ -5,6 +5,7 @@ import { renderStaticLegalPage } from '../src/features/legal/staticLegalPage';
 import { translate } from '../src/i18n/translate';
 
 const PRIVACY = renderStaticLegalPage(PRIVACY_PAGE);
+const TERMS = renderStaticLegalPage(TERMS_PAGE);
 
 describe('static legal pages', () => {
   it.each([
@@ -33,7 +34,7 @@ describe('static legal pages', () => {
     ['how to delete', 'choose Delete account'],
     ['the Limited Use statement', 'including the Limited Use requirements'],
     ['no AI training', 'develop, improve or train AI or machine learning models'],
-    ['who runs the app', 'run by Gabriel Diem'],
+    ['who is responsible', 'whoever runs a copy of it is responsible'],
     ['server logs', 'including your IP address'],
     ['workout photos and gyms', 'where they are if you put them on the map, a photo of a workout'],
     ['the map provider', 'OpenStreetMap (receives what you search for'],
@@ -56,6 +57,19 @@ describe('static legal pages', () => {
   });
 
   it('gives a way to reach us', () => {
-    expect(PRIVACY).toContain('contact@gabrieldiem.com');
+    expect(PRIVACY).toContain('hello@example.test');
+  });
+});
+
+describe('Who runs it', () => {
+  it('never names a person, because anyone can run a copy', () => {
+    for (const page of [PRIVACY, TERMS]) {
+      expect(page).not.toMatch(/Gabriel|Diem|gabrieldiem/);
+    }
+  });
+
+  it('says who is responsible anyway', () => {
+    expect(PRIVACY).toContain('whoever runs a copy of it is responsible');
+    expect(TERMS).toContain('whoever runs this copy');
   });
 });

@@ -19,17 +19,25 @@ type Props = {
   campStep: number;
   /** Your all-time fraction before the workout you just finished, to animate the climb. */
   climbFrom?: number | undefined;
+  /** How a camp's value reads, for a climb that isn't in points. */
+  campValue?: ((value: number) => string) | undefined;
   onClimbDone?: (() => void) | undefined;
 };
 
-function Camps({ campStep }: { campStep: number }) {
+function Camps({
+  campStep,
+  campValue,
+}: {
+  campStep: number;
+  campValue?: ((value: number) => string) | undefined;
+}) {
   const { t, n } = useI18n();
   return (
     <g>
       {Array.from({ length: CAMPS }, (_, i) => {
         const p = TRAIL.pointAt(i / (CAMPS - 1));
         const name = t(`rank_${i}` as MessageKey);
-        const pts = t('pts_n', { n: n(campStep * i) });
+        const pts = campValue ? campValue(campStep * i) : t('pts_n', { n: n(campStep * i) });
         if (i === CAMPS - 1) {
           return (
             <g key={i}>
@@ -71,7 +79,14 @@ function Camps({ campStep }: { campStep: number }) {
 }
 
 /** The topographic trail map with every member's marker placed by points. */
-export function TrailMap({ standings, summit, campStep, climbFrom, onClimbDone }: Props) {
+export function TrailMap({
+  standings,
+  summit,
+  campStep,
+  climbFrom,
+  onClimbDone,
+  campValue,
+}: Props) {
   const { t, n } = useI18n();
   const targets = useMemo(
     () => Object.fromEntries(standings.map((s) => [s.user_id, Math.min(1, s.points / summit)])),
@@ -147,7 +162,7 @@ export function TrailMap({ standings, summit, campStep, climbFrom, onClimbDone }
             strokeDashoffset={1 - myFraction}
           />
         )}
-        <Camps campStep={campStep} />
+        <Camps campStep={campStep} campValue={campValue} />
         <g aria-hidden="true">
           {drawOrder.map((index) => {
             const s = standings[index];

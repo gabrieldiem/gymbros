@@ -45,7 +45,7 @@ export function formatPrevious(exercise: Exercise, set: SetData | undefined, n: 
   }
   if (exercise.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
   const load = set.load_kg ?? 0;
-  const prefix = exercise.type === 'bw' ? (load > 0 ? `+${n(load)}` : 'BW') : n(load);
+  const prefix = load === 0 ? 'BW' : exercise.type === 'bw' ? `+${n(load)}` : n(load);
   return `${prefix} × ${set.reps ?? 0}`;
 }
 
@@ -72,6 +72,12 @@ export function lineItemText(item: LineItem, exercises: Exercise[], t: T, n: N):
     }
     case 'ln_distance':
       return t('ln_distance', { km: n(Number(vars.km)) });
+    case 'ln_intensity':
+      return t('ln_intensity', { minutes: Number(vars.minutes) });
+    case 'ln_custom':
+      return t('ln_custom');
+    case 'ln_steps':
+      return t('ln_steps', { n: n(Number(vars.steps)) });
     case 'ln_stretch':
     case 'ln_show':
     case 'ln_vol':

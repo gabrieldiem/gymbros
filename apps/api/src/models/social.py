@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 
 from models.me import Color
 
-ReactionKind = Literal["fist", "fire"]
+Emoji = Annotated[str, StringConstraints(min_length=1, max_length=32)]
 QuickReply = Literal["q_light", "q_beast", "q_form", "q_six", "q_spot", "q_respect"]
 CommentBody = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=140)]
 
@@ -24,12 +24,22 @@ class ActorModel(BaseModel):
     color: Color
 
 
+class EmojiCountModel(BaseModel):
+    """One emoji on a post or comment."""
+
+    emoji: str
+    count: int
+    mine: bool
+
+
 class ReactionsModel(BaseModel):
-    """Counts per kind and which ones you added."""
+    """Every emoji with its count. `fist`, `fire` and `mine` are how the first two were sent,
+    which a phone still on an old version reads."""
 
     fist: int
     fire: int
-    mine: list[ReactionKind]
+    mine: list[str]
+    emoji: list[EmojiCountModel] = []
 
 
 class CommentModel(BaseModel):
@@ -40,6 +50,8 @@ class CommentModel(BaseModel):
     body: str | None
     quick_key: str | None
     created_at: datetime
+    photo_url: str | None = None
+    reactions: ReactionsModel | None = None
 
 
 class FeedItemModel(BaseModel):
@@ -73,9 +85,9 @@ class FeedResponse(BaseModel):
 
 
 class ReactRequest(BaseModel):
-    """Toggle a reaction."""
+    """Toggle an emoji. `fist` and `fire` also mean 👊 and 🔥, as they always did."""
 
-    kind: ReactionKind
+    kind: Emoji
 
 
 class CommentRequest(BaseModel):

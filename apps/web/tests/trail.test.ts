@@ -5,6 +5,8 @@ import {
   buildTrail,
   markerOffsets,
   parseCubicPath,
+  VIEW_H,
+  VIEW_W,
 } from '../src/features/climb/trail';
 
 describe('trail geometry', () => {
@@ -41,6 +43,23 @@ describe('trail geometry', () => {
     // 32-unit steps against a 34-unit clearance: the first step never clears (as in the prototype).
     expect(markerOffsets(trail, [0.4, 0.4, 0.4])).toEqual([0, 64, -64]);
     expect(markerOffsets(trail, [0.1, 0.9])).toEqual([0, 0]);
+  });
+
+  it('keeps everyone on the map when a whole crew starts on the same spot', () => {
+    for (const fraction of [0, 1]) {
+      const fractions = [fraction, fraction, fraction, fraction, fraction];
+      const offsets = markerOffsets(trail, fractions);
+      const point = trail.pointAt(fraction);
+      const normal = trail.normalAt(fraction);
+      const places = offsets.map((o) => ({ x: point.x + normal.x * o, y: point.y + normal.y * o }));
+      for (const place of places) {
+        expect(place.y).toBeLessThanOrEqual(VIEW_H);
+        expect(place.y).toBeGreaterThanOrEqual(0);
+        expect(place.x).toBeLessThanOrEqual(VIEW_W);
+        expect(place.x).toBeGreaterThanOrEqual(0);
+      }
+      expect(new Set(offsets).size).toBe(5);
+    }
   });
 
   it('draws 30 contour lines with every fifth main line as an index line', () => {

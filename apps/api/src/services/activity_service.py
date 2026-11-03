@@ -24,6 +24,7 @@ def workout_post_vars(workout: Workout, finished: FinishedWorkout | None = None)
     exercises = [
         {
             "exercise_id": entry.exercise_id,
+            **({"custom_name": entry.custom_name} if entry.custom_name else {}),
             "sets": [
                 {
                     "load_kg": s.load_kg,

@@ -22,6 +22,7 @@ from clients.resend_client import ResendEmailClient
 from clock import utc_now
 from db.repositories.admin_repository import AdminRepository
 from db.repositories.badge_repository import BadgeRepository
+from db.repositories.comment_photo_repository import CommentPhotoRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
@@ -33,6 +34,7 @@ from db.repositories.notification_repository import NotificationRepository
 from db.repositories.personal_record_repository import PersonalRecordRepository
 from db.repositories.point_event_repository import PointEventRepository
 from db.repositories.session_repository import SessionRepository
+from db.repositories.step_repository import StepRepository
 from db.repositories.user_repository import UserRepository
 from db.repositories.workout_photo_repository import WorkoutPhotoRepository
 from db.repositories.workout_repository import WorkoutRepository
@@ -72,6 +74,7 @@ from services.recap_service import RecapService
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
+from services.steps_service import StepRules, StepsService
 from services.welcome_email import EmailSender, GameNumbers
 from services.workout_editor import WorkoutEditor
 from services.training_now_service import TrainingNowService
@@ -375,6 +378,24 @@ def get_workout_editor(
     )
 
 
+def get_steps_service(session: AsyncSession = DB_SESSION) -> StepsService:
+    """FastAPI dependency provider for StepsService."""
+    return StepsService(
+        StepRepository(session),
+        PointEventRepository(session),
+        CrewRepository(session),
+        StepRules(
+            per_point=settings.scoring_steps_per_point,
+            daily_cap=settings.scoring_steps_daily_cap,
+            back_days=settings.game_past_workout_days,
+            remove_window=timedelta(days=settings.game_edit_workout_days),
+            week_summit=settings.game_steps_week_summit,
+            all_summit=settings.game_steps_all_summit,
+        ),
+        utc_now,
+    )
+
+
 def get_scoring_context(session: AsyncSession = DB_SESSION) -> ScoringContextBuilder:
     """FastAPI dependency provider for ScoringContextBuilder."""
     return _context(session)
@@ -397,6 +418,7 @@ def get_feed_service(session: AsyncSession = DB_SESSION) -> FeedService:
         notifier=_notifier(session),
         inactive_days=settings.social_inactive_days,
         now=utc_now,
+        photos=CommentPhotoRepository(session),
         badges=build_badge_service(session),
     )
 

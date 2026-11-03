@@ -66,6 +66,8 @@ export const CATALOG: Catalog = {
     goal_streak_max: 100,
     over_target: 50,
     better_than_last_time: 25,
+    steps_per_point: 250,
+    steps_daily_cap: 20000,
     stretching: 25,
     weekly_target: 3,
   },

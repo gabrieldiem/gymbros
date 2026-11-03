@@ -16,6 +16,7 @@ class CommentView:
 
     comment: Comment
     author: User
+    reactions: "ReactionSummary | None" = None
 
 
 @dataclass(frozen=True, slots=True)

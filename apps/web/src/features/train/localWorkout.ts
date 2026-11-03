@@ -52,9 +52,10 @@ export function toQueued(workout: Workout, draft: StoredDraft, finishedAt: Date)
     performed_on: workout.performed_on,
     started_at: workout.started_at,
     finished_at: finishedAt.toISOString(),
-    exercises: draft.exercises.map(({ exercise_id, sets }) => ({
+    exercises: draft.exercises.map(({ exercise_id, sets, custom_name }) => ({
       exercise_id,
       sets: forServer(sets),
+      ...(custom_name ? { custom_name } : {}),
     })),
   };
 }

@@ -116,6 +116,7 @@ export function PointsList({ rules, embedded = false }: { rules: Rules; embedded
             [t('e_pr'), plus(p.pr)],
             [t('e_better'), plus(p.better_than_last_time)],
             [t('e_stretch'), plus(p.stretching)],
+            [t('e_steps', { n: n(p.steps_per_point), cap: n(p.steps_daily_cap) }), plus(1)],
             [t('e_goal', { n: p.weekly_target }), plus(p.weekly_goal)],
             [t('e_over', { n: p.weekly_target }), plus(p.over_target)],
             [t('e_streak'), t('up_to', { per: p.goal_streak_per_week, max: p.goal_streak_max })],

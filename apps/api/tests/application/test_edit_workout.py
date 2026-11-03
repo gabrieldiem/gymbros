@@ -243,6 +243,19 @@ async def test_the_crew_sees_the_same_post_corrected_and_marked(client, member, 
     assert posts[0].vars["points"] == detail["points"]
     assert posts[0].vars["volume_kg"] == 350
     assert posts[0].vars["exercises"][0]["sets"][0]["load_kg"] == 70
+    assert posts[0].vars["original"]["exercises"][0]["sets"][0]["load_kg"] == 60
+    assert posts[0].vars["original"]["points"] == finished["total"]
+
+
+async def test_the_post_compares_with_how_it_was_first_posted(client, member, db_session):
+    finished = await finish(client)
+    await edited(client, finished["workout_id"], [bench(70)], name="Second")
+    await edited(client, finished["workout_id"], [bench(80)], name="Third")
+    db_session.expire_all()
+    post = await db_session.scalar(select(FeedItem).where(FeedItem.kind == "workout"))
+    assert post.vars["name"] == "Third"
+    assert post.vars["original"]["name"] == "Morning"
+    assert post.vars["original"]["exercises"][0]["sets"][0]["load_kg"] == 60
 
 
 async def test_editing_doesnt_notify_anyone(client, other_client, crew, member, db_session):

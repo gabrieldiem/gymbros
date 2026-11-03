@@ -9,7 +9,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, NavLink, useNavigate, useParams } from 'react-router';
 
 import {
@@ -36,9 +36,13 @@ import { timeAgo } from '../../i18n/timeAgo';
 import { useProfileLanguage } from '../../i18n/useLanguage';
 import styles from './Admin.module.css';
 import { CrewPanel, MemberPanel } from './AdminPanels';
+import { ColumnHandle } from './ColumnHandle';
+import { useColumnWidth } from './useColumnWidth';
 import { EmailTab } from './EmailTab';
 
 const NEW = 'new';
+const RAIL_COLUMN = { name: 'gymbros-admin-rail', initial: 232, min: 180, max: 360 };
+const LIST_COLUMN = { name: 'gymbros-admin-list', initial: 400, min: 260, max: 640 };
 
 function Overview() {
   const { t, n } = useI18n();
@@ -86,8 +90,19 @@ function Split({
   empty: string;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
+  const [listWidth, setListWidth] = useColumnWidth(LIST_COLUMN);
   return (
-    <div className={cx(styles.split, isOpen && styles.splitOpen)}>
+    <div
+      className={cx(styles.split, isOpen && styles.splitOpen)}
+      style={{ '--list-w': `${listWidth}px` } as CSSProperties}
+    >
+      <ColumnHandle
+        label={t('admin_resize_list')}
+        width={listWidth}
+        limits={LIST_COLUMN}
+        onChange={setListWidth}
+      />
       <div className={styles.listPane}>
         <h1>{title}</h1>
         {list}
@@ -365,8 +380,15 @@ export function AdminPage() {
   const me = useMe().data;
   const logout = useLogout();
   const { section } = useParams();
+  const [railWidth, setRailWidth] = useColumnWidth(RAIL_COLUMN);
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} style={{ '--rail-w': `${railWidth}px` } as CSSProperties}>
+      <ColumnHandle
+        label={t('admin_resize_rail')}
+        width={railWidth}
+        limits={RAIL_COLUMN}
+        onChange={setRailWidth}
+      />
       <aside className={styles.rail}>
         <div className={styles.railBrand}>
           <Brand />

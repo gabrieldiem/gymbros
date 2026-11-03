@@ -1,0 +1,43 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--touch);
+  padding: 0 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--iron);
+  border-radius: var(--r-pill);
+}
+
+.pill[aria-pressed='true'] {
+  color: var(--volt);
+  background: var(--volt-tint);
+}
+
+.emoji {
+  font-style: normal;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* On a comment: quieter, but still big enough for a finger. */
+.small {
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.small .pill {
+  min-height: 32px;
+  padding: 0 9px;
+  font-size: 0.8125rem;
+}

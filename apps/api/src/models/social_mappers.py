@@ -2,10 +2,11 @@
 
 from db.tables.user import User
 from models.avatar import avatar_url
-from models.photos import photo_url
+from models.photos import comment_photo_url, photo_url
 from models.social import (
     ActorModel,
     CommentModel,
+    EmojiCountModel,
     FeedItemModel,
     FeedResponse,
     HallOfFameResponse,
@@ -16,6 +17,7 @@ from models.social import (
     ReactionsModel,
     RecordModel,
 )
+from services.emoji_text import shown_emoji
 from services.social_types import (
     CommentView,
     FeedEntry,
@@ -41,12 +43,16 @@ def to_actor(user: User) -> ActorModel:
 
 def to_reactions(summary: ReactionSummary) -> ReactionsModel:
     """Reaction counts plus your own."""
-    return ReactionsModel.model_validate(
-        {
-            "fist": summary.counts.get("fist", 0),
-            "fire": summary.counts.get("fire", 0),
-            "mine": sorted(summary.mine),
-        }
+    # Oldest first, like a chat: an emoji doesn't jump around as others add theirs.
+    emoji = [
+        EmojiCountModel(emoji=shown_emoji(kind), count=count, mine=kind in summary.mine)
+        for kind, count in summary.counts.items()
+    ]
+    return ReactionsModel(
+        fist=summary.counts.get("fist", 0) + summary.counts.get("👊", 0),
+        fire=summary.counts.get("fire", 0) + summary.counts.get("🔥", 0),
+        mine=sorted(summary.mine),
+        emoji=emoji,
     )
 
 
@@ -59,6 +65,8 @@ def to_comment(view: CommentView) -> CommentModel:
         body=c.body,
         quick_key=c.quick_key,
         created_at=c.created_at,
+        photo_url=comment_photo_url(c.id, c.photo_version),
+        reactions=to_reactions(view.reactions) if view.reactions else None,
     )
 
 

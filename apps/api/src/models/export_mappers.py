@@ -27,7 +27,7 @@ def _workout(item: ExportedWorkout, catalog: Catalog) -> ExportWorkout:
         exercises.append(
             ExportExercise(
                 exercise_id=entry.exercise_id,
-                name=known.name if known else entry.exercise_id,
+                name=entry.custom_name or (known.name if known else entry.exercise_id),
                 sets=[ExportSet(**asdict(logged)) for logged in entry.sets],
             )
         )

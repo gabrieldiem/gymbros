@@ -41,7 +41,8 @@ class Settings:
     resend_api_key: str = ""
     # Whether this server looks for weekly digests to send. Off only for tests and one-off runs.
     email_scheduler_enabled: bool = True
-    email_from: str = "GYMBROS <contact@gabrieldiem.com>"
+    # Resend's own test sender, which reaches only your Resend account. Set EMAIL_FROM to go live.
+    email_from: str = "GYMBROS <onboarding@resend.dev>"
     # Email-only sign-in for demo and e2e accounts. Never in production (see _validate).
     dev_login_enabled: bool = False
     # Who can open the backoffice. Set on the server only, so nobody can grant it from the app.
@@ -52,6 +53,10 @@ class Settings:
     # How many days back a forgotten workout can be logged.
     game_past_workout_days: int = 7
     game_edit_workout_days: int = 2
+    game_steps_week_summit: int = 70_000
+    game_steps_all_summit: int = 1_500_000
+    scoring_steps_per_point: int = 250
+    scoring_steps_daily_cap: int = 20_000
     game_rank_step: int = 1500
     game_rank_count: int = 7
     game_week_scale: int = 1500
@@ -195,6 +200,10 @@ class Settings:
             raise ValueError("game.weekly_target and game.rank_step must be positive")
         if self.game_past_workout_days < 0:
             raise ValueError("game.past_workout_days can't be negative")
+        if self.scoring_steps_per_point < 1 or self.scoring_steps_daily_cap < 1:
+            raise ValueError("scoring.steps_per_point and steps_daily_cap must be positive")
+        if self.game_steps_week_summit < 6 or self.game_steps_all_summit < 6:
+            raise ValueError("game.steps_week_summit and steps_all_summit must have room for camps")
         if self.game_edit_workout_days < 0:
             raise ValueError("game.edit_workout_days can't be negative")
         if self.scoring_volume_kg_per_point < 1:

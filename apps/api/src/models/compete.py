@@ -172,6 +172,7 @@ class WorkoutDetailExercise(BaseModel):
 
     exercise_id: str
     sets: list[SetModel]
+    custom_name: str | None = None
 
 
 class WorkoutDetailResponse(BaseModel):

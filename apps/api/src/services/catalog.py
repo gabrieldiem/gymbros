@@ -8,7 +8,8 @@ from typing import Literal
 
 CATALOG_PATH = Path(__file__).resolve().parent.parent / "resources" / "catalog.json"
 
-ExerciseType = Literal["w", "bw", "c", "s"]
+ExerciseType = Literal["w", "bw", "c", "s", "x"]
+CUSTOM_EXERCISE = "custom"
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,6 +27,18 @@ class Exercise:
     km_factor: float = 1.0
     # Stretching only: the minutes it starts with.
     default_minutes: int | None = None
+    # A sport with no distance to log: what a minute of it is worth, in run-equivalent km.
+    minute_effort_km: float = 0.0
+
+    @property
+    def is_custom(self) -> bool:
+        """Named by the member. It's logged, and pays nothing."""
+        return self.type == "x"
+
+    @property
+    def is_timed(self) -> bool:
+        """Scored on minutes alone: there's no distance."""
+        return self.minute_effort_km > 0
 
     @property
     def is_cardio(self) -> bool:

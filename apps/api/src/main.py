@@ -21,6 +21,7 @@ from routes import (
     feed,
     feedback,
     gyms,
+    steps,
     me,
     notifications,
     places,
@@ -62,6 +63,7 @@ app.add_exception_handler(DomainError, handle_domain_error)
 app.include_router(auth.router, prefix="/api")
 app.include_router(rules.router, prefix="/api")
 app.include_router(places.router, prefix="/api")
+app.include_router(steps.router, prefix="/api")
 app.include_router(email.router, prefix="/api")
 app.include_router(feedback.router, prefix="/api")
 app.include_router(avatars.router, prefix="/api")

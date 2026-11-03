@@ -64,6 +64,8 @@ class ScoringRules:
     stretching: int
     weekly_target: int
     bodyweight_kg: float
+    steps_per_point: int = 250
+    steps_daily_cap: int = 20_000
 
     @classmethod
     def from_settings(cls, settings: Settings) -> "ScoringRules":
@@ -84,6 +86,8 @@ class ScoringRules:
             stretching=settings.scoring_stretching,
             weekly_target=settings.game_weekly_target,
             bodyweight_kg=settings.game_bodyweight_kg,
+            steps_per_point=settings.scoring_steps_per_point,
+            steps_daily_cap=settings.scoring_steps_daily_cap,
         )
 
 

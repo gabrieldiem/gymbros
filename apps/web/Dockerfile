@@ -9,6 +9,10 @@ WORKDIR /app
 COPY package.json package-lock.json /app/
 RUN npm ci --no-audit --no-fund
 
+# Where people write about their data, on the legal pages. Whoever runs this copy sets it.
+ARG VITE_CONTACT_EMAIL=
+ENV VITE_CONTACT_EMAIL=$VITE_CONTACT_EMAIL
+
 # Type-check and build to /app/dist
 COPY . .
 RUN npm run build

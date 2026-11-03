@@ -14,7 +14,7 @@ function LegalPage({ title, intro, sections }: LegalContent) {
       {sections.map(({ heading, body }) => (
         <section key={heading}>
           <h2>{t(heading)}</h2>
-          <p>{t(body, { email: CONTACT_EMAIL })}</p>
+          <p>{t(body, { email: CONTACT_EMAIL || t('legal_contact_fallback') })}</p>
         </section>
       ))}
       <Link className={styles.back} to="/">

@@ -1,5 +1,8 @@
 {
   "entries": [
+    { "id": "steps", "date": "2026-11-03", "link": "/steps" },
+    { "id": "emoji-and-photos", "date": "2026-11-03", "link": "/crew" },
+    { "id": "ways-to-train", "date": "2026-11-03", "link": "/train" },
     { "id": "more-exercises", "date": "2026-11-03", "link": "/train" },
     { "id": "edit-workout", "date": "2026-11-02", "link": "/me" },
     { "id": "gym-map", "date": "2026-11-02", "link": "/me" },
