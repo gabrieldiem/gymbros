@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,6 +13,50 @@ async function openApp(workout: unknown = null) {
   renderApp('/me');
   await screen.findByRole('button', { name: /^Alerts/ });
 }
+
+describe('A new version found while the app opens', () => {
+  afterEach(() => {
+    clearUpdate();
+    sessionStorage.clear();
+  });
+
+  it('starts by itself, so a normal reload gets it', async () => {
+    await openApp();
+    const apply = vi.fn();
+    act(() => announceUpdate(apply, true));
+    await waitFor(() => expect(apply).toHaveBeenCalledOnce());
+  });
+
+  it('starts for someone signed out too, without asking for their workout', async () => {
+    const fetchMock = mockApi({ 'GET /api/me': [401, { detail: { code: 'not_authenticated' } }] });
+    renderApp('/login');
+    await screen.findByRole('heading', { level: 1 });
+    const apply = vi.fn();
+    act(() => announceUpdate(apply, true));
+    await waitFor(() => expect(apply).toHaveBeenCalledOnce());
+    expect(fetchMock.mock.calls.map(([url]) => String(url))).not.toContain('/api/workouts/active');
+  });
+
+  it('waits while a workout is in progress', async () => {
+    await openApp(makeWorkout());
+    await screen.findByRole('link', { name: /Back to your workout/ });
+    const apply = vi.fn();
+    act(() => announceUpdate(apply, true));
+    await act(() => new Promise((done) => setTimeout(done, 50)));
+    expect(apply).not.toHaveBeenCalled();
+  });
+
+  it('never reloads in a loop if it fails to take over', async () => {
+    await openApp();
+    const apply = vi.fn();
+    act(() => announceUpdate(apply, true));
+    await waitFor(() => expect(apply).toHaveBeenCalledOnce());
+    act(() => clearUpdate());
+    act(() => announceUpdate(apply, true));
+    await act(() => new Promise((done) => setTimeout(done, 50)));
+    expect(apply).toHaveBeenCalledOnce();
+  });
+});
 
 describe('New version banner', () => {
   afterEach(() => clearUpdate());

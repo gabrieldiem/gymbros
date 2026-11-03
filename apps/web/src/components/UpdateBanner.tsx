@@ -9,7 +9,7 @@ import styles from './InstallBanner.module.css';
 
 /**
  * Says a new version is ready. It waits while a workout is in progress, and "Later" hides it until
- * the app is next opened, which is when the new version starts anyway.
+ * the app is next opened or reloaded, which is when the new version starts anyway.
  */
 export function UpdateBanner() {
   const { t } = useI18n();
