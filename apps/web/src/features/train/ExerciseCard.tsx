@@ -1,4 +1,4 @@
-import { Disc3, Plus, Repeat2, Trash2, TrendingUp, X } from 'lucide-react';
+import { Disc3, PersonStanding, Plus, Repeat2, Trash2, TrendingUp, X } from 'lucide-react';
 import { Fragment } from 'react';
 
 import { useMyStats } from '../../api/compete';
@@ -12,10 +12,12 @@ import {
   barOf,
   disksOf,
   editSet,
+  hasNoWeight,
   isSuggestion,
   repeatSource,
   repeated,
   withBar,
+  withoutWeight,
 } from './barbell';
 import { formatLift, formatPrevious } from './format';
 import type { DraftExercise } from './useWorkoutDraft';
@@ -37,6 +39,7 @@ const COLUMNS: Record<Exercise['type'], [MessageKey, MessageKey]> = {
   bw: ['col_added_kg', 'col_reps'],
   c: ['col_min', 'col_km'],
   s: ['col_min', 'col_km'], // Never shown: stretching has its own card.
+  x: ['col_kg', 'col_reps'],
 };
 
 const EMPTY_SET: SetData = { load_kg: null, reps: null, minutes: null, km: null, done: false };
@@ -65,6 +68,11 @@ export function ExerciseCard(props: Props) {
   const [colA, colB] = COLUMNS[exercise.type];
   const [fieldA, fieldB] = fields(exercise);
   const bar = barOf(entry.sets);
+  const name = entry.custom_name ?? exercise.name;
+  const timed = (exercise.minute_effort_km ?? 0) > 0;
+  // Bodyweight exercises already work this way, and neither does cardio have a weight.
+  const canSkipWeight = exercise.type === 'w' || exercise.type === 'x';
+  const noWeight = canSkipWeight && hasNoWeight(entry.sets);
   const firstLoad = entry.sets.find((s) => s.load_kg)?.load_kg;
   const number = (set: SetData, field: keyof SetData) =>
     exercise.barbell && field === 'load_kg' && set.load_kg !== null
@@ -89,15 +97,16 @@ export function ExerciseCard(props: Props) {
   const removeSet = (index: number) => onChange(entry.sets.filter((_, i) => i !== index));
 
   // The next set to do: its full weight, so nobody does the sum between sets.
-  const nextSet = entry.sets.findIndex((s) => !s.done && s.load_kg !== null);
+  const nextSet = entry.sets.findIndex((s) => !s.done && Boolean(s.load_kg));
 
   return (
-    <article className={styles.card} aria-label={exercise.name}>
+    <article className={styles.card} aria-label={name}>
       <header className={styles.head}>
         <span className={styles.title}>
           <h3>
-            {exercise.name}
+            {name}
             {legBonus && <span className={styles.bonus}>{t('leg_bonus')}</span>}
+            {exercise.type === 'x' && <span className={styles.noPoints}>{t('custom_tag')}</span>}
           </h3>
           {record && (
             <small className={styles.record}>
@@ -108,7 +117,18 @@ export function ExerciseCard(props: Props) {
           )}
         </span>
         <span className={styles.tools}>
-          {exercise.barbell && (
+          {canSkipWeight && (
+            <button
+              type="button"
+              className={cx(styles.link, noWeight && styles.linkOn)}
+              aria-pressed={noWeight}
+              onClick={() => onChange(withoutWeight(exercise, entry.sets, !noWeight))}
+            >
+              <PersonStanding size={16} aria-hidden="true" />
+              {t('no_weight')}
+            </button>
+          )}
+          {exercise.barbell && !noWeight && (
             <button
               type="button"
               className={styles.link}
@@ -122,7 +142,7 @@ export function ExerciseCard(props: Props) {
             type="button"
             className={styles.link}
             onClick={onRemove}
-            aria-label={t('remove_ex', { name: exercise.name })}
+            aria-label={t('remove_ex', { name })}
           >
             <X size={16} aria-hidden="true" />
             {t('remove')}
@@ -135,7 +155,7 @@ export function ExerciseCard(props: Props) {
             <TrendingUp size={15} aria-hidden="true" /> {t('beat')}
           </p>
         )}
-        {exercise.barbell && (
+        {exercise.barbell && !noWeight && (
           <label className={styles.bar}>
             {t('bar_label')}
             <select
@@ -155,7 +175,7 @@ export function ExerciseCard(props: Props) {
         <span>{t('col_set')}</span>
         <span>{t('col_repeat')}</span>
         <span>{t(exercise.barbell ? 'col_disks' : colA)}</span>
-        <span>{t(colB)}</span>
+        <span>{timed ? '' : t(colB)}</span>
         <span />
       </div>
       {entry.sets.map((set, i) => {
@@ -175,24 +195,39 @@ export function ExerciseCard(props: Props) {
                 {source && <Repeat2 size={15} aria-hidden="true" />}
                 <span>{sourceText}</span>
               </button>
-              {[fieldA, fieldB].map((field, f) => (
-                <input
-                  key={field}
-                  className={styles.input}
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  step={field === 'load_kg' ? 2.5 : field === 'km' ? 0.1 : 1}
-                  value={isSuggestion(set) ? '' : (number(set, field) ?? '')}
-                  placeholder={isSuggestion(set) ? String(number(set, field) ?? '') : undefined}
-                  onChange={(e) => setValue(i, field, e.target.value)}
-                  aria-label={t('set_field', {
-                    name: exercise.name,
-                    n: i + 1,
-                    field: t(f ? colB : exercise.barbell ? 'col_disks' : colA),
-                  })}
-                />
-              ))}
+              {[fieldA, fieldB].map((field, f) =>
+                timed && f === 1 ? (
+                  <span key={field} />
+                ) : (
+                  <input
+                    key={field}
+                    className={styles.input}
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step={field === 'load_kg' ? 2.5 : field === 'km' ? 0.1 : 1}
+                    disabled={field === 'load_kg' && set.load_kg === 0}
+                    value={
+                      isSuggestion(set) || (field === 'load_kg' && set.load_kg === 0)
+                        ? ''
+                        : (number(set, field) ?? '')
+                    }
+                    placeholder={
+                      field === 'load_kg' && set.load_kg === 0
+                        ? 'BW'
+                        : isSuggestion(set)
+                          ? String(number(set, field) ?? '')
+                          : undefined
+                    }
+                    onChange={(e) => setValue(i, field, e.target.value)}
+                    aria-label={t('set_field', {
+                      name,
+                      n: i + 1,
+                      field: t(f ? colB : exercise.barbell ? 'col_disks' : colA),
+                    })}
+                  />
+                ),
+              )}
               {entry.sets.length > 1 ? (
                 <button
                   type="button"
@@ -206,10 +241,10 @@ export function ExerciseCard(props: Props) {
                 <span />
               )}
             </div>
-            {exercise.barbell && i === nextSet && set.load_kg !== null && (
+            {exercise.barbell && i === nextSet && Boolean(set.load_kg) && (
               <p className={styles.barDetail}>
                 {t('bar_detail', {
-                  kg: n(set.load_kg),
+                  kg: n(set.load_kg ?? 0),
                   side: n((number(set, 'load_kg') ?? 0) / 2),
                 })}
               </p>

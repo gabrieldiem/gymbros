@@ -207,7 +207,13 @@ class WorkoutService:
             ExerciseView(
                 exercise_id=entry.exercise_id,
                 sets=entry.sets,
-                previous_sets=tuple(to_logged_set(r) for r in previous.get(entry.exercise_id, [])),
+                # Someone else's name, under the same id: nothing to repeat.
+                previous_sets=(
+                    ()
+                    if entry.custom_name
+                    else tuple(to_logged_set(r) for r in previous.get(entry.exercise_id, []))
+                ),
+                custom_name=entry.custom_name,
             )
             for entry in entries
         )

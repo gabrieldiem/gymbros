@@ -1,5 +1,5 @@
 {
-  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km. ppl: push/pull/legs class (null for cardio and core).",
+  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km, x = named by the member, pays nothing. minute_effort_km: a sport with no distance, credited as km per minute. ppl: push/pull/legs class (null for cardio and core).",
   "exercises": [
     {
       "id": "bench",
@@ -145,7 +145,8 @@
       "ppl": "legs",
       "aliases_es": [
         "prensa de piernas",
-        "prensa"
+        "prensa",
+        "prensa de pierna"
       ]
     },
     {
@@ -158,7 +159,8 @@
       "aliases_es": [
         "zancadas caminando",
         "zancadas",
-        "estocadas"
+        "estocadas",
+        "estocada"
       ]
     },
     {
@@ -170,7 +172,12 @@
       "ppl": "legs",
       "aliases_es": [
         "curl femoral",
-        "femoral"
+        "femoral",
+        "camilla de isquiotibiales",
+        "camilla de isotobiales",
+        "isquiotibiales",
+        "isotobiales",
+        "camilla"
       ]
     },
     {
@@ -205,7 +212,8 @@
       "ppl": "legs",
       "aliases_es": [
         "sentadilla hack",
-        "prensa hack"
+        "prensa hack",
+        "hack"
       ]
     },
     {
@@ -243,7 +251,11 @@
       "aliases_es": [
         "extensión de piernas",
         "extension de cuadriceps",
-        "sillón de cuádriceps"
+        "sillón de cuádriceps",
+        "extensión de cuádriceps",
+        "extension de cuatriceps",
+        "cuádriceps",
+        "cuatriceps"
       ]
     },
     {
@@ -267,7 +279,8 @@
       "ppl": "legs",
       "aliases_es": [
         "empuje de cadera",
-        "puente de glúteos con barra"
+        "puente de glúteos con barra",
+        "hip trust"
       ]
     },
     {
@@ -291,7 +304,9 @@
       "ppl": "legs",
       "aliases_es": [
         "aductores",
-        "máquina de aductores"
+        "máquina de aductores",
+        "aductores con máquina",
+        "aductories con maquina"
       ]
     },
     {
@@ -341,6 +356,31 @@
       "aliases_es": [
         "swing con pesa rusa",
         "swing kettlebell"
+      ]
+    },
+    {
+      "id": "sumosquat",
+      "name": "Sumo squat",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "sentadilla sumo",
+        "sentadilla zumo"
+      ]
+    },
+    {
+      "id": "kickback",
+      "name": "Glute kickback",
+      "group": "Legs",
+      "type": "w",
+      "barbell": false,
+      "ppl": "legs",
+      "aliases_es": [
+        "patada de glúteos",
+        "patada de gluteos",
+        "glúteos en polea"
       ]
     },
     {
@@ -875,7 +915,8 @@
         "escaladora",
         "escaleras"
       ],
-      "km_factor": 2.0
+      "km_factor": 1.0,
+      "minute_effort_km": 0.13
     },
     {
       "id": "walk",
@@ -903,7 +944,8 @@
         "soga",
         "comba"
       ],
-      "km_factor": 1.0
+      "km_factor": 1.0,
+      "minute_effort_km": 0.13
     },
     {
       "id": "hiit",
@@ -917,7 +959,40 @@
         "intervalos",
         "funcional"
       ],
-      "km_factor": 1.0
+      "km_factor": 1.0,
+      "minute_effort_km": 0.13
+    },
+    {
+      "id": "muaythai",
+      "name": "Muay Thai",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "muay tai",
+        "muai tai",
+        "muai thai",
+        "boxeo tailandés",
+        "thai"
+      ],
+      "km_factor": 1.0,
+      "minute_effort_km": 0.13
+    },
+    {
+      "id": "boxing",
+      "name": "Boxing",
+      "group": "Cardio",
+      "type": "c",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "boxeo",
+        "kickboxing",
+        "kick boxing"
+      ],
+      "km_factor": 1.0,
+      "minute_effort_km": 0.13
     },
     {
       "id": "stretch",
@@ -934,6 +1009,17 @@
         "movilidad"
       ],
       "default_minutes": 5
+    },
+    {
+      "id": "custom",
+      "name": "Custom exercise",
+      "group": "Custom",
+      "type": "x",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "personalizado"
+      ]
     }
   ],
   "routines": [

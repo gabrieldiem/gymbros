@@ -69,7 +69,7 @@ export function WorkoutDetailSheet({ workoutId, title, onClose }: Props) {
                 <ul className={styles.rows}>
                   {workout.exercises.map((e, i) => (
                     <li key={`${e.exercise_id}-${i}`}>
-                      <span>{exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
+                      <span>{e.custom_name ?? exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
                       <span className={styles.sets}>
                         {e.sets
                           .map((s) => formatPostedSet(exercise(e.exercise_id), s, n, t))

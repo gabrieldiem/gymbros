@@ -37,6 +37,12 @@ export type Comment = {
   created_at: string;
 };
 
+export type PostedExercise = {
+  exercise_id: string;
+  custom_name?: string | null;
+  sets: PostedSet[];
+};
+
 export type PostedSet = {
   load_kg: number | null;
   bar_kg?: number | null;
@@ -62,7 +68,7 @@ export type WorkoutPostVars = {
   points: number;
   vs_last_pct: number | null;
   prs: { exercise_id: string; load_kg: number; reps: number; bar_kg?: number | null }[];
-  exercises: { exercise_id: string; sets: PostedSet[] }[];
+  exercises: PostedExercise[];
 };
 
 export type FeedItem = {

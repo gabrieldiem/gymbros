@@ -335,6 +335,18 @@ export const en = {
   edit_save: 'Save changes',
   feed_edited: 'Edited',
   err_workout_edit_expired: 'The time to edit this workout has passed.',
+  ln_intensity: '{minutes} min of hard work',
+  ln_custom: 'Custom exercises are logged, with no points',
+  custom_tag: 'No points',
+  custom_ex_label: 'Not on the list? Name it',
+  custom_ex_hint: 'Custom exercises are logged but pay no points, so the climb stays fair.',
+  custom_ex_add: 'Add it',
+  no_weight: 'No weight',
+  cancel_workout: 'Cancel workout',
+  wn_ways_to_train_title: 'More ways to train',
+  wn_ways_to_train_body: 'Muay Thai, training with no weight, and exercises the list doesn’t have.',
+  wn_ways_to_train_points:
+    'Muay Thai and boxing count by the minute, and pay about what an hour of any sport pays\nTap No weight on an exercise for sets with just your body. Sets pay, with no volume or PR\nName an exercise the list doesn’t have. It’s logged, and pays no points\nSpanish search knows more names, like “sentadilla zumo” and “camilla de isquiotibiales”',
   wn_more_exercises_title: 'More exercises to choose from',
   wn_more_exercises_body:
     'Over 50 common movements joined the list, so you’re less likely to miss yours.',

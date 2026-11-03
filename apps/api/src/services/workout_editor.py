@@ -89,7 +89,7 @@ class WorkoutEditor:
         score, count = await self._score(member, workout, await self._earlier(others, logged_at))
         await self._store(member, workout, score, kept, logged_at)
         await self._settle_records(member, workout, others, exercises)
-        bonus = await self._bonus.after_workout(member, workout, before)
+        bonus = await self._bonus.after_workout(member, workout, before) if score.total > 0 else []
         workout.points = sum(e.points for e in await self._events.for_workout(workout.id))
         await self._rows.save(workout)
         await self._update_post(member, workout, score, count, before, bonus)

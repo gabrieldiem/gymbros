@@ -77,8 +77,8 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         </summary>
         <ul className={styles.exercises}>
           {v.exercises.map((e) => (
-            <li key={e.exercise_id}>
-              <span>{exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
+            <li key={`${e.exercise_id}-${e.custom_name ?? ''}`}>
+              <span>{e.custom_name ?? exercise(e.exercise_id)?.name ?? e.exercise_id}</span>
               <span>
                 {e.sets.map((s) => formatPostedSet(exercise(e.exercise_id), s, n, t)).join(', ')}
               </span>

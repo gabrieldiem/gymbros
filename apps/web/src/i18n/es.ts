@@ -343,6 +343,19 @@ export const es = {
   edit_save: 'Guardar cambios',
   feed_edited: 'Editado',
   err_workout_edit_expired: 'Ya pasó el tiempo para editar este entreno.',
+  ln_intensity: '{minutes} min de trabajo intenso',
+  ln_custom: 'Los ejercicios personalizados se registran, sin puntos',
+  custom_tag: 'Sin puntos',
+  custom_ex_label: '¿No está en la lista? Ponle nombre',
+  custom_ex_hint:
+    'Los ejercicios personalizados se registran pero no dan puntos, para que la subida siga siendo justa.',
+  custom_ex_add: 'Añadirlo',
+  no_weight: 'Sin peso',
+  cancel_workout: 'Cancelar entreno',
+  wn_ways_to_train_title: 'Más formas de entrenar',
+  wn_ways_to_train_body: 'Muay Thai, entrenar sin peso y ejercicios que la lista no tiene.',
+  wn_ways_to_train_points:
+    'Muay Thai y boxeo cuentan por minuto, y pagan más o menos lo que una hora de cualquier deporte\nToca Sin peso en un ejercicio para sets solo con tu cuerpo. Los sets pagan, sin volumen ni PR\nPonle nombre a un ejercicio que la lista no tiene. Se registra, y no da puntos\nLa búsqueda conoce más nombres, como “sentadilla zumo” y “camilla de isquiotibiales”',
   wn_more_exercises_title: 'Más ejercicios para elegir',
   wn_more_exercises_body:
     'Se sumaron más de 50 movimientos habituales, para que sea más difícil que falte el tuyo.',

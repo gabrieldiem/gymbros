@@ -11,7 +11,12 @@ const DRAFT_PREFIX = 'gymbros.offline.draft.';
 export type StoredDraft = {
   name: string;
   gym: string | null;
-  exercises: { exercise_id: string; sets: SetData[]; previous_sets: SetData[] }[];
+  exercises: {
+    exercise_id: string;
+    sets: SetData[];
+    previous_sets: SetData[];
+    custom_name?: string | null;
+  }[];
 };
 
 /** A whole finished workout, as `POST /api/workouts/{id}/sync` takes it. */
@@ -23,7 +28,7 @@ export type QueuedWorkout = {
   performed_on: string | null;
   started_at: string;
   finished_at: string;
-  exercises: { exercise_id: string; sets: SetData[] }[];
+  exercises: { exercise_id: string; sets: SetData[]; custom_name?: string | null }[];
   /** The server refused it, so trying again won't help. */
   failed?: boolean;
 };

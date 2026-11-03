@@ -30,7 +30,7 @@ export function WorkoutExercises({ exercises, onChange, catalog, past, legEvent 
   const setSets = (index: number, sets: SetData[]) =>
     onChange((list) => list.map((e, i) => (i === index ? { ...e, sets } : e)));
   const removeExercise = (index: number) => onChange((list) => list.filter((_, i) => i !== index));
-  const addExercise = (id: string) => {
+  const addExercise = (id: string, customName?: string) => {
     const exercise = exerciseById(id);
     const single = exercise?.type === 'c' || exercise?.type === 's';
     const empty: SetData = {
@@ -41,7 +41,15 @@ export function WorkoutExercises({ exercises, onChange, catalog, past, legEvent 
       done: false,
     };
     const sets = Array.from({ length: single ? 1 : 3 }, () => ({ ...empty }));
-    onChange((list) => [...list, { exercise_id: id, sets, previous_sets: [] }]);
+    onChange((list) => [
+      ...list,
+      {
+        exercise_id: id,
+        sets,
+        previous_sets: [],
+        ...(customName ? { custom_name: customName } : {}),
+      },
+    ]);
     setPicking(false);
   };
 
@@ -90,6 +98,7 @@ export function WorkoutExercises({ exercises, onChange, catalog, past, legEvent 
           exercises={catalog.exercises}
           legBonus={legEvent}
           onPick={addExercise}
+          onPickCustom={(name) => addExercise('custom', name)}
           onClose={() => setPicking(false)}
         />
       )}

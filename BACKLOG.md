@@ -26,6 +26,19 @@ Product or technical decisions that are still open. If one blocks work, pick the
 
 ## Later
 
+- [ ] `GYM-75` **Log steps by day or period, with a calendar and a steps climb** (api+web, L): Log daily steps or a total for several days (last 3 days combined) on a calendar. Pays points within the balance: capped per day, a day counts once. A steps dashboard shows the crew climbing by steps. _Added 2026-11-03_
+- [ ] `GYM-76` **Muay Thai and other timed sports** (api+web, S): Muay Thai (a friend trains 3 times a week) needs minutes only, no km, and should pay about what an hour of any sport pays. _Added 2026-11-03_
+- [ ] `GYM-77` **Log a set with no weight** (api+web, S): Squats and other weighted exercises can be done with body weight alone. Sets pay, with no volume and no PR. _Added 2026-11-03_
+- [ ] `GYM-78` **Add the exercises a member couldn't find** (api, S): Sumo squat and glute kickback are new; hack squat, adductors, leg press, lunges, quad extension, hamstring curl and hip thrust exist but need the names people type in Spanish. _Added 2026-11-03_
+- [ ] `GYM-79` **Custom exercises by name, with no points** (api+web, M): A free text exercise name. It pays nothing, to keep the balance, and doesn't count as a workout on its own. _Added 2026-11-03_
+- [ ] `GYM-80` **Cancel a workout from the banner** (web, S): The floating Back to your workout banner also offers cancelling it, with a confirmation. _Added 2026-11-03_
+- [ ] `GYM-81` **React with any emoji on posts and comments** (api+web, M): Like WhatsApp or Slack: an emoji picker on posts and on comments, with counts per emoji. _Added 2026-11-03_
+- [ ] `GYM-82` **Answer a post with an image** (api+web, M): A comment can be, or include, a photo. _Added 2026-11-03_
+- [ ] `GYM-83` **Strip metadata from every uploaded image and give it a standard name** (api, M): The server re-encodes uploads, so no metadata survives whatever the client sends, and serves them under a neutral unique file name. _Added 2026-11-03_
+- [ ] `GYM-84` **Colour picker from a package, showing a custom colour** (web, S): Replace the native colour input with a package. A custom colour is marked as custom, with a picker symbol always available. _Added 2026-11-03_
+- [ ] `GYM-85` **Edited tag last, showing what changed** (api+web, M): The Edited chip goes last, and hovering or tapping it shows what changed. _Added 2026-11-03_
+- [ ] `GYM-86` **Don't name who runs GYMBROS in the legal pages** (web+docs, S): Someone can clone the repo and run it, so the privacy policy and terms shouldn't name a person. The contact address is set per deployment. _Added 2026-11-03_
+- [ ] `GYM-87` **Adjustable width for backoffice columns** (web, S): The rail and list columns can be dragged wider or narrower, and remember it. _Added 2026-11-03_
 - [ ] `GYM-15` **Scoring balance pass** (game, M): a jackpot day reaches about 1,200 pts against 150 to 250 for a normal day. Simulate a month for 5 profiles and flatten it if one day decides the week. _Added 2026-10-31_
 - [ ] `GYM-16` **Bodyweight from profile** (game, S): bodyweight exercises assume an 80 kg load. Use each member's bodyweight. _Added 2026-10-31_
 - [ ] `GYM-17` **More weekly events** (game, M): only Leg day x2 exists. Add a rotating set (Pull week, Cardio week, Volume week). _Added 2026-10-31_

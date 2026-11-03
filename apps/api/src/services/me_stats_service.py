@@ -21,7 +21,7 @@ from services.climb_types import ClimbView
 from services.errors import UnknownExerciseForHistory, WorkoutNotFound
 from services.member import Member
 from services.training_rules import estimated_1rm, is_completed, week_start
-from services.workout_mapping import to_workout_log
+from services.workout_mapping import to_entries, to_workout_log
 from services.workout_types import ExerciseEntry
 
 HEATMAP_DAYS = 84
@@ -96,8 +96,9 @@ class MeStatsService:
             ExerciseEntry(
                 logged.exercise.id,
                 tuple(s for s in logged.sets if is_completed(logged.exercise, s)),
+                entry.custom_name,
             )
-            for logged in log.exercises
+            for logged, entry in zip(log.exercises, to_entries(workout))
         )
         done = tuple(entry for entry in exercises if entry.sets)
         paid = tuple(await self._events.for_workout(workout.id))

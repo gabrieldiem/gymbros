@@ -23,6 +23,7 @@ function toDraft(workout: WorkoutDetail): Draft {
     gym: workout.gym,
     exercises: workout.exercises.map((e) => ({
       exercise_id: e.exercise_id,
+      custom_name: e.custom_name ?? null,
       // They're what you logged, not suggestions.
       sets: e.sets.map((s): SetData => ({ ...s, done: true, started: true })),
       previous_sets: [],
@@ -38,9 +39,10 @@ export function EditWorkoutSheet({ workout, onClose }: Props) {
   const [draft, setDraft] = useState(() => toDraft(workout));
 
   const handleSave = () => {
-    const exercises = draft.exercises.map(({ exercise_id, sets }) => ({
+    const exercises = draft.exercises.map(({ exercise_id, sets, custom_name }) => ({
       exercise_id,
       sets: forServer(sets),
+      ...(custom_name ? { custom_name } : {}),
     }));
     const name = draft.name.trim();
     edit.mutate(name ? { name, gym: draft.gym, exercises } : { gym: draft.gym, exercises }, {

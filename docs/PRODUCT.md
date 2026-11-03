@@ -199,6 +199,14 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 | Comeback | Return after 14 days away | 100 |
 | Unstoppable | Reach 9,000 pts | 300 |
 
+## Timed sports, no weight and custom exercises
+
+Point balance rules for anything that isn't a lift with a weight or a distance:
+
+- **Timed sports** (Muay Thai, boxing, HIIT, jump rope, stair climber) log minutes only. Each minute pays like cardio, plus an effort credit (`minute_effort_km` in the catalog, 8 km an hour), so an hour pays about 232 points, in line with a 10 km run at about 250. They count as a workout towards the weekly goal, and have no PR: longer isn't a record.
+- **No weight**: any weighted exercise can be done with just your body (`load_kg` 0, no bar). Sets pay as usual, with no volume and no PR, because there's no weight to measure.
+- **Custom exercises** have a name the member types, stored on the sets (`custom_name`). They pay nothing, because a name anyone can type can't be balanced. A workout of only custom exercises can be finished and appears on the feed, but pays nothing, unlocks nothing and doesn't count towards the weekly goal.
+
 ## Exercise catalog (v1)
 
 Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.

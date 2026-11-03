@@ -22,6 +22,8 @@ class WorkoutSet(Base):  # pylint: disable=too-few-public-methods
         Uuid, ForeignKey("workouts.id", ondelete="CASCADE"), index=True
     )
     exercise_id: Mapped[str] = mapped_column(String(32), index=True)
+    # What the member called it, on a custom exercise.
+    custom_name: Mapped[str | None] = mapped_column(String(60))
     exercise_position: Mapped[int] = mapped_column(Integer)
     set_position: Mapped[int] = mapped_column(Integer)
     # The whole weight, bar included: what scoring reads. The logger shows it as disks + bar.

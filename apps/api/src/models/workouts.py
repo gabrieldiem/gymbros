@@ -3,8 +3,10 @@
 import uuid
 from datetime import date, datetime
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints, model_validator
 from typing_extensions import Annotated
+
+from services.catalog import CUSTOM_EXERCISE
 
 from models.climb import ClimbChangeModel
 from models.gyms import GymName
@@ -29,6 +31,15 @@ class ExerciseInput(BaseModel):
 
     exercise_id: str = Field(max_length=32)
     sets: list[SetModel] = Field(max_length=20)
+    custom_name: str | None = Field(default=None, min_length=1, max_length=60)
+
+    @model_validator(mode="after")
+    def _a_custom_exercise_has_a_name(self) -> "ExerciseInput":
+        if self.exercise_id == CUSTOM_EXERCISE and not (self.custom_name or "").strip():
+            raise ValueError("a custom exercise needs a name")
+        if self.exercise_id != CUSTOM_EXERCISE:
+            self.custom_name = None
+        return self
 
 
 class StartWorkoutRequest(BaseModel):
@@ -68,6 +79,7 @@ class ExerciseOutput(BaseModel):
     exercise_id: str
     sets: list[SetModel]
     previous_sets: list[SetModel]
+    custom_name: str | None = None
 
 
 class WorkoutResponse(BaseModel):

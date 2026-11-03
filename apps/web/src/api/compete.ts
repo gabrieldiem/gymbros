@@ -125,7 +125,7 @@ export type WorkoutDetail = {
   points: number;
   sets: number;
   volume_kg: number;
-  exercises: { exercise_id: string; sets: PostedSet[] }[];
+  exercises: { exercise_id: string; custom_name?: string | null; sets: PostedSet[] }[];
   line_items: LineItem[];
   /** Until when you can edit it. Null: you can't any more. */
   editable_until?: string | null;

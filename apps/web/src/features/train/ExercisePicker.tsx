@@ -1,7 +1,10 @@
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import type { Exercise, MuscleGroup } from '../../api/train';
+import { Button } from '../../components/Button';
 import { Sheet } from '../../components/Sheet';
+import { TextField } from '../../components/TextField';
 import { useI18n } from '../../i18n/context';
 import styles from './ExercisePicker.module.css';
 import { searchExercises } from './exerciseSearch';
@@ -12,6 +15,7 @@ type Props = {
   onClose: () => void;
   /** A timed event pays extra for leg exercises. */
   legBonus?: boolean;
+  onPickCustom: (name: string) => void;
 };
 
 const GROUPS: MuscleGroup[] = [
@@ -26,10 +30,22 @@ const GROUPS: MuscleGroup[] = [
 ];
 
 /** Search the catalog by English name or Spanish alias ("sentadilla" finds Back squat). */
-export function ExercisePicker({ exercises, legBonus = false, onPick, onClose }: Props) {
+export function ExercisePicker({
+  exercises,
+  legBonus = false,
+  onPick,
+  onClose,
+  onPickCustom,
+}: Props) {
   const { t } = useI18n();
   const [query, setQuery] = useState('');
-  const matches = searchExercises(exercises, query);
+  const [customName, setCustomName] = useState('');
+  const matches = searchExercises(
+    exercises.filter((e) => e.type !== 'x'),
+    query,
+  );
+  // Nothing found: whatever they searched for is probably what they'd call it.
+  const typedName = customName || (matches.length === 0 ? query : '');
 
   return (
     <Sheet title={t('add_ex')} onClose={onClose}>
@@ -68,6 +84,25 @@ export function ExercisePicker({ exercises, legBonus = false, onPick, onClose }:
           </section>
         );
       })}
+      <form
+        className={styles.custom}
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (typedName.trim()) onPickCustom(typedName.trim());
+        }}
+      >
+        <TextField
+          label={t('custom_ex_label')}
+          hint={t('custom_ex_hint')}
+          maxLength={60}
+          autoComplete="off"
+          value={typedName}
+          onChange={(e) => setCustomName(e.target.value)}
+        />
+        <Button type="submit" variant="ghost" icon={Plus} disabled={!typedName.trim()}>
+          {t('custom_ex_add')}
+        </Button>
+      </form>
     </Sheet>
   );
 }

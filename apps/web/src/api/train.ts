@@ -17,7 +17,7 @@ import { gymsKey } from './gyms';
 import { liveInterval } from './liveInterval';
 import type { CrewColor } from './types';
 
-export type ExerciseType = 'w' | 'bw' | 'c' | 's';
+export type ExerciseType = 'w' | 'bw' | 'c' | 's' | 'x';
 export type MuscleGroup =
   'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Core' | 'Cardio' | 'Mobility';
 
@@ -33,6 +33,8 @@ export type Exercise = {
   km_factor?: number;
   /** Stretching only: the minutes it starts with. */
   default_minutes?: number | null;
+  /** A sport with no distance: only minutes are logged. */
+  minute_effort_km?: number;
 };
 
 export type Routine = { id: string; name: string; exercise_ids: string[] };
@@ -73,7 +75,12 @@ export type SetData = {
   started?: boolean;
 };
 
-export type WorkoutExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
+export type WorkoutExercise = {
+  exercise_id: string;
+  sets: SetData[];
+  previous_sets: SetData[];
+  custom_name?: string | null;
+};
 
 export type Workout = {
   id: string;
@@ -153,7 +160,7 @@ export type WorkoutTemplate = {
 export type SaveBody = {
   name?: string;
   gym: string | null;
-  exercises: { exercise_id: string; sets: SetData[] }[];
+  exercises: { exercise_id: string; sets: SetData[]; custom_name?: string | null }[];
 };
 
 export const catalogKey = ['catalog'] as const;

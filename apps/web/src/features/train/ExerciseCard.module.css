@@ -288,3 +288,24 @@
   align-items: center;
   gap: 5px;
 }
+
+.linkOn {
+  color: var(--volt);
+}
+
+.noPoints {
+  margin-left: 8px;
+  padding: 1px 8px;
+  color: var(--smoke);
+  font-family: var(--body, inherit);
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  border: 1px solid var(--steel);
+  border-radius: var(--r-pill);
+}
+
+.input:disabled {
+  background: transparent;
+  border-style: dashed;
+}

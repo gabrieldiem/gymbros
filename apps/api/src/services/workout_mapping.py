@@ -26,7 +26,11 @@ def to_logged_set(row: WorkoutSet) -> LoggedSet:
 def to_entries(workout: Workout) -> tuple[ExerciseEntry, ...]:
     """The workout's sets grouped by exercise, in logger order."""
     return tuple(
-        ExerciseEntry(exercise_id=rows[0].exercise_id, sets=tuple(to_logged_set(r) for r in rows))
+        ExerciseEntry(
+            exercise_id=rows[0].exercise_id,
+            sets=tuple(to_logged_set(r) for r in rows),
+            custom_name=rows[0].custom_name,
+        )
         for rows in (
             list(group) for _, group in groupby(workout.sets, lambda s: s.exercise_position)
         )
@@ -38,6 +42,7 @@ def to_rows(entries: tuple[ExerciseEntry, ...]) -> list[WorkoutSet]:
     return [
         WorkoutSet(
             exercise_id=entry.exercise_id,
+            custom_name=entry.custom_name,
             exercise_position=exercise_position,
             set_position=set_position,
             load_kg=logged.load_kg,

@@ -119,7 +119,9 @@ async def save_workout(
 ) -> WorkoutResponse:
     """Save the logger state. Returns the live points preview."""
     entries = tuple(
-        ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+        ExerciseEntry(
+            e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets), e.custom_name
+        )
         for e in body.exercises
     )
     change_gym = "gym" in body.model_fields_set
@@ -213,7 +215,9 @@ async def sync_workout(
         started_at=body.started_at,
         finished_at=body.finished_at,
         entries=tuple(
-            ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+            ExerciseEntry(
+                e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets), e.custom_name
+            )
             for e in body.exercises
         ),
     )
@@ -234,7 +238,9 @@ async def edit_workout(
 ) -> WorkoutDetailResponse:
     """Change a finished workout, within the time allowed, and rescore it."""
     entries = tuple(
-        ExerciseEntry(e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets))
+        ExerciseEntry(
+            e.exercise_id, tuple(LoggedSet(**s.model_dump()) for s in e.sets), e.custom_name
+        )
         for e in body.exercises
     )
     change_gym = "gym" in body.model_fields_set

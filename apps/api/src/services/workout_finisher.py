@@ -137,7 +137,8 @@ class WorkoutFinisher:
         before = await self._climb.totals(member)
         await self._close(member, workout, score, moment)
         bonus: list[LineItem] = []
-        if self._bonus is not None:
+        # A workout of only custom exercises pays nothing, and that includes what it would unlock.
+        if self._bonus is not None and score.total > 0:
             bonus = await self._bonus.after_workout(member, workout, before)
         after = await self._climb.totals(member)
         finished = FinishedWorkout(

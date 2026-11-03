@@ -20,9 +20,13 @@ export function formatPostedSet(
     return t('posted_disks', { kg: n(disks), reps: set.reps ?? 0 });
   }
   if (exercise?.type === 's') return `${set.minutes ?? 0} min`;
-  if (exercise?.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
+  if (exercise?.type === 'c') {
+    const km = set.km ?? 0;
+    return km > 0 ? `${set.minutes ?? 0} min, ${n(km)} km` : `${set.minutes ?? 0} min`;
+  }
   const load = set.load_kg ?? 0;
-  if (exercise?.type === 'bw') return `${load > 0 ? `+${n(load)}` : 'BW'}×${set.reps ?? 0}`;
+  if (load === 0) return `BW×${set.reps ?? 0}`;
+  if (exercise?.type === 'bw') return `+${n(load)}×${set.reps ?? 0}`;
   return `${n(load)}×${set.reps ?? 0}`;
 }
 

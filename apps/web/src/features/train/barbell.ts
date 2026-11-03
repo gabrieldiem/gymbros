@@ -17,6 +17,16 @@ export const loadOf = (disksKg: number, barKg: number) => round(disksKg + barKg)
 export const barOf = (sets: SetData[]) =>
   sets.find((s) => s.bar_kg !== null && s.bar_kg !== undefined)?.bar_kg ?? DEFAULT_BAR_KG;
 
+/** No weight at all, on something that usually has one: it's stored as zero, with no bar. */
+export const hasNoWeight = (sets: SetData[]) =>
+  sets.length > 0 && sets.every((s) => s.load_kg === 0);
+
+export const withoutWeight = (exercise: Exercise, sets: SetData[], on: boolean): SetData[] =>
+  sets.map((s) => {
+    const next = { ...s, load_kg: on ? 0 : null, bar_kg: null };
+    return { ...next, started: true, done: isLogged(exercise, next) };
+  });
+
 /** A different bar on every set: the disks stay, the whole weight changes. */
 export function withBar(sets: SetData[], barKg: number): SetData[] {
   const current = barOf(sets);
