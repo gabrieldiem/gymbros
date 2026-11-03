@@ -44,13 +44,25 @@ export default function EmojiSheet({ onPick, onClose }: Props) {
                 </div>
               ),
               Emoji: ({ emoji, ...props }) => (
-                <button type="button" className={styles.emoji} {...props}>
+                <button type="button" className={styles.emoji} title={emoji.label} {...props}>
                   {emoji.emoji}
                 </button>
               ),
             }}
           />
         </EmojiPicker.Viewport>
+        <div className={styles.active} aria-hidden="true">
+          <EmojiPicker.ActiveEmoji>
+            {({ emoji }) =>
+              emoji ? (
+                <>
+                  <span className={styles.activeEmoji}>{emoji.emoji}</span>
+                  <span className={styles.activeName}>{emoji.label}</span>
+                </>
+              ) : null
+            }
+          </EmojiPicker.ActiveEmoji>
+        </div>
       </EmojiPicker.Root>
     </Sheet>
   );

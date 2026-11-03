@@ -1,6 +1,15 @@
 import { SmilePlus } from 'lucide-react';
-import { lazy, Suspense, useState, type ReactNode } from 'react';
+import {
+  lazy,
+  Suspense,
+  useId,
+  useState,
+  type FocusEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 
+import { emojiName, useEmojiNames } from '../../api/emojiNames';
 import type { EmojiCount } from '../../api/social';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
@@ -19,8 +28,18 @@ type Props = {
 
 /** Emoji with their counts, and a way to add any other, like in a chat. */
 export function ReactionBar({ reactions, onToggle, always = [], small = false, children }: Props) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [picking, setPicking] = useState(false);
+  // A mouse or a keyboard, not a finger: a tap shouldn't download every emoji's name.
+  const [wantNames, setWantNames] = useState(false);
+  const allNames = useEmojiNames(lang, wantNames);
+  const tipPrefix = useId();
+  const handlePointerEnter = (event: PointerEvent) => {
+    if (event.pointerType === 'mouse') setWantNames(true);
+  };
+  const handleFocus = (event: FocusEvent<HTMLElement>) => {
+    if (event.target.matches(':focus-visible')) setWantNames(true);
+  };
   const names: Record<string, string> = { '👊': t('fist'), '🔥': t('fire') };
   const shown: EmojiCount[] = [
     ...always.map(
@@ -30,23 +49,36 @@ export function ReactionBar({ reactions, onToggle, always = [], small = false, c
   ];
   return (
     <div className={cx(styles.bar, small && styles.small)}>
-      {shown.map(({ emoji, count, mine }) => (
-        <button
-          key={emoji}
-          type="button"
-          className={styles.pill}
-          aria-pressed={mine}
-          aria-label={`${names[emoji] ?? emoji}, ${count}`}
-          onClick={() => onToggle(emoji)}
-        >
-          <i className={styles.emoji}>{emoji}</i>
-          {count > 0 && (
-            <span key={count} className={styles.count}>
-              {count}
-            </span>
-          )}
-        </button>
-      ))}
+      {shown.map(({ emoji, count, mine }, index) => {
+        const name = names[emoji] ?? emojiName(allNames, emoji);
+        const tipId = `${tipPrefix}-${index}`;
+        return (
+          <span key={emoji} className={styles.withTip}>
+            <button
+              type="button"
+              className={styles.pill}
+              aria-pressed={mine}
+              aria-label={`${names[emoji] ?? emoji}, ${count}`}
+              aria-describedby={name ? tipId : undefined}
+              onPointerEnter={handlePointerEnter}
+              onFocus={handleFocus}
+              onClick={() => onToggle(emoji)}
+            >
+              <i className={styles.emoji}>{emoji}</i>
+              {count > 0 && (
+                <span key={count} className={styles.count}>
+                  {count}
+                </span>
+              )}
+            </button>
+            {name && (
+              <span id={tipId} role="tooltip" className={styles.tip}>
+                {name}
+              </span>
+            )}
+          </span>
+        );
+      })}
       <button
         type="button"
         className={styles.pill}
