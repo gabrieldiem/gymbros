@@ -285,7 +285,7 @@ export const en = {
   dur_hm: '{h} h {m} min',
   dur_m: '{m} min',
   rest_start: 'Rest {x}',
-  empty_title: 'Empty workout',
+  empty_title: 'Build your own',
   empty_sub: 'Add exercises one at a time.',
   earn_title: 'How you earn points',
   e_log: 'Log a workout',
@@ -335,9 +335,15 @@ export const en = {
   edit_save: 'Save changes',
   feed_edited: 'Edited',
   err_workout_edit_expired: 'The time to edit this workout has passed.',
+  wn_more_exercises_title: 'More exercises to choose from',
+  wn_more_exercises_body:
+    'Over 50 common movements joined the list, so you’re less likely to miss yours.',
+  wn_more_exercises_points:
+    'Machines, cables and dumbbells for every muscle group\nA new Core group for your abs\nMore cardio: bike, cycling, elliptical, stair climber, incline walk, jump rope and HIIT\nSearch works in Spanish too: try “sentadilla búlgara”',
   wn_edit_workout_title: 'Fix a workout after finishing it',
-  wn_edit_workout_body:
-    'Got a number wrong? Open the workout on your profile and edit it for up to 2 days. Your points are worked out again.',
+  wn_edit_workout_body: 'Got a number wrong? You have 2 days to change a workout after logging it.',
+  wn_edit_workout_points:
+    'Open the workout on your profile and tap Edit workout\nChange its sets, exercises, name or gym\nYour points are worked out again, and bonuses you already earned stay\nYour crew sees the corrected post, marked Edited',
   gym_edit_title: 'Change gym',
   gym_edit: 'Change {name}',
   gym_search: 'Search for a place, or paste a Google Maps link',
@@ -357,8 +363,9 @@ export const en = {
   err_map_link_not_understood:
     'That link doesn’t say where the place is. Search for it or tap the map.',
   wn_gym_map_title: 'Put your gym on the map',
-  wn_gym_map_body:
-    'Search for your gym, paste a Google Maps link or tap the map. Your crew can open it in Google Maps from your posts.',
+  wn_gym_map_body: 'Your gyms can now have a real place, so your crew knows where you train.',
+  wn_gym_map_points:
+    'Search for it, paste a Google Maps link, use your location or tap the map\nIt’s optional: a gym can still be just a name\nYour crew can open it in Google Maps from your posts',
   email_updates_title: 'Emails',
   email_updates_hint: 'The weekly digest and messages from the people running GYMBROS.',
   unsubscribe_title: 'Stop these emails?',
@@ -379,9 +386,50 @@ export const en = {
   admin_email_test: 'Send me a test digest',
   admin_email_test_sent: 'Sent. Check your inbox.',
   admin_email_test_failed: 'It couldn’t be sent.',
+  admin_list_back: 'Back to the list',
+  admin_pick_member: 'Choose an account to see it here.',
+  admin_pick_crew: 'Choose a crew to see it here.',
   admin_email_compose: 'Write to members',
+  admin_tpl_title: 'Start from',
+  admin_tpl_language: 'Template language',
+  admin_tpl_blank: 'Blank',
+  admin_tpl_blank_hint: 'Write it yourself, in the GYMBROS frame.',
+  admin_tpl_announcement: 'Announcement',
+  admin_tpl_announcement_hint: 'A headline, bullet points and a button.',
+  admin_tpl_welcome: 'Welcome email',
+  admin_tpl_welcome_hint: 'What new members get.',
+  admin_tpl_digest: 'Weekly digest',
+  admin_tpl_digest_hint: 'Everyone’s own numbers from last week.',
+  admin_tpl_invite: 'Crew invitation',
+  admin_tpl_invite_hint: 'The invite email, to adapt.',
+  admin_tpl_live_note:
+    'Sent as it is, each person gets their own copy, in their language, with their own name and numbers. This preview uses example numbers.',
+  admin_tpl_edit_copy: 'Edit a copy instead',
+  admin_tpl_digest_example:
+    'This copy has example numbers, and they go out as written. Change them before sending.',
+  admin_email_mode: 'View',
+  admin_mode_write: 'Write',
+  admin_mode_html: 'HTML',
+  admin_mode_preview: 'Preview',
+  admin_email_preview: 'Preview of the email',
+  admin_email_preview_empty: 'Write something to see it here.',
+  admin_email_tags: '{name}, {app} and {stop} fill in for each person.',
+  admin_rt_bold: 'Bold',
+  admin_rt_italic: 'Italic',
+  admin_rt_underline: 'Underline',
+  admin_rt_h2: 'Heading',
+  admin_rt_h3: 'Smaller heading',
+  admin_rt_bullets: 'Bullet list',
+  admin_rt_numbers: 'Numbered list',
+  admin_rt_quote: 'Quote',
+  admin_rt_link: 'Link',
+  admin_rt_divider: 'Divider',
+  admin_rt_undo: 'Undo',
+  admin_rt_redo: 'Redo',
+  admin_rt_link_url: 'Link address',
+  admin_rt_link_apply: 'Apply',
   admin_email_compose_hint:
-    'Plain text. Each email has a link to stop them, and people who stopped them are skipped.',
+    'Each email has a link to stop them, and people who stopped them are skipped.',
   admin_email_to: 'To',
   admin_email_everyone: 'Everyone',
   admin_email_person: 'One person',
@@ -540,6 +588,7 @@ export const en = {
   group_Back: 'Back',
   group_Shoulders: 'Shoulders',
   group_Arms: 'Arms',
+  group_Core: 'Core',
   group_Cardio: 'Cardio',
   ln_show: 'Showed up',
   ln_set1: '1 completed set',
@@ -664,51 +713,67 @@ export const en = {
   update_later: 'Later',
   whats_new: 'What’s new',
   whats_new_sub: 'What we’ve added to GYMBROS lately.',
-  whats_new_try: 'Try it',
   whats_new_failed: 'Couldn’t load what’s new.',
   n_whats_new: 'New in GYMBROS: {title}.',
   n_whats_new_many: '{n} new things in GYMBROS. Take a look.',
   n_whats_new_other: 'There’s something new in GYMBROS.',
   wn_weekly_email_title: 'Your week in your inbox',
-  wn_weekly_email_body:
-    'On Monday mornings GYMBROS can email you how your week went. You can turn it off in settings, and our privacy policy now covers it, along with photos, gyms and working offline.',
+  wn_weekly_email_body: 'On Monday mornings you can get an email with how your week went.',
+  wn_weekly_email_points:
+    'Your points and workouts, and how the crew did\nWho climbed the most and the heaviest PR\nTurn it off in settings, or from the link in any email',
   wn_offline_title: 'Log with no signal',
-  wn_offline_body:
-    'The app opens and logs with no signal, even a whole workout. It’s kept on your phone and sends itself when you’re back.',
+  wn_offline_body: 'A basement gym with no signal no longer gets in the way of logging.',
+  wn_offline_points:
+    'The app opens and logs with no connection, even a whole workout\nIt’s kept on your phone until you’re back online\nThen it sends itself, with nothing for you to do',
   wn_export_title: 'Take your training with you',
-  wn_export_body: 'Download every session you’ve logged as a JSON file, from settings.',
+  wn_export_body: 'Your training is yours, so you can download all of it at any time.',
+  wn_export_points:
+    'Every session you’ve logged, in one JSON file\nFind Download my data in settings',
   wn_feedback_title: 'Tell us what you think',
-  wn_feedback_body: 'Got an idea or found a bug? Send feedback from the menu on your picture.',
+  wn_feedback_body: 'Got an idea or found a bug? There’s now a direct way to tell us.',
+  wn_feedback_points:
+    'Tap your picture, then Send feedback\nYour message goes straight to the people running GYMBROS',
   wn_photos_title: 'Add a photo to your workout',
-  wn_photos_body:
-    'Show your crew your gym: add a photo while you log, or later from your page. It appears on your post.',
+  wn_photos_body: 'Show your crew your gym, or the pump, with one photo per workout.',
+  wn_photos_points:
+    'Add it while you log, or later from your profile\nIt appears on your post, and only your crew can see it',
   wn_profile_title: 'Make your profile yours',
-  wn_profile_body:
-    'Upload a picture or pick any two letters or emoji, and choose any color. Tap Profile and settings on your page.',
+  wn_profile_body: 'Your picture and color are now up to you.',
+  wn_profile_points:
+    'Upload a picture, or use any two letters or emoji\nChoose any color with the color picker\nTap Profile and settings on your page',
   wn_gyms_title: 'Show your crew where you train',
-  wn_gyms_body:
-    'Add your gyms in settings and pick a default. Your crew sees which one you’re at while you train and on your posts.',
+  wn_gyms_body: 'Save the gyms you go to and your crew can see which one you’re at.',
+  wn_gyms_points:
+    'Add up to 10 in settings\nPick a default, and it’s chosen for you each time\nIt shows while you train and on your posts',
   wn_rest_timer_title: 'A rest timer you control',
-  wn_rest_timer_body:
-    'It no longer starts by itself. Tap Rest when you want it, and the screen flashes when it’s time for the next set.',
+  wn_rest_timer_body: 'The rest timer no longer starts by itself.',
+  wn_rest_timer_points:
+    'Tap Rest when you want it\nAdjust or skip it as you go\nThe screen flashes when it’s time for the next set',
   wn_stretching_title: 'Stretching pays now',
-  wn_stretching_body:
-    'Add 5 or 10 minutes to a workout, or log it alone on a rest day, for fixed points once a day. Alone, it doesn’t count towards your weekly goal.',
+  wn_stretching_body: 'Stretching earns fixed points once a day.',
+  wn_stretching_points:
+    'Add 5 or 10 minutes to a workout, or log it alone on a rest day\nLogged alone, it doesn’t count towards your weekly goal',
   wn_workout_details_title: 'See the details of any workout',
-  wn_workout_details_body:
-    'On your page, tap a workout to see its exercises, sets and what each thing paid.',
+  wn_workout_details_body: 'Your past workouts now open up.',
+  wn_workout_details_points:
+    'Tap a workout on your page\nSee its exercises and sets\nSee what each thing paid',
   wn_faster_sets_title: 'Faster sets, clearer weights',
-  wn_faster_sets_body:
-    'Tap to repeat the set above, remove a row you don’t need, and see barbell lifts as disks plus the bar. Your points don’t change.',
+  wn_faster_sets_body: 'Logging takes fewer taps, and your points don’t change.',
+  wn_faster_sets_points:
+    'Tap to repeat the set above\nRemove a row you don’t need\nSee barbell lifts as disks plus the bar',
   wn_past_workouts_title: 'Log a past workout',
-  wn_past_workouts_body:
-    'Forgot to log one? Add it from Train for any of the last 7 days. It counts for that day, so your streak stays safe.',
+  wn_past_workouts_body: 'Forgot to log one? You can add it for any of the last 7 days.',
+  wn_past_workouts_points:
+    'Start it from Train and choose the day\nIt counts for that day, so your streak stays safe',
   wn_achievements_menu_title: 'Achievements and points, one tap away',
-  wn_achievements_menu_body:
-    'See how close you are to each achievement and what every task pays, right from the menu.',
+  wn_achievements_menu_body: 'Both now have their own place in the menu.',
+  wn_achievements_menu_points:
+    'See how close you are to each achievement\nSee what every task pays',
   wn_runs_and_swims_title: 'Runs and swims score too',
   wn_runs_and_swims_body:
-    'An hour of any sport pays about the same. Log your time and distance: going further pays more.',
+    'An hour of any sport pays about the same, so running and swimming count like lifting.',
+  wn_runs_and_swims_points:
+    'Log your time and distance\nGoing further pays more\nBeat your own distance or pace for a PR',
   sets_1: '1 set',
   just_now: 'just now',
   quests_title: 'Quests',

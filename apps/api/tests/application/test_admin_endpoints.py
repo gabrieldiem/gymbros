@@ -499,7 +499,7 @@ async def test_a_crew_name_cannot_inject_html_into_the_email(client, admin, outb
     await client.post(
         f"/api/admin/crews/{created.json()['id']}/invites", json={"email": "new@friend.com"}
     )
-    assert "<img" not in outbox.sent[0].html
+    assert "<img src=x" not in outbox.sent[0].html
     assert "&lt;img" in outbox.sent[0].html
 
 

@@ -45,7 +45,7 @@ async def test_catalog_lists_exercises_routines_and_points(client, member):
     response = await client.get("/api/catalog")
     assert response.status_code == 200
     body = response.json()
-    assert len(body["exercises"]) == 21
+    assert len(body["exercises"]) == 75
     assert [r["id"] for r in body["routines"]] == [
         "push",
         "pull",

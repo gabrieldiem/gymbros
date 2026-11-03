@@ -148,7 +148,7 @@ class AdminService:
             language = existing.language
         link = invite_link(self._public_url, crew.invite_code)
         sent = await self._email.send(
-            invite_email(address, admin.display_name, crew.name, language, link)
+            invite_email(address, admin.display_name, crew.name, language, link, self._public_url)
         )
         await self._audit(admin, "invite_sent", crew.id, {"name": crew.name})
         return InviteSent(sent, link, existing is not None)

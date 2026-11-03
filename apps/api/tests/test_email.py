@@ -8,17 +8,18 @@ import httpx
 import pytest
 
 from clients.resend_client import SEND_URL, ResendEmailClient
-from services.welcome_email import welcome_email
+from services.welcome_email import GameNumbers, StopLinks, welcome_email
 
 LOGGER = logging.getLogger("test-email")
-MESSAGE = welcome_email("gabi@example.com", "Gabi", "en", "https://app.example.com")
+NUMBERS = GameNumbers(50, 5, 100, 150, 3, 1500)
+MESSAGE = welcome_email("gabi@example.com", "Gabi", "en", "https://app.example.com", NUMBERS)
 
 
 def test_the_email_follows_the_member_language():
-    assert welcome_email("a@b.co", "Gabi", "es", "https://x").subject.endswith("GYMBROS")
-    assert "Hola Gabi" in welcome_email("a@b.co", "Gabi", "es", "https://x").text
-    assert "Hi Gabi" in welcome_email("a@b.co", "Gabi", "en", "https://x").text
-    assert "Hi Gabi" in welcome_email("a@b.co", "Gabi", "fr", "https://x").text
+    assert welcome_email("a@b.co", "Gabi", "es", "https://x", NUMBERS).subject.endswith("GYMBROS")
+    assert "Hola Gabi" in welcome_email("a@b.co", "Gabi", "es", "https://x", NUMBERS).text
+    assert "Hi Gabi" in welcome_email("a@b.co", "Gabi", "en", "https://x", NUMBERS).text
+    assert "Hi Gabi" in welcome_email("a@b.co", "Gabi", "fr", "https://x", NUMBERS).text
 
 
 def test_the_email_links_to_the_app():
@@ -27,9 +28,39 @@ def test_the_email_links_to_the_app():
 
 
 def test_a_name_cannot_inject_html():
-    message = welcome_email("a@b.co", "<img src=x>", "en", "https://x")
-    assert "<img" not in message.html
+    message = welcome_email("a@b.co", "<img src=x>", "en", "https://x", NUMBERS)
+    assert "<img src=x" not in message.html
     assert "&lt;img" in message.html
+
+
+def test_the_email_says_what_the_game_really_pays():
+    message = welcome_email(
+        "a@b.co", "Gabi", "es", "https://x", GameNumbers(77, 7, 123, 456, 4, 2000)
+    )
+    for number in ("+77", "+7", "+123", "+456", "por 4 entrenos", "12.000 pts"):
+        assert number in message.html
+
+
+def test_the_artwork_follows_the_language_and_says_it_in_words_too():
+    spanish = welcome_email("a@b.co", "Gabi", "es", "https://x", NUMBERS)
+    assert 'src="https://x/email/hero-es.png"' in spanish.html
+    assert 'alt="GYMBROS. Empieza la subida."' in spanish.html
+    assert 'src="https://app.example.com/email/hero-en.png"' in MESSAGE.html
+
+
+def test_it_fits_before_gmail_clips_it():
+    assert len(MESSAGE.html.encode()) < 100_000
+
+
+def test_at_sign_up_there_is_nothing_to_stop_but_a_bulk_copy_can_be_stopped():
+    assert "unsubscribe" not in MESSAGE.html
+    assert MESSAGE.headers == ()
+    bulk = welcome_email(
+        "a@b.co", "Gabi", "en", "https://x", NUMBERS, StopLinks("https://x/stop", (("A", "b"),))
+    )
+    assert 'href="https://x/stop"' in bulk.html
+    assert "https://x/stop" in bulk.text
+    assert bulk.headers == (("A", "b"),)
 
 
 def _client(handler, api_key="the-key") -> ResendEmailClient:
@@ -111,7 +142,9 @@ async def test_many_go_out_as_batches_each_to_one_person():
         requests.append(json.loads(request.content))
         return httpx.Response(200, json={"data": []})
 
-    messages = [welcome_email(f"m{i}@example.com", "Gabi", "en", "https://x") for i in range(205)]
+    messages = [
+        welcome_email(f"m{i}@example.com", "Gabi", "en", "https://x", NUMBERS) for i in range(205)
+    ]
     assert await _client(handler).send_many(messages) == 205
     assert [len(batch) for batch in requests] == [100, 100, 5]
     assert all(len(item["to"]) == 1 for batch in requests for item in batch)
@@ -124,7 +157,7 @@ async def test_a_failed_batch_doesnt_count(caplog):
         calls.append(1)
         return httpx.Response(500 if len(calls) == 1 else 200, json={})
 
-    messages = [welcome_email("a@b.co", "Gabi", "en", "https://x") for _ in range(150)]
+    messages = [welcome_email("a@b.co", "Gabi", "en", "https://x", NUMBERS) for _ in range(150)]
     assert await _client(handler).send_many(messages) == 50
     assert "Sending email failed" in caplog.text
 

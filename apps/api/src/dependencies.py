@@ -72,7 +72,7 @@ from services.recap_service import RecapService
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
-from services.welcome_email import EmailSender
+from services.welcome_email import EmailSender, GameNumbers
 from services.workout_editor import WorkoutEditor
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
@@ -530,7 +530,9 @@ def build_email_service(session: AsyncSession, sender: EmailSender) -> EmailServ
         ),
         get_recap_service(session),
         sender,
-        EmailLinks(settings.public_url, settings.session_secret),
+        EmailLinks(
+            settings.public_url, settings.session_secret, GameNumbers.from_settings(settings)
+        ),
         utc_now,
         logger,
     )

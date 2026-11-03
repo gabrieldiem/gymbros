@@ -43,6 +43,10 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 - Badges: hexagon icons in the badge color. Locked badges are greyed.
 - Icons: Lucide (`lucide-react`), line icons at 15 to 20 px beside a label. They sit next to words, not instead of them, and are decorative (`aria-hidden`), so the label names the control. `Button` takes an `icon` prop. The five tabs keep their own icons from `components/Icon.tsx`.
 
+## Email
+
+Emails are the one place that goes loud from top to bottom: artwork, big numbers, and a volt band to close. Mail apps drop SVG and web fonts, so hero type is baked into PNGs (`apps/web/public/email/`, with the words repeated as `alt`), and everything else is tables and inline styles from `services/email_design.py`. Barlow Condensed falls back to the narrowest font each system has. Keep an email under 100 KB, where Gmail clips it.
+
 ## Motion
 
 - Answer the user: set check → pop and a small "+5" float, finish → points lines stagger in → climb animation on the map, reactions pop, numbers count up, a rope reorder slides.
@@ -57,3 +61,4 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 - Mobile first at 390px. The floating dock is 64px high, 10px from the edges and the safe area, with Train as a raised 54px rounded-square button and a tint that slides to the active tab.
 - At ≥960px: a 240px side rail, content max 1240px. ATUS Climb becomes a two-column grid (map | standing panel) at ≥1120px.
 - No horizontal overflow at 390px. Touch targets ≥44px.
+- The backoffice works like a password manager: at ≥960px a side rail for its sections, then the list, then what's open docked beside it instead of a sheet, each scrolling on its own. On a phone the rail is a bar on top, and the list and what's open take turns with a way back. Sections and items have their own URLs (`/admin/accounts/:id`).

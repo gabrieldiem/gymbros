@@ -7,7 +7,15 @@ import pytest
 
 from services.email_service import digest_is_due
 from services.unsubscribe import token_is_valid, unsubscribe_query, unsubscribe_token
-from services.update_email import DigestNumbers, admin_email, digest_email
+from services.update_email import (
+    DigestNumbers,
+    Recipient,
+    admin_email,
+    digest_email,
+    html_to_text,
+    merge_tags,
+    style_fragment,
+)
 
 NUMBERS = DigestNumbers(
     name="Gabi",
@@ -53,8 +61,13 @@ def test_a_week_you_didnt_train_says_so_kindly():
     assert "Biggest climber" not in message.text
 
 
+def written(html="<p>Text</p>", full_document=False, subject="Hi", name="Gabi"):
+    who = Recipient("a@b.co", name, "en", STOP, ONE_CLICK)
+    return admin_email(who, subject, html, "https://app.example.com", full_document)
+
+
 def test_every_update_can_be_stopped_with_one_click():
-    for message in (digest(), admin_email("a@b.co", "en", "Hi", "Text", STOP, ONE_CLICK)):
+    for message in (digest(), written(), written("<html><body>Hi</body></html>", True)):
         assert STOP.replace("&", "&amp;") in message.html
         assert STOP in message.text
         assert dict(message.headers) == {
@@ -65,17 +78,65 @@ def test_every_update_can_be_stopped_with_one_click():
 
 def test_names_cant_inject_html():
     message = digest(numbers=DigestNumbers("<img src=x>", 10, 1, 3, 10, ("<b>", 1), None))
-    assert "<img" not in message.html
+    assert "<img src=x" not in message.html
     assert "<b>," not in message.html
 
 
-def test_an_admins_message_is_never_html():
-    message = admin_email("a@b.co", "en", "Hi", "<script>x</script>\nline\n\nnext", STOP, ONE_CLICK)
-    assert "<script>" not in message.html
-    assert "&lt;script&gt;" in message.html
-    assert "line<br>" not in message.text
-    assert "<br>line" in message.html
-    assert message.html.count("<p") == 4  # the logo, two paragraphs and the footer
+def test_what_the_editor_writes_goes_in_the_frame_with_styles_mail_apps_keep():
+    message = written("<h2>News</h2><p>Hello</p><ul><li>One</li></ul>")
+    assert "/email/banner.png" in message.html
+    assert '<h2 style="' in message.html
+    assert '<p style="' in message.html
+    assert '<li style="' in message.html
+
+
+def test_a_style_of_your_own_stays():
+    assert '<p style="color:red">x</p>' in style_fragment('<p style="color:red">x</p>')
+
+
+def test_a_whole_email_goes_as_written():
+    html = '<html><body><p style="color:red">Mine</p></body></html>'
+    message = written(html, True)
+    assert "/email/banner.png" not in message.html
+    assert '<p style="color:red">Mine</p>' in message.html
+
+
+def test_a_whole_email_that_forgot_the_stop_link_gets_one_before_it_ends():
+    message = written("<html><body><p>Mine</p></body></html>", True)
+    assert message.html.index("Stop these emails") < message.html.index("</body>")
+    assert written("<p>No body tag</p>", True).html.count("Stop these emails") == 1
+
+
+def test_a_template_with_its_own_stop_link_doesnt_get_another():
+    html = '<a href="{{unsubscribe_url}}">Bye</a>'
+    assert "Stop these emails" not in written(html, True).html
+
+
+def test_the_tags_fill_in_for_each_person_everywhere():
+    message = written("<p>Hi {{name}}</p><a href='{{app_url}}'>Go</a>", subject="Yo {{ name }}")
+    assert "Hi Gabi" in message.html
+    assert "https://app.example.com'" in message.html
+    assert message.subject == "Yo Gabi"
+    assert "Hi Gabi" in message.text
+
+
+def test_a_name_in_a_tag_cant_inject_html_or_another_tag():
+    message = written("<p>{{name}}</p>", name="<b>{{unsubscribe_url}}")
+    assert "<b>" not in message.html
+    assert "&lt;b&gt;{{unsubscribe_url}}" in message.html
+    assert merge_tags("{{name}}", "<b>", "u", "s", as_html=False) == "<b>"
+
+
+def test_the_plain_version_keeps_the_words_and_where_links_go():
+    text = html_to_text(
+        "<head><style>p{}</style><title>No</title></head><h2>News</h2><p>See <a href='https://x'>"
+        "this</a></p><ul><li>One</li><li>Two</li></ul><img alt='Logo'>"
+    )
+    assert "No" not in text
+    assert "p{}" not in text
+    assert "See this (https://x)" in text
+    assert "- One\n- Two" in text.replace("\n\n", "\n")
+    assert "Logo" in text
 
 
 @pytest.mark.parametrize(

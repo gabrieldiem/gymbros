@@ -292,7 +292,7 @@ export const es = {
   dur_hm: '{h} h {m} min',
   dur_m: '{m} min',
   rest_start: 'Descanso {x}',
-  empty_title: 'Entreno vacío',
+  empty_title: 'Arma tu entreno',
   empty_sub: 'Añade ejercicios uno a uno.',
   earn_title: 'Cómo sumas puntos',
   e_log: 'Registrar un entreno',
@@ -343,9 +343,16 @@ export const es = {
   edit_save: 'Guardar cambios',
   feed_edited: 'Editado',
   err_workout_edit_expired: 'Ya pasó el tiempo para editar este entreno.',
+  wn_more_exercises_title: 'Más ejercicios para elegir',
+  wn_more_exercises_body:
+    'Se sumaron más de 50 movimientos habituales, para que sea más difícil que falte el tuyo.',
+  wn_more_exercises_points:
+    'Máquinas, poleas y mancuernas para cada grupo muscular\nUn grupo nuevo de Abdomen\nMás cardio: bici fija, ciclismo, elíptica, escaladora, caminata inclinada, soga y HIIT\nBusca también en español: prueba “sentadilla búlgara”',
   wn_edit_workout_title: 'Corrige un entreno después de terminarlo',
   wn_edit_workout_body:
-    '¿Pusiste un número mal? Abre el entreno en tu perfil y edítalo hasta 2 días después. Tus puntos se vuelven a calcular.',
+    '¿Pusiste un número mal? Tienes 2 días para cambiar un entreno después de registrarlo.',
+  wn_edit_workout_points:
+    'Abre el entreno en tu perfil y toca Editar entreno\nCambia sus sets, ejercicios, nombre o gimnasio\nTus puntos se vuelven a calcular, y las bonificaciones que ya ganaste se quedan\nTu equipo ve la publicación corregida, marcada como Editado',
   gym_edit_title: 'Cambiar gimnasio',
   gym_edit: 'Cambiar {name}',
   gym_search: 'Busca un lugar o pega un enlace de Google Maps',
@@ -366,7 +373,9 @@ export const es = {
   err_map_link_not_understood: 'Ese enlace no dice dónde está el lugar. Búscalo o toca el mapa.',
   wn_gym_map_title: 'Pon tu gimnasio en el mapa',
   wn_gym_map_body:
-    'Busca tu gimnasio, pega un enlace de Google Maps o toca el mapa. Tu equipo puede abrirlo en Google Maps desde tus publicaciones.',
+    'Tus gimnasios ahora pueden tener un lugar real, para que tu equipo sepa dónde entrenas.',
+  wn_gym_map_points:
+    'Búscalo, pega un enlace de Google Maps, usa tu ubicación o toca el mapa\nEs opcional: un gimnasio puede seguir siendo solo un nombre\nTu equipo puede abrirlo en Google Maps desde tus publicaciones',
   email_updates_title: 'Emails',
   email_updates_hint: 'El resumen semanal y los mensajes de quienes llevan GYMBROS.',
   unsubscribe_title: '¿No recibir más estos emails?',
@@ -389,9 +398,50 @@ export const es = {
   admin_email_test: 'Enviarme un resumen de prueba',
   admin_email_test_sent: 'Enviado. Mira tu bandeja de entrada.',
   admin_email_test_failed: 'No se pudo enviar.',
+  admin_list_back: 'Volver a la lista',
+  admin_pick_member: 'Elige una cuenta para verla aquí.',
+  admin_pick_crew: 'Elige un equipo para verlo aquí.',
   admin_email_compose: 'Escribir a los miembros',
+  admin_tpl_title: 'Empezar desde',
+  admin_tpl_language: 'Idioma de la plantilla',
+  admin_tpl_blank: 'En blanco',
+  admin_tpl_blank_hint: 'Escríbelo tú, en el marco de GYMBROS.',
+  admin_tpl_announcement: 'Anuncio',
+  admin_tpl_announcement_hint: 'Un titular, puntos y un botón.',
+  admin_tpl_welcome: 'Email de bienvenida',
+  admin_tpl_welcome_hint: 'Lo que reciben los miembros nuevos.',
+  admin_tpl_digest: 'Resumen semanal',
+  admin_tpl_digest_hint: 'Los números de cada uno de la semana pasada.',
+  admin_tpl_invite: 'Invitación al equipo',
+  admin_tpl_invite_hint: 'El email de invitación, para adaptar.',
+  admin_tpl_live_note:
+    'Si lo envías tal cual, cada persona recibe su propia copia, en su idioma, con su nombre y sus números. Esta vista previa usa números de ejemplo.',
+  admin_tpl_edit_copy: 'Editar una copia',
+  admin_tpl_digest_example:
+    'Esta copia tiene números de ejemplo, y se envían tal como están. Cámbialos antes de enviar.',
+  admin_email_mode: 'Vista',
+  admin_mode_write: 'Escribir',
+  admin_mode_html: 'HTML',
+  admin_mode_preview: 'Vista previa',
+  admin_email_preview: 'Vista previa del email',
+  admin_email_preview_empty: 'Escribe algo para verlo aquí.',
+  admin_email_tags: '{name}, {app} y {stop} se completan para cada persona.',
+  admin_rt_bold: 'Negrita',
+  admin_rt_italic: 'Cursiva',
+  admin_rt_underline: 'Subrayado',
+  admin_rt_h2: 'Título',
+  admin_rt_h3: 'Título pequeño',
+  admin_rt_bullets: 'Lista con puntos',
+  admin_rt_numbers: 'Lista numerada',
+  admin_rt_quote: 'Cita',
+  admin_rt_link: 'Enlace',
+  admin_rt_divider: 'Separador',
+  admin_rt_undo: 'Deshacer',
+  admin_rt_redo: 'Rehacer',
+  admin_rt_link_url: 'Dirección del enlace',
+  admin_rt_link_apply: 'Aplicar',
   admin_email_compose_hint:
-    'Texto sin formato. Cada email tiene un enlace para dejar de recibirlos, y se omite a quienes lo usaron.',
+    'Cada email tiene un enlace para dejar de recibirlos, y quienes los desactivaron no los reciben.',
   admin_email_to: 'Para',
   admin_email_everyone: 'Todos',
   admin_email_person: 'Una persona',
@@ -549,6 +599,7 @@ export const es = {
   group_Back: 'Espalda',
   group_Shoulders: 'Hombros',
   group_Arms: 'Brazos',
+  group_Core: 'Abdomen',
   group_Cardio: 'Cardio',
   ln_show: 'Te presentaste',
   ln_set1: '1 set completado',
@@ -673,52 +724,68 @@ export const es = {
   update_later: 'Más tarde',
   whats_new: 'Novedades',
   whats_new_sub: 'Lo último que añadimos a GYMBROS.',
-  whats_new_try: 'Probarlo',
   whats_new_failed: 'No se pudieron cargar las novedades.',
   n_whats_new: 'Nuevo en GYMBROS: {title}.',
   n_whats_new_many: '{n} novedades en GYMBROS. Échales un vistazo.',
   n_whats_new_other: 'Hay algo nuevo en GYMBROS.',
   wn_weekly_email_title: 'Tu semana en tu bandeja de entrada',
-  wn_weekly_email_body:
-    'Los lunes por la mañana GYMBROS puede enviarte cómo fue tu semana. Puedes desactivarlo en ajustes, y nuestra política de privacidad ahora lo cubre, junto con fotos, gimnasios y el uso sin conexión.',
+  wn_weekly_email_body: 'Los lunes por la mañana puedes recibir un email con cómo fue tu semana.',
+  wn_weekly_email_points:
+    'Tus puntos y entrenos, y cómo le fue al equipo\nQuién más subió y el PR más pesado\nDesactívalo en ajustes, o desde el enlace de cualquier email',
   wn_offline_title: 'Registra sin señal',
-  wn_offline_body:
-    'La app abre y registra sin señal, incluso un entreno entero. Se guarda en tu teléfono y se envía solo cuando vuelves.',
+  wn_offline_body: 'Un gimnasio en un sótano sin señal ya no te impide registrar.',
+  wn_offline_points:
+    'La app abre y registra sin conexión, incluso un entreno completo\nSe guarda en tu teléfono hasta que vuelvas a tener conexión\nLuego se envía solo, sin que tengas que hacer nada',
   wn_export_title: 'Llévate tu entrenamiento',
-  wn_export_body: 'Descarga cada sesión que registraste en un archivo JSON, desde ajustes.',
+  wn_export_body: 'Tu entrenamiento es tuyo, así que puedes descargarlo entero cuando quieras.',
+  wn_export_points:
+    'Cada sesión que registraste, en un archivo JSON\nBusca Descargar mis datos en ajustes',
   wn_feedback_title: 'Cuéntanos qué piensas',
   wn_feedback_body:
-    '¿Tienes una idea o encontraste un error? Envía comentarios desde el menú de tu foto.',
+    '¿Tienes una idea o encontraste un error? Ahora hay una forma directa de contárnoslo.',
+  wn_feedback_points:
+    'Toca tu foto y luego Enviar comentarios\nTu mensaje llega directo a quienes llevan GYMBROS',
   wn_photos_title: 'Añade una foto a tu entreno',
-  wn_photos_body:
-    'Muestra tu gym a tu equipo: añade una foto mientras registras, o después desde tu página. Aparece en tu publicación.',
+  wn_photos_body: 'Muéstrale a tu equipo tu gimnasio, o el bombeo, con una foto por entreno.',
+  wn_photos_points:
+    'Añádela mientras registras, o después desde tu perfil\nAparece en tu publicación, y solo tu equipo puede verla',
   wn_profile_title: 'Haz tuyo tu perfil',
-  wn_profile_body:
-    'Sube una foto o elige dos letras o emojis, y el color que quieras. Toca Perfil y ajustes en tu página.',
-  wn_gyms_title: 'Muestra a tu equipo dónde entrenas',
-  wn_gyms_body:
-    'Añade tus gimnasios en ajustes y elige uno predeterminado. Tu equipo ve en cuál estás mientras entrenas y en tus publicaciones.',
-  wn_rest_timer_title: 'Un temporizador de descanso a tu ritmo',
-  wn_rest_timer_body:
-    'Ya no arranca solo. Toca Descanso cuando quieras, y la pantalla destella cuando toca el siguiente set.',
-  wn_stretching_title: 'Estirar ahora paga',
-  wn_stretching_body:
-    'Añade 5 o 10 minutos a un entreno, o regístralo solo en un día de descanso, por puntos fijos una vez al día. Solo, no cuenta para tu meta semanal.',
-  wn_workout_details_title: 'Mira el detalle de cualquier entreno',
-  wn_workout_details_body:
-    'En tu página, toca un entreno para ver sus ejercicios, sets y lo que pagó cada cosa.',
+  wn_profile_body: 'Tu foto y tu color ahora los eliges tú.',
+  wn_profile_points:
+    'Sube una foto, o usa dos letras o emojis cualesquiera\nElige cualquier color con el selector\nToca Perfil y ajustes en tu página',
+  wn_gyms_title: 'Muéstrale a tu equipo dónde entrenas',
+  wn_gyms_body: 'Guarda los gimnasios a los que vas y tu equipo puede ver en cuál estás.',
+  wn_gyms_points:
+    'Añade hasta 10 en ajustes\nElige uno predeterminado, y se selecciona solo cada vez\nSe ve mientras entrenas y en tus publicaciones',
+  wn_rest_timer_title: 'Un descanso que controlas tú',
+  wn_rest_timer_body: 'El temporizador de descanso ya no arranca solo.',
+  wn_rest_timer_points:
+    'Toca Descanso cuando lo quieras\nAjústalo o sáltalo sobre la marcha\nLa pantalla destella cuando toca el siguiente set',
+  wn_stretching_title: 'Estirar ahora da puntos',
+  wn_stretching_body: 'Estirar da puntos fijos una vez al día.',
+  wn_stretching_points:
+    'Añade 5 o 10 minutos a un entreno, o regístralo solo en un día de descanso\nSi lo registras solo, no cuenta para tu meta semanal',
+  wn_workout_details_title: 'Mira los detalles de cualquier entreno',
+  wn_workout_details_body: 'Tus entrenos pasados ahora se pueden abrir.',
+  wn_workout_details_points:
+    'Toca un entreno en tu página\nMira sus ejercicios y sets\nMira cuánto pagó cada cosa',
   wn_faster_sets_title: 'Sets más rápidos, pesos más claros',
-  wn_faster_sets_body:
-    'Toca para repetir el set de arriba, quita una fila que no necesites y mira los levantamientos con barra como discos más la barra. Tus puntos no cambian.',
+  wn_faster_sets_body: 'Registrar lleva menos toques, y tus puntos no cambian.',
+  wn_faster_sets_points:
+    'Toca para repetir el set de arriba\nQuita una fila que no necesitas\nMira los ejercicios con barra como discos más la barra',
   wn_past_workouts_title: 'Registra un entreno pasado',
   wn_past_workouts_body:
-    '¿Se te olvidó registrar uno? Añádelo desde Entrenar, para cualquiera de los últimos 7 días. Cuenta para ese día, así que tu racha sigue a salvo.',
+    '¿Olvidaste registrar uno? Puedes añadirlo en cualquiera de los últimos 7 días.',
+  wn_past_workouts_points:
+    'Empiézalo desde Entrenar y elige el día\nCuenta para ese día, así tu racha queda a salvo',
   wn_achievements_menu_title: 'Logros y puntos, a un toque',
-  wn_achievements_menu_body:
-    'Mira cuánto te falta para cada logro y cuánto paga cada tarea, desde el menú.',
+  wn_achievements_menu_body: 'Ambos ahora tienen su lugar en el menú.',
+  wn_achievements_menu_points: 'Mira cuánto te falta para cada logro\nMira cuánto paga cada tarea',
   wn_runs_and_swims_title: 'Correr y nadar también puntúan',
   wn_runs_and_swims_body:
-    'Una hora de cualquier deporte paga más o menos lo mismo. Registra tu tiempo y distancia: cuanto más lejos, más puntos.',
+    'Una hora de cualquier deporte paga más o menos lo mismo, así que correr y nadar cuentan como levantar.',
+  wn_runs_and_swims_points:
+    'Registra tu tiempo y distancia\nCuanto más lejos, más puntos\nSupera tu distancia o tu ritmo para un PR',
   sets_1: '1 set',
   just_now: 'ahora mismo',
   quests_title: 'Retos',

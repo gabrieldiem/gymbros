@@ -3,10 +3,10 @@
 from services.catalog import load_catalog
 
 
-def test_catalog_has_the_eighteen_v1_exercises():
+def test_catalog_has_every_exercise_once():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 21
-    assert len({ex.id for ex in catalog.exercises}) == 21
+    assert len(catalog.exercises) == 75
+    assert len({ex.id for ex in catalog.exercises}) == 75
 
 
 def test_every_routine_uses_known_exercises():
@@ -39,3 +39,31 @@ def test_unknown_ids_return_none():
     catalog = load_catalog()
     assert catalog.exercise("nope") is None
     assert catalog.routine("nope") is None
+
+
+def test_every_exercise_can_be_found_in_both_languages():
+    exercises = load_catalog().exercises
+    assert len({e.id for e in exercises}) == len(exercises)
+    assert len({e.name for e in exercises}) == len(exercises)
+    assert all(e.aliases_es for e in exercises)
+
+
+def test_the_common_movements_are_there():
+    ids = {e.id for e in load_catalog().exercises}
+    assert {"pushup", "hipthrust", "cablerow", "facepull", "hammer", "crunch", "bike"} <= ids
+
+
+def test_cardio_distance_is_weighed_for_every_sport():
+    cardio = [e for e in load_catalog().exercises if e.is_cardio]
+    assert all(e.km_factor > 0 for e in cardio)
+    # A km on a bike is worth far less than a km on foot, or it would pay for coasting.
+    by_id = {e.id: e for e in cardio}
+    assert by_id["cycling"].km_factor < by_id["outrun"].km_factor < by_id["swim"].km_factor
+
+
+def test_only_lifts_have_a_push_pull_or_legs_day():
+    for exercise in load_catalog().exercises:
+        if exercise.is_cardio or exercise.is_stretch or exercise.group == "Core":
+            assert exercise.ppl is None
+        else:
+            assert exercise.ppl in {"push", "pull", "legs"}

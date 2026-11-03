@@ -1,6 +1,7 @@
 """The backoffice API. Every route here is for admins only (ADMIN_EMAILS)."""
 
 import uuid
+from typing import Literal
 
 from fastapi import APIRouter, Depends, status
 
@@ -27,6 +28,9 @@ from models.admin import (
     UpdateCrewRequest,
 )
 from models.email import (
+    EmailTemplateResponse,
+    PreviewRequest,
+    PreviewResponse,
     EmailSettingsResponse,
     MessageResultResponse,
     SendMessageRequest,
@@ -257,9 +261,38 @@ async def send_message(
     """Write to everyone, one crew or one person. `dry_run` only counts who it would reach."""
     audience = Audience(crew_id=body.crew_id, email=body.email)
     if body.dry_run:
-        return MessageResultResponse(recipients=await email.audience_size(audience), sent=0)
-    recipients, sent = await email.send_message(admin, audience, body.subject, body.body)
+        reach = await email.audience_size(audience, body.template)
+        return MessageResultResponse(recipients=reach, sent=0)
+    if body.template is not None:
+        recipients, sent = await email.send_template(admin, audience, body.template)
+    else:
+        assert body.subject is not None and body.html is not None
+        recipients, sent = await email.send_message(
+            admin, audience, body.subject, body.html, body.full_document
+        )
     return MessageResultResponse(recipients=recipients, sent=sent)
+
+
+@router.get("/email/templates", response_model=list[EmailTemplateResponse])
+async def email_templates(
+    language: Literal["en", "es"] = "en",
+    email: EmailService = Depends(get_email_service),
+) -> list[EmailTemplateResponse]:
+    """Every email GYMBROS sends, with tags where each person's details go."""
+    return [
+        EmailTemplateResponse(id=t.id, subject=t.subject, html=t.html, live=t.live)
+        for t in email.templates(language)
+    ]
+
+
+@router.post("/email/preview", response_model=PreviewResponse, responses=error_responses(422))
+async def preview_email(
+    body: PreviewRequest,
+    admin: User = Depends(get_current_admin),
+    email: EmailService = Depends(get_email_service),
+) -> PreviewResponse:
+    """A message as it will reach you."""
+    return PreviewResponse(html=email.preview(admin, body.html, body.full_document))
 
 
 @router.post(

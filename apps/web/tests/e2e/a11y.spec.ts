@@ -67,24 +67,24 @@ test('every tab and the main sheets', async ({ page }, testInfo) => {
 test('backoffice', async ({ page }, testInfo) => {
   await logIn(page, 'gabi', testInfo);
   await page.goto('/admin');
-  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: /Backoffice/ })).toBeVisible();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin overview');
-  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await page.getByRole('link', { name: /^(Accounts|Cuentas)$/ }).click();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin accounts');
-  await page.getByRole('button', { name: /^Email$/ }).click();
+  await page.getByRole('link', { name: /^Email$/ }).click();
   await expect(
     page.getByRole('heading', { name: /Automatic emails|Emails automáticos/ }),
   ).toBeVisible();
   await audit(page, 'admin email');
-  await page.getByRole('button', { name: /^(Feedback|Comentarios)$/ }).click();
+  await page.getByRole('link', { name: /^(Feedback|Comentarios)$/ }).click();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin feedback');
-  await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
+  await page.getByRole('link', { name: /^(Crews|Equipos)$/ }).click();
   await page.waitForLoadState('networkidle');
   await audit(page, 'admin crews');
-  await page.getByRole('button', { name: /E2E/ }).first().click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await audit(page, 'admin crew sheet');
+  await page.getByRole('link', { name: /E2E/ }).first().click();
+  await expect(page.getByRole('region')).toBeVisible();
+  await audit(page, 'admin crew panel');
 });

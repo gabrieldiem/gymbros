@@ -1,41 +1,199 @@
-.page {
-  width: 100%;
-  max-width: 1040px;
+/* Phone: the rail is a bar on top. Wide: a column, with the panes scrolling on their own. */
+.shell {
   min-height: 100dvh;
-  margin: 0 auto;
-  padding: calc(10px + var(--safe-top)) 18px calc(32px + var(--safe-bottom));
 }
 
-.top {
+.rail {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 8px 12px;
+  padding: calc(10px + var(--safe-top)) 14px 10px;
+  background: var(--rail);
+  border-bottom: 1px solid var(--steel);
 }
 
-.topActions {
+.railBrand {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.railBrand small {
+  color: var(--smoke);
+  font-size: 0.8125rem;
+}
+
+.railFoot {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 6px 12px;
 }
 
-.back {
-  display: inline-flex;
+.nav {
+  display: flex;
+  flex: 0 0 100%;
+  order: 3;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.navItem {
+  text-decoration: none;
+  display: flex;
+  flex: none;
   align-items: center;
+  gap: 8px;
   min-height: var(--touch);
-  color: var(--chalk);
+  padding: 0 12px;
+  color: var(--smoke);
   font-weight: 600;
   white-space: nowrap;
+  border-radius: var(--r-control-sm);
+}
+
+.navItem:hover {
+  color: var(--chalk);
+  background: var(--plate);
+}
+
+.navItem[aria-current='page'] {
+  color: var(--volt);
+  background: var(--volt-tint);
+}
+
+.main {
+  min-width: 0;
+}
+
+.single {
+  max-width: 1040px;
+  padding: 20px 16px calc(32px + var(--safe-bottom));
+}
+
+.single h1,
+.listPane h1 {
+  margin-bottom: 18px;
+}
+
+/* Phone: the list, or what's open. */
+.listPane {
+  min-width: 0;
+  padding: 20px 16px calc(32px + var(--safe-bottom));
+}
+
+.detailPane {
+  display: none;
+  min-width: 0;
+  padding: 16px 16px calc(32px + var(--safe-bottom));
+}
+
+.splitOpen .listPane {
+  display: none;
+}
+
+.splitOpen .detailPane {
+  display: block;
+}
+
+.pick {
+  color: var(--smoke);
+}
+
+.panel h2 {
+  margin-bottom: 8px;
+  font-size: 2rem;
+}
+
+.panelBack {
+  margin: -6px 0 6px -8px;
+}
+
+@media (min-width: 960px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 232px minmax(0, 1fr);
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .rail {
+    flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 22px;
+    padding: 22px 12px 16px;
+    overflow-y: auto;
+    border-right: 1px solid var(--steel);
+    border-bottom: 0;
+  }
+
+  .railBrand {
+    flex: none;
+    padding: 0 10px;
+  }
+
+  .nav {
+    flex: 1;
+    flex-direction: column;
+    order: 0;
+    overflow: visible;
+  }
+
+  .railFoot {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 10px;
+  }
+
+  .main {
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .single {
+    padding: 28px 32px 40px;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+    height: 100%;
+  }
+
+  .listPane,
+  .splitOpen .listPane {
+    display: block;
+    padding: 28px 16px 24px;
+    overflow-y: auto;
+    border-right: 1px solid var(--steel);
+  }
+
+  .detailPane,
+  .splitOpen .detailPane {
+    display: block;
+    padding: 28px 32px 40px;
+    overflow-y: auto;
+  }
+
+  .panel {
+    max-width: 620px;
+  }
+
+  .panelBack {
+    display: none;
+  }
+
+  .pick {
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
 }
 
 .muted {
   color: var(--smoke);
-}
-
-.views {
-  margin: 18px 0 22px;
-  overflow-x: auto;
 }
 
 .toolbar {
@@ -69,6 +227,7 @@
 }
 
 .row {
+  text-decoration: none;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -86,6 +245,11 @@
   background: var(--plate);
 }
 
+.row[aria-current='true'] {
+  background: var(--plate);
+  box-shadow: inset 3px 0 0 var(--volt);
+}
+
 .rowMain {
   flex: 1 1 180px;
   display: grid;
@@ -98,11 +262,6 @@
   font-size: var(--fs-small);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.rowCrew {
-  color: var(--smoke);
-  font-size: var(--fs-small);
 }
 
 .rowNumbers {
@@ -258,11 +417,6 @@
   border-radius: var(--r-card);
 }
 
-.emailForm {
-  display: grid;
-  gap: 14px;
-}
-
 .warning {
   color: var(--red-text);
 }
@@ -297,27 +451,4 @@
   background: var(--iron);
   border: 1px solid var(--steel);
   border-radius: var(--r-control-sm);
-}
-
-.bodyField {
-  display: grid;
-  gap: 6px;
-  font-weight: 600;
-}
-
-.bodyField textarea {
-  width: 100%;
-  padding: 12px 14px;
-  font: inherit;
-  font-weight: 400;
-  color: var(--chalk);
-  background: var(--iron);
-  border: 1px solid var(--steel);
-  border-radius: var(--r-control);
-  resize: vertical;
-}
-
-.bodyField textarea:focus {
-  outline: none;
-  border-color: var(--volt);
 }
