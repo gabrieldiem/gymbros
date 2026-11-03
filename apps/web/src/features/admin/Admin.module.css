@@ -258,11 +258,6 @@
   border-radius: var(--r-card);
 }
 
-.emailForm {
-  display: grid;
-  gap: 14px;
-}
-
 .warning {
   color: var(--red-text);
 }
@@ -297,27 +292,4 @@
   background: var(--iron);
   border: 1px solid var(--steel);
   border-radius: var(--r-control-sm);
-}
-
-.bodyField {
-  display: grid;
-  gap: 6px;
-  font-weight: 600;
-}
-
-.bodyField textarea {
-  width: 100%;
-  padding: 12px 14px;
-  font: inherit;
-  font-weight: 400;
-  color: var(--chalk);
-  background: var(--iron);
-  border: 1px solid var(--steel);
-  border-radius: var(--r-control);
-  resize: vertical;
-}
-
-.bodyField textarea:focus {
-  outline: none;
-  border-color: var(--volt);
 }

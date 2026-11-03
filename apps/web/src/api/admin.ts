@@ -102,7 +102,16 @@ export type EmailSettings = {
 
 export type EmailAudience = { crew_id?: string; email?: string };
 
-export type EmailMessageBody = EmailAudience & { subject: string; body: string; dry_run?: boolean };
+export type EmailMessageBody = EmailAudience & {
+  subject?: string;
+  html?: string;
+  full_document?: boolean;
+  template?: string;
+  dry_run?: boolean;
+};
+
+/** An email to start from. `live`: it can also go out as it is, made for each person. */
+export type EmailTemplate = { id: string; subject: string; html: string; live: boolean };
 
 export function useEmailSettings() {
   return useQuery({
@@ -149,6 +158,26 @@ export function useUpdateEmailSettings() {
     (body: Partial<Pick<EmailSettings, 'welcome_enabled' | 'digest_enabled' | 'digest_hour'>>) =>
       apiRequest<EmailSettings>('/admin/email', { method: 'PATCH', body }),
   );
+}
+
+export const emailTemplatesOptions = (language: 'en' | 'es') => ({
+  queryKey: [...adminKey, 'email', 'templates', language],
+  queryFn: () => apiRequest<EmailTemplate[]>(`/admin/email/templates?language=${language}`),
+  staleTime: Infinity, // They only change with a new version of the app.
+});
+
+/** How a message will arrive. A POST, because what's being written can be long. */
+export function useEmailPreview(html: string, fullDocument: boolean) {
+  return useQuery({
+    queryKey: [...adminKey, 'email', 'preview', html, fullDocument],
+    queryFn: ({ signal }) =>
+      apiRequest<{ html: string }>('/admin/email/preview', {
+        method: 'POST',
+        body: { html, full_document: fullDocument },
+        signal,
+      }),
+    gcTime: 0,
+  });
 }
 
 export function useSendEmailMessage() {

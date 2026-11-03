@@ -49,6 +49,18 @@ const openView = async (name: string) => {
   await userEvent.click(await screen.findByRole('button', { name }));
 };
 
+vi.mock('../src/features/admin/RichTextEditor', () => ({
+  default: ({
+    value,
+    onChange,
+    label,
+  }: {
+    value: string;
+    onChange: (v: string) => void;
+    label: string;
+  }) => <textarea aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} />,
+}));
+
 describe('Backoffice access', () => {
   it('sends regular members back to the app', async () => {
     mockApi({ 'GET /api/me': [200, makeMe()] });
@@ -467,20 +479,20 @@ describe('Backoffice: email', () => {
           : [200, { recipients: 5, sent: 5 }],
     });
     await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
-    await userEvent.type(screen.getByLabelText('Message'), 'See you Monday');
+    await userEvent.type(await screen.findByLabelText('Message'), 'See you Monday');
     await userEvent.click(screen.getByRole('button', { name: 'Review' }));
     await userEvent.click(await screen.findByRole('button', { name: 'Send to 5' }));
     expect(await screen.findByText('Sent to 5 of 5.')).toBeVisible();
     expect(bodies(fetchMock, '/api/admin/email/message')).toEqual([
-      { subject: 'Gym closed', body: 'See you Monday', dry_run: true },
-      { subject: 'Gym closed', body: 'See you Monday' },
+      { subject: 'Gym closed', html: 'See you Monday', full_document: false, dry_run: true },
+      { subject: 'Gym closed', html: 'See you Monday', full_document: false },
     ]);
   });
 
   it('counts again if the message changes after reviewing', async () => {
     await openEmail({ 'POST /api/admin/email/message': [200, { recipients: 5, sent: 0 }] });
     await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
-    await userEvent.type(screen.getByLabelText('Message'), 'See you');
+    await userEvent.type(await screen.findByLabelText('Message'), 'See you');
     await userEvent.click(screen.getByRole('button', { name: 'Review' }));
     await screen.findByRole('button', { name: 'Send to 5' });
     await userEvent.selectOptions(screen.getByLabelText('To'), 'One person');
@@ -488,10 +500,82 @@ describe('Backoffice: email', () => {
     expect(screen.getByRole('button', { name: 'Review' })).toBeDisabled();
   });
 
+  const TEMPLATES = [
+    { id: 'announcement', subject: 'News', html: '<html>Announcing {{name}}</html>', live: false },
+    { id: 'welcome', subject: 'Welcome', html: '<html>Hi {{name}}</html>', live: true },
+    { id: 'digest', subject: 'Your week', html: '<html>+640</html>', live: true },
+    { id: 'invite', subject: 'Invited', html: '<html>Join</html>', live: false },
+  ];
+  const withTemplates = {
+    'GET /api/admin/email/templates?language=en': [200, TEMPLATES],
+    'POST /api/admin/email/preview': [200, { html: '<p>Rendered</p>' }],
+    'POST /api/admin/email/message': (body: unknown) =>
+      (body as { dry_run?: boolean }).dry_run
+        ? [200, { recipients: 5, sent: 0 }]
+        : [200, { recipients: 5, sent: 5 }],
+  } as Parameters<typeof openEmail>[0];
+
+  it('offers every email GYMBROS sends to start from', async () => {
+    await openEmail(withTemplates);
+    for (const name of [
+      /^Blank/,
+      /^Announcement/,
+      /^Welcome email/,
+      /^Weekly digest/,
+      /^Crew invitation/,
+    ]) {
+      expect(screen.getByRole('radio', { name })).toBeVisible();
+    }
+  });
+
+  it('starts from a template as HTML, sent whole, with no editor to flatten it', async () => {
+    const fetchMock = await openEmail(withTemplates);
+    await userEvent.click(screen.getByRole('radio', { name: /^Announcement/ }));
+    expect(await screen.findByLabelText('HTML')).toHaveValue('<html>Announcing {{name}}</html>');
+    expect(screen.getByLabelText('Subject')).toHaveValue('News');
+    expect(screen.getByRole('button', { name: 'HTML' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Write' })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Review' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Send to 5' }));
+    await screen.findByText('Sent to 5 of 5.');
+    expect(bodies(fetchMock, '/api/admin/email/message')[1]).toEqual({
+      subject: 'News',
+      html: '<html>Announcing {{name}}</html>',
+      full_document: true,
+    });
+  });
+
+  it('sends a live template as each person’s own, previewed in a page with no scripts', async () => {
+    const fetchMock = await openEmail(withTemplates);
+    await userEvent.click(screen.getByRole('radio', { name: /^Welcome email/ }));
+    const preview = await screen.findByTitle('Preview of the email');
+    expect(preview).toHaveAttribute('sandbox', '');
+    expect(screen.queryByLabelText('Subject')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Review' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Send to 5' }));
+    await screen.findByText('Sent to 5 of 5.');
+    expect(bodies(fetchMock, '/api/admin/email/message')[1]).toEqual({ template: 'welcome' });
+  });
+
+  it('warns that a copy of the digest has example numbers', async () => {
+    await openEmail(withTemplates);
+    await userEvent.click(screen.getByRole('radio', { name: /^Weekly digest/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit a copy instead' }));
+    expect(await screen.findByText(/example numbers, and they go out as written/)).toBeVisible();
+    expect(screen.getByLabelText('HTML')).toHaveValue('<html>+640</html>');
+  });
+
+  it('won’t send an empty message', async () => {
+    await openEmail(withTemplates);
+    await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
+    await userEvent.type(await screen.findByLabelText('Message'), '<p> </p>');
+    expect(screen.getByRole('button', { name: 'Review' })).toBeDisabled();
+  });
+
   it('can’t send to nobody', async () => {
     await openEmail({ 'POST /api/admin/email/message': [200, { recipients: 0, sent: 0 }] });
     await userEvent.type(screen.getByLabelText('Subject'), 'Gym closed');
-    await userEvent.type(screen.getByLabelText('Message'), 'See you');
+    await userEvent.type(await screen.findByLabelText('Message'), 'See you');
     await userEvent.click(screen.getByRole('button', { name: 'Review' }));
     expect(await screen.findByText('Nobody would get this.')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Send to 0' })).toBeDisabled();

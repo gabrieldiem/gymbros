@@ -278,3 +278,46 @@ test('navbar: the indicator sits on the active tab and follows it', async ({ pag
   await nav.getByRole('link', { name: /^(Train|Entrenar)/ }).click();
   await expect(indicator).toHaveCSS('opacity', '0');
 });
+
+test('backoffice: write in the rich editor, preview it and start from a template', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(memberEmail('gabi', testInfo));
+  await page.getByRole('button', { name: /Log in|Entrar/ }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await page.goto('/admin');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.getByRole('button', { name: 'Email', exact: true }).click();
+
+  // The real editor, which the unit tests stand in for.
+  const writing = page.getByRole('textbox', { name: 'Message' });
+  await expect(writing).toBeVisible();
+  await page.getByLabel('Subject').fill('Gym closed Friday');
+  await writing.click();
+  await page.keyboard.type('See you Monday');
+  await page.keyboard.press('Control+A');
+  await page.getByRole('button', { name: 'Bold', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Bold', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: 'HTML', exact: true }).click();
+  await expect(page.locator('form textarea')).toHaveValue('<p><strong>See you Monday</strong></p>');
+  await page.getByRole('button', { name: 'Preview', exact: true }).click();
+  const preview = page.frameLocator('iframe[title="Preview of the email"]');
+  await expect(preview.locator('strong', { hasText: 'See you Monday' })).toBeVisible();
+  await page.screenshot({ path: `${SCREENS}/admin-compose-${testInfo.project.name}.png` });
+
+  // The welcome email, as it really is.
+  await page.getByRole('radio', { name: /^Welcome email/ }).click({ force: true });
+  await expect(preview.getByRole('img', { name: /The climb starts now/ })).toBeVisible();
+  await expect(preview.getByText('What pays')).toBeVisible();
+  await page.screenshot({
+    path: `${SCREENS}/admin-template-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    page.viewportSize()?.width,
+  );
+});
