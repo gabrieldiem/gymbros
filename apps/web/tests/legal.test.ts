@@ -56,6 +56,6 @@ describe('static legal pages', () => {
   });
 
   it('gives a way to reach us', () => {
-    expect(PRIVACY).toContain('hola@contact.gabrieldiem.com');
+    expect(PRIVACY).toContain('contact@gabrieldiem.com');
   });
 });

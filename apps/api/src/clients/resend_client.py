@@ -1,5 +1,6 @@
 """Resend's HTTP API: https://resend.com/docs/api-reference/emails/send-email."""
 
+import re
 from collections.abc import Sequence
 from logging import Logger
 from typing import Any
@@ -12,6 +13,19 @@ SEND_URL = "https://api.resend.com/emails"
 BATCH_URL = "https://api.resend.com/emails/batch"
 _BATCH_SIZE = 100
 _TIMEOUT_SECONDS = 10
+_EMAIL_ADDRESS = re.compile(r"\S+@\S+")
+
+
+def _rejection(response: httpx.Response) -> str:
+    """What Resend said, which is what tells a bad key from an unverified domain. Addresses are
+    masked, so a member's email never reaches the logs."""
+    try:
+        body = response.json()
+    except ValueError:
+        return "no details"
+    if not isinstance(body, dict):
+        return "no details"
+    return _EMAIL_ADDRESS.sub("<address>", f"{body.get('name')}: {body.get('message')}")
 
 
 class ResendEmailClient:
@@ -54,9 +68,13 @@ class ResendEmailClient:
                     },
                     json=body,
                 )
-            response.raise_for_status()
         except httpx.HTTPError as error:
             self._logger.warning("Sending email failed: %s", type(error).__name__)
+            return False
+        if response.is_error:
+            self._logger.warning(
+                "Sending email failed: HTTP %d, %s", response.status_code, _rejection(response)
+            )
             return False
         return True
 

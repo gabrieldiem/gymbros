@@ -163,7 +163,7 @@ describe('Legal pages', () => {
     renderApp(path);
     expect(await screen.findByRole('heading', { level: 1, name: title })).toBeVisible();
     expect(screen.getByRole('heading', { level: 2, name: section })).toBeVisible();
-    expect(document.body.textContent).toContain('hola@contact.gabrieldiem.com');
+    expect(document.body.textContent).toContain('contact@gabrieldiem.com');
     expect(document.body.textContent).not.toContain('{email}');
   });
 

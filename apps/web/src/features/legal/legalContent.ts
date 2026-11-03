@@ -1,7 +1,7 @@
 import type { MessageKey } from '../../i18n/en';
 
 /** Where people write about their data. It has to be an address that really receives mail. */
-export const CONTACT_EMAIL = 'hola@contact.gabrieldiem.com';
+export const CONTACT_EMAIL = 'contact@gabrieldiem.com';
 
 type Section = { heading: MessageKey; body: MessageKey };
 export type LegalContent = { title: MessageKey; intro: MessageKey; sections: Section[] };
