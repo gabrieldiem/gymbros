@@ -166,11 +166,11 @@ test('backoffice: an admin opens it from the menu, a member is sent away', async
   await page.getByRole('button', { name: /Your profile|Tu perfil/ }).click();
   await page.getByRole('menuitem', { name: 'Backoffice' }).click();
   await expect(page).toHaveURL(/\/admin$/);
-  await expect(page.getByRole('heading', { level: 1, name: 'Backoffice' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Backoffice' })).toBeVisible();
   await expectNoSidewaysScroll(page);
   await page.waitForTimeout(1100);
   await shoot(page, 'admin-overview', testInfo);
-  await page.getByRole('button', { name: /^(Accounts|Cuentas)$/ }).click();
+  await page.getByRole('link', { name: /^(Accounts|Cuentas)$/ }).click();
   await expect(page.getByText(`maxo@${testInfo.project.name}.e2e.gymbros.app`)).toBeVisible();
   await expectNoSidewaysScroll(page);
   await shoot(page, 'admin-members', testInfo);
@@ -200,9 +200,9 @@ test('invite limits: an admin sets a custom code with one use, then the link joi
   await page.getByRole('button', { name: /Log in|Entrar/ }).click();
   await expect(page).toHaveURL(/\/climb$/);
   await page.goto('/admin');
-  await page.getByRole('button', { name: /^(Crews|Equipos)$/ }).click();
-  await page.getByRole('button', { name: /New crew|Nuevo equipo/ }).click();
-  const sheet = page.getByRole('dialog');
+  await page.getByRole('link', { name: /^(Crews|Equipos)$/ }).click();
+  await page.getByRole('link', { name: /New crew|Nuevo equipo/ }).click();
+  const sheet = page.getByRole('region', { name: /New crew|Nuevo equipo/ });
   await sheet.getByLabel(/Crew name|Nombre del equipo/).fill(`Invite ${code}`);
   await sheet.getByLabel(/^(Code|Código)/).fill(code);
   await sheet.getByLabel(/Maximum uses|Usos máximos/).fill('1');
@@ -212,7 +212,7 @@ test('invite limits: an admin sets a custom code with one use, then the link joi
     fullPage: true,
   });
   await sheet.getByRole('button', { name: /^(Save|Guardar)$/ }).click();
-  await expect(page.getByRole('button', { name: new RegExp(`Invite ${code}`) })).toBeVisible();
+  await expect(page.getByRole('link', { name: new RegExp(`Invite ${code}`) })).toBeVisible();
 
   const signInAndOpen = async (name: string) => {
     const context = await browser.newContext({ locale: 'en-US' });
@@ -288,7 +288,7 @@ test('backoffice: write in the rich editor, preview it and start from a template
   await expect(page).toHaveURL(/\/climb$/);
   await page.goto('/admin');
   await page.getByRole('button', { name: 'EN', exact: true }).click();
-  await page.getByRole('button', { name: 'Email', exact: true }).click();
+  await page.getByRole('link', { name: 'Email', exact: true }).click();
 
   // The real editor, which the unit tests stand in for.
   const writing = page.getByRole('textbox', { name: 'Message' });

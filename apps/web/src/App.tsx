@@ -30,6 +30,7 @@ export function App() {
         <Route path="register" element={<Navigate to="/" replace />} />
         <Route element={<Gate allow="admin" />}>
           <Route path="admin" element={<AdminPage />} />
+          <Route path="admin/:section/:itemId?" element={<AdminPage />} />
         </Route>
         <Route element={<AuthLayout />}>
           <Route path="invite/:code" element={<InvitePage />} />

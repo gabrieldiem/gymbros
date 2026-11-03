@@ -15,12 +15,12 @@ import {
 } from '../../api/admin';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
-import { Sheet } from '../../components/Sheet';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
 import { inviteUrl } from '../auth/pendingInvite';
 import styles from './Admin.module.css';
+import { DetailPanel } from './DetailPanel';
 
 const DEFAULT_TIME_ZONE = 'America/Argentina/Buenos_Aires';
 
@@ -127,7 +127,7 @@ function SendInvite({ crew }: { crew: AdminCrew }) {
 }
 
 /** Create a crew, or edit one: its details, invite code and limits, and inviting people. */
-export function CrewSheet({ crew, onClose }: { crew: AdminCrew | null; onClose: () => void }) {
+export function CrewPanel({ crew, onClose }: { crew: AdminCrew | null; onClose: () => void }) {
   const { t, n } = useI18n();
   const showToast = useToast();
   const copyLink = useCopyLink();
@@ -160,7 +160,7 @@ export function CrewSheet({ crew, onClose }: { crew: AdminCrew | null; onClose: 
   };
 
   return (
-    <Sheet title={crew ? crew.name : t('admin_new_crew')} onClose={onClose}>
+    <DetailPanel title={crew ? crew.name : t('admin_new_crew')} onClose={onClose}>
       {crew && crew.invite_status === 'active' && <SendInvite crew={crew} />}
       <form className={styles.form} onSubmit={handleSubmit}>
         {crew && <h3>{t('admin_crew_details')}</h3>}
@@ -253,7 +253,7 @@ export function CrewSheet({ crew, onClose }: { crew: AdminCrew | null; onClose: 
           </Button>
         </div>
       )}
-    </Sheet>
+    </DetailPanel>
   );
 }
 
@@ -359,10 +359,10 @@ function DangerZone({ member, onDone }: { member: AdminMember; onDone: () => voi
 }
 
 /** One account: adjust points, remove from the crew, or delete. */
-export function MemberSheet({ member, onClose }: { member: AdminMember; onClose: () => void }) {
+export function MemberPanel({ member, onClose }: { member: AdminMember; onClose: () => void }) {
   const { t, n } = useI18n();
   return (
-    <Sheet title={member.display_name} onClose={onClose}>
+    <DetailPanel title={member.display_name} onClose={onClose}>
       <p className={styles.muted}>
         {member.email}, {t('pts_n', { n: n(member.points) })},{' '}
         {member.workouts === 1
@@ -371,6 +371,6 @@ export function MemberSheet({ member, onClose }: { member: AdminMember; onClose:
       </p>
       {member.crew_name && <AdjustPoints member={member} onDone={onClose} />}
       <DangerZone member={member} onDone={onClose} />
-    </Sheet>
+    </DetailPanel>
   );
 }

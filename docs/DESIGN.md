@@ -61,3 +61,4 @@ Emails are the one place that goes loud from top to bottom: artwork, big numbers
 - Mobile first at 390px. The floating dock is 64px high, 10px from the edges and the safe area, with Train as a raised 54px rounded-square button and a tint that slides to the active tab.
 - At ≥960px: a 240px side rail, content max 1240px. ATUS Climb becomes a two-column grid (map | standing panel) at ≥1120px.
 - No horizontal overflow at 390px. Touch targets ≥44px.
+- The backoffice works like a password manager: at ≥960px a side rail for its sections, then the list, then what's open docked beside it instead of a sheet, each scrolling on its own. On a phone the rail is a bar on top, and the list and what's open take turns with a way back. Sections and items have their own URLs (`/admin/accounts/:id`).
