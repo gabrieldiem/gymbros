@@ -1,5 +1,6 @@
 """Uploaded profile pictures: yours to change, your crew's to see."""
 
+import asyncio
 import uuid
 from collections.abc import Callable
 from datetime import datetime
@@ -10,7 +11,7 @@ from db.repositories.user_repository import UserRepository
 from db.tables.avatar import Avatar
 from db.tables.user import User
 from services.errors import AvatarNotFound
-from services.images import MAX_AVATAR_BYTES, check_image
+from services.images import MAX_AVATAR_BYTES, clean_image
 
 
 class AvatarService:
@@ -28,10 +29,12 @@ class AvatarService:
 
     async def upload(self, user: User, data: bytes) -> None:
         """Replace your picture. Raises if it's too big or isn't a picture."""
-        content_type = check_image(data, MAX_AVATAR_BYTES)
+        clean = await asyncio.to_thread(clean_image, data, MAX_AVATAR_BYTES)
         now = self._now()
         await self._avatars.store(
-            Avatar(user_id=user.id, image=data, content_type=content_type, updated_at=now)
+            Avatar(
+                user_id=user.id, image=clean.data, content_type=clean.content_type, updated_at=now
+            )
         )
         # Past the last version even if two uploads land in the same second.
         user.avatar_version = max(int(now.timestamp()), (user.avatar_version or 0) + 1)

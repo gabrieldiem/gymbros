@@ -1,5 +1,6 @@
 """A photo of a whole workout: the member's to change, their crew's to see."""
 
+import asyncio
 import uuid
 from collections.abc import Callable
 from datetime import datetime
@@ -9,7 +10,7 @@ from db.repositories.workout_repository import WorkoutRepository
 from db.tables.workout import Workout
 from db.tables.workout_photo import WorkoutPhoto
 from services.errors import WorkoutNotFound, WorkoutPhotoNotFound
-from services.images import MAX_PHOTO_BYTES, check_image
+from services.images import MAX_PHOTO_BYTES, clean_image
 from services.member import Member
 
 
@@ -29,11 +30,14 @@ class WorkoutPhotoService:
     async def upload(self, member: Member, workout_id: uuid.UUID, data: bytes) -> Workout:
         """Add or replace the photo of your workout, in progress or finished."""
         workout = await self._own(member, workout_id)
-        content_type = check_image(data, MAX_PHOTO_BYTES)
+        clean = await asyncio.to_thread(clean_image, data, MAX_PHOTO_BYTES)
         now = self._now()
         await self._photos.store(
             WorkoutPhoto(
-                workout_id=workout.id, image=data, content_type=content_type, updated_at=now
+                workout_id=workout.id,
+                image=clean.data,
+                content_type=clean.content_type,
+                updated_at=now,
             )
         )
         # Past the last version even if two uploads land in the same second.

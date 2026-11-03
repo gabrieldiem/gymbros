@@ -17,8 +17,8 @@ export type Actor = {
   avatar_url?: string | null;
   color: CrewColor;
 };
-export type ReactionKind = 'fist' | 'fire';
-export type Reactions = { fist: number; fire: number; mine: ReactionKind[] };
+export type EmojiCount = { emoji: string; count: number; mine: boolean };
+export type Reactions = { emoji: EmojiCount[] };
 export type QuickReply = 'q_light' | 'q_beast' | 'q_form' | 'q_six' | 'q_spot' | 'q_respect';
 export const QUICK_REPLIES: QuickReply[] = [
   'q_light',
@@ -35,6 +35,8 @@ export type Comment = {
   body: string | null;
   quick_key: QuickReply | null;
   created_at: string;
+  photo_url?: string | null;
+  reactions?: Reactions | null;
 };
 
 export type PostedExercise = {
@@ -152,20 +154,23 @@ function updateItem(data: FeedData | undefined, id: string, change: (item: FeedI
   };
 }
 
-export function toggledReactions(reactions: Reactions, kind: ReactionKind): Reactions {
-  const had = reactions.mine.includes(kind);
+export function toggledReactions(reactions: Reactions, emoji: string): Reactions {
+  const found = reactions.emoji.find((e) => e.emoji === emoji);
+  if (!found) return { emoji: [...reactions.emoji, { emoji, count: 1, mine: true }] };
   return {
-    ...reactions,
-    [kind]: Math.max(0, reactions[kind] + (had ? -1 : 1)),
-    mine: had ? reactions.mine.filter((k) => k !== kind) : [...reactions.mine, kind],
+    emoji: reactions.emoji
+      .map((e) =>
+        e.emoji === emoji ? { ...e, mine: !e.mine, count: e.count + (e.mine ? -1 : 1) } : e,
+      )
+      .filter((e) => e.count > 0),
   };
 }
 
-/** Toggle 👊/🔥. Optimistic: the count changes at once and rolls back on error. */
+/** Toggle an emoji. Optimistic: the count changes at once and rolls back on error. */
 export function useReact() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, kind }: { itemId: string; kind: ReactionKind }) =>
+    mutationFn: ({ itemId, kind }: { itemId: string; kind: string }) =>
       apiRequest<Reactions>(`/feed/${itemId}/reactions`, { method: 'POST', body: { kind } }),
     onMutate: async ({ itemId, kind }) => {
       await queryClient.cancelQueries({ queryKey: feedKey });
@@ -233,5 +238,47 @@ export function useHallOfFame() {
   return useQuery({
     queryKey: hallOfFameKey,
     queryFn: ({ signal }) => apiRequest<HallOfFame>('/crew/hall-of-fame', { signal }),
+  });
+}
+
+/** Toggle an emoji on a comment. Optimistic, like on a post. */
+export function useReactToComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ commentId, emoji }: { itemId: string; commentId: string; emoji: string }) =>
+      apiRequest<Reactions>(`/feed/comments/${commentId}/reactions`, {
+        method: 'POST',
+        body: { kind: emoji },
+      }),
+    onMutate: async ({ itemId, commentId, emoji }) => {
+      await queryClient.cancelQueries({ queryKey: feedKey });
+      const previous = queryClient.getQueryData<FeedData>(feedKey);
+      queryClient.setQueryData<FeedData>(feedKey, (data) =>
+        updateItem(data, itemId, (item) => ({
+          ...item,
+          comments: item.comments.map((c) =>
+            c.id === commentId
+              ? { ...c, reactions: toggledReactions(c.reactions ?? { emoji: [] }, emoji) }
+              : c,
+          ),
+        })),
+      );
+      return { previous };
+    },
+    onError: (_error, _vars, context) => queryClient.setQueryData(feedKey, context?.previous),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: feedKey }),
+  });
+}
+
+/** Answer a post with a picture, already made small on the device. */
+export function useCommentPhoto() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, file, caption }: { itemId: string; file: Blob; caption?: string }) =>
+      apiRequest<Comment>(
+        `/feed/${itemId}/comments/photo${caption ? `?caption=${encodeURIComponent(caption)}` : ''}`,
+        { method: 'POST', file },
+      ),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: feedKey }),
   });
 }

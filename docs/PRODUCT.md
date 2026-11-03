@@ -168,6 +168,10 @@ Seven camps at 1,500-point steps, with the summit at 9,000. In "This week" mode 
 - **What's new:** when a feature ships, members hear about it once, as one bell notification that opens the What's new page (also in the profile menu). Several features since your last visit roll into one notification. It never toasts, pops up or emails, and it isn't sent to someone who joined after the feature came out.
 - **Weekly recap:** story-style slides (crew total, biggest climber, heaviest PR, your week, most improved, this week's event). This is the one place where the bold, loud visual treatment is allowed.
 
+Reactions work like a chat: any emoji, on posts and comments, on your own too. The picker's data comes from this server, not a CDN. A post can be answered with a picture. The Hype crew badge counts posts of others you reacted to, not emoji, so piling them on earns nothing.
+
+Every uploaded image is rebuilt from its pixels on the server, so location, camera, dates and anything else in the file are gone whatever the client sends. Images are stored without a file name and served as `gymbros-<hash>.jpg`.
+
 ## Competition mechanics
 
 - **Weekly quests** (reset Monday): Leg day twice (150), Push, pull and legs (120), Move 20 tonnes (200), Run 20 km or swim 5 km (200), Sixty cardio minutes (100).

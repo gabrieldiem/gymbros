@@ -4,6 +4,8 @@ from db.tables.admin_action import AdminAction
 from db.tables.auth_session import AuthSession
 from db.tables.avatar import Avatar
 from db.tables.comment import Comment
+from db.tables.comment_photo import CommentPhoto
+from db.tables.comment_reaction import CommentReaction
 from db.tables.crew import Crew
 from db.tables.digest_send import DigestSend
 from db.tables.duel import Duel
@@ -27,6 +29,8 @@ __all__ = [
     "AuthSession",
     "Avatar",
     "Comment",
+    "CommentPhoto",
+    "CommentReaction",
     "Crew",
     "DigestSend",
     "Duel",

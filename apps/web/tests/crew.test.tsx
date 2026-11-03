@@ -47,7 +47,15 @@ describe('Crew feed', () => {
 
   it('toggles a reaction optimistically and sends it', async () => {
     const fetchMock = crewApi({
-      'POST /api/feed/f1/reactions': [200, { fist: 3, fire: 3, mine: ['fire'] }],
+      'POST /api/feed/f1/reactions': [
+        200,
+        {
+          emoji: [
+            { emoji: '👊', count: 3, mine: false },
+            { emoji: '🔥', count: 3, mine: true },
+          ],
+        },
+      ],
     });
     renderApp('/crew');
     const fire = await screen.findByRole('button', { name: 'Fire, 2' });
@@ -56,17 +64,17 @@ describe('Crew feed', () => {
       'aria-pressed',
       'true',
     );
-    expect(lastBody(fetchMock, '/api/feed/f1/reactions')).toEqual({ kind: 'fire' });
+    expect(lastBody(fetchMock, '/api/feed/f1/reactions')).toEqual({ kind: '🔥' });
   });
 
-  it('shows counts instead of buttons on your own posts', async () => {
+  it('lets you react to your own posts too, like in a chat', async () => {
     crewApi({ 'GET /api/feed': [200, { ...FEED, items: [{ ...WORKOUT_POST, is_mine: true }] }] });
     renderApp('/crew');
     const post = (await screen.findByRole('heading', { name: 'Push day' })).closest(
       'li',
     ) as HTMLElement;
-    expect(within(post).queryByRole('button', { name: /Fire/ })).toBeNull();
-    expect(post).toHaveTextContent('👊 3');
+    expect(within(post).getByRole('button', { name: 'Fire, 2' })).toBeEnabled();
+    expect(within(post).getByRole('button', { name: 'Add a reaction' })).toBeVisible();
   });
 
   it('sends a quick reply and shows it in the thread', async () => {

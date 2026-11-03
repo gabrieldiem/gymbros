@@ -31,7 +31,7 @@ from models.workouts import (
     WeekResponse,
     WorkoutResponse,
 )
-from routes.uploads import read_upload
+from routes.uploads import image_response, read_upload
 from services.gym_service import GymService
 from services.images import MAX_PHOTO_BYTES
 from services.me_stats_service import MeStatsService
@@ -46,8 +46,6 @@ from services.workout_types import ExerciseEntry, LoggedOffline
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
-
-_A_YEAR = 365 * 24 * 3600
 
 
 @router.post(
@@ -182,15 +180,7 @@ async def get_photo(
 ) -> Response:
     """A workout's photo, for its crew. Its URL changes with each upload, so it caches for good."""
     photo = await photos.view(member, workout_id)
-    return Response(
-        content=photo.image,
-        media_type=photo.content_type,
-        headers={
-            "Cache-Control": f"private, max-age={_A_YEAR}, immutable",
-            "X-Content-Type-Options": "nosniff",
-            "Content-Security-Policy": "default-src 'none'; sandbox",
-        },
-    )
+    return image_response(photo.image, photo.content_type)
 
 
 @router.post(

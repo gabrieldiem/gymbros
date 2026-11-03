@@ -73,3 +73,31 @@
   outline: none;
   border-color: var(--volt);
 }
+
+.photo {
+  display: block;
+  max-width: min(100%, 320px);
+  max-height: 320px;
+  margin-top: 6px;
+  border-radius: var(--r-control-sm);
+}
+
+.attach {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  color: var(--smoke);
+  border-radius: var(--r-control-sm);
+}
+
+.attach:hover {
+  color: var(--chalk);
+}
+
+.unreadable {
+  margin-top: 8px;
+  color: var(--red-text);
+  font-size: var(--fs-small);
+}

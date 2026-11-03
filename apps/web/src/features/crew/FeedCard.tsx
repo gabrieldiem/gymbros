@@ -1,7 +1,7 @@
 import { ListChecks, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
-import { useReact, type FeedItem, type ReactionKind, type WorkoutPostVars } from '../../api/social';
+import { useReact, type FeedItem, type WorkoutPostVars } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
@@ -13,9 +13,8 @@ import { formatLift } from '../train/format';
 import { EditedTag } from './EditedTag';
 import styles from './Feed.module.css';
 import { formatPostedSet } from './format';
+import { ReactionBar } from './ReactionBar';
 import { Thread } from './Thread';
-
-const EMOJI: Record<ReactionKind, string> = { fist: '👊', fire: '🔥' };
 
 /** A finished workout in the feed: stats, PRs, exercises, reactions and comments. */
 export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exercise[] }) {
@@ -87,36 +86,21 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
           ))}
         </ul>
       </details>
-      <div className={styles.reacts}>
-        {item.is_mine ? (
-          <span className={styles.counts}>
-            👊 {item.reactions.fist} &nbsp; 🔥 {item.reactions.fire}
-          </span>
-        ) : (
-          (['fist', 'fire'] as const).map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              aria-pressed={item.reactions.mine.includes(kind)}
-              aria-label={`${t(kind)}, ${item.reactions[kind]}`}
-              onClick={() => react.mutate({ itemId: item.id, kind })}
-            >
-              <i className={styles.emoji}>{EMOJI[kind]}</i>{' '}
-              <span key={item.reactions[kind]} className={styles.count}>
-                {item.reactions[kind]}
-              </span>
-            </button>
-          ))
-        )}
+      <ReactionBar
+        reactions={item.reactions.emoji ?? []}
+        always={['👊', '🔥']}
+        onToggle={(emoji) => react.mutate({ itemId: item.id, kind: emoji })}
+      >
         <button
           type="button"
+          className={styles.commentsButton}
           aria-expanded={open}
           aria-label={t('comments_n', { n: item.comments.length })}
           onClick={() => setOpen((o) => !o)}
         >
           <MessageCircle size={16} aria-hidden="true" /> <span>{item.comments.length}</span>
         </button>
-      </div>
+      </ReactionBar>
       {open && <Thread itemId={item.id} comments={item.comments} />}
     </li>
   );

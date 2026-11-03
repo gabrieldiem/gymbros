@@ -1,9 +1,8 @@
 """A photo of the whole workout: yours to add, your crew's to see."""
 
 from tests.application.conftest import register_on
+from tests.images import JPEG, PNG
 
-JPEG = b"\xff\xd8\xff\xe0" + b"pixels" * 10
-PNG = b"\x89PNG\r\n\x1a\n" + b"pixels" * 10
 BENCH = {"exercise_id": "bench", "sets": [{"load_kg": 60, "reps": 5, "done": True}]}
 
 
@@ -33,7 +32,7 @@ async def test_a_photo_goes_up_while_logging_and_comes_back(client, member):
     url = response.json()["photo_url"]
     assert url.startswith(f"/api/workouts/{workout['id']}/photo?v=")
     picture = await client.get(url)
-    assert picture.content == JPEG
+    assert picture.content.startswith(b"\xff\xd8\xff")
     assert picture.headers["content-type"] == "image/jpeg"
     assert picture.headers["x-content-type-options"] == "nosniff"
     assert (await client.get("/api/workouts/active")).json()["photo_url"] == url
@@ -59,7 +58,7 @@ async def test_a_new_photo_replaces_it_with_a_new_url(client, member):
     first = (await add_photo(client, workout["id"])).json()["photo_url"]
     second = (await add_photo(client, workout["id"], PNG)).json()["photo_url"]
     assert first != second
-    assert (await client.get(second)).content == PNG
+    assert (await client.get(second)).content.startswith(b"\x89PNG")
 
 
 async def test_a_photo_can_be_removed(client, member):
@@ -91,7 +90,7 @@ async def test_your_crew_sees_it_on_the_feed(client, other_client, crew, member)
     feed = (await other_client.get("/api/feed")).json()["items"]
     post = next(i for i in feed if i["kind"] == "workout")
     assert post["photo_url"] == url
-    assert (await other_client.get(url)).content == JPEG
+    assert (await other_client.get(url)).content.startswith(b"\xff\xd8\xff")
 
 
 async def test_a_photo_added_later_shows_on_the_post(client, member):

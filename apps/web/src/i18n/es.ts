@@ -211,13 +211,13 @@ export const es = {
     'Cuando entras con Google, GYMBROS solo pide tu perfil básico y tu email (los permisos openid, email y profile). De ahí guardamos tu nombre, tu email y el ID de tu cuenta de Google. No guardamos tu foto de perfil de Google, nunca vemos tu contraseña de Google y no tenemos acceso a tu Gmail, Drive, Contactos, Calendario ni a nada más de tu cuenta de Google.',
   privacy_collect_h: 'Otros datos que guardamos',
   privacy_collect:
-    'Lo que añades, si decides hacerlo: tus entrenos, sets, pesos, tiempos, distancias, los nombres de tus gimnasios y dónde están si los pones en el mapa, una foto de un entreno, una foto de perfil, comentarios, reacciones, duelos, los comentarios que nos envías y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
+    'Lo que añades, si decides hacerlo: tus entrenos, sets, pesos, tiempos, distancias, los nombres de tus gimnasios y dónde están si los pones en el mapa, una foto de un entreno, una foto de perfil, comentarios, fotos con las que respondes publicaciones, reacciones, duelos, los comentarios que nos envías y ajustes. Lo que la app calcula a partir de eso: tus puntos, rangos, PR, logros y notificaciones. Si un administrador te invita por email, tu dirección se usa para enviar ese email y no se guarda hasta que entras. Como la mayoría de los sitios web, nuestros servidores también guardan registros técnicos de las peticiones, incluidos tu dirección IP y el tipo de navegador, para que el servicio funcione y para resolver problemas.',
   privacy_use_h: 'Cómo usamos tus datos',
   privacy_use:
     'Solo para ofrecer y mejorar las funciones de GYMBROS. El ID de tu cuenta de Google y tu email te identifican en la misma cuenta cada vez. Tu nombre se muestra a tu equipo en la clasificación, el muro y las notificaciones. Tu email también se usa para enviarte el email de bienvenida y, salvo que los desactives en ajustes o con el enlace de cada uno, un resumen semanal de tu semana y mensajes de quienes llevan GYMBROS. Tus entrenos se usan para puntuarlos, clasificar a tu equipo, mostrar tu progreso y publicarlos en el muro de tu equipo. Los comentarios que envías se leen para mejorar la app. No hay anuncios ni herramientas de analítica.',
   privacy_who_h: 'Con quién los compartimos',
   privacy_who:
-    'Tu equipo ve tu nombre, foto, entrenos, gimnasios y dónde están en el mapa, fotos de entrenos, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluidos tu email, tu foto de perfil y los comentarios que envías. Cuatro proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), OpenStreetMap (recibe lo que buscas al ubicar un gimnasio, a través de nuestro servidor, así que no quién buscó, y tu navegador carga sus imágenes de mapa directamente, lo que le muestra tu dirección IP), Resend (recibe tu nombre, tu email y el contenido de cada email, que puede incluir los nombres y números semanales de tu equipo, para entregarlo) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). Si abres un gimnasio en Google Maps, a esa visita se le aplica la política de Google. No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
+    'Tu equipo ve tu nombre, foto, entrenos, gimnasios y dónde están en el mapa, fotos de entrenos y de comentarios, puntos, rangos, PR, logros, comentarios y reacciones, pero no tu email. Los administradores de GYMBROS pueden ver los datos de la cuenta, incluidos tu email, tu foto de perfil y los comentarios que envías. Cuatro proveedores tratan datos para nosotros, solo para que el servicio funcione: Google (inicio de sesión), OpenStreetMap (recibe lo que buscas al ubicar un gimnasio, a través de nuestro servidor, así que no quién buscó, y tu navegador carga sus imágenes de mapa directamente, lo que le muestra tu dirección IP), Resend (recibe tu nombre, tu email y el contenido de cada email, que puede incluir los nombres y números semanales de tu equipo, para entregarlo) y Amazon Web Services (aloja los servidores y la base de datos, en Brasil). Si abres un gimnasio en Google Maps, a esa visita se le aplica la política de Google. No vendemos tus datos ni los transferimos a nadie más, salvo que la ley lo exija.',
   privacy_protect_h: 'Cómo protegemos tus datos',
   privacy_protect:
     'Todo el tráfico de GYMBROS va cifrado con HTTPS. La base de datos no es accesible desde internet: solo puede conectarse el propio servidor de la app. La cookie que mantiene tu sesión no puede leerse desde scripts y solo se envía por HTTPS, y el servidor guarda solo un hash con clave, no su valor. GYMBROS no te pide contraseña. Las fotos que subes se reducen primero en tu dispositivo, lo que elimina sus metadatos, como dónde se tomaron, y solo pueden abrirlas los miembros de tu equipo con sesión iniciada. Solo los administradores indicados en la configuración del servidor pueden abrir el área de administración, y cada cambio que hacen queda en un registro.',
@@ -368,6 +368,10 @@ export const es = {
   custom_ex_add: 'Añadirlo',
   no_weight: 'Sin peso',
   cancel_workout: 'Cancelar entreno',
+  wn_emoji_photos_title: 'Cualquier emoji, y respuestas con foto',
+  wn_emoji_photos_body: 'Reaccionar y responder en Equipo ahora funciona como en un chat.',
+  wn_emoji_photos_points:
+    'Reacciona con cualquier emoji, en publicaciones y en comentarios\nResponde una publicación con una foto\nLas fotos pierden su ubicación y los datos de la cámara al subirlas, envíe lo que envíe tu teléfono',
   wn_ways_to_train_title: 'Más formas de entrenar',
   wn_ways_to_train_body: 'Muay Thai, entrenar sin peso y ejercicios que la lista no tiene.',
   wn_ways_to_train_points:
@@ -738,6 +742,14 @@ export const es = {
   inbox_empty: 'Nada nuevo. Ve a entrenar y agita las cosas.',
   n_react: 'A {name} le gustó tu entreno {emoji}.',
   n_comment: '{name} comentó tu entreno.',
+  emoji_pick: 'Elige un emoji',
+  emoji_search: 'Buscar emoji',
+  emoji_none: 'No se encontró ningún emoji.',
+  emoji_add: 'Añadir una reacción',
+  comment_photo: 'Responder con una foto',
+  comment_photo_of: 'Foto de {name}',
+  comment_photo_unreadable: 'Ese archivo no se puede abrir como foto. Prueba con otro.',
+  n_comment_react: '{name} reaccionó {emoji} a tu comentario.',
   n_passed: '{name} te ha adelantado. Ve a recuperar tu puesto.',
   n_behind: '{name} está a {n} pts de ti y entrenando ahora mismo.',
   n_goal: '{name} cumplió la meta semanal: {n} de {n}.',

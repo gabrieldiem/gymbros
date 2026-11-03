@@ -39,7 +39,12 @@ export const WORKOUT_POST: FeedItem = {
       },
     ],
   },
-  reactions: { fist: 3, fire: 2, mine: [] },
+  reactions: {
+    emoji: [
+      { emoji: '👊', count: 3, mine: false },
+      { emoji: '🔥', count: 2, mine: false },
+    ],
+  },
   comments: [
     {
       id: 'c1',

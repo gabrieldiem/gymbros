@@ -6,10 +6,9 @@ from httpx import ASGITransport, AsyncClient
 
 from main import app
 from tests.application.conftest import register_on
+from tests.images import JPEG, PNG, picture
 
-PNG = b"\x89PNG\r\n\x1a\n" + b"pixels" * 10
-JPEG = b"\xff\xd8\xff\xe0" + b"pixels" * 10
-WEBP = b"RIFF\x00\x00\x00\x00WEBP" + b"pixels" * 10
+WEBP = picture("WEBP")
 
 
 async def upload(client, data=PNG, content_type="image/png"):
@@ -54,7 +53,7 @@ async def test_a_picture_goes_up_and_comes_back(client, member):
     assert body["avatar_url"].startswith(f"/api/avatars/{body['id']}?v=")
     picture = await client.get(body["avatar_url"])
     assert picture.status_code == 200
-    assert picture.content == PNG
+    assert picture.content.startswith(b"\x89PNG")
     assert picture.headers["content-type"] == "image/png"
     assert picture.headers["x-content-type-options"] == "nosniff"
     assert "immutable" in picture.headers["cache-control"]
@@ -64,7 +63,7 @@ async def test_each_upload_gets_a_new_url(client, member):
     first = (await upload(client)).json()["avatar_url"]
     second = (await upload(client, JPEG)).json()["avatar_url"]
     assert first != second
-    assert (await client.get(second)).content == JPEG
+    assert (await client.get(second)).content.startswith(b"\xff\xd8\xff")
 
 
 async def test_the_type_comes_from_the_bytes_not_the_client(client, member):
@@ -98,7 +97,7 @@ async def test_removing_it_goes_back_to_your_characters(client, member):
 async def test_your_crew_sees_it_with_your_name(client, other_client, crew, member):
     await register_on(other_client, "maxo@example.com", crew.invite_code)
     url = (await upload(client)).json()["avatar_url"]
-    assert (await other_client.get(url)).content == PNG
+    assert (await other_client.get(url)).content.startswith(b"\x89PNG")
     climb = (await other_client.get("/api/climb")).json()
     assert url in [s["avatar_url"] for s in climb["standings"]]
 

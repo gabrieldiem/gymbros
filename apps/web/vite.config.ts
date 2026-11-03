@@ -1,6 +1,9 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { VitePWA } from 'vite-plugin-pwa';
 
 import { PRIVACY_PAGE, TERMS_PAGE } from './src/features/legal/legalContent';
@@ -23,10 +26,37 @@ function staticLegalPages(): Plugin {
   };
 }
 
+/**
+ * Serve the emoji data from this site at /emoji, for the picker. It would otherwise come from a
+ * public CDN, which would learn who opens it.
+ */
+function emojiData(): Plugin {
+  const FILES = ['en/data.json', 'en/messages.json', 'es/data.json', 'es/messages.json'];
+  const read = (file: string) =>
+    readFileSync(resolve(__dirname, 'node_modules/emojibase-data', file));
+  return {
+    name: 'gymbros-emoji-data',
+    configureServer(server) {
+      server.middlewares.use('/emoji', (request, response, next) => {
+        const file = (request.url ?? '').split('?')[0]?.replace(/^\//, '') ?? '';
+        if (!FILES.includes(file)) return next();
+        response.setHeader('Content-Type', 'application/json');
+        response.end(read(file));
+      });
+    },
+    generateBundle() {
+      for (const file of FILES) {
+        this.emitFile({ type: 'asset', fileName: `emoji/${file}`, source: read(file) });
+      }
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     react(),
     staticLegalPages(),
+    emojiData(),
     VitePWA({
       // A new version waits for the member: see src/pwa/registerServiceWorker.ts.
       registerType: 'prompt',

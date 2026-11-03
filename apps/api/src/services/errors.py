@@ -169,8 +169,12 @@ class FeedItemNotFound(DomainError):
     """No such feed item in the member's crew."""
 
 
-class OwnFeedItem(DomainError):
-    """Members can't react to their own posts."""
+class InvalidReaction(DomainError):
+    """A reaction has to be one emoji."""
+
+
+class CommentNotFound(DomainError):
+    """No such comment, or it's in another crew."""
 
 
 class MemberNotFound(DomainError):

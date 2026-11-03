@@ -178,34 +178,16 @@
   text-align: right;
 }
 
-.reacts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 14px;
-}
-
-.reacts button,
-.counts {
+.commentsButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: var(--touch);
   padding: 0 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
   background: var(--iron);
   border-radius: var(--r-pill);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.counts {
-  color: var(--smoke);
-  font-weight: 600;
-}
-
-.reacts button[aria-pressed='true'] {
-  background: var(--volt-tint);
-  color: var(--volt);
 }
 
 .event {

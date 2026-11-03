@@ -1,19 +1,55 @@
-import { Send } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { ImagePlus, Send } from 'lucide-react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 
-import { QUICK_REPLIES, useComment, type Comment } from '../../api/social';
+import {
+  QUICK_REPLIES,
+  useComment,
+  useCommentPhoto,
+  useReactToComment,
+  type Comment,
+} from '../../api/social';
 import { Avatar } from '../../components/Avatar';
 import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
+import { resizeImage } from '../../components/resizeImage';
 import { useI18n } from '../../i18n/context';
 import { timeAgo } from '../../i18n/timeAgo';
+import { ReactionBar } from './ReactionBar';
 import styles from './Thread.module.css';
+
+const PHOTO_SIDE = 1280;
 
 /** Comments on a feed item, quick replies and a reply box. */
 export function Thread({ itemId, comments }: { itemId: string; comments: Comment[] }) {
   const { t, lang } = useI18n();
   const comment = useComment();
+  const photo = useCommentPhoto();
+  const reactTo = useReactToComment();
   const [text, setText] = useState('');
+  const [preparing, setPreparing] = useState(false);
+  const [unreadable, setUnreadable] = useState(false);
+  const picker = useRef<HTMLInputElement>(null);
+
+  // Made small here for the connection, and cleaned on the server whatever a phone sends.
+  async function handlePhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setPreparing(true);
+    setUnreadable(false);
+    try {
+      const small = await resizeImage(file, { maxSide: PHOTO_SIDE });
+      const caption = text.trim();
+      photo.mutate(
+        { itemId, file: small, ...(caption ? { caption } : {}) },
+        { onSuccess: () => setText('') },
+      );
+    } catch {
+      setUnreadable(true); // A file that says it's a picture, and isn't one this phone can open.
+    } finally {
+      setPreparing(false);
+    }
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -38,6 +74,19 @@ export function Thread({ itemId, comments }: { itemId: string; comments: Comment
                 <b>{c.author.display_name}</b>
                 {c.quick_key ? t(c.quick_key) : c.body}{' '}
                 <span className={styles.time}>{timeAgo(lang, c.created_at)}</span>
+                {c.photo_url && (
+                  <img
+                    className={styles.photo}
+                    src={c.photo_url}
+                    alt={t('comment_photo_of', { name: c.author.display_name })}
+                    loading="lazy"
+                  />
+                )}
+                <ReactionBar
+                  small
+                  reactions={c.reactions?.emoji ?? []}
+                  onToggle={(emoji) => reactTo.mutate({ itemId, commentId: c.id, emoji })}
+                />
               </span>
             </li>
           ))}
@@ -66,11 +115,34 @@ export function Thread({ itemId, comments }: { itemId: string; comments: Comment
           autoComplete="off"
           onChange={(e) => setText(e.target.value)}
         />
+        <input
+          ref={picker}
+          type="file"
+          accept="image/*"
+          hidden
+          aria-label={t('comment_photo')}
+          onChange={(event) => void handlePhoto(event)}
+        />
+        <button
+          type="button"
+          className={styles.attach}
+          aria-label={t('comment_photo')}
+          title={t('comment_photo')}
+          disabled={preparing || photo.isPending}
+          onClick={() => picker.current?.click()}
+        >
+          <ImagePlus size={20} aria-hidden="true" />
+        </button>
         <Button icon={Send} type="submit" disabled={comment.isPending || !text.trim()}>
           {t('send')}
         </Button>
       </form>
-      <FormError error={comment.error} />
+      {unreadable && (
+        <p className={styles.unreadable} role="alert">
+          {t('comment_photo_unreadable')}
+        </p>
+      )}
+      <FormError error={comment.error ?? photo.error ?? reactTo.error} />
     </div>
   );
 }

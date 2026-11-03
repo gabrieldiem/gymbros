@@ -22,6 +22,7 @@ from clients.resend_client import ResendEmailClient
 from clock import utc_now
 from db.repositories.admin_repository import AdminRepository
 from db.repositories.badge_repository import BadgeRepository
+from db.repositories.comment_photo_repository import CommentPhotoRepository
 from db.repositories.crew_repository import CrewRepository
 from db.repositories.duel_repository import DuelRepository
 from db.repositories.feed_repository import FeedRepository
@@ -397,6 +398,7 @@ def get_feed_service(session: AsyncSession = DB_SESSION) -> FeedService:
         notifier=_notifier(session),
         inactive_days=settings.social_inactive_days,
         now=utc_now,
+        photos=CommentPhotoRepository(session),
         badges=build_badge_service(session),
     )
 
