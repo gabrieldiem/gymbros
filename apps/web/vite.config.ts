@@ -55,8 +55,15 @@ export default defineConfig({
         // Fonts: only the latin subset (covers English and Spanish). The latin-ext and
         // vietnamese files stay in the font CSS and load on demand via unicode-range.
         globPatterns: ['**/*.{js,css,html,svg,png}', '**/*-latin-[0-9]*.woff2'],
-        // Offline, the app's own /privacy and /terms routes show this copy.
-        globIgnores: ['privacy.html', 'terms.html', 'og.png', 'email/**'],
+        // Offline, the app's own /privacy and /terms routes show this copy. The email artwork is
+        // for mail apps, and the rich text editor only for admins, so phones don't fetch them.
+        globIgnores: [
+          'privacy.html',
+          'terms.html',
+          'og.png',
+          'email/**',
+          'assets/RichTextEditor-*',
+        ],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
