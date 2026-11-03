@@ -332,12 +332,27 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
     await page.getByRole('button', { name: 'Discard workout' }).click();
   }
   await page.getByRole('link', { name: /^Steps/ }).click();
-  await expect(page).toHaveURL(/\/steps$/);
+  await expect(page).toHaveURL(/\/climb\/steps$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Steps' })).toBeVisible();
   await expect(page.locator('svg text', { hasText: /steps$/ }).first()).toBeVisible();
   const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
   const serious = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
   expect(serious.map((v) => `${v.id} ${v.nodes[0]?.target.join(' ')}`)).toEqual([]);
+
+  // The climb and steps are one tap apart, both ways, on either size of screen.
+  const section = (name: string) =>
+    page.locator('nav').getByRole('link', { name, exact: true }).locator('visible=true');
+  await section('Climb').click();
+  await expect(page).toHaveURL(/\/climb$/);
+  await expect(section('Climb')).toHaveAttribute('aria-current', 'page');
+  await page.screenshot({ path: `${SCREENS}/climb-switch-${testInfo.project.name}.png` });
+  await section('Steps').click();
+  await expect(page).toHaveURL(/\/climb\/steps$/);
+  await expect(section('Steps')).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'ATUS Climb', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 
   // A period on the real calendar: two taps.
   const days = page.locator('table[role="grid"] button:not([disabled])');

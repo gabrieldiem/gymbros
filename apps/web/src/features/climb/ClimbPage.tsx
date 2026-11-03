@@ -1,4 +1,4 @@
-import { CalendarDays, Footprints, Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
+import { CalendarDays, Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -6,7 +6,7 @@ import { useClimb, type ClimbChange, type ClimbMode } from '../../api/climb';
 import { useMe } from '../../api/me';
 import { useActiveWorkout, useCatalog, useWeek } from '../../api/train';
 import { RecapStories } from '../recap/RecapStories';
-import { Button, ButtonLink } from '../../components/Button';
+import { Button } from '../../components/Button';
 import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
 import { useToast } from '../../components/toast';
@@ -14,6 +14,7 @@ import { useShareInvite } from '../../components/useShareInvite';
 import { TimedEventChip } from '../../components/TimedEvent';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
+import { ClimbNav } from './ClimbNav';
 import styles from './ClimbPage.module.css';
 import { RopeOrder } from './RopeOrder';
 import { StandingPanel } from './StandingPanel';
@@ -59,6 +60,7 @@ export function ClimbPage() {
 
   return (
     <>
+      <ClimbNav />
       <section className={styles.hero} aria-labelledby="page-title">
         <h1 id="page-title">
           <span>{t('hero1')}</span>
@@ -66,12 +68,7 @@ export function ClimbPage() {
         </h1>
         <p>{t('hero_sub')}</p>
         <div className={styles.row}>
-          <div className={styles.rowStart}>
-            {legEvent && <TimedEventChip endsAt={week?.event_ends_at} />}
-            <ButtonLink variant="ghost" icon={Footprints} to="/steps">
-              {t('steps_title')}
-            </ButtonLink>
-          </div>
+          <div>{legEvent && <TimedEventChip endsAt={week?.event_ends_at} />}</div>
           <Segmented
             label={t('mode_label')}
             value={mode}

@@ -214,7 +214,7 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 - Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests, badges or the feed.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 
-`/steps` has the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
+`/climb/steps` is a section of ATUS Climb, one tap from the points climb, with the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
 
 ## Timed sports, no weight and custom exercises
 

@@ -127,7 +127,7 @@ export function RoutinePicker(props: Props) {
           </h3>
           <p>{t('empty_sub')}</p>
         </button>
-        <Link to="/steps" className={`${styles.routine} ${styles.empty}`}>
+        <Link to="/climb/steps" className={`${styles.routine} ${styles.empty}`}>
           <h3 className={styles.routineTitle}>
             <Footprints size={20} aria-hidden="true" />
             {t('steps_title')}

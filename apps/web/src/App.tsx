@@ -53,7 +53,8 @@ export function App() {
             <Route path="climb" element={<ClimbPage />} />
             <Route path="crew" element={<CrewPage />} />
             <Route path="train" element={<TrainPage />} />
-            <Route path="steps" element={<StepsPage />} />
+            <Route path="climb/steps" element={<StepsPage />} />
+            <Route path="steps" element={<Navigate to="/climb/steps" replace />} />
             <Route path="quests" element={<QuestsPage />} />
             <Route path="quests/achievements" element={<QuestsPage />} />
             <Route path="quests/points" element={<QuestsPage />} />

@@ -21,6 +21,8 @@ describe('App shell (signed in)', () => {
       .map((link) => link.textContent);
     expect(tabs).toEqual([
       'ATUS Climb',
+      'Climb',
+      'Steps',
       'Crew',
       'Train',
       'Quests',
