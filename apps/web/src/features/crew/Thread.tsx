@@ -1,3 +1,4 @@
+import { Send } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import { QUICK_REPLIES, useComment, type Comment } from '../../api/social';
@@ -65,7 +66,7 @@ export function Thread({ itemId, comments }: { itemId: string; comments: Comment
           autoComplete="off"
           onChange={(e) => setText(e.target.value)}
         />
-        <Button type="submit" disabled={comment.isPending || !text.trim()}>
+        <Button icon={Send} type="submit" disabled={comment.isPending || !text.trim()}>
           {t('send')}
         </Button>
       </form>

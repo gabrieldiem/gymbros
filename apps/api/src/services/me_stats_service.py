@@ -60,6 +60,8 @@ class WorkoutDetail:
     sets: int
     exercises: tuple[ExerciseEntry, ...]
     line_items: tuple[PointEvent, ...]
+    # Until when you can change it. None: you can't any more.
+    editable_until: datetime | None = None
 
 
 class MeStatsService:
@@ -74,9 +76,11 @@ class MeStatsService:
         catalog: Catalog,
         now: Callable[[], datetime],
         events: PointEventRepository,
+        edit_window: timedelta,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._events = events
+        self._edit_window = edit_window
         self._climb = climb
         self._workouts, self._stats, self._records, self._badges = repos
         self._catalog = catalog
@@ -96,12 +100,20 @@ class MeStatsService:
             for logged in log.exercises
         )
         done = tuple(entry for entry in exercises if entry.sets)
+        paid = tuple(await self._events.for_workout(workout.id))
         return WorkoutDetail(
             workout=workout,
             sets=sum(len(entry.sets) for entry in done),
             exercises=done,
-            line_items=tuple(await self._events.for_workout(workout.id)),
+            line_items=paid,
+            editable_until=self._editable_until(paid),
         )
+
+    def _editable_until(self, paid: tuple[PointEvent, ...]) -> datetime | None:
+        logged_at = min((event.created_at for event in paid), default=None)
+        if logged_at is None or self._now() > logged_at + self._edit_window:
+            return None
+        return logged_at + self._edit_window
 
     async def stats(self, member: Member) -> MeStats:
         """The member's profile."""

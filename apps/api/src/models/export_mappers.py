@@ -11,7 +11,7 @@ from models.export import (
     ExportSet,
     ExportWorkout,
 )
-from models.gyms import GymModel
+from models.gyms import to_gym_model
 from models.photos import photo_url
 from services.catalog import Catalog
 from services.export_service import Export, ExportedWorkout
@@ -62,7 +62,7 @@ def to_export_response(export: Export, catalog: Catalog) -> ExportResponse:
             crew=export.crew.name if export.crew else None,
             created_at=user.created_at,
         ),
-        gyms=[GymModel(id=g.id, name=g.name, is_default=g.is_default) for g in export.gyms],
+        gyms=[to_gym_model(g) for g in export.gyms],
         personal_records=[
             ExportRecord(
                 exercise_id=r.exercise_id,

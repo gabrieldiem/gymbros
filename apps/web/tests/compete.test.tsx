@@ -224,7 +224,7 @@ describe('You tab', () => {
   it('changes the rest timer in settings', async () => {
     const fetchMock = api({ 'PATCH /api/me': (body) => [200, makeMe(body as object)] });
     renderApp('/me');
-    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Profile and settings' }));
     await userEvent.click(screen.getByRole('button', { name: '120 s' }));
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

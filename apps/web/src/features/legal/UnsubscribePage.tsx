@@ -1,3 +1,4 @@
+import { MailX } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
 
@@ -28,7 +29,7 @@ export function UnsubscribePage() {
         <>
           <p>{t('unsubscribe_hint')}</p>
           <p style={{ marginTop: 16 }}>
-            <Button disabled={stop.isPending} onClick={() => stop.mutate()}>
+            <Button icon={MailX} disabled={stop.isPending} onClick={() => stop.mutate()}>
               {t('unsubscribe_cta')}
             </Button>
           </p>

@@ -48,6 +48,10 @@ export type PostedSet = {
 export type WorkoutPostVars = {
   name: string;
   gym?: string | null;
+  gym_lat?: number | null;
+  gym_lon?: number | null;
+  /** Changed after it was posted. */
+  edited?: boolean;
   /** The past day this was logged for. Missing on posts from before past workouts existed. */
   performed_on?: string | null;
   routine_id: string | null;

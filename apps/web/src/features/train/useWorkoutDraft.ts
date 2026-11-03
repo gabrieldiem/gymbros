@@ -9,6 +9,7 @@ import {
   type Workout,
 } from '../../api/train';
 import { AutosaveQueue, type SaveStatus } from './autosaveQueue';
+import { forServer } from './barbell';
 import { clearDraft, loadDraft, saveDraft, saveLocalWorkout } from './offlineStore';
 
 export type DraftExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
@@ -26,7 +27,10 @@ function toDraft(workout: Workout): Draft {
 }
 
 function toBody(draft: Draft): SaveBody {
-  const exercises = draft.exercises.map(({ exercise_id, sets }) => ({ exercise_id, sets }));
+  const exercises = draft.exercises.map(({ exercise_id, sets }) => ({
+    exercise_id,
+    sets: forServer(sets),
+  }));
   const name = draft.name.trim();
   return name ? { name, gym: draft.gym, exercises } : { gym: draft.gym, exercises };
 }

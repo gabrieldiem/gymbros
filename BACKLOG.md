@@ -58,7 +58,6 @@ Product or technical decisions that are still open. If one blocks work, pick the
 - [ ] `GYM-53` **Drop the targeted apk upgrade in the web image** (infra, S): `apps/web/Dockerfile` upgrades `brotli-libs`, `curl` and `libcurl` on top of `nginx:1.30-alpine` (CVE-2026-111497 was CRITICAL and failed the deploy scan). Remove that line once a newer `nginx:1.30-alpine` ships brotli-libs ≥ 1.2.1-r0 and curl ≥ 8.23.0. _Added 2026-10-31_
 - [ ] `GYM-59` **Drop users.password_hash** (api, S): nothing reads it since Google sign-in. It stays nullable for one release so the migration can be rolled back; drop it once Google sign-in has worked in production, as it still holds old argon2 hashes. _Added 2026-11-01_
 - [ ] `GYM-68` **Cap how long server logs are kept** (infra, S): Docker logs are capped at 30 MB per service. Still to do: check what Caddy keeps on the host, then state the real retention period in the privacy policy. _Added 2026-11-02_
-- [ ] `GYM-70` **Skipped exercises wipe last time and the pre-fill** (api, S): `WorkoutRepository.last_sets` picks the latest workout that lists an exercise, even with no checked sets, so it shows "0 × 0" and loses the pre-fill. Use the latest workout with a completed set of that exercise, and only its completed sets. _Added 2026-11-02_
 
 ## Done
 
@@ -91,3 +90,4 @@ Move items here with the date and the commit or PR that closed them.
 - [x] `GYM-27` **Show the current PR in the logger**: closed 2026-11-02 in d95005a.
 - [x] `GYM-29` **Offline logging**: closed 2026-11-02 in f48399e.
 - [x] `GYM-58` **Which emails should GYMBROS send**: answered 2026-11-02: welcome, weekly digest and messages from admins, in 06a8909.
+- [x] `GYM-70` **Skipped exercises wipe last time and the pre-fill**: closed 2026-11-02 in d32999d.

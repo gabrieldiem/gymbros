@@ -66,21 +66,17 @@ describe('Train: entering sets', () => {
     };
   };
 
-  it('repeats the set above without checking it off', async () => {
+  it('logs a set with one tap on repeat', async () => {
     const { fetchMock, bench } = await openBench();
     await userEvent.click(bench.getByRole('button', { name: 'Repeat 40 × 8 on set 2' }));
     expect(bench.getByLabelText('Bench press, set 2, disks')).toHaveValue(40);
     expect(bench.getByLabelText('Bench press, set 2, reps')).toHaveValue(8);
-    expect(bench.getByRole('button', { name: 'Complete set 2' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
     await waitFor(() =>
       expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({
         load_kg: 60,
         bar_kg: 20,
         reps: 8,
-        done: false,
+        done: true,
       }),
     );
   });
@@ -88,7 +84,7 @@ describe('Train: entering sets', () => {
   it('has nothing to repeat on the first set of a new exercise', async () => {
     const { bench } = await openBench();
     const first = bench.getByLabelText('Bench press, set 1, disks').parentElement as HTMLElement;
-    expect(within(first).getAllByRole('button')[1]).toBeDisabled();
+    expect(within(first).getAllByRole('button')[0]).toBeDisabled();
   });
 
   it('sends the whole weight when you type the disks', async () => {
@@ -111,7 +107,6 @@ describe('Train: entering sets', () => {
   it('counts reps with no disks as the empty bar', async () => {
     const { fetchMock, bench } = await openBench();
     await userEvent.type(bench.getByLabelText('Bench press, set 2, reps'), '10');
-    await userEvent.click(bench.getByRole('button', { name: 'Complete set 2' }));
     await waitFor(() =>
       expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({
         load_kg: 20,
@@ -121,11 +116,45 @@ describe('Train: entering sets', () => {
     );
   });
 
+  it('counts nothing until a loaded set is logged', async () => {
+    const loaded = makeWorkout();
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, loaded],
+      'PUT /api/workouts/w1': () => [200, loaded],
+    });
+    renderApp('/train');
+    const bench = within(await screen.findByRole('article', { name: 'Bench press' }));
+    await userEvent.type(bench.getByLabelText('Bench press, set 2, reps'), '6');
+    await waitFor(() => {
+      const sets = lastPut(fetchMock).exercises[0]?.sets ?? [];
+      expect(sets[0]).toMatchObject({ done: false });
+      // The set you typed in takes its suggested disks along with it.
+      expect(sets[1]).toMatchObject({ done: true, reps: 6, load_kg: 92.5 });
+    });
+    expect(bench.getByLabelText('Bench press, set 2, disks')).toHaveValue(72.5);
+  });
+
+  it('shows what you typed in an empty row before it counts', async () => {
+    const { fetchMock, bench } = await openBench();
+    await userEvent.type(bench.getByLabelText('Bench press, set 2, disks'), '50');
+    expect(bench.getByLabelText('Bench press, set 2, disks')).toHaveValue(50);
+    await waitFor(() =>
+      expect(lastPut(fetchMock).exercises[0]?.sets[1]).toMatchObject({ load_kg: 70, done: false }),
+    );
+  });
+
+  it('adds a set as a suggestion of the one above', async () => {
+    const { bench } = await openBench();
+    await userEvent.click(bench.getByRole('button', { name: /Add set/ }));
+    const added = bench.getByLabelText('Bench press, set 3, disks');
+    expect(added).toHaveValue(null);
+  });
+
   it('removes a row, but not the only one', async () => {
     const { bench } = await openBench();
     await userEvent.click(bench.getByRole('button', { name: 'Remove set 2' }));
     expect(bench.queryByLabelText('Bench press, set 2, disks')).toBeNull();
-    expect(bench.getByRole('button', { name: 'Remove set 1' })).toBeDisabled();
+    expect(bench.queryByRole('button', { name: 'Remove set 1' })).toBeNull();
   });
 });
 
@@ -254,10 +283,10 @@ describe('Train: stretching', () => {
     });
     renderApp('/train');
     const card = within(await screen.findByRole('article', { name: 'Stretching' }));
-    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'true');
+    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByText(/Doesn’t count towards your weekly goal/)).toBeVisible();
     await userEvent.click(card.getByRole('button', { name: '10 min' }));
-    await userEvent.click(card.getByRole('button', { name: 'Complete set 1' }));
+    expect(card.getByRole('button', { name: '10 min' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
     await waitFor(() =>
       expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
@@ -275,7 +304,7 @@ describe('Train: stretching', () => {
     await userEvent.click(await screen.findByRole('button', { name: /Add exercise/ }));
     await userEvent.click(await screen.findByRole('button', { name: /Stretching/ }));
     const card = within(await screen.findByRole('article', { name: 'Stretching' }));
-    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'true');
+    expect(card.getByRole('button', { name: '5 min' })).toHaveAttribute('aria-pressed', 'false');
     await waitFor(() =>
       expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
         exercises: [{}, { exercise_id: 'stretch', sets: [{ minutes: 5, done: false }] }],
@@ -368,8 +397,8 @@ describe('Train: logging a past workout', () => {
     const bench = await screen.findByRole('article', { name: 'Bench press' });
     expect(screen.getByText(/^For Fri,? 30 Oct$/)).toBeVisible();
     expect(screen.queryByRole('timer')).toBeNull();
-    expect(within(bench).queryByText('↑ Loaded to beat last time')).toBeNull();
-    await userEvent.click(within(bench).getByRole('button', { name: 'Complete set 1' }));
+    expect(within(bench).queryByText('Loaded to beat last time')).toBeNull();
+    await userEvent.click(within(bench).getByRole('button', { name: /^Repeat .* on set 1$/ }));
     expect(screen.queryByRole('timer', { name: 'Rest' })).toBeNull();
   });
 
@@ -404,29 +433,29 @@ describe('Train: start screen', () => {
     renderApp('/train');
     await userEvent.click(await screen.findByRole('button', { name: /Push day/ }));
     const bench = await screen.findByRole('article', { name: 'Bench press' });
-    expect(within(bench).getByText('↑ Loaded to beat last time')).toBeVisible();
+    expect(within(bench).getByText('Loaded to beat last time')).toBeVisible();
     // Last time's set on the first row, the row above on the next one. The disks, not the bar.
-    expect(within(bench).getByRole('button', { name: 'Repeat 70 × 5 on set 1' })).toBeVisible();
+    expect(within(bench).getByRole('button', { name: 'Repeat 72.5 × 5 on set 1' })).toBeVisible();
     expect(within(bench).getByRole('button', { name: 'Repeat 72.5 × 5 on set 2' })).toBeVisible();
-    expect(within(bench).getByLabelText('Bench press, set 1, disks')).toHaveValue(72.5);
+    // Loaded numbers are suggestions until you log them.
+    const disks = within(bench).getByLabelText('Bench press, set 1, disks');
+    expect(disks).toHaveValue(null);
+    expect(disks).toHaveAttribute('placeholder', '72.5');
     expect(within(bench).getByText('= 92.5 kg with the bar, 36.25 kg per side')).toBeVisible();
     expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({ routine_id: 'push' });
   });
 });
 
 describe('Train: logging', () => {
-  it('saves a checked set and shows the server’s live points', async () => {
+  it('saves a logged set and shows the server’s live points', async () => {
     const fetchMock = trainApi({
       'GET /api/workouts/active': [200, makeWorkout()],
       'PUT /api/workouts/w1': () => [200, makeWorkout({ live_points: 58 })],
     });
     renderApp('/train');
     const bench = await screen.findByRole('article', { name: 'Bench press' });
-    await userEvent.click(within(bench).getByRole('button', { name: 'Complete set 1' }));
-    expect(within(bench).getByRole('button', { name: 'Complete set 1' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    await userEvent.click(within(bench).getByRole('button', { name: /^Repeat .* on set 1$/ }));
+    expect(within(bench).getByLabelText('Bench press, set 1, disks')).toHaveValue(72.5);
     await waitFor(() => expect(screen.getByTestId('live-points')).toHaveTextContent('58'), {
       timeout: 5000,
     });
@@ -446,7 +475,7 @@ describe('Train: logging', () => {
   it('finds exercises by Spanish alias and adds them', async () => {
     trainApi({ 'GET /api/workouts/active': [200, makeWorkout({ exercises: [] })] });
     renderApp('/train');
-    await userEvent.click(await screen.findByRole('button', { name: '+ Add exercise' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Add exercise' }));
     const dialog = await screen.findByRole('dialog', { name: 'Add exercise' });
     await userEvent.type(within(dialog).getByRole('searchbox'), 'sentadilla');
     expect(within(dialog).queryByRole('button', { name: 'Bench press' })).toBeNull();

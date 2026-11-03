@@ -29,6 +29,14 @@ class DeleteNotConfirmed(DomainError):
     """The confirmation typed doesn't match the account's email."""
 
 
+class PlacesUnavailable(DomainError):
+    """The place search can't answer right now. The map still works."""
+
+
+class MapLinkNotUnderstood(DomainError):
+    """That link doesn't say where anything is."""
+
+
 class NothingToDigest(DomainError):
     """The crew did nothing last week, so there's no digest to show."""
 
@@ -139,6 +147,10 @@ class WorkoutAlreadyActive(DomainError):
 
 class WorkoutAlreadyFinished(DomainError):
     """The workout is finished and can't change."""
+
+
+class WorkoutEditExpired(DomainError):
+    """The time for changing this workout has passed."""
 
 
 class WorkoutEmpty(DomainError):

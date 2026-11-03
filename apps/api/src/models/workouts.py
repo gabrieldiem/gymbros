@@ -78,6 +78,8 @@ class WorkoutResponse(BaseModel):
     routine_id: str | None
     performed_on: date | None
     gym: str | None
+    gym_lat: float | None = None
+    gym_lon: float | None = None
     photo_url: str | None
     started_at: datetime
     exercises: list[ExerciseOutput]
@@ -156,6 +158,8 @@ class TrainingNowItem(BaseModel):
     color: Color
     workout_name: str
     gym: str | None
+    gym_lat: float | None = None
+    gym_lon: float | None = None
     routine_id: str | None
     started_at: datetime
     current_exercise_id: str | None

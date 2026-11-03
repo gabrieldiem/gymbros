@@ -1,3 +1,4 @@
+import { ChevronRight, Settings } from 'lucide-react';
 import { useState } from 'react';
 
 import { useMyStats, type MeStats } from '../../api/compete';
@@ -14,7 +15,6 @@ import type { MessageKey } from '../../i18n/en';
 import { ordinal } from '../../i18n/ordinal';
 import { timeAgo } from '../../i18n/timeAgo';
 import { formatLift } from '../train/format';
-import { ProfileSheet } from './ProfileSheet';
 import { WorkoutDetailSheet } from './WorkoutDetailSheet';
 import { heatLevel } from './charts';
 import styles from './Me.module.css';
@@ -78,7 +78,6 @@ export function MePage() {
   const stats = useMyStats();
   const exercises = useCatalog().data?.exercises ?? [];
   const [settings, setSettings] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [openWorkout, setOpenWorkout] = useState<{ id: string; name: string } | null>(null);
   const [chart, setChart] = useState<string | null>(null);
   const data = stats.data;
@@ -117,29 +116,14 @@ export function MePage() {
             {t('pips_label', { n: climb.me.workouts_this_week, target: climb.weekly_target })}
           </p>
         </div>
-        <Button variant="ghost" className={styles.editProfile} onClick={() => setEditing(true)}>
-          {t('profile_edit')}
-        </Button>
-        <button
-          type="button"
-          className={styles.gear}
-          aria-label={t('settings')}
+        <Button
+          variant="ghost"
+          icon={Settings}
+          className={styles.editProfile}
           onClick={() => setSettings(true)}
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" />
-          </svg>
-        </button>
+          {t('settings')}
+        </Button>
       </div>
 
       <div className={styles.stats}>
@@ -238,7 +222,10 @@ export function MePage() {
                       {t('history_row', { sets: h.sets, kg: n(h.volume_kg), min: h.duration_min })}
                     </small>
                   </span>
-                  <b>+{n(h.points)}</b>
+                  <b>
+                    +{n(h.points)}
+                    <ChevronRight size={16} aria-hidden="true" />
+                  </b>
                 </button>
               </li>
             ))}
@@ -247,7 +234,6 @@ export function MePage() {
       </div>
 
       {settings && <SettingsSheet onClose={() => setSettings(false)} />}
-      {editing && <ProfileSheet onClose={() => setEditing(false)} />}
       {openWorkout && (
         <WorkoutDetailSheet
           workoutId={openWorkout.id}

@@ -173,7 +173,7 @@ describe('Train with no signal', () => {
     const fetchMock = trainApi();
     renderApp('/train');
     const bench = within(await screen.findByRole('article', { name: 'Bench press' }));
-    await userEvent.click(bench.getByRole('button', { name: 'Complete set 1' }));
+    await userEvent.click(bench.getByRole('button', { name: /^Repeat .* on set 1$/ }));
     await waitFor(() => expect(loadLocalWorkout()?.exercises[0]?.sets[0]?.done).toBe(true));
     expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'PUT')).toBe(false);
   });

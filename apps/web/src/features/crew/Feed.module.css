@@ -206,3 +206,17 @@ button[aria-pressed='true'] > .emoji {
   object-fit: cover;
   border-radius: var(--r-control);
 }
+
+.chips > span > span,
+.chips > a,
+.chips > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.details summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

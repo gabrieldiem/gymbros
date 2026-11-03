@@ -16,7 +16,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
 | You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
 
-Desktop (≥960 px) shows a side rail with Train as the primary button and the Quests sections nested under Quests. Mobile shows a floating dock with Train as the raised centre button, and a sticky section bar inside Quests. Achievements and Points are also in the profile menu. The code and API call achievements `badge`; the UI says Achievements / Logros.
+Desktop (≥960 px) shows a side rail with Train as the primary button and the Quests sections nested under Quests. Mobile shows a floating dock with Train as the raised centre button, and a sticky section bar inside Quests. Achievements is also in the profile menu. The code and API call achievements `badge`; the UI says Achievements / Logros.
 
 ## Weekly goal
 
@@ -54,7 +54,7 @@ Points are computed server-side when a workout is finished. Values live in `apps
 
 The finish screen lists every line item (an i18n key plus variables) and the total, plus "+X% volume vs last time".
 
-A completed set is a checked set with reps > 0 (minutes > 0 for cardio). A workout needs at least one completed set to be finished; otherwise discard it. While logging, the app shows the points the workout would pay if finished now (computed by the API).
+A completed set is one with reps > 0 (minutes > 0 for cardio). A workout needs at least one completed set to be finished; otherwise discard it. While logging, the app shows the points the workout would pay if finished now (computed by the API).
 
 **Balance note:** a jackpot day (3rd workout + streak + PR + quest + bounty + badge) reaches about 1,200 pts against a typical 150 to 250. This is intentional for now; the balance pass is in `BACKLOG.md`.
 
@@ -72,7 +72,9 @@ Gyms are often in basements, so logging never depends on the connection.
 
 ## Gyms
 
-Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. It's only a name, not a location. A workout keeps the name it was logged with, so renaming or deleting a gym doesn't change your history.
+Each member has their own list of up to 10 named gyms, managed in settings, with one default (the first you add, until you pick another; deleting the default hands it to the oldest left). A workout starts at your default and you can change it or choose "No gym", when you start or while logging. Your crew sees the gym in Training now and on the feed post. A workout keeps the name and place it was logged with, so changing or deleting a gym doesn't change your history.
+
+A gym can be put on a map, which is optional: search for it, paste a Google Maps or OpenStreetMap link, use your location, or tap the map. Small gyms often aren't in the free search, so the last three matter. Friends get a link that opens the place in Google Maps. None of this uses a paid API: the map and search are OpenStreetMap's, credited on the map, and the Google link is a plain link with no key.
 
 ## Workout photos
 
@@ -80,19 +82,32 @@ One photo per workout, added while logging or later from its details on the You 
 
 ## Stretching
 
-Add it to any workout, or log it alone from its own routine. It asks only how long (5 or 10 minutes, 5 by default) and pays fixed points, once per crew-local day, so it can't be farmed.
+Add it to any workout, or log it alone from its own routine. You tap how long you did (5 or 10 minutes) and it pays fixed points, once per crew-local day, so it can't be farmed.
 
 Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or badges, and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
 
 ## Entering sets
 
-- **Repeat:** the second column of every row copies the set above it into that row, or that set from last time when the row above is empty. It fills the numbers and leaves the set unchecked.
-- **Remove a row:** the × under the set number removes it. An exercise always keeps one row; to drop it, remove the exercise.
+- **No box to tick:** a set counts as soon as it has reps (minutes for cardio). The numbers a routine loads are grey suggestions worth nothing until you log them, so a set you skip never scores.
+- **Repeat:** one tap on the second column logs that row: its own suggestion, else the set above it, else that set from last time. Typing one number in a suggested row logs it with the other suggested number.
+- **Remove a row:** the trash button at the end of the row. An exercise always keeps one row; to drop it, remove the exercise.
 - **Disks and bar:** on a barbell lift you enter the total weight of the disks, the number shown everywhere you read a barbell lift ("40 kg + bar × 5"). The bar sits beside it and can be 20, 15 or 10 kg, and the row you're on shows the full weight and the kg per side. Points, PRs and badges read the whole weight, bar included, so changing how it's shown changed no scores. Reps with no disks count as the empty bar. Other lifts show plain kg.
 
 ## Rest timer
 
 Logging a set doesn't start anything. A button in the logger starts the rest with your length from settings, and it can be adjusted or skipped. At zero the whole screen flashes three slow times and the phone vibrates, so it can be seen from a distance; with reduced motion it's one still screen. There's no rest timer when logging a past workout or stretching alone.
+
+## Editing a workout
+
+You can change a finished workout for 2 days after you logged it (`game.edit_workout_days`), from its details on your profile: the sets, exercises, name and gym. For a past day, the 2 days start when you logged it, not on the day it's for.
+
+Saving works the points out again as things stood when it was logged: the PRs, goal count and last session it was measured against then, not anything logged since. Only that workout's own lines change.
+
+- A PR moves with its set. If you lower the set that held it, the PR goes back to your next best.
+- Quests, the crew quest, the bounty and badges already paid stay, and an edit can earn ones newly reached. They aren't taken back: the crew trusts what anyone logs, as it does for a past day.
+- The crew sees the same post with the corrected numbers, marked Edited. Nobody gets a notification.
+- A workout can't be emptied. It has to keep at least one completed set.
+- A duel already settled isn't reopened.
 
 ## Past workouts
 
@@ -224,10 +239,10 @@ Sent through Resend. Nothing goes out without `RESEND_API_KEY` on the server, an
 
 ## Your account
 
-The avatar opens a menu with your profile, Edit profile, settings, inviting friends and log out. Edit profile is also a button on the You tab.
+The avatar opens a menu with your profile, achievements, what's new, Profile and settings, feedback, inviting friends and log out. Profile and settings is also a button on the You tab, and it's one place for everything about you.
 
-- **Edit profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
-- **Settings:** your gyms, language and rest time, downloading your data, and deleting your account and everything in it by typing your email.
+- **Your profile:** your name; your picture, either uploaded or up to two characters as a person counts them, so emoji work (a family emoji is one); and your color, from eleven presets or any color from the picker. A new name changes your characters only if you never chose your own. An uploaded picture is cropped square and resized on your device before it's sent, which also drops its metadata, and only you, your crew and admins can see it.
+- **Settings, in the same sheet:** your gyms, language and rest time, downloading your data, and deleting your account and everything in it by typing your email.
 - **Your data:** Download my data gives you a JSON file with every finished session (its sets as logged, gym, day and what it paid), your PRs and your gyms. Photos appear as links, which need you signed in.
 - **Send feedback:** in the menu, an idea, a bug or anything else, up to 10 a day. Admins read it in the backoffice and it goes when the account goes.
 

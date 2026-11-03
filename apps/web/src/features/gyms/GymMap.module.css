@@ -1,0 +1,26 @@
+.map {
+  /* Keeps Leaflet's own layers inside the map, under the rest of the sheet. */
+  isolation: isolate;
+  width: 100%;
+  height: 260px;
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-card);
+  cursor: crosshair;
+}
+
+.pin {
+  background: none;
+  border: none;
+}
+
+/* OpenStreetMap's credit has to stay readable: their tiles require it. */
+.map :global(.leaflet-control-attribution) {
+  color: var(--chalk);
+  background: var(--iron);
+}
+
+.map :global(.leaflet-control-attribution a) {
+  color: var(--chalk);
+  text-decoration: underline;
+}

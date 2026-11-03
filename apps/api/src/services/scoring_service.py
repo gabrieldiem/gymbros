@@ -82,6 +82,11 @@ def score_workout(
     )
 
 
+def best_sets(log: WorkoutLog, rules: ScoringRules) -> tuple[RecordSet, ...]:
+    """The best set of each exercise in this workout, PR or not."""
+    return _tally(log, rules).bests
+
+
 def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
     sets = legs = minutes = 0
     volume = km = effort = 0.0

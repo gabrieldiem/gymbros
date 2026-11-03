@@ -1,3 +1,4 @@
+import { CalendarDays, Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -71,8 +72,8 @@ export function ClimbPage() {
             value={mode}
             onChange={setMode}
             options={[
-              { value: 'all', label: t('mode_all') },
-              { value: 'week', label: t('mode_week') },
+              { value: 'all', label: t('mode_all'), icon: AllTime },
+              { value: 'week', label: t('mode_week'), icon: CalendarDays },
             ]}
           />
         </div>
@@ -108,7 +109,7 @@ export function ClimbPage() {
               <section className={styles.alone} aria-labelledby="alone-title">
                 <h2 id="alone-title">{t('invite_alone_title')}</h2>
                 <p>{t('invite_alone_sub')}</p>
-                <Button variant="ghost" wide onClick={() => void shareInvite()}>
+                <Button icon={UserPlus} variant="ghost" wide onClick={() => void shareInvite()}>
                   {t('invite_alone_cta')}
                 </Button>
               </section>
@@ -122,7 +123,7 @@ export function ClimbPage() {
       ) : climb.isError ? (
         <div className={styles.error} role="alert">
           <p>{t('climb_failed')}</p>
-          <Button variant="ghost" onClick={() => void climb.refetch()}>
+          <Button icon={RotateCw} variant="ghost" onClick={() => void climb.refetch()}>
             {t('retry')}
           </Button>
         </div>

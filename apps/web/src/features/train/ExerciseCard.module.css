@@ -50,7 +50,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 72px 60px 46px;
+  grid-template-columns: 22px minmax(0, 1fr) 72px 60px 44px;
   align-items: center;
   gap: 6px;
   padding: 5px 0;
@@ -68,32 +68,16 @@
   text-align: center;
 }
 
-/* The set number is also how you remove the row: 46 px tall, and the gap counts towards its width. */
 .n {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 46px;
-  color: var(--smoke);
-  line-height: 1.1;
-}
-
-.n b {
   font-weight: 700;
-}
-
-.n i {
-  font-style: normal;
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-.n:hover:not(:disabled) {
-  color: var(--chalk);
+  color: var(--smoke);
+  text-align: center;
 }
 
 .prev {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   height: 46px;
   min-width: 0;
   font-size: 0.85rem;
@@ -135,22 +119,6 @@
 .input:focus-visible {
   outline: 3px solid var(--volt);
   outline-offset: 1px;
-}
-
-.check {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 46px;
-  border: 2px solid var(--steel);
-  border-radius: var(--r-control-sm);
-  color: var(--smoke);
-}
-
-.done .check {
-  background: var(--volt);
-  border-color: var(--volt);
-  color: var(--iron);
 }
 
 .done .input {
@@ -267,13 +235,9 @@
 }
 
 .choices button[aria-pressed='true'] {
-  color: var(--chalk);
-  border-color: var(--chalk);
-}
-
-.stretch .check {
-  width: 46px;
-  flex: none;
+  color: var(--iron);
+  background: var(--volt);
+  border-color: var(--volt);
 }
 
 .bonus {
@@ -286,4 +250,41 @@
   vertical-align: middle;
   background: var(--event-tint);
   border-radius: var(--r-pill);
+}
+
+.prev span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prev svg {
+  flex: none;
+}
+
+.input::placeholder {
+  color: var(--smoke);
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.removeSet {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 46px;
+  color: var(--smoke);
+  border: 1px solid var(--steel);
+  border-radius: var(--r-control-sm);
+}
+
+.removeSet:hover {
+  color: var(--red-text);
+  border-color: var(--red-text);
+}
+
+.link,
+.addSet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

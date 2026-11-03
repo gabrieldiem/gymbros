@@ -1,3 +1,4 @@
+import { Dumbbell } from 'lucide-react';
 import type { Climb } from '../../api/climb';
 import { Avatar } from '../../components/Avatar';
 import { ButtonLink } from '../../components/Button';
@@ -114,7 +115,7 @@ export function StandingPanel({ climb, myAvatar, training, onRecap }: Props) {
           <span>{next}</span>
         </li>
       </ul>
-      <ButtonLink to="/train" wide>
+      <ButtonLink icon={Dumbbell} to="/train" wide>
         {training ? t('back_workout') : t('start_training')}
       </ButtonLink>
       <p className={styles.vsTitle}>{t('vs_title')}</p>

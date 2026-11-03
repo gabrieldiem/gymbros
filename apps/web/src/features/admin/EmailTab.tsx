@@ -1,3 +1,4 @@
+import { Eye, Send, X } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import {
@@ -67,7 +68,12 @@ function Settings() {
             {t('admin_email_sent_count', { n: n(settings.digests_sent_this_week) })}
           </p>
           <div>
-            <Button variant="ghost" disabled={test.isPending} onClick={() => test.mutate()}>
+            <Button
+              icon={Send}
+              variant="ghost"
+              disabled={test.isPending}
+              onClick={() => test.mutate()}
+            >
               {t('admin_email_test')}
             </Button>
             {test.data && (
@@ -175,11 +181,15 @@ function Compose() {
           </p>
         )}
         <div className={styles.toolbar}>
-          <Button type="submit" disabled={!ready || send.isPending || reach === 0}>
+          <Button
+            type="submit"
+            icon={reach === null ? Eye : Send}
+            disabled={!ready || send.isPending || reach === 0}
+          >
             {reach === null ? t('admin_email_review') : t('admin_email_send', { n: reach })}
           </Button>
           {reach !== null && (
-            <Button type="button" variant="quiet" onClick={() => setReach(null)}>
+            <Button icon={X} type="button" variant="quiet" onClick={() => setReach(null)}>
               {t('cancel')}
             </Button>
           )}

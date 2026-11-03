@@ -1,3 +1,4 @@
+import { Dumbbell, Swords } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation } from 'react-router';
 
@@ -42,7 +43,7 @@ function QuestsView() {
         {board.weekly_event === 'leg_day_x2' && (
           <TimedEventCard endsAt={board.ends_at}>
             <div className={styles.cta}>
-              <ButtonLink to="/train" variant="ghost">
+              <ButtonLink icon={Dumbbell} to="/train" variant="ghost">
                 {t('weather_cta')}
               </ButtonLink>
             </div>
@@ -98,7 +99,7 @@ function QuestsView() {
       </div>
       <div className={styles.sectionHead}>
         <h2>{t('duels')}</h2>
-        <Button variant="ghost" onClick={() => setDuelOpen(true)}>
+        <Button icon={Swords} variant="ghost" onClick={() => setDuelOpen(true)}>
           {t('start_duel')}
         </Button>
       </div>

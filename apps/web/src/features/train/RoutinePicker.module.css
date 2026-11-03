@@ -134,3 +134,21 @@
 .gym:not(:empty) {
   margin-top: 12px;
 }
+
+.routineTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.routineTitle svg {
+  flex: none;
+  color: var(--smoke);
+}
+
+.pastOpen,
+.past button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

@@ -7,6 +7,7 @@ from dataclasses import replace
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from db.repositories.gym_repository import GymRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.tables.workout import Workout
 from services.activity_service import ActivityService
@@ -55,6 +56,7 @@ class WorkoutService:
         now: Callable[[], datetime],
         activity: ActivityService | None = None,
         past_workout_days: int = 7,
+        gyms: GymRepository | None = None,
     ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts = workouts
@@ -64,6 +66,7 @@ class WorkoutService:
         self._now = now
         self._activity = activity
         self._past_workout_days = past_workout_days
+        self._gyms = gyms
 
     async def start(
         self,
@@ -90,10 +93,10 @@ class WorkoutService:
             routine_id=routine_id,
             name=(name or self._routine_name(routine_id)).strip(),
             performed_on=performed_on,
-            gym_name=gym,
             started_at=self._now(),
             sets=to_rows(entries),
         )
+        await self.set_gym(member, workout, gym)
         view = await self.view(member, await self._workouts.add(workout))
         if self._activity is not None and performed_on is None and routine_id != STRETCH_ROUTINE:
             await self._activity.workout_started(member)
@@ -163,9 +166,21 @@ class WorkoutService:
         if name is not None:
             workout.name = name.strip()
         if change_gym:
-            workout.gym_name = gym
+            await self.set_gym(member, workout, gym)
         workout.sets = to_rows(entries)
         return await self.view(member, await self._workouts.save(workout))
+
+    def check_exercise(self, exercise_id: str) -> None:
+        """Raises if the catalog doesn't have this exercise."""
+        self._exercise(exercise_id)
+
+    async def set_gym(self, member: Member, workout: Workout, name: str | None) -> None:
+        """Where this workout is. It keeps the gym's name and place as they are now, so changing
+        or deleting the gym later doesn't rewrite what happened."""
+        known = await self._gyms.by_name(member.user.id, name) if self._gyms and name else None
+        workout.gym_name = name
+        workout.gym_lat = known.lat if known else None
+        workout.gym_lon = known.lon if known else None
 
     async def discard(self, member: Member, workout_id: uuid.UUID) -> None:
         """Throw away an in-progress workout."""

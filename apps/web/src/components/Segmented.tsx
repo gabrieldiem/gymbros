@@ -1,8 +1,9 @@
+import type { LucideIcon } from 'lucide-react';
 import { useLayoutEffect, useRef } from 'react';
 
 import styles from './Segmented.module.css';
 
-type Option<T extends string> = { value: T; label: string };
+type Option<T extends string> = { value: T; label: string; icon?: LucideIcon };
 
 type Props<T extends string> = {
   label: string;
@@ -33,6 +34,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
         >
+          {option.icon && <option.icon size={16} aria-hidden="true" />}
           {option.label}
         </button>
       ))}

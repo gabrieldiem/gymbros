@@ -33,6 +33,8 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
         routine_id=workout.routine_id,
         performed_on=workout.performed_on,
         gym=workout.gym_name,
+        gym_lat=workout.gym_lat,
+        gym_lon=workout.gym_lon,
         photo_url=photo_url(workout.id, workout.photo_version),
         started_at=workout.started_at,
         exercises=[
@@ -106,6 +108,8 @@ def to_training_now_item(active: ActiveWorkout) -> TrainingNowItem:
             "color": active.user.color,
             "workout_name": active.workout.name,
             "gym": active.workout.gym_name,
+            "gym_lat": active.workout.gym_lat,
+            "gym_lon": active.workout.gym_lon,
             "routine_id": active.workout.routine_id,
             "started_at": active.workout.started_at,
             "current_exercise_id": active.current_exercise_id,

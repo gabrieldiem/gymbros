@@ -1,4 +1,5 @@
-"""feed_items: what the crew sees in the Crew tab. Immutable snapshots with i18n keys + vars."""
+"""feed_items: what the crew sees in the Crew tab. Snapshots with i18n keys + vars, never
+prose. Only editing a workout changes one."""
 
 import uuid
 from datetime import datetime

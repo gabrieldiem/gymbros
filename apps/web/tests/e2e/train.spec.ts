@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { logIn } from './members';
 
@@ -32,7 +33,6 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
   const reps = bench.getByLabel('Bench press, set 1, reps');
   if (!(await load.inputValue())) await load.fill('60');
   if (!(await reps.inputValue())) await reps.fill('5');
-  await bench.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await expect(page.getByRole('timer', { name: 'Rest' })).toHaveCount(0);
   await page.getByRole('button', { name: /^Rest \d/ }).click();
@@ -61,7 +61,6 @@ test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
   await expect(swim).toBeVisible();
   await swim.getByLabel('Pool swim, set 1, min').fill('40');
   await swim.getByLabel('Pool swim, set 1, km').fill('1.5');
-  await swim.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await page.getByRole('button', { name: 'Finish workout' }).click();
   const summary = page.getByRole('dialog');
@@ -91,7 +90,6 @@ test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
   const run = page.getByRole('article', { name: 'Outdoor run' });
   await run.getByLabel('Outdoor run, set 1, min').fill('30');
   await run.getByLabel('Outdoor run, set 1, km').fill('5');
-  await run.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
   await expect(page.getByRole('timer')).toHaveCount(0);
   await expect(page.getByText(/^For /)).toBeVisible();
@@ -117,7 +115,6 @@ test('stretching alone pays fixed points and leaves the week alone', async ({ pa
   await page.getByRole('button', { name: /^Stretching/ }).click();
   const card = page.getByRole('article', { name: 'Stretching' });
   await card.getByRole('button', { name: '10 min' }).click();
-  await card.getByRole('button', { name: 'Complete set 1' }).click();
   await expect(page.getByTestId('live-points')).toHaveText('25', { timeout: 5000 });
   await page.waitForTimeout(600);
   await page.screenshot({ path: `${SCREENS}/stretch-${testInfo.project.name}.png` });
@@ -135,7 +132,6 @@ test('add a gym photo and your crew sees it on the post', async ({ page }, testI
   await page.getByRole('button', { name: /^Run/ }).click();
   const run = page.getByRole('article', { name: 'Outdoor run' });
   await run.getByLabel('Outdoor run, set 1, min').fill('20');
-  await run.getByRole('button', { name: 'Complete set 1' }).click();
 
   // A large picture: the app has to shrink it below the server's limit.
   const png = await page.evaluate(() => {
@@ -188,7 +184,6 @@ test('a whole workout with no signal sends itself when the signal is back', asyn
   await expect(page.getByText('Points when there’s signal')).toBeVisible();
   await expect(page.getByText(/^No signal\. Keep logging/)).toBeVisible();
   await treadmill.getByLabel('Treadmill run, set 1, min').fill('25');
-  await treadmill.getByRole('button', { name: 'Complete set 1' }).click();
   await page.waitForTimeout(700); // the save to the phone is debounced
   await page.screenshot({ path: `${SCREENS}/offline-logger-${testInfo.project.name}.png` });
   await page.getByRole('button', { name: 'Finish workout' }).click();
@@ -198,4 +193,131 @@ test('a whole workout with no signal sends itself when the signal is back', asyn
   await context.setOffline(false);
   await expect(page.getByText(/^Cardio sent: \+\d+ points\.$/)).toBeVisible({ timeout: 40000 });
   await expect(page.getByText(/^1 workout is waiting/)).toHaveCount(0);
+});
+
+test('put a gym on a real map and friends get a link to it', async ({ page }, testInfo) => {
+  // The map library runs for real. Only the outside services are stood in for.
+  const tiles: string[] = [];
+  await page.route('**/tile.openstreetmap.org/**', (route) => {
+    tiles.push(route.request().url());
+    return route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.alloc(0) });
+  });
+  await page.route('**/api/places?*', (route) =>
+    route.fulfill({
+      json: [{ name: 'Tolón', address: 'Santa Fe 3200, Buenos Aires', lat: -34.589, lon: -58.41 }],
+    }),
+  );
+  await logIn(page, 'santi', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/me');
+  await page.getByRole('button', { name: 'Profile and settings' }).click();
+  await page.getByRole('button', { name: 'Add a gym' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Add a gym' });
+  await expect(sheet.locator('.leaflet-container')).toBeVisible();
+  await expect(sheet.locator('.leaflet-marker-icon')).toHaveCount(0);
+
+  await sheet.getByRole('group', { name: 'Map' }).click({ position: { x: 150, y: 150 } });
+  await expect(sheet.locator('.leaflet-marker-icon')).toHaveCount(1);
+  // From the world view a tap closes in a little. It doesn't jump to a street it can't be sure of.
+  await expect.poll(() => tiles.some((url) => /\.org\/6\//.test(url))).toBe(true);
+  expect(tiles.some((url) => /\.org\/16\//.test(url))).toBe(false);
+
+  await sheet.getByLabel(/^Search for a place/).fill('Santa Fe 3200');
+  await sheet.getByRole('button', { name: 'Search' }).click();
+  await expect(sheet.getByLabel('Name')).toHaveValue('Tolón');
+  await expect(sheet.getByRole('link', { name: 'Open in Google Maps' })).toHaveAttribute(
+    'href',
+    /query=-34\.589,-58\.41$/,
+  );
+  await sheet.getByRole('button', { name: 'Save gym' }).click();
+  await expect(page.getByRole('link', { name: 'Open Tolón in Google Maps' })).toBeVisible();
+  await expect(page.locator('#root')).toHaveAttribute('inert', '');
+  await page.screenshot({ path: `${SCREENS}/gym-saved-${testInfo.project.name}.png` });
+});
+
+test('edit a finished workout: new points, a refused edit changes nothing', async ({
+  page,
+}, testInfo) => {
+  await logIn(page, 'matex', testInfo, 'offline');
+  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await page.goto('/train');
+  await page.getByRole('button', { name: /Push day/ }).click();
+  const logged = page.getByRole('article', { name: 'Bench press' });
+  await logged.getByLabel('Bench press, set 1, disks').fill('40');
+  await logged.getByLabel('Bench press, set 1, reps').fill('5');
+  await expect(page.getByTestId('live-points')).not.toHaveText('0', { timeout: 5000 });
+  await page.getByRole('button', { name: 'Finish workout' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'See ATUS Climb' }).click();
+  await expect(page).toHaveURL(/\/climb$/);
+
+  const openDetails = async () => {
+    await page.goto('/me');
+    await page
+      .getByRole('button', { name: /^Push day/ })
+      .first()
+      .click();
+    const details = page.getByRole('dialog', { name: 'Push day' });
+    await expect(details.getByText('Total')).toBeVisible();
+    return details;
+  };
+  const total = (details: ReturnType<typeof page.getByRole>) =>
+    details.locator('li', { hasText: 'Total' }).locator('b').innerText();
+
+  let details = await openDetails();
+  const before = await total(details);
+  await details.getByRole('button', { name: 'Edit workout' }).click();
+  let editor = page.getByRole('dialog', { name: 'Edit workout' });
+  await expect(editor.getByLabel('Bench press, set 1, disks')).toHaveValue('40');
+  await editor.getByLabel('Bench press, set 1, reps').fill('20');
+  const set2 = editor.getByLabel('Bench press, set 2, reps');
+  if (await set2.count()) await set2.fill('20');
+  const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  const serious = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
+  expect(serious.map((v) => v.id)).toEqual([]);
+  await page.screenshot({ path: `${SCREENS}/edit-workout-${testInfo.project.name}.png` });
+  await editor.getByRole('button', { name: 'Save changes' }).click();
+  await expect(editor).toHaveCount(0);
+  await expect(details.locator('li', { hasText: 'Total' }).locator('b')).not.toHaveText(before);
+  const after = await total(details);
+
+  // The real server rolls back: a refused edit must leave the points where they were.
+  await details.getByRole('button', { name: 'Edit workout' }).click();
+  editor = page.getByRole('dialog', { name: 'Edit workout' });
+  await editor
+    .getByRole('button', { name: /^Remove Bench press|^Remove$/ })
+    .first()
+    .click();
+  await editor.getByRole('button', { name: 'Save changes' }).click();
+  await expect(editor.getByRole('alert')).toBeVisible();
+  await editor.getByRole('button', { name: 'Cancel' }).click();
+  details = await openDetails();
+  expect(await total(details)).toBe(after);
+
+  await page.goto('/crew');
+  await expect(page.getByText('Edited', { exact: true }).first()).toBeVisible();
+
+  // Two saves at once, as a retry could send: the second waits, so nothing is paid twice.
+  const lines = await page.evaluate(async () => {
+    const history = await (await fetch('/api/me/stats')).json();
+    const id = history.history[0].id as string;
+    const url = `/api/me/workouts/${id}`;
+    const before = await (await fetch(url)).json();
+    const save = () =>
+      fetch(`/api/workouts/${id}/edit`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exercises: before.exercises }),
+      }).then((r) => r.status);
+    const statuses = await Promise.all([save(), save(), save()]);
+    const after = await (await fetch(url)).json();
+    const keys = (d: { line_items: { key: string }[] }) => d.line_items.map((l) => l.key).sort();
+    return {
+      statuses,
+      same: JSON.stringify(keys(before)) === JSON.stringify(keys(after)),
+      total: [before.points, after.points],
+    };
+  });
+  expect(lines.statuses).toEqual([200, 200, 200]);
+  expect(lines.same).toBe(true);
+  expect(lines.total[1]).toBe(lines.total[0]);
 });

@@ -11,6 +11,7 @@ import {
   type StoredDraft,
 } from '../features/train/offlineStore';
 import { ApiError, apiRequest, isConnectionError } from './client';
+import type { WorkoutDetail } from './compete';
 import type { ClimbChange } from './climb';
 import { gymsKey } from './gyms';
 import { liveInterval } from './liveInterval';
@@ -67,6 +68,8 @@ export type SetData = {
   done: boolean;
   /** The bar inside `load_kg`, on a barbell lift. */
   bar_kg?: number | null;
+  /** On this screen only: someone has typed in this row, so its numbers aren't suggestions. */
+  started?: boolean;
 };
 
 export type WorkoutExercise = { exercise_id: string; sets: SetData[]; previous_sets: SetData[] };
@@ -126,6 +129,8 @@ export type TrainingNowItem = {
   color: CrewColor;
   workout_name: string;
   gym: string | null;
+  gym_lat?: number | null;
+  gym_lon?: number | null;
   routine_id: string | null;
   started_at: string;
   current_exercise_id: string | null;
@@ -273,6 +278,19 @@ export function refreshAfterWorkout(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: trainingNowKey });
   void queryClient.invalidateQueries({ queryKey: ['feed'] });
   void queryClient.invalidateQueries({ queryKey: ['me', 'stats'] });
+}
+
+/** Change a finished workout. The answer is the workout as it now stands, rescored. */
+export function useEditWorkout(workoutId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: SaveBody) =>
+      apiRequest<WorkoutDetail>(`/workouts/${workoutId}/edit`, { method: 'PUT', body }),
+    onSuccess: (workout) => {
+      queryClient.setQueryData(['me', 'workouts', workoutId], workout);
+      refreshAfterWorkout(queryClient);
+    },
+  });
 }
 
 export function syncWorkout(workout: QueuedWorkout) {

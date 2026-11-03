@@ -1,3 +1,13 @@
+import {
+  Download,
+  FileDown,
+  Languages,
+  LogOut,
+  Mail,
+  SignalLow,
+  Timer,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import { chooseLowData, lowDataChosen } from '../../api/liveInterval';
 import { Link } from 'react-router';
@@ -12,6 +22,7 @@ import { Segmented } from '../../components/Segmented';
 import { Sheet } from '../../components/Sheet';
 import { useI18n } from '../../i18n/context';
 import { GymsSection } from './GymsSection';
+import { ProfileSection } from './ProfileSection';
 import styles from './Me.module.css';
 
 const REST_OPTIONS = ['60', '90', '120', '180'] as const;
@@ -21,7 +32,10 @@ function LowDataSwitch() {
   const [on, setOn] = useState(lowDataChosen);
   return (
     <div>
-      <h3>{t('low_data_title')}</h3>
+      <h3 className={styles.iconTitle}>
+        <SignalLow size={18} aria-hidden="true" />
+        {t('low_data_title')}
+      </h3>
       <label className={styles.switch}>
         <input
           type="checkbox"
@@ -46,7 +60,9 @@ function DeleteAccount() {
   const matches = typed.trim().toLowerCase() === email.toLowerCase();
   return (
     <details className={styles.deleteAccount}>
-      <summary>{t('delete_account')}</summary>
+      <summary>
+        <Trash2 size={16} aria-hidden="true" /> {t('delete_account')}
+      </summary>
       <p>{t('delete_hint')}</p>
       <TextField
         label={t('delete_type_email', { email })}
@@ -61,13 +77,14 @@ function DeleteAccount() {
         disabled={!matches || destroy.isPending}
         onClick={() => destroy.mutate(typed)}
       >
+        <Trash2 size={16} aria-hidden="true" />
         {t('delete_account')}
       </button>
     </details>
   );
 }
 
-/** Gyms, language, rest timer length, log out and deleting the account. */
+/** Everything about you in one place: your profile, gyms, language, rest timer, data and account. */
 export function SettingsSheet({ onClose }: { onClose: () => void }) {
   const { t } = useI18n();
   const me = useMe().data;
@@ -76,14 +93,21 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
   return (
     <Sheet title={t('settings')} onClose={onClose}>
       <div className={styles.settings}>
+        <ProfileSection />
         <GymsSection />
         <div>
-          <h3>{t('language')}</h3>
+          <h3 className={styles.iconTitle}>
+            <Languages size={18} aria-hidden="true" />
+            {t('language')}
+          </h3>
           <p>{t('language_hint')}</p>
           <LanguageToggle />
         </div>
         <div>
-          <h3>{t('rest_set')}</h3>
+          <h3 className={styles.iconTitle}>
+            <Timer size={18} aria-hidden="true" />
+            {t('rest_set')}
+          </h3>
           <p>{t('rest_hint')}</p>
           <Segmented
             label={t('rest_set')}
@@ -97,7 +121,10 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
         </div>
         <LowDataSwitch />
         <div>
-          <h3>{t('email_updates_title')}</h3>
+          <h3 className={styles.iconTitle}>
+            <Mail size={18} aria-hidden="true" />
+            {t('email_updates_title')}
+          </h3>
           <label className={styles.switch}>
             <input
               type="checkbox"
@@ -108,13 +135,23 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
           </label>
         </div>
         <div>
-          <h3>{t('export_title')}</h3>
+          <h3 className={styles.iconTitle}>
+            <FileDown size={18} aria-hidden="true" />
+            {t('export_title')}
+          </h3>
           <p>{t('export_hint')}</p>
           <a className={styles.download} href="/api/me/export" download>
+            <Download size={18} aria-hidden="true" />
             {t('export_download')}
           </a>
         </div>
-        <Button variant="ghost" wide onClick={() => logout.mutate()} disabled={logout.isPending}>
+        <Button
+          icon={LogOut}
+          variant="ghost"
+          wide
+          onClick={() => logout.mutate()}
+          disabled={logout.isPending}
+        >
           {t('log_out')}
         </Button>
         <DeleteAccount />

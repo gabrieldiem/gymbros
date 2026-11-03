@@ -1,3 +1,4 @@
+import { Camera, Check, ImageIcon, Palette, Trash2 } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 
 import { useMe, useRemoveAvatar, useUpdateMe, useUploadAvatar } from '../../api/me';
@@ -7,7 +8,6 @@ import { Button } from '../../components/Button';
 import { FormError } from '../../components/FormError';
 import { memberColorHex } from '../../components/memberColor';
 import { resizeImage } from '../../components/resizeImage';
-import { Sheet } from '../../components/Sheet';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
@@ -71,6 +71,7 @@ function NameAndCharacters() {
       />
       <FormError error={updateMe.error} />
       <Button
+        icon={Check}
         type="submit"
         variant="ghost"
         disabled={
@@ -105,7 +106,10 @@ function Picture() {
 
   return (
     <div>
-      <h3>{t('profile_picture')}</h3>
+      <h3 className={styles.iconTitle}>
+        <ImageIcon size={18} aria-hidden="true" />
+        {t('profile_picture')}
+      </h3>
       <p>{t('profile_picture_hint')}</p>
       <input
         ref={input}
@@ -120,6 +124,7 @@ function Picture() {
         <Button
           type="button"
           variant="ghost"
+          icon={Camera}
           disabled={upload.isPending}
           onClick={() => input.current?.click()}
         >
@@ -127,6 +132,7 @@ function Picture() {
         </Button>
         {me?.avatar_url && (
           <Button
+            icon={Trash2}
             type="button"
             variant="quiet"
             disabled={remove.isPending}
@@ -153,7 +159,10 @@ function ColorPicker() {
   const isPreset = COLORS.some(({ value }) => value === me?.color);
   return (
     <div>
-      <h3>{t('settings_color')}</h3>
+      <h3 className={styles.iconTitle}>
+        <Palette size={18} aria-hidden="true" />
+        {t('settings_color')}
+      </h3>
       <div className={styles.colors} role="group" aria-label={t('settings_color')}>
         {COLORS.map(({ value, label }) => (
           <button
@@ -184,21 +193,18 @@ function ColorPicker() {
 }
 
 /** Your name, your picture or characters, and your color, with how you'll look as you change it. */
-export function ProfileSheet({ onClose }: { onClose: () => void }) {
-  const { t } = useI18n();
+export function ProfileSection() {
   const me = useMe().data;
   return (
-    <Sheet title={t('profile_edit')} onClose={onClose}>
-      <div className={styles.settings}>
-        {me && (
-          <div className={styles.profilePreview}>
-            <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={88} />
-          </div>
-        )}
-        <NameAndCharacters />
-        <Picture />
-        <ColorPicker />
-      </div>
-    </Sheet>
+    <>
+      {me && (
+        <div className={styles.profilePreview}>
+          <Avatar initials={me.initials} color={me.color} image={me.avatar_url} size={88} />
+        </div>
+      )}
+      <NameAndCharacters />
+      <Picture />
+      <ColorPicker />
+    </>
   );
 }

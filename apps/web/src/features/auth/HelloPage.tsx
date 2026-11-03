@@ -1,3 +1,4 @@
+import { Mountain } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { useMe } from '../../api/me';
@@ -28,7 +29,7 @@ export function HelloPage() {
       <p className={styles.sub}>{t('w_body')}</p>
       <WelcomeSteps />
       <div className={styles.actions}>
-        <Button wide onClick={handleStart}>
+        <Button icon={Mountain} wide onClick={handleStart}>
           {t('w_cta')}
         </Button>
       </div>

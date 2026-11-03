@@ -22,6 +22,7 @@ export function QuestsNav() {
       <span className={styles.thumb} aria-hidden="true" />
       {QUEST_SECTIONS.map((section) => (
         <NavLink key={section.to} to={section.to} end className={cx(styles.link)}>
+          <section.icon size={15} aria-hidden="true" />
           {t(section.label)}{' '}
           {section.to === '/quests/achievements' && badges && (
             <small className={styles.count}>

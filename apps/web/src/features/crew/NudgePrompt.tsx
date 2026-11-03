@@ -1,3 +1,4 @@
+import { BellRing } from 'lucide-react';
 import { errorCode } from '../../api/errors';
 import { useNudge, type Actor } from '../../api/social';
 import { Avatar } from '../../components/Avatar';
@@ -31,7 +32,12 @@ export function NudgePrompt({ member, days }: { member: Actor; days: number }) {
       <p>
         <b>{name}</b> {t('ev_nudge', { d: days })}
       </p>
-      <Button variant="ghost" onClick={handleNudge} disabled={nudge.isPending || nudge.isSuccess}>
+      <Button
+        icon={BellRing}
+        variant="ghost"
+        onClick={handleNudge}
+        disabled={nudge.isPending || nudge.isSuccess}
+      >
         {t('nudge')}
       </Button>
     </li>

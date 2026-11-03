@@ -1,9 +1,11 @@
+import { ListChecks, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 import { useReact, type FeedItem, type ReactionKind, type WorkoutPostVars } from '../../api/social';
 import type { Exercise } from '../../api/train';
 import { Avatar } from '../../components/Avatar';
 import { cx } from '../../components/cx';
+import { GymLink } from '../../components/GymLink';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { timeAgo } from '../../i18n/timeAgo';
@@ -47,13 +49,14 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         />
       )}
       <div className={styles.chips}>
-        {v.gym && <span>{t('at_gym', { gym: v.gym })}</span>}
+        {v.gym && <GymLink label={t('at_gym', { gym: v.gym })} lat={v.gym_lat} lon={v.gym_lon} />}
         <span>
           {v.performed_on
             ? t('past_for', { day: formatDay(lang, v.performed_on) })
             : t('min_n', { n: v.duration_min })}
         </span>
         {v.sets > 0 && <span>{v.sets === 1 ? t('sets_1') : t('sets_n', { n: v.sets })}</span>}
+        {v.edited && <span>{t('feed_edited')}</span>}
         {v.volume_kg > 0 && <span>{t('kg_n', { n: n(v.volume_kg) })}</span>}
         {v.cardio_minutes > 0 && <span>{t('cardio_min', { n: v.cardio_minutes })}</span>}
         {v.vs_last_pct !== null && v.vs_last_pct > 0 && (
@@ -69,7 +72,9 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
         </p>
       ))}
       <details className={styles.details}>
-        <summary>{t('show_ex')}</summary>
+        <summary>
+          <ListChecks size={15} aria-hidden="true" /> {t('show_ex')}
+        </summary>
         <ul className={styles.exercises}>
           {v.exercises.map((e) => (
             <li key={e.exercise_id}>
@@ -108,7 +113,7 @@ export function FeedCard({ item, exercises }: { item: FeedItem; exercises: Exerc
           aria-label={t('comments_n', { n: item.comments.length })}
           onClick={() => setOpen((o) => !o)}
         >
-          💬 <span>{item.comments.length}</span>
+          <MessageCircle size={16} aria-hidden="true" /> <span>{item.comments.length}</span>
         </button>
       </div>
       {open && <Thread itemId={item.id} comments={item.comments} />}

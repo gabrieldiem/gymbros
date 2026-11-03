@@ -1,3 +1,4 @@
+import { Bug, Lightbulb, MessageCircle, Send } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import { useSendFeedback, type FeedbackKind } from '../../api/feedback';
@@ -41,9 +42,9 @@ export function FeedbackSheet({ onClose }: { onClose: () => void }) {
           value={kind}
           onChange={setKind}
           options={[
-            { value: 'idea', label: t('feedback_idea') },
-            { value: 'bug', label: t('feedback_bug') },
-            { value: 'other', label: t('feedback_other') },
+            { value: 'idea', label: t('feedback_idea'), icon: Lightbulb },
+            { value: 'bug', label: t('feedback_bug'), icon: Bug },
+            { value: 'other', label: t('feedback_other'), icon: MessageCircle },
           ]}
         />
         <label className={styles.feedbackBody}>
@@ -57,7 +58,7 @@ export function FeedbackSheet({ onClose }: { onClose: () => void }) {
           />
         </label>
         <FormError error={send.error} />
-        <Button type="submit" wide disabled={!body.trim() || send.isPending}>
+        <Button icon={Send} type="submit" wide disabled={!body.trim() || send.isPending}>
           {t('feedback_send')}
         </Button>
       </form>

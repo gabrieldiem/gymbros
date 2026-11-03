@@ -1,30 +1,27 @@
-import { useState, type FormEvent } from 'react';
+import { ExternalLink, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-import { useAddGym, useDeleteGym, useGyms, useMakeGymDefault } from '../../api/gyms';
+import { useDeleteGym, useGyms, useMakeGymDefault, type Gym } from '../../api/gyms';
 import { Button } from '../../components/Button';
-import { FormError } from '../../components/FormError';
-import { TextField } from '../../components/TextField';
+import { googleMapsUrl } from '../../components/mapLinks';
 import { useI18n } from '../../i18n/context';
+import { GymPickerSheet } from '../gyms/GymPickerSheet';
 import styles from './Me.module.css';
 
 /** The gyms you train at. Your crew sees the one you're at; the default is picked for you. */
 export function GymsSection() {
   const { t } = useI18n();
   const gyms = useGyms().data ?? [];
-  const add = useAddGym();
   const makeDefault = useMakeGymDefault();
   const remove = useDeleteGym();
-  const [name, setName] = useState('');
-
-  const handleAdd = (event: FormEvent) => {
-    event.preventDefault();
-    if (!name.trim()) return;
-    add.mutate(name.trim(), { onSuccess: () => setName('') });
-  };
+  const [editing, setEditing] = useState<Gym | 'new' | null>(null);
 
   return (
     <div>
-      <h3>{t('gyms_title')}</h3>
+      <h3 className={styles.iconTitle}>
+        <MapPin size={18} aria-hidden="true" />
+        {t('gyms_title')}
+      </h3>
       <p>{t('gyms_hint')}</p>
       {gyms.length > 0 && (
         <ul className={styles.gyms}>
@@ -38,32 +35,56 @@ export function GymsSection() {
                   aria-label={t('gym_default_of', { name: gym.name })}
                   onChange={() => makeDefault.mutate(gym.id)}
                 />
-                <span>{gym.name}</span>
-                {gym.is_default && <small>{t('gym_default')}</small>}
+                <span>
+                  {gym.name}
+                  {gym.is_default && <small> {t('gym_default')}</small>}
+                  {gym.location?.address && (
+                    <small className={styles.gymAddress}>{gym.location.address}</small>
+                  )}
+                </span>
               </label>
+              {gym.location && (
+                <a
+                  className={styles.gymAction}
+                  href={googleMapsUrl(gym.location.lat, gym.location.lon)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t('gym_open_named', { name: gym.name })}
+                >
+                  <ExternalLink size={18} aria-hidden="true" />
+                </a>
+              )}
               <button
                 type="button"
+                className={styles.gymAction}
+                aria-label={t('gym_edit', { name: gym.name })}
+                onClick={() => setEditing(gym)}
+              >
+                <Pencil size={18} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className={styles.gymAction}
                 aria-label={t('gym_remove', { name: gym.name })}
                 onClick={() => remove.mutate(gym.id)}
               >
-                ×
+                <Trash2 size={18} aria-hidden="true" />
               </button>
             </li>
           ))}
         </ul>
       )}
-      <form className={styles.nameForm} onSubmit={handleAdd}>
-        <TextField
-          label={t('gym_name')}
-          maxLength={40}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Button variant="ghost" type="submit" disabled={add.isPending || !name.trim()}>
+      <div className={styles.gymAdd}>
+        <Button variant="ghost" icon={Plus} onClick={() => setEditing('new')}>
           {t('gym_add')}
         </Button>
-      </form>
-      <FormError error={add.error} />
+      </div>
+      {editing && (
+        <GymPickerSheet
+          {...(editing === 'new' ? {} : { gym: editing })}
+          onClose={() => setEditing(null)}
+        />
+      )}
     </div>
   );
 }

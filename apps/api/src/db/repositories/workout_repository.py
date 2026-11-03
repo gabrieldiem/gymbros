@@ -52,9 +52,10 @@ class WorkoutRepository:
     async def last_sets(
         self, user_id: uuid.UUID, exercise_ids: list[str], before: datetime | None = None
     ) -> dict[str, list[WorkoutSet]]:
-        """Per exercise, the sets from the user's most recent finished workout that had it.
+        """Per exercise, the sets completed the last time the user really did it. A workout that
+        only listed it, because the routine has it and they skipped it, doesn't count.
 
-        With `before`, the most recent one finished before then.
+        With `before`, the last time before then.
         """
         latest = (
             select(WorkoutSet.exercise_id, WorkoutSet.workout_id)
@@ -63,6 +64,7 @@ class WorkoutRepository:
                 Workout.user_id == user_id,
                 Workout.finished_at.is_not(None),
                 WorkoutSet.exercise_id.in_(exercise_ids),
+                WorkoutSet.done.is_(True),
                 *([Workout.finished_at < before] if before else []),
             )
             .ext(distinct_on(WorkoutSet.exercise_id))
@@ -73,7 +75,10 @@ class WorkoutRepository:
             return {}
         result = await self._session.execute(
             select(WorkoutSet)
-            .where(tuple_(WorkoutSet.exercise_id, WorkoutSet.workout_id).in_(pairs))
+            .where(
+                tuple_(WorkoutSet.exercise_id, WorkoutSet.workout_id).in_(pairs),
+                WorkoutSet.done.is_(True),
+            )
             .order_by(WorkoutSet.set_position)
         )
         by_exercise: dict[str, list[WorkoutSet]] = defaultdict(list)

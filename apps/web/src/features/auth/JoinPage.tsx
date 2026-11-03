@@ -1,3 +1,4 @@
+import { LogOut } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 import { Link } from 'react-router';
@@ -57,7 +58,7 @@ export function JoinPage() {
       </form>
       <p className={styles.switch}>
         {isAdmin && <Link to="/admin">{t('admin_title')}</Link>}{' '}
-        <Button variant="quiet" onClick={() => logout.mutate()}>
+        <Button icon={LogOut} variant="quiet" onClick={() => logout.mutate()}>
           {t('log_out')}
         </Button>
       </p>

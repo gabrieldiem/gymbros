@@ -1,6 +1,7 @@
 """Dependency injection module: module-level singletons plus `Depends` providers."""
 
 import asyncio
+from functools import cache
 from datetime import timedelta
 from logging import Logger
 from typing import AsyncIterator
@@ -15,6 +16,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from clients.google_oauth_client import GoogleOAuthClient
+from clients.map_link_client import MapLinkClient
+from clients.nominatim_client import NominatimClient
 from clients.resend_client import ResendEmailClient
 from clock import utc_now
 from db.repositories.admin_repository import AdminRepository
@@ -61,6 +64,8 @@ from services.member import Member
 from services.notifier import Notifier
 from services.nudge_service import NudgeService
 from services.google_identity import GoogleSignIn
+from services.place_service import PlaceService
+from services.places import MapLinkResolver, PlaceSearch
 from services.profile_service import ProfileService
 from services.quest_service import QuestService
 from services.recap_service import RecapService
@@ -68,6 +73,7 @@ from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
 from services.session_tokens import SessionTokens
 from services.welcome_email import EmailSender
+from services.workout_editor import WorkoutEditor
 from services.training_now_service import TrainingNowService
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
@@ -115,6 +121,25 @@ DB_SESSION = Depends(get_session, scope="function")
 def get_crew_service(session: AsyncSession = DB_SESSION) -> CrewService:
     """FastAPI dependency provider for CrewService."""
     return CrewService(CrewRepository(session))
+
+
+@cache
+def get_place_search() -> PlaceSearch:
+    """Searching places. One per process: it holds the wait between requests and the cache."""
+    return NominatimClient(settings.public_url)
+
+
+def get_map_link_resolver() -> MapLinkResolver:
+    """Following short map links."""
+    return MapLinkClient()
+
+
+def get_place_service(
+    search: PlaceSearch = Depends(get_place_search),
+    resolver: MapLinkResolver = Depends(get_map_link_resolver),
+) -> PlaceService:
+    """FastAPI dependency provider for PlaceService."""
+    return PlaceService(search, resolver)
 
 
 def get_avatar_service(session: AsyncSession = DB_SESSION) -> AvatarService:
@@ -284,6 +309,7 @@ def get_workout_service(session: AsyncSession = DB_SESSION) -> WorkoutService:
         utc_now,
         activity=build_activity_service(session),
         past_workout_days=settings.game_past_workout_days,
+        gyms=GymRepository(session),
     )
 
 
@@ -325,6 +351,27 @@ def get_workout_finisher(
         now=utc_now,
         activity=build_activity_service(session),
         bonus=build_bonus_service(session),
+    )
+
+
+def get_workout_editor(
+    session: AsyncSession = DB_SESSION,
+    workouts: WorkoutService = Depends(get_workout_service),
+) -> WorkoutEditor:
+    """FastAPI dependency provider for WorkoutEditor."""
+    return WorkoutEditor(
+        workouts=workouts,
+        climb=build_climb_service(session),
+        workout_rows=WorkoutRepository(session),
+        context=_context(session),
+        records=PersonalRecordRepository(session),
+        events=PointEventRepository(session),
+        feed=FeedRepository(session),
+        catalog=load_catalog(),
+        rules=get_scoring_rules(),
+        bonus=build_bonus_service(session),
+        window=timedelta(days=settings.game_edit_workout_days),
+        now=utc_now,
     )
 
 
@@ -524,4 +571,5 @@ def get_me_stats_service(session: AsyncSession = DB_SESSION) -> MeStatsService:
         load_catalog(),
         utc_now,
         PointEventRepository(session),
+        timedelta(days=settings.game_edit_workout_days),
     )

@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,6 +48,14 @@ class PersonalRecordRepository:
         statement = insert(PersonalRecord).values(**values)
         await self._session.execute(
             statement.on_conflict_do_update(index_elements=["user_id", "exercise_id"], set_=values)
+        )
+
+    async def delete(self, user_id: uuid.UUID, exercise_id: str) -> None:
+        """Nothing holds this PR any more."""
+        await self._session.execute(
+            delete(PersonalRecord).where(
+                PersonalRecord.user_id == user_id, PersonalRecord.exercise_id == exercise_id
+            )
         )
 
     async def heaviest_in_crew(self, crew_id: uuid.UUID, exercise_id: str) -> PersonalRecord | None:

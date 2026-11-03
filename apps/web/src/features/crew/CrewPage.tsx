@@ -1,3 +1,5 @@
+import { Newspaper, Trophy } from 'lucide-react';
+import { ChevronDown, RotateCw } from 'lucide-react';
 import { useState } from 'react';
 
 import { useMe } from '../../api/me';
@@ -24,7 +26,7 @@ function Feed() {
     return (
       <div className={feedStyles.empty} role="alert">
         <p>{t('feed_failed')}</p>
-        <Button variant="ghost" onClick={() => void feed.refetch()}>
+        <Button icon={RotateCw} variant="ghost" onClick={() => void feed.refetch()}>
           {t('retry')}
         </Button>
       </div>
@@ -53,6 +55,7 @@ function Feed() {
       {feed.hasNextPage && (
         <div className={feedStyles.more}>
           <Button
+            icon={ChevronDown}
             variant="ghost"
             onClick={() => void feed.fetchNextPage()}
             disabled={feed.isFetchingNextPage}
@@ -84,8 +87,8 @@ export function CrewPage() {
           value={view}
           onChange={setView}
           options={[
-            { value: 'feed', label: t('tab_feed') },
-            { value: 'hof', label: t('tab_hof') },
+            { value: 'feed', label: t('tab_feed'), icon: Newspaper },
+            { value: 'hof', label: t('tab_hof'), icon: Trophy },
           ]}
         />
       </div>

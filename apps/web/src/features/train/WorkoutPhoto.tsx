@@ -1,3 +1,4 @@
+import { Camera, Trash2 } from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
 
 import { useWorkoutPhoto } from '../../api/train';
@@ -46,6 +47,7 @@ export function WorkoutPhoto({ workoutId, url }: Props) {
         <Button
           type="button"
           variant="ghost"
+          icon={Camera}
           disabled={upload.isPending}
           onClick={() => input.current?.click()}
         >
@@ -55,6 +57,7 @@ export function WorkoutPhoto({ workoutId, url }: Props) {
         </Button>
         {url && (
           <Button
+            icon={Trash2}
             type="button"
             variant="quiet"
             disabled={remove.isPending}

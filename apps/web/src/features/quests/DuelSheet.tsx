@@ -1,3 +1,4 @@
+import { Swords } from 'lucide-react';
 import { useState } from 'react';
 
 import { STAKES, useChallenge, type DuelMetric, type Stake } from '../../api/compete';
@@ -97,7 +98,7 @@ export function DuelSheet({ members, winPoints, onClose }: Props) {
           </div>
         </div>
         <FormError error={challenge.error} />
-        <Button wide onClick={handleSend} disabled={!opponent || challenge.isPending}>
+        <Button icon={Swords} wide onClick={handleSend} disabled={!opponent || challenge.isPending}>
           {t('send_duel')}
         </Button>
       </div>

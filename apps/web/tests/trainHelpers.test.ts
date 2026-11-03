@@ -2,7 +2,17 @@ import { describe, expect, it } from 'vitest';
 
 import type { Exercise } from '../src/api/train';
 import { searchExercises } from '../src/features/train/exerciseSearch';
-import { barOf, disksOf, loadOf, repeatSource, withBar } from '../src/features/train/barbell';
+import {
+  barOf,
+  disksOf,
+  editSet,
+  forServer,
+  isSuggestion,
+  loadOf,
+  repeatSource,
+  repeated,
+  withBar,
+} from '../src/features/train/barbell';
 import { formatElapsed, formatPrevious, lineItemText } from '../src/features/train/format';
 import { countPlates, platesPerSide } from '../src/features/train/plates';
 import { formatNumber, translate } from '../src/i18n/translate';
@@ -193,9 +203,11 @@ describe('barbell weight', () => {
     ]);
   });
 
-  it('repeats the set above, else that set last time, else nothing', () => {
-    const above = row(60, 5);
+  it('repeats its own suggestion, else the set above, else that set last time', () => {
+    const above = { ...row(60, 5), done: true };
     const last = row(50, 8);
+    const suggested = row(70, 3);
+    expect(repeatSource([above, suggested], [last, last], 1)).toBe(suggested);
     expect(repeatSource([above, row(null, null)], [last, last], 1)).toBe(above);
     expect(repeatSource([row(null, null), row(null, null)], [last, last], 1)).toBe(last);
     expect(repeatSource([row(null, null)], [last], 0)).toBe(last);
@@ -204,5 +216,56 @@ describe('barbell weight', () => {
 
   it('ignores an empty set from last time', () => {
     expect(repeatSource([row(null, null)], [row(null, null)], 0)).toBeUndefined();
+  });
+});
+
+describe('logging a set without ticking it', () => {
+  const lift = { id: 'bench', type: 'w', barbell: true } as Exercise;
+  const machine = { id: 'press', type: 'w', barbell: false } as Exercise;
+  const cardio = { id: 'run', type: 'c', barbell: false } as Exercise;
+  const set = (over = {}) => ({
+    load_kg: null,
+    reps: null,
+    minutes: null,
+    km: null,
+    done: false,
+    ...over,
+  });
+
+  it('counts a lift once it has reps', () => {
+    expect(editSet(lift, set(), 'load_kg', 40, 20).done).toBe(false);
+    expect(editSet(lift, set({ load_kg: 60 }), 'reps', 5, 20).done).toBe(true);
+    expect(editSet(machine, set({ reps: 5, done: true }), 'reps', null, 20).done).toBe(false);
+  });
+
+  it('counts cardio once it has minutes', () => {
+    expect(editSet(cardio, set(), 'km', 5, 20).done).toBe(false);
+    expect(editSet(cardio, set({ km: 5 }), 'minutes', 30, 20).done).toBe(true);
+  });
+
+  it('treats a loaded row as a suggestion until it’s touched', () => {
+    expect(isSuggestion(set({ load_kg: 60, reps: 5 }))).toBe(true);
+    expect(isSuggestion(set())).toBe(false);
+    expect(isSuggestion(set({ load_kg: 60, reps: 5, done: true }))).toBe(false);
+    expect(isSuggestion(editSet(lift, set({ load_kg: 60 }), 'load_kg', 50, 20))).toBe(false);
+  });
+
+  it('keeps what’s suggested when one number changes', () => {
+    const next = editSet(lift, set({ load_kg: 60, bar_kg: 20, reps: 5 }), 'load_kg', 50, 20);
+    expect(next).toMatchObject({ load_kg: 70, reps: 5, done: true });
+  });
+
+  it('calls reps with nothing loaded the empty bar', () => {
+    expect(editSet(lift, set(), 'reps', 10, 15)).toMatchObject({ load_kg: 15, bar_kg: 15 });
+    expect(editSet(machine, set(), 'reps', 10, 15).load_kg).toBeNull();
+  });
+
+  it('logs what repeat copies', () => {
+    const logged = repeated(lift, set(), set({ load_kg: 60, bar_kg: 20, reps: 5 }), 20);
+    expect(logged).toMatchObject({ load_kg: 60, reps: 5, done: true, started: true });
+  });
+
+  it('never sends what only this screen needs', () => {
+    expect(forServer([{ ...set(), started: true }])[0]).not.toHaveProperty('started');
   });
 });

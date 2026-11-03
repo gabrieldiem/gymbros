@@ -2,6 +2,7 @@
   "game": {
     "weekly_target": 3,
     "past_workout_days": 7,
+    "edit_workout_days": 2,
     "rank_step": 1500,
     "rank_count": 7,
     "week_scale": 1500,

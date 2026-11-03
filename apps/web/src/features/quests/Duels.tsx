@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react';
 import { useDuels, useRespondDuel, type Duel } from '../../api/compete';
 import { useMe } from '../../api/me';
 import { Avatar } from '../../components/Avatar';
@@ -54,12 +55,14 @@ function DuelCard({ duel, myId, winPoints }: { duel: Duel; myId: string; winPoin
           <p className={styles.status}>{t('duel_pending_in', { name: them.display_name })}</p>
           <div className={styles.actions}>
             <Button
+              icon={Check}
               onClick={() => respond.mutate({ id: duel.id, accept: true })}
               disabled={respond.isPending}
             >
               {t('accept')}
             </Button>
             <Button
+              icon={X}
               variant="ghost"
               onClick={() => respond.mutate({ id: duel.id, accept: false })}
               disabled={respond.isPending}

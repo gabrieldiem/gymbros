@@ -180,6 +180,8 @@ class WorkoutDetailResponse(BaseModel):
     id: uuid.UUID
     name: str
     gym: str | None
+    gym_lat: float | None = None
+    gym_lon: float | None = None
     photo_url: str | None
     performed_on: date | None
     finished_at: datetime
@@ -189,6 +191,7 @@ class WorkoutDetailResponse(BaseModel):
     volume_kg: float
     exercises: list[WorkoutDetailExercise]
     line_items: list[LineItemModel]
+    editable_until: datetime | None = None
 
 
 class MeStatsResponse(BaseModel):

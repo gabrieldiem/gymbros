@@ -13,6 +13,7 @@ type Props = {
 };
 
 const EXIT_MS = 220;
+const openSheets: HTMLElement[] = [];
 
 const reducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -70,8 +71,14 @@ export function Sheet({ title, onClose, children, hideTitle }: Props) {
   useEffect(() => {
     // Everything behind the sheet is inert: no focus, clicks or screen-reader reading leak out.
     const root = document.getElementById('root');
+    const element = panel.current as HTMLElement;
     root?.setAttribute('inert', '');
-    return () => root?.removeAttribute('inert');
+    openSheets.push(element);
+    return () => {
+      openSheets.splice(openSheets.indexOf(element), 1);
+      // A sheet opened from a sheet leaves the page inert for the one still open.
+      if (openSheets.length === 0) root?.removeAttribute('inert');
+    };
   }, []);
 
   useEffect(() => {
@@ -83,6 +90,8 @@ export function Sheet({ title, onClose, children, hideTitle }: Props) {
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
+      // A sheet opened from a sheet: only the one on top answers.
+      if (openSheets[openSheets.length - 1] !== panel.current) return;
       if (event.key === 'Escape') onClose();
       if (event.key === 'Tab') trapFocus(event, panel.current);
     };

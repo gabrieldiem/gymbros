@@ -1,13 +1,15 @@
+import { CalendarDays, Coins, Trophy, type LucideIcon } from 'lucide-react';
+
 import type { MessageKey } from '../i18n/en';
 import type { IconName } from './Icon';
 
 export type Tab = { to: string; icon: IconName; label: MessageKey; primary?: boolean };
 
 /** Inside Quests: what stays useful every week. Deep links, so the nav can go straight to them. */
-export const QUEST_SECTIONS: readonly { to: string; label: MessageKey }[] = [
-  { to: '/quests', label: 'nav_weekly' },
-  { to: '/quests/achievements', label: 'nav_achievements' },
-  { to: '/quests/points', label: 'nav_points' },
+export const QUEST_SECTIONS: readonly { to: string; label: MessageKey; icon: LucideIcon }[] = [
+  { to: '/quests', label: 'nav_weekly', icon: CalendarDays },
+  { to: '/quests/achievements', label: 'nav_achievements', icon: Trophy },
+  { to: '/quests/points', label: 'nav_points', icon: Coins },
 ];
 
 /** The five tabs, in nav order. Train is the primary action (raised centre button on mobile). */

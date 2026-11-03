@@ -1,3 +1,4 @@
+import { Dumbbell } from 'lucide-react';
 import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -153,7 +154,7 @@ function useSlides(recap: Recap, exercises: Exercise[], onClose: () => void): Sl
             ? t('r_bounty', { n: recap.bounty_points, name: recap.bounty_target.display_name })
             : ''}
         </p>
-        <ButtonLink to="/train" className={styles.cta} onClick={onClose}>
+        <ButtonLink icon={Dumbbell} to="/train" className={styles.cta} onClick={onClose}>
           {t('start_training')}
         </ButtonLink>
       </>
