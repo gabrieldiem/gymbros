@@ -9,6 +9,15 @@ from db.repositories.crew_repository import CrewRepository
 from services.crew_service import CrewService
 
 
+@pytest.fixture(autouse=True)
+def no_clock_badges(monkeypatch):
+    """Workouts here finish at the real time, so without this the night and dawn badges pay on top
+    of what a test expects, depending on when the suite runs: from 22:00 it would fail, including
+    in the pipeline. Their rules have tests of their own, with fixed times."""
+    monkeypatch.setattr("services.badges.NIGHT_FROM_HOUR", 24)
+    monkeypatch.setattr("services.badges.DAWN_BEFORE_HOUR", 0)
+
+
 @pytest.fixture
 async def crew(db_session):
     """A crew with invite code IRONRIDGE."""
