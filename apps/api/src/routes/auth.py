@@ -27,7 +27,7 @@ from services.errors import GoogleSignInFailed
 from services.google_identity import GoogleIdentity, GoogleSignIn
 from services.oauth_attempt import OAuthAttempt
 from services.profile_service import ProfileService
-from services.welcome_email import EmailSender, welcome_email
+from services.welcome_email import EmailSender, GameNumbers, welcome_email
 from settings import Settings
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -97,7 +97,13 @@ async def google_callback(  # pylint: disable=too-many-arguments,too-many-positi
     await session.commit()
     if logged_in.created and (await EmailRepository(session).settings()).welcome_enabled:
         user = logged_in.user
-        message = welcome_email(user.email, user.display_name, user.language, settings.public_url)
+        message = welcome_email(
+            user.email,
+            user.display_name,
+            user.language,
+            settings.public_url,
+            GameNumbers.from_settings(settings),
+        )
         background.add_task(email.send, message)
     response = _redirect(settings, SIGNED_IN_PATH)
     set_session_cookie(response, logged_in.token, settings)

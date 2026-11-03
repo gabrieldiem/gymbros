@@ -21,8 +21,21 @@ from services.member import Member
 from services.recap_service import Recap, RecapService
 from services.training_rules import week_start
 from services.unsubscribe import token_is_valid, unsubscribe_query
-from services.update_email import DigestNumbers, admin_email, digest_email
-from services.welcome_email import EmailMessage, EmailSender
+from services.email_templates import DIGEST, EmailTemplate, all_templates
+from services.update_email import (
+    DigestNumbers,
+    Recipient,
+    admin_email,
+    digest_email,
+    stop_headers,
+)
+from services.welcome_email import (
+    EmailMessage,
+    EmailSender,
+    GameNumbers,
+    StopLinks,
+    welcome_email,
+)
 
 MONDAY = 0
 
@@ -39,6 +52,7 @@ class EmailLinks:
 
     public_url: str
     secret: str
+    numbers: GameNumbers
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,25 +115,30 @@ class EmailService:
 
     # ---- Messages from admins
 
-    async def audience_size(self, audience: Audience) -> int:
+    def templates(self, language: str) -> tuple[EmailTemplate, ...]:
+        """Every email GYMBROS sends, to start from."""
+        return all_templates(language, self._links.numbers)
+
+    def preview(self, admin: User, html: str, full_document: bool) -> str:
+        """How a message looks when it reaches the admin writing it."""
+        return admin_email(
+            self._recipient(admin), "", html, self._links.public_url, full_document
+        ).html
+
+    async def audience_size(self, audience: Audience, template: str | None = None) -> int:
         """How many people a message would reach."""
+        if template == DIGEST:
+            return len(await self._crew_members(audience))
         return len(await self._audience(audience))
 
-    async def send_message(
-        self, admin: User, audience: Audience, subject: str, message: str
+    async def send_message(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self, admin: User, audience: Audience, subject: str, html: str, full_document: bool
     ) -> tuple[int, int]:
         """Send to everyone in the audience. Returns (recipients, how many went out)."""
         users = await self._audience(audience)
         messages = [
-            admin_email(
-                user.email,
-                user.language,
-                subject,
-                message,
-                self._stop_url(user),
-                self._one_click_url(user),
-            )
-            for user in users
+            admin_email(self._recipient(u), subject, html, self._links.public_url, full_document)
+            for u in users
         ]
         sent = await self._sender.send_many(messages)
         # The subject, not who got it or what it said: the log keeps no personal data.
@@ -127,6 +146,50 @@ class EmailService:
             admin, "email_sent", {"reason": subject, "points": sent}, target=audience.crew_id
         )
         return len(users), sent
+
+    async def send_template(
+        self, admin: User, audience: Audience, template: str
+    ) -> tuple[int, int]:
+        """Send an email as GYMBROS makes it: each person's own, in their language."""
+        if template == DIGEST:
+            members = await self._crew_members(audience)
+            messages = [await self._digest(member) for member in members]
+        else:
+            messages = [self._welcome(user) for user in await self._audience(audience)]
+        sent = await self._sender.send_many(messages)
+        await self._audit(
+            admin, "email_sent", {"reason": template, "points": sent}, target=audience.crew_id
+        )
+        return len(messages), sent
+
+    async def _crew_members(self, audience: Audience) -> list[Member]:
+        """The audience, without anyone not in a crew: a digest has nothing to say to them."""
+        members = []
+        for user in await self._audience(audience):
+            crew = await self._crews.get_crew_of(user.id)
+            if crew is not None:
+                members.append(Member(user, crew))
+        return members
+
+    def _welcome(self, user: User) -> EmailMessage:
+        stop = StopLinks(self._stop_url(user), stop_headers(self._one_click_url(user)))
+        return welcome_email(
+            user.email,
+            user.display_name,
+            user.language,
+            self._links.public_url,
+            self._links.numbers,
+            stop,
+        )
+
+    def _recipient(self, user: User) -> Recipient:
+        return Recipient(
+            user.email,
+            user.display_name,
+            user.language,
+            self._stop_url(user),
+            self._one_click_url(user),
+        )
 
     async def _audience(self, audience: Audience) -> list[User]:
         if audience.email is not None:

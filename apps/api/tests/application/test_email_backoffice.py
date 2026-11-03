@@ -99,7 +99,7 @@ async def test_a_member_cant_see_or_change_them(other_client, admin, maxo):
     assert (await other_client.get("/api/admin/email")).status_code == 403
     response = await other_client.patch("/api/admin/email", json={"digest_enabled": True})
     assert response.status_code == 403
-    message = {"subject": "x", "body": "y"}
+    message = {"subject": "x", "html": "<p>y</p>"}
     assert (await other_client.post("/api/admin/email/message", json=message)).status_code == 403
 
 
@@ -238,7 +238,7 @@ async def test_the_settings_row_survives_being_read_twice(db_session):
 
 
 def message(**extra):
-    return {"subject": "Gym closed Friday", "body": "See you Monday.\n\nThe crew", **extra}
+    return {"subject": "Gym closed Friday", "html": "<p>See you Monday.</p>", **extra}
 
 
 async def test_counting_who_it_reaches_sends_nothing(client, admin, maxo, outbox):
@@ -329,3 +329,71 @@ async def test_a_member_can_turn_it_back_on(client, member):
     assert (await client.patch("/api/me", json={"email_updates": True})).json()[
         "email_updates"
     ] is True
+
+
+# --- Templates and rich messages ------------------------------------------------------------
+
+
+async def test_every_email_gymbros_sends_can_be_started_from(client, admin):
+    response = await client.get("/api/admin/email/templates?language=es")
+    assert response.status_code == 200
+    templates = {t["id"]: t for t in response.json()}
+    assert set(templates) == {"announcement", "welcome", "digest", "invite"}
+    assert {t["id"] for t in response.json() if t["live"]} == {"welcome", "digest"}
+    assert "Hola {{name}}" in templates["welcome"]["html"]
+    assert "{{unsubscribe_url}}" in templates["digest"]["html"]
+    assert "{{unsubscribe_url}}" in templates["announcement"]["html"]
+
+
+async def test_only_admins_get_the_templates_or_a_preview(other_client, crew):
+    await register_on(other_client, "maxo@example.com", crew.invite_code)
+    assert (await other_client.get("/api/admin/email/templates")).status_code == 403
+    body = {"html": "<p>x</p>"}
+    assert (await other_client.post("/api/admin/email/preview", json=body)).status_code == 403
+
+
+async def test_a_preview_shows_it_as_it_will_arrive(client, admin, outbox):
+    body = {"html": "<p>Hi {{name}}</p>"}
+    response = await client.post("/api/admin/email/preview", json=body)
+    assert "/email/banner.png" in response.json()["html"]
+    assert "{{name}}" not in response.json()["html"]
+    assert outbox.sent == []
+
+
+async def test_a_whole_template_goes_out_with_each_persons_details(client, admin, maxo, outbox):
+    templates = (await client.get("/api/admin/email/templates")).json()
+    announcement = next(t for t in templates if t["id"] == "announcement")
+    body = {"subject": announcement["subject"], "html": announcement["html"], "full_document": True}
+    response = await client.post("/api/admin/email/message", json=body)
+    assert response.json() == {"recipients": 2, "sent": 2}
+    for sent in outbox.sent:
+        assert "{{" not in sent.html
+        assert dict(sent.headers)["List-Unsubscribe-Post"] == "List-Unsubscribe=One-Click"
+    mine = next(m for m in outbox.sent if m.to == "maxo@example.com")
+    assert "Maxo" in mine.html
+
+
+async def test_the_welcome_goes_out_as_each_persons_own(client, admin, maxo, outbox):
+    response = await client.post("/api/admin/email/message", json={"template": "welcome"})
+    assert response.json() == {"recipients": 2, "sent": 2}
+    assert all(m.headers for m in outbox.sent)
+    assert any("Hi Maxo" in m.text for m in outbox.sent)
+
+
+async def test_the_digest_goes_only_to_people_in_a_crew(client, other_client, admin, maxo, outbox):
+    await register_on(other_client, "solo@example.com")
+    everyone = {"subject": "x", "html": "<p>y</p>", "dry_run": True}
+    assert (await client.post("/api/admin/email/message", json=everyone)).json()["recipients"] == 3
+    body = {"template": "digest", "dry_run": True}
+    assert (await client.post("/api/admin/email/message", json=body)).json()["recipients"] == 2
+    response = await client.post("/api/admin/email/message", json={"template": "digest"})
+    assert response.json() == {"recipients": 2, "sent": 2}
+    assert "solo@example.com" not in {m.to for m in outbox.sent}
+
+
+async def test_a_message_is_one_thing_or_the_other(client, admin):
+    send = lambda body: client.post("/api/admin/email/message", json=body)  # noqa: E731
+    assert (await send({"subject": "x"})).status_code == 422
+    assert (await send({"html": "<p>x</p>"})).status_code == 422
+    assert (await send({"template": "welcome", "subject": "x"})).status_code == 422
+    assert (await send({"template": "nope"})).status_code == 422
