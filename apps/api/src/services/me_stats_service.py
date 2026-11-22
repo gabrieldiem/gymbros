@@ -137,7 +137,7 @@ class MeStatsService:
     ) -> tuple[tuple[date, float], ...]:
         """Best e1RM per week for a lift over the last half year."""
         exercise = self._catalog.exercise(exercise_id)
-        if exercise is None or exercise.is_cardio:
+        if exercise is None or exercise.is_cardio or exercise.is_hold:
             raise UnknownExerciseForHistory(exercise_id)
         since = week_start(self._now(), member.crew.time_zone) - timedelta(weeks=PR_HISTORY_WEEKS)
         best: dict[date, float] = {}

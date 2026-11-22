@@ -50,6 +50,12 @@ def test_week_activity_counts_leg_workouts_groups_volume_and_cardio():
     )
 
 
+def test_a_hold_counts_towards_the_weekly_tonnes_like_it_scores():
+    # An L-sit counts a rep every 2 seconds: 20 s is 10 reps of bodyweight.
+    activity = week_activity([WorkoutLog((lift("lsit", 0, 20),))], bodyweight_kg=80)
+    assert activity.volume_kg == 800
+
+
 def test_quest_progress_per_metric():
     activity = WeekActivity(
         leg_workouts=1,

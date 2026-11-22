@@ -37,12 +37,25 @@ def is_completed(exercise: Exercise, logged: LoggedSet) -> bool:
 
 
 def effective_load(exercise: Exercise, load_kg: float | None, bodyweight_kg: float) -> float:
-    """Bodyweight exercises lift the body plus any added load."""
+    """Bodyweight exercises and holds lift the body plus any added load."""
     added = load_kg or 0.0
-    return bodyweight_kg + added if exercise.type == "bw" else added
+    return bodyweight_kg + added if exercise.type in ("bw", "h") else added
 
 
-def estimated_1rm(load_kg: float, reps: int) -> float:
+def effective_reps(exercise: Exercise, reps: int | None) -> float:
+    """Reps, or for a hold its seconds as the bodyweight reps they're worth."""
+    if exercise.is_hold and exercise.hold_s_per_rep:
+        return (reps or 0) / exercise.hold_s_per_rep
+    return float(reps or 0)
+
+
+def set_volume(exercise: Exercise, logged: LoggedSet, bodyweight_kg: float) -> float:
+    """Load × reps, with a hold's seconds turned into reps."""
+    load = effective_load(exercise, logged.load_kg, bodyweight_kg)
+    return load * effective_reps(exercise, logged.reps)
+
+
+def estimated_1rm(load_kg: float, reps: float) -> float:
     """Epley: load × (1 + reps / 30)."""
     return load_kg * (1 + reps / 30)
 

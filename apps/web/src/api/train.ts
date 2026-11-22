@@ -17,7 +17,7 @@ import { gymsKey } from './gyms';
 import { liveInterval } from './liveInterval';
 import type { CrewColor } from './types';
 
-export type ExerciseType = 'w' | 'bw' | 'c' | 's' | 'x';
+export type ExerciseType = 'w' | 'bw' | 'h' | 'c' | 's' | 'x';
 export type MuscleGroup =
   'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Core' | 'Cardio' | 'Mobility';
 
@@ -35,6 +35,8 @@ export type Exercise = {
   default_minutes?: number | null;
   /** A sport with no distance: only minutes are logged. */
   minute_effort_km?: number;
+  /** Holds only: seconds of the hold that count as one bodyweight rep. Seconds go in `reps`. */
+  hold_s_per_rep?: number | null;
 };
 
 export type Routine = { id: string; name: string; exercise_ids: string[] };

@@ -616,6 +616,7 @@ export const es = {
   col_kg: 'kg',
   col_added_kg: '+kg',
   col_reps: 'reps',
+  col_sec: 'seg',
   col_min: 'min',
   col_km: 'km',
   plates: 'Discos',
@@ -686,6 +687,8 @@ export const es = {
   pr_load: '{kg} kg × {reps}',
   pr_added: '+{kg} kg × {reps}',
   pr_reps: '{reps} reps',
+  pr_hold: '{s} s',
+  pr_hold_added: '+{kg} kg × {s} s',
   err_workout_empty: 'Marca al menos un set para terminar.',
   err_workout_already_active: 'Ya tienes un entreno en marcha.',
   err_workout_finished: 'Ese entreno ya está terminado.',
@@ -852,6 +855,11 @@ export const es = {
   wn_faster_sets_body: 'Registrar lleva menos toques, y tus puntos no cambian.',
   wn_faster_sets_points:
     'Toca para repetir el set de arriba\nQuita una fila que no necesitas\nMira los ejercicios con barra como discos más la barra',
+  wn_calisthenics_title: 'Calistenia: isométricos y más flexiones',
+  wn_calisthenics_body:
+    'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose y Planche lean se registran en segundos. Parallette push-up y Decline push-up, en reps.',
+  wn_calisthenics_points:
+    'Un isométrico registra segundos, con kg añadidos si llevas lastre\nUno sólido paga como un set de 10 reps con tu peso\nAguantar más es un PR',
   wn_past_workouts_title: 'Registra un entreno pasado',
   wn_past_workouts_body:
     '¿Olvidaste registrar uno? Puedes añadirlo en cualquiera de los últimos 7 días.',

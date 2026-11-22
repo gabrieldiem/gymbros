@@ -604,6 +604,7 @@ export const en = {
   col_kg: 'kg',
   col_added_kg: '+kg',
   col_reps: 'reps',
+  col_sec: 'sec',
   col_min: 'min',
   col_km: 'km',
   plates: 'Plates',
@@ -674,6 +675,8 @@ export const en = {
   pr_load: '{kg} kg × {reps}',
   pr_added: '+{kg} kg × {reps}',
   pr_reps: '{reps} reps',
+  pr_hold: '{s} s',
+  pr_hold_added: '+{kg} kg × {s} s',
   err_workout_empty: 'Check off at least one set to finish.',
   err_workout_already_active: 'You already have a workout going.',
   err_workout_finished: 'That workout is already finished.',
@@ -839,6 +842,11 @@ export const en = {
   wn_faster_sets_body: 'Logging takes fewer taps, and your points don’t change.',
   wn_faster_sets_points:
     'Tap to repeat the set above\nRemove a row you don’t need\nSee barbell lifts as disks plus the bar',
+  wn_calisthenics_title: 'Calisthenics: holds and more push-ups',
+  wn_calisthenics_body:
+    'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose and Planche lean log seconds. Parallette and decline push-ups log reps.',
+  wn_calisthenics_points:
+    'A hold logs seconds, with added kg if you wear any\nA solid hold pays like a set of 10 bodyweight reps\nHolding longer is a PR',
   wn_past_workouts_title: 'Log a past workout',
   wn_past_workouts_body: 'Forgot to log one? You can add it for any of the last 7 days.',
   wn_past_workouts_points:

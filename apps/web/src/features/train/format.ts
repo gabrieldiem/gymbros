@@ -33,6 +33,10 @@ export function formatLift(
   if (exercise?.type === 'bw') {
     return loadKg > 0 ? t('pr_added', { kg: n(loadKg), reps }) : t('pr_reps', { reps });
   }
+  // A hold keeps its seconds where a lift keeps reps.
+  if (exercise?.type === 'h') {
+    return loadKg > 0 ? t('pr_hold_added', { kg: n(loadKg), s: reps }) : t('pr_hold', { s: reps });
+  }
   return t('pr_load', { kg: n(loadKg), reps });
 }
 
@@ -45,6 +49,8 @@ export function formatPrevious(exercise: Exercise, set: SetData | undefined, n: 
   }
   if (exercise.type === 'c') return `${set.minutes ?? 0} min, ${n(set.km ?? 0)} km`;
   const load = set.load_kg ?? 0;
+  if (exercise.type === 'h')
+    return load > 0 ? `+${n(load)} × ${set.reps ?? 0} s` : `${set.reps ?? 0} s`;
   const prefix = load === 0 ? 'BW' : exercise.type === 'bw' ? `+${n(load)}` : n(load);
   return `${prefix} × ${set.reps ?? 0}`;
 }

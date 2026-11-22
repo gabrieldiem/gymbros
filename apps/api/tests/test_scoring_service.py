@@ -146,6 +146,71 @@ def test_volume_bodyweight_comes_from_the_rules():
     assert result.volume_kg == 700
 
 
+# --- Holds ---------------------------------------------------------------------------------
+
+
+def hold(exercise_id: str, *seconds: int, added_kg: float = 0) -> LoggedExercise:
+    """A hold logs its seconds where a lift logs reps."""
+    return lift(exercise_id, *[(added_kg, s) for s in seconds])
+
+
+def test_a_hold_counts_as_a_set_when_it_has_seconds():
+    result = score(workout(hold("lsit", 20, 0)))
+    assert items(result)["ln_sets"] == ({"n": 1}, 5)
+
+
+def test_a_hold_pays_volume_as_bodyweight_reps_by_its_seconds_per_rep():
+    # An L-sit counts a rep every 2 seconds: 20 s is 10 reps of bodyweight, 800 kg.
+    result = score(workout(hold("lsit", 20)))
+    assert result.volume_kg == 800
+    assert items(result)["ln_vol"] == ({"kg": 800}, 8)
+
+
+def test_added_weight_on_a_hold_counts_with_bodyweight():
+    # A front lever counts a rep every second: 90 kg × 10.
+    assert score(workout(hold("frontlever", 10, added_kg=10))).volume_kg == 900
+
+
+@pytest.mark.parametrize(
+    ("exercise_id", "seconds"),
+    [
+        ("lsit", 20),
+        ("hanginglsit", 30),
+        ("frontlever", 10),
+        ("crow", 30),
+        ("crane", 20),
+        ("planchelean", 30),
+    ],
+)
+def test_a_solid_hold_pays_like_a_set_of_ten_bodyweight_reps(exercise_id, seconds):
+    held = score(workout(hold(exercise_id, seconds))).total
+    assert held == score(workout(lift("pushup", (0, 10)))).total
+
+
+def test_an_hour_of_holds_pays_about_the_same_as_an_hour_of_lifting():
+    lifting = score(workout(lift("squat", *[(75, 10)] * 16))).total
+    holds = score(
+        workout(
+            hold("lsit", *[20] * 4),
+            hold("frontlever", *[10] * 4),
+            hold("crow", *[30] * 4),
+            hold("planchelean", *[30] * 4),
+        )
+    ).total
+    assert abs(holds - lifting) / lifting <= 0.1
+
+
+def test_a_longer_hold_is_a_pr():
+    history = replace(NO_HISTORY, personal_records={"lsit": 80 * (1 + 10 / 30)})  # 20 s
+    result = score(workout(hold("lsit", 25)), history=history)
+    assert items(result)["ln_pr"] == ({"exercise_id": "lsit", "load_kg": 0, "reps": 25}, 100)
+
+
+def test_the_same_hold_again_is_not_a_pr():
+    history = replace(NO_HISTORY, personal_records={"lsit": 80 * (1 + 10 / 30)})
+    assert "ln_pr" not in items(score(workout(hold("lsit", 20)), history=history))
+
+
 # --- Cardio -------------------------------------------------------------------------------
 
 

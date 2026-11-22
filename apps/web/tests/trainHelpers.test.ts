@@ -46,6 +46,16 @@ const EXERCISES: Exercise[] = [
     aliases_es: ['dominadas'],
   },
   {
+    id: 'lsit',
+    name: 'L-sit',
+    group: 'Core',
+    type: 'h',
+    barbell: false,
+    ppl: null,
+    aliases_es: ['escuadra'],
+    hold_s_per_rep: 2,
+  },
+  {
     id: 'run',
     name: 'Treadmill run',
     group: 'Cardio',
@@ -93,7 +103,7 @@ describe('searchExercises', () => {
     expect(searchExercises(EXERCISES, 'sentadilla').map((e) => e.id)).toEqual(['squat']);
     expect(searchExercises(EXERCISES, 'JALON').map((e) => e.id)).toEqual(['latpull']);
     expect(searchExercises(EXERCISES, 'pull').map((e) => e.id)).toEqual(['latpull', 'pullup']);
-    expect(searchExercises(EXERCISES, '')).toHaveLength(4);
+    expect(searchExercises(EXERCISES, '')).toHaveLength(EXERCISES.length);
     expect(searchExercises(EXERCISES, 'zzz')).toEqual([]);
   });
 });
@@ -123,7 +133,9 @@ describe('formatPrevious', () => {
     expect(formatPrevious(ex(0), set(102.5, 5), es.n)).toBe('82,5 × 5');
     expect(formatPrevious(ex(2), set(0, 10), en.n)).toBe('BW × 10');
     expect(formatPrevious(ex(2), set(10, 6), en.n)).toBe('+10 × 6');
-    expect(formatPrevious(ex(3), set(null, null, 25, 4.2), en.n)).toBe('25 min, 4.2 km');
+    expect(formatPrevious(ex(4), set(null, null, 25, 4.2), en.n)).toBe('25 min, 4.2 km');
+    expect(formatPrevious(ex(3), set(0, 20), en.n)).toBe('20 s');
+    expect(formatPrevious(ex(3), set(5, 15), en.n)).toBe('+5 × 15 s');
     expect(formatPrevious(ex(0), undefined, en.n)).toBe('–');
   });
 });
@@ -162,6 +174,14 @@ describe('lineItemText', () => {
         en.n,
       ),
     ).toBe('New PR: Pull-up +10 kg × 6');
+    expect(
+      lineItemText(
+        item('ln_pr', { exercise_id: 'lsit', load_kg: 0, reps: 25 }),
+        EXERCISES,
+        es.t,
+        es.n,
+      ),
+    ).toBe('Nuevo PR: L-sit 25 s');
     expect(lineItemText(item('ln_goal', { n: 3 }), EXERCISES, en.t, en.n)).toBe(
       'Weekly goal hit: 3 of 3',
     );

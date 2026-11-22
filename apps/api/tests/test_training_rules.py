@@ -58,6 +58,12 @@ def test_overload_adds_a_rep_to_other_weighted_and_bodyweight_lifts():
     )
 
 
+def test_overload_adds_a_second_to_a_hold():
+    assert overload(ex("lsit"), LoggedSet(load_kg=0, reps=20, done=True)) == LoggedSet(
+        load_kg=0, reps=21
+    )
+
+
 def test_overload_adds_a_minute_to_cardio():
     assert overload(ex("run"), LoggedSet(minutes=25, km=4.2, done=True)) == LoggedSet(
         minutes=26, km=4.2

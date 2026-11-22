@@ -8,13 +8,15 @@ from typing import Literal
 
 CATALOG_PATH = Path(__file__).resolve().parent.parent / "resources" / "catalog.json"
 
-ExerciseType = Literal["w", "bw", "c", "s", "x"]
+ExerciseType = Literal["w", "bw", "h", "c", "s", "x"]
 CUSTOM_EXERCISE = "custom"
 
 
 @dataclass(frozen=True, slots=True)
 class Exercise:
     """A catalog movement."""
+
+    # pylint: disable=too-many-instance-attributes
 
     id: str
     name: str
@@ -29,6 +31,8 @@ class Exercise:
     default_minutes: int | None = None
     # A sport with no distance to log: what a minute of it is worth, in run-equivalent km.
     minute_effort_km: float = 0.0
+    # Holds only: how many seconds of the hold count as one rep of bodyweight.
+    hold_s_per_rep: float | None = None
 
     @property
     def is_custom(self) -> bool:
@@ -39,6 +43,11 @@ class Exercise:
     def is_timed(self) -> bool:
         """Scored on minutes alone: there's no distance."""
         return self.minute_effort_km > 0
+
+    @property
+    def is_hold(self) -> bool:
+        """Held still for seconds, logged where a lift logs reps."""
+        return self.type == "h"
 
     @property
     def is_cardio(self) -> bool:

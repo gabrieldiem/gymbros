@@ -5,8 +5,8 @@ from services.catalog import load_catalog
 
 def test_catalog_has_every_exercise_once():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 80
-    assert len({ex.id for ex in catalog.exercises}) == 80
+    assert len(catalog.exercises) == 88
+    assert len({ex.id for ex in catalog.exercises}) == 88
 
 
 def test_every_routine_uses_known_exercises():
@@ -85,3 +85,17 @@ def test_the_names_a_member_asked_for_can_be_found():
     by_id = {e.id: e for e in load_catalog().exercises}
     for name, exercise_id in wanted.items():
         assert name in by_id[exercise_id].aliases_es, name
+
+
+def test_every_hold_says_how_many_seconds_make_a_rep():
+    holds = [e for e in load_catalog().exercises if e.is_hold]
+    assert {e.id for e in holds} == {
+        "lsit",
+        "hanginglsit",
+        "frontlever",
+        "crow",
+        "crane",
+        "planchelean",
+    }
+    assert all(e.hold_s_per_rep and e.hold_s_per_rep > 0 for e in holds)
+    assert all(e.hold_s_per_rep is None for e in load_catalog().exercises if not e.is_hold)

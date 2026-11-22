@@ -223,11 +223,12 @@ Point balance rules for anything that isn't a lift with a weight or a distance:
 
 - **Timed sports** (Muay Thai, boxing, HIIT, jump rope, stair climber) log minutes only. Each minute pays like cardio, plus an effort credit (`minute_effort_km` in the catalog, 8 km an hour), so an hour pays about 232 points, in line with a 10 km run at about 250. They count as a workout towards the weekly goal, and have no PR: longer isn't a record.
 - **No weight**: any weighted exercise can be done with just your body (`load_kg` 0, no bar). Sets pay as usual, with no volume and no PR, because there's no weight to measure.
+- **Holds** (L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose, Planche lean) log seconds per set, plus any added kg, and are stored where a lift keeps its reps. Each has `hold_s_per_rep` in the catalog: the seconds that count as one rep of bodyweight (80 kg + added), so a solid hold (20 s of L-sit, 10 s of front lever, 30 s of crow) pays like a set of 10 bodyweight reps, and an hour of holds pays about what an hour of lifting does. The harder the hold, the fewer seconds a rep takes. A longer hold is a PR, measured the same way; the first one sets the baseline. Holds have no e1RM chart, and pre-fill adds a second.
 - **Custom exercises** have a name the member types, stored on the sets (`custom_name`). They pay nothing, because a name anyone can type can't be balanced. A workout of only custom exercises can be finished and appears on the feed, but pays nothing, unlocks nothing and doesn't count towards the weekly goal.
 
 ## Exercise catalog (v1)
 
-Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
+Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `h` a hold: bodyweight + kg × seconds, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
 
 Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim, Stretching.
 
