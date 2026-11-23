@@ -3,7 +3,7 @@
 import uuid
 from datetime import date
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.tables.step_entry import StepEntry
@@ -49,3 +49,10 @@ class StepRepository:
             .order_by(StepEntry.start_date, StepEntry.created_at)
         )
         return list(result)
+
+    async def total(self, user_id: uuid.UUID) -> int:
+        """Every step the user has logged."""
+        total = await self._session.scalar(
+            select(func.sum(StepEntry.steps)).where(StepEntry.user_id == user_id)
+        )
+        return int(total or 0)

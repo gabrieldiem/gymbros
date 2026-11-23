@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from db.repositories.badge_repository import BadgeRepository
 from db.repositories.feed_repository import FeedRepository
 from db.repositories.point_event_repository import PointEventRepository
+from db.repositories.step_repository import StepRepository
 from db.repositories.workout_repository import WorkoutRepository
 from db.repositories.workout_stats_repository import WorkoutStatsRepository
 from db.tables.feed_item import FeedItem
@@ -45,11 +46,14 @@ class BadgeService:
         catalog: Catalog,
         weekly_target: int,
         now: Callable[[], datetime],
+        steps: StepRepository | None = None,
     ) -> None:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         self._workouts, self._stats, self._events, self._feed, self._badges = repos
         self._catalog = catalog
         self._weekly_target = weekly_target
         self._now = now
+        self._steps = steps
 
     async def stats(self, member: Member) -> BadgeStats:
         """Everything the badge metrics read."""
@@ -62,6 +66,7 @@ class BadgeService:
         totals = await self._events.totals_by_user(crew.id)
         leg_ids = [e.id for e in self._catalog.exercises if e.group == "Legs"]
         distances = await self._stats.distance_by_exercise(user_id)
+        by_exercise = await self._stats.totals_by_exercise(user_id)
         return BadgeStats(
             workouts=len(times),
             better_than_last_time=await self._events.count_key(user_id, "ln_better"),
@@ -81,7 +86,17 @@ class BadgeService:
             best_run_km=max((distances.get(i, (0.0, 0.0))[0] for i in RUN_IDS), default=0.0),
             best_swim_km=distances.get(SWIM_ID, (0.0, 0.0))[0],
             lifetime_effort_km=self._lifetime_effort(distances),
+            stretch_sessions=await self._stats.workouts_with(user_id, self._ids("s")),
+            lifetime_steps=await self._steps.total(user_id) if self._steps else 0,
+            timed_minutes=sum(by_exercise.get(i, (0, 0))[1] for i in self._timed_ids()),
+            hold_seconds=sum(by_exercise.get(i, (0, 0))[0] for i in self._ids("h")),
         )
+
+    def _ids(self, exercise_type: str) -> list[str]:
+        return [e.id for e in self._catalog.exercises if e.type == exercise_type]
+
+    def _timed_ids(self) -> list[str]:
+        return [e.id for e in self._catalog.exercises if e.is_timed]
 
     def _lifetime_effort(self, distances: dict[str, tuple[float, float]]) -> float:
         total = 0.0

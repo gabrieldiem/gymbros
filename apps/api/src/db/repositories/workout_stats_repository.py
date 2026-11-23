@@ -49,6 +49,21 @@ class WorkoutStatsRepository:
         )
         return {exercise: (best or 0.0, total or 0.0) for exercise, best, total in result.all()}
 
+    async def totals_by_exercise(self, user_id: uuid.UUID) -> dict[str, tuple[int, int]]:
+        """(reps, minutes) summed per exercise, over completed sets of finished workouts. A hold's
+        reps are its seconds."""
+        result = await self._session.execute(
+            select(WorkoutSet.exercise_id, func.sum(WorkoutSet.reps), func.sum(WorkoutSet.minutes))
+            .join(Workout, Workout.id == WorkoutSet.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at.is_not(None),
+                WorkoutSet.done.is_(True),
+            )
+            .group_by(WorkoutSet.exercise_id)
+        )
+        return {exercise: (int(reps or 0), int(minutes or 0)) for exercise, reps, minutes in result}
+
     async def workouts_with(self, user_id: uuid.UUID, exercise_ids: list[str]) -> int:
         """Finished workouts with at least one completed set of these exercises."""
         count = await self._session.scalar(

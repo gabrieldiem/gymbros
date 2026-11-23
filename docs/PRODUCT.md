@@ -84,7 +84,7 @@ One photo per workout, added while logging or later from its details on the You 
 
 Add it to any workout, or log it alone from its own routine. You tap how long you did (5 or 10 minutes) and it pays fixed points, once per crew-local day, so it can't be farmed.
 
-Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or badges, and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
+Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or the workout badges (it does count for Limber), and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
 
 ## Entering sets
 
@@ -185,7 +185,7 @@ Every uploaded image is rebuilt from its pixels on the server, so location, came
 - **Bounty:** every week the bounty is on the all-time leader; the first member to pass them that week takes 150 (then it's claimed until Monday). Checked after quests and the crew quest, before badges.
 - **Weekly event:** one twist per week, shown as a timed event with how long it has left until Sunday night. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). Every set of a leg exercise pays the bonus, in any workout, whatever the routine: squat, RDL, leg press, lunge and leg curl (the catalog's Legs group), each marked x2 in the logger and the exercise picker. It is always on in v1 (`game.weekly_event` in settings.json).
 
-## Badges (18)
+## Badges (22)
 
 | Badge | Condition | Pts |
 |---|---|---|
@@ -207,6 +207,12 @@ Every uploaded image is rebuilt from its pixels on the server, so location, came
 | Night owl | Finish a workout after 22:00 | 75 |
 | Comeback | Return after 14 days away | 100 |
 | Unstoppable | Reach 9,000 pts | 300 |
+| Limber | Stretch in 10 sessions (alone or in a workout) | 100 |
+| Quarter million | Log 250,000 steps in total | 150 |
+| Engine | 5 hours of timed sports (Muay Thai, boxing, HIIT, jump rope, stair climber) | 150 |
+| Iron hold | Hold for 20 minutes in total (L-sit, front lever, crow pose…) | 150 |
+
+Every kind of training has one: lifting, running, swimming, all cardio, stretching, steps, timed sports and calisthenics holds. Steps are checked when you log them, the rest when a workout or stretching session is finished.
 
 ## Steps
 
@@ -216,7 +222,7 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 
 - A day counts once. A period can't overlap days already logged.
 - Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
-- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or badges.
+- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or the workout badges; they have their own, Quarter million, checked when you log them.
 - The crew sees each entry on the Activity tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 

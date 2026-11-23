@@ -144,6 +144,38 @@
       "points": 300,
       "icon": "peak",
       "color": "#F2F2EE"
+    },
+    {
+      "id": "limber",
+      "metric": "stretch_sessions",
+      "goal": 10,
+      "points": 100,
+      "icon": "stretch",
+      "color": "#7CFF4F"
+    },
+    {
+      "id": "quarter",
+      "metric": "lifetime_steps",
+      "goal": 250000,
+      "points": 150,
+      "icon": "steps",
+      "color": "#00D1FF"
+    },
+    {
+      "id": "engine",
+      "metric": "timed_hours",
+      "goal": 5,
+      "points": 150,
+      "icon": "stopwatch",
+      "color": "#FF3B1F"
+    },
+    {
+      "id": "ironhold",
+      "metric": "hold_minutes",
+      "goal": 20,
+      "points": 150,
+      "icon": "rings",
+      "color": "#FF4FD8"
     }
   ]
 }

@@ -102,7 +102,7 @@ async def test_passing_the_leader_claims_the_bounty_once(
 
 async def test_badges_list_progress_and_the_first_unlock(client, member):
     badges = {b["id"]: b for b in (await client.get("/api/badges")).json()}
-    assert len(badges) == 18
+    assert len(badges) == 22
     assert badges["first"]["unlocked_at"] is None
     await finish(client, [{"exercise_id": "squat", "sets": [done(100, 5)]}], "legs")
     badges = {b["id"]: b for b in (await client.get("/api/badges")).json()}

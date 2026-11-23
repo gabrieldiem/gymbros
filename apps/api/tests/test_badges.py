@@ -33,12 +33,13 @@ NONE = BadgeStats(
 BADGES = {b.id: b for b in load_badges()}
 
 
-def test_there_are_eighteen_badges_with_the_spec_points():
+def test_there_are_twenty_two_badges_with_the_spec_points():
     assert {b.id: b.points for b in load_badges()} == {
         "first": 50, "better": 150, "twoplates": 200, "tonnage": 150, "ironmonth": 150,
         "plateclub": 200, "dawn": 100, "legs": 150, "hunter": 100, "rope": 200,
         "hype": 50, "trash": 50, "owl": 75, "comeback": 100, "unstoppable": 300,
         "tenk": 200, "mile": 200, "longroad": 150,
+        "limber": 100, "quarter": 150, "engine": 150, "ironhold": 150,
     }  # fmt: skip
 
 
@@ -56,6 +57,14 @@ def test_there_are_eighteen_badges_with_the_spec_points():
         ("mile", {"best_swim_km": 1.5}, True),
         ("longroad", {"lifetime_effort_km": 99.9}, False),
         ("longroad", {"lifetime_effort_km": 100}, True),
+        ("limber", {"stretch_sessions": 9}, False),
+        ("limber", {"stretch_sessions": 10}, True),
+        ("quarter", {"lifetime_steps": 249_999}, False),
+        ("quarter", {"lifetime_steps": 250_000}, True),
+        ("engine", {"timed_minutes": 299}, False),
+        ("engine", {"timed_minutes": 300}, True),
+        ("ironhold", {"hold_seconds": 1199}, False),
+        ("ironhold", {"hold_seconds": 1200}, True),
         ("tonnage", {"lifetime_volume_kg": 99_999}, False),
         ("tonnage", {"lifetime_volume_kg": 100_000}, True),
         ("ironmonth", {"longest_goal_streak": 4}, True),

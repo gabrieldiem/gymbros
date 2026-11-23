@@ -15,6 +15,7 @@ from db.tables.feed_item import FeedItem
 from db.tables.point_event import PointEvent
 from db.tables.step_entry import StepEntry
 from db.tables.user import User
+from services.badge_service import BadgeService
 from services.errors import (
     StepEntryNotFound,
     StepsDayOutOfRange,
@@ -96,8 +97,10 @@ class StepsService:
         feed: FeedRepository,
         rules: StepRules,
         now: Callable[[], datetime],
+        badges: BadgeService | None = None,
     ) -> None:
         self._steps = steps
+        self._badges = badges
         self._events = events
         self._crews = crews
         self._feed = feed
@@ -139,6 +142,8 @@ class StepsService:
         )
         await self._pay(member, entry, days, now)
         await self._post(member, entry, len(days), now)
+        if self._badges is not None:
+            await self._badges.check_and_store(member)  # Steps have their own achievement.
         return entry
 
     async def _post(self, member: Member, entry: StepEntry, days: int, now: datetime) -> None:
