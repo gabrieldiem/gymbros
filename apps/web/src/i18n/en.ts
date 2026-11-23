@@ -627,6 +627,7 @@ export const en = {
   set_field: '{name}, set {n}, {field}',
   add_set: 'Add set',
   saving: 'Saving…',
+  refreshing: 'Refreshing…',
   save_failed: 'Saved on this phone. It’ll send itself when there’s signal.',
   rest: 'Rest',
   rest_minus: '15 seconds less',

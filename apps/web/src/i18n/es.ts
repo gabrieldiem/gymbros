@@ -638,6 +638,7 @@ export const es = {
   err_workout_date_out_of_range: 'Puedes registrar un entreno pasado hasta una semana atrás.',
   set_field: '{name}, set {n}, {field}',
   add_set: 'Añadir set',
+  refreshing: 'Actualizando…',
   saving: 'Guardando…',
   save_failed: 'Guardado en este teléfono. Se enviará solo cuando haya señal.',
   rest: 'Descanso',
