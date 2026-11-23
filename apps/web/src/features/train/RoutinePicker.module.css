@@ -129,9 +129,25 @@ a.routine:hover {
   white-space: nowrap;
 }
 
-.empty {
-  background: none;
-  border-style: dashed;
+/* Building your own is the primary action here: tinted and edged in volt, brighter than the
+   routines but quieter than the solid volt Train button. */
+.build {
+  background: linear-gradient(160deg, rgba(255, 230, 0, 0.2), var(--volt-tint) 60%);
+  border-color: var(--volt);
+  box-shadow: 0 0 22px rgba(255, 230, 0, 0.12);
+}
+
+.build .routineTitle svg {
+  color: var(--volt);
+}
+
+.build p {
+  color: var(--chalk);
+  opacity: 0.8;
+}
+
+.build:hover:not(:disabled) {
+  box-shadow: 0 0 28px rgba(255, 230, 0, 0.22);
 }
 
 .tag {

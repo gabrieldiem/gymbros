@@ -103,7 +103,7 @@ export function RoutinePicker(props: Props) {
       <div className={styles.routines}>
         <button
           type="button"
-          className={`${styles.routine} ${styles.empty}`}
+          className={`${styles.routine} ${styles.build}`}
           disabled={starting}
           onClick={() => onStart(null)}
         >
