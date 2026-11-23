@@ -33,7 +33,9 @@ async def get_rules(
         swim_km_factor=public.swim_km_factor,
         quests=[RuleQuestModel(id=q.id, goal=q.goal, bonus=q.bonus) for q in public.quests],
         badges=[
-            RuleBadgeModel(id=b.id, goal=b.goal, points=b.points, icon=b.icon, color=b.color)
+            RuleBadgeModel(
+                id=b.id, goal=b.goal, points=b.points, icon=b.icon, color=b.color, elite=b.elite
+            )
             for b in public.badges
         ],
         sessions=[

@@ -33,14 +33,60 @@ NONE = BadgeStats(
 BADGES = {b.id: b for b in load_badges()}
 
 
-def test_there_are_twenty_two_badges_with_the_spec_points():
+def test_there_are_forty_five_badges_with_the_spec_points():
     assert {b.id: b.points for b in load_badges()} == {
         "first": 50, "better": 150, "twoplates": 200, "tonnage": 150, "ironmonth": 150,
         "plateclub": 200, "dawn": 100, "legs": 150, "hunter": 100, "rope": 200,
         "hype": 50, "trash": 50, "owl": 75, "comeback": 100, "unstoppable": 300,
         "tenk": 200, "mile": 200, "longroad": 150,
         "limber": 100, "quarter": 150, "engine": 150, "ironhold": 150,
+        # The hard tier: the same metrics, much further.
+        "lifer": 400, "improver": 300, "threeplates": 400, "kilotonne": 400, "ironseason": 500,
+        "bigbench": 400, "deadlift200": 400, "halfmarathon": 400, "openwater": 400,
+        "thousandk": 500, "sunrise": 300, "leglegend": 400, "mostwanted": 400,
+        "summitteam": 400, "hypemachine": 200, "commentator": 150, "nightshift": 300,
+        "legend": 500, "rubberband": 300, "twomillion": 400, "fightcamp": 400, "statue": 400,
+        "lsitminute": 300,
     }  # fmt: skip
+
+
+def test_twenty_three_badges_are_the_hard_tier():
+    assert sum(b.elite for b in load_badges()) == 23
+
+
+@pytest.mark.parametrize(
+    ("badge_id", "field", "below", "at"),
+    [
+        ("lifer", "workouts", 199, 200),
+        ("improver", "better_than_last_time", 49, 50),
+        ("threeplates", "best_squat_kg", 177.5, 180),
+        ("kilotonne", "lifetime_volume_kg", 999_999, 1_000_000),
+        ("ironseason", "longest_goal_streak", 25, 26),
+        ("bigbench", "best_bench_kg", 137.5, 140),
+        ("deadlift200", "best_deadlift_kg", 197.5, 200),
+        ("halfmarathon", "best_run_km", 21, 21.1),
+        ("openwater", "best_swim_km", 4.9, 5),
+        ("thousandk", "lifetime_effort_km", 999, 1000),
+        ("sunrise", "dawn_workouts", 49, 50),
+        ("leglegend", "leg_days", 99, 100),
+        ("mostwanted", "bounties", 9, 10),
+        ("summitteam", "crew_quests", 24, 25),
+        ("hypemachine", "reactions_given", 499, 500),
+        ("commentator", "comments_written", 99, 100),
+        ("nightshift", "night_workouts", 24, 25),
+        ("legend", "total_points", 49_999, 50_000),
+        ("rubberband", "stretch_sessions", 99, 100),
+        ("twomillion", "lifetime_steps", 1_999_999, 2_000_000),
+        ("fightcamp", "timed_minutes", 2999, 3000),
+        ("statue", "hold_seconds", 10_799, 10_800),
+        ("lsitminute", "best_lsit_seconds", 59, 60),
+    ],
+)
+def test_each_hard_badge_unlocks_at_its_goal(badge_id, field, below, at):
+    badge = BADGES[badge_id]
+    assert badge.elite
+    assert not is_unlocked(badge, replace(NONE, **{field: below}))
+    assert is_unlocked(badge, replace(NONE, **{field: at}))
 
 
 @pytest.mark.parametrize(

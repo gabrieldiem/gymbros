@@ -90,6 +90,8 @@ class BadgeService:
             lifetime_steps=await self._steps.total(user_id) if self._steps else 0,
             timed_minutes=sum(by_exercise.get(i, (0, 0))[1] for i in self._timed_ids()),
             hold_seconds=sum(by_exercise.get(i, (0, 0))[0] for i in self._ids("h")),
+            best_deadlift_kg=await self._stats.best_load(user_id, "deadlift"),
+            best_lsit_seconds=await self._stats.best_reps(user_id, "lsit"),
         )
 
     def _ids(self, exercise_type: str) -> list[str]:

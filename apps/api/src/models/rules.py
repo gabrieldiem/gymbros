@@ -22,6 +22,7 @@ class RuleBadgeModel(BaseModel):
     points: int
     icon: str
     color: str
+    elite: bool = False
 
 
 class SampleSessionModel(BaseModel):

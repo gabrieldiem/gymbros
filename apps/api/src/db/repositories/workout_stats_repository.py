@@ -93,6 +93,20 @@ class WorkoutStatsRepository:
         )
         return float(best or 0)
 
+    async def best_reps(self, user_id: uuid.UUID, exercise_id: str) -> int:
+        """The most reps in one completed set of an exercise (a hold's longest set, in seconds)."""
+        best = await self._session.scalar(
+            select(func.max(WorkoutSet.reps))
+            .join(Workout, Workout.id == WorkoutSet.workout_id)
+            .where(
+                Workout.user_id == user_id,
+                Workout.finished_at.is_not(None),
+                WorkoutSet.exercise_id == exercise_id,
+                WorkoutSet.done.is_(True),
+            )
+        )
+        return int(best or 0)
+
     async def exercise_volume_in_week(
         self, user_id: uuid.UUID, exercise_id: str, week_start: date
     ) -> float:
