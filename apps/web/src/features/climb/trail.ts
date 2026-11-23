@@ -102,8 +102,10 @@ export function buildTrail(d: string = TRAIL_D, samplesPerSegment = 120): Trail 
   return { pointAt, normalAt, length: total };
 }
 
-const MIN_GAP = 34;
-const STEP = 32;
+// Markers are 34 units wide. Nearby ones overlap into a tight stack (each still shows its
+// initials), rather than fanning out across the map.
+const MIN_GAP = 26;
+const STEP = 26;
 const MAX_TRIES = 24;
 const EDGE = 26;
 
@@ -124,7 +126,8 @@ export function markerOffsets(trail: Trail, fractions: number[]): number[] {
     };
     const clash = (o: number) =>
       outside(o) ||
-      placed.some((q) => Math.hypot(q.x - (p.x + n.x * o), q.y - (p.y + n.y * o)) < MIN_GAP);
+      // The tolerance absorbs rounding: a normal 0.9999 long mustn't make one step a clash.
+      placed.some((q) => Math.hypot(q.x - (p.x + n.x * o), q.y - (p.y + n.y * o)) < MIN_GAP - 0.5);
     let offset = 0;
     for (let tries = 1; clash(offset) && tries <= MAX_TRIES; tries++) {
       offset = (tries % 2 ? 1 : -1) * Math.ceil(tries / 2) * STEP;
@@ -132,6 +135,34 @@ export function markerOffsets(trail: Trail, fractions: number[]): number[] {
     placed.push({ x: p.x + n.x * offset, y: p.y + n.y * offset });
     return offset;
   });
+}
+
+export type TagSide = 'above' | 'left' | 'right';
+
+// The box "You" takes around your marker's centre, on each side (see TAG_AT in TrailMap).
+const TAG_BOXES: Record<TagSide, { x: [number, number]; y: [number, number] }> = {
+  above: { x: [-18, 18], y: [-50, -30] },
+  left: { x: [-58, -22], y: [-9, 11] },
+  right: { x: [22, 58], y: [-9, 11] },
+};
+const MARKER_R = 17;
+
+/**
+ * Where your "You" label goes: above your marker, unless a marker stacked there would hide it;
+ * then beside it, on a side that's free and on the map.
+ */
+export function tagSide(me: Point, others: Point[]): TagSide {
+  const free = (side: TagSide) => {
+    const box = TAG_BOXES[side];
+    const onMap = me.x + box.x[0] >= 0 && me.x + box.x[1] <= VIEW_W && me.y + box.y[0] >= 0;
+    const covered = others.some((o) => {
+      const dx = Math.max(box.x[0] - (o.x - me.x), 0, o.x - me.x - box.x[1]);
+      const dy = Math.max(box.y[0] - (o.y - me.y), 0, o.y - me.y - box.y[1]);
+      return Math.hypot(dx, dy) < MARKER_R;
+    });
+    return onMap && !covered;
+  };
+  return (['above', 'left', 'right'] as const).find(free) ?? 'above';
 }
 
 /** A wobbly closed contour line around (cx, cy), as in the prototype. */

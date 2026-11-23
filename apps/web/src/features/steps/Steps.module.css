@@ -207,3 +207,15 @@
   height: var(--touch);
   color: var(--smoke);
 }
+
+/* On a phone the tab above already says Steps; the heading stays for screen readers. */
+@media (max-width: 959px) {
+  .head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

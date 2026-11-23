@@ -8,6 +8,21 @@ export const WHATS_NEW_COPY: Record<
   string,
   { title: MessageKey; body: MessageKey; points: MessageKey }
 > = {
+  'repeat-workout': {
+    title: 'wn_repeat_title',
+    body: 'wn_repeat_body',
+    points: 'wn_repeat_points',
+  },
+  'change-day': {
+    title: 'wn_change_day_title',
+    body: 'wn_change_day_body',
+    points: 'wn_change_day_points',
+  },
+  calisthenics: {
+    title: 'wn_calisthenics_title',
+    body: 'wn_calisthenics_body',
+    points: 'wn_calisthenics_points',
+  },
   steps: { title: 'wn_steps_title', body: 'wn_steps_body', points: 'wn_steps_points' },
   'emoji-and-photos': {
     title: 'wn_emoji_photos_title',

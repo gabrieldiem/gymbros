@@ -1,0 +1,38 @@
+.pull {
+  position: fixed;
+  top: var(--safe-top);
+  left: 50%;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--smoke);
+  background: var(--plate);
+  border: 1px solid var(--steel);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  transition: opacity var(--dur-fast);
+}
+
+.pull[data-state='ready'],
+.pull[data-state='refreshing'] {
+  color: var(--volt);
+}
+
+.pull[data-state='refreshing'] svg {
+  animation: pull-spin 0.8s linear infinite;
+}
+
+@keyframes pull-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull[data-state='refreshing'] svg {
+    animation: none;
+  }
+}

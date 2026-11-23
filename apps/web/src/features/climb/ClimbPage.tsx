@@ -1,4 +1,4 @@
-import { CalendarDays, Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
+import { Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -9,6 +9,7 @@ import { RecapStories } from '../recap/RecapStories';
 import { Button } from '../../components/Button';
 import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
+import { SevenDaysIcon } from '../../components/SevenDaysIcon';
 import { useToast } from '../../components/toast';
 import { useShareInvite } from '../../components/useShareInvite';
 import { TimedEventChip } from '../../components/TimedEvent';
@@ -58,27 +59,32 @@ export function ClimbPage() {
     navigate(location.pathname, { replace: true, state: null });
   };
 
+  const modeToggle = (
+    <Segmented
+      overlay
+      label={t('mode_label')}
+      value={mode}
+      onChange={setMode}
+      options={[
+        { value: 'all', label: t('mode_all'), icon: AllTime },
+        { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
+      ]}
+    />
+  );
+
   return (
     <>
       <ClimbNav />
       <section className={styles.hero} aria-labelledby="page-title">
         <h1 id="page-title">
-          <span>{t('hero1')}</span>
-          <span className={styles.volt}>{t('hero2')}</span>
+          <span>{t('hero1')}</span> <span className={styles.volt}>{t('hero2')}</span>
         </h1>
         <p>{t('hero_sub')}</p>
-        <div className={styles.row}>
-          <div>{legEvent && <TimedEventChip endsAt={week?.event_ends_at} />}</div>
-          <Segmented
-            label={t('mode_label')}
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'all', label: t('mode_all'), icon: AllTime },
-              { value: 'week', label: t('mode_week'), icon: CalendarDays },
-            ]}
-          />
-        </div>
+        {legEvent && (
+          <div className={styles.row}>
+            <TimedEventChip endsAt={week?.event_ends_at} />
+          </div>
+        )}
       </section>
       {climb.data ? (
         <div className={styles.grid}>
@@ -93,6 +99,7 @@ export function ClimbPage() {
                 : undefined
             }
             onClimbDone={handleClimbDone}
+            corner={modeToggle}
           />
           <aside>
             {me && (

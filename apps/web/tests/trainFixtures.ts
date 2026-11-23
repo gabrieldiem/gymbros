@@ -3,6 +3,16 @@ import type { Catalog, FinishResult, SetData, Workout } from '../src/api/train';
 export const CATALOG: Catalog = {
   exercises: [
     {
+      id: 'lsit',
+      name: 'L-sit',
+      group: 'Calisthenics',
+      type: 'h',
+      barbell: false,
+      ppl: null,
+      aliases_es: ['escuadra'],
+      hold_s_per_rep: 2,
+    },
+    {
       id: 'bench',
       name: 'Bench press',
       group: 'Chest',

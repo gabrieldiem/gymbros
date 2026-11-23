@@ -37,6 +37,7 @@ type Props = {
 const COLUMNS: Record<Exercise['type'], [MessageKey, MessageKey]> = {
   w: ['col_kg', 'col_reps'],
   bw: ['col_added_kg', 'col_reps'],
+  h: ['col_added_kg', 'col_sec'],
   c: ['col_min', 'col_km'],
   s: ['col_min', 'col_km'], // Never shown: stretching has its own card.
   x: ['col_kg', 'col_reps'],

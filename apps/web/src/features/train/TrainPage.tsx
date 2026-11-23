@@ -8,8 +8,10 @@ import {
   useFinishWorkout,
   useStartWorkout,
   useWeek,
+  useRecentWorkouts,
   useWorkoutTemplates,
   type FinishResult,
+  type RecentWorkout,
 } from '../../api/train';
 import { useGyms } from '../../api/gyms';
 import { ErrorBlock, LoadingBlock } from '../../components/QueryState';
@@ -32,6 +34,7 @@ export function TrainPage() {
   const discard = useDiscardWorkout();
   const showToast = useToast();
   useWorkoutTemplates(); // Kept on the phone, so a routine can start with no signal.
+  const recent = useRecentWorkouts().data ?? [];
   const [result, setResult] = useState<FinishResult | null>(null);
   const [pastDay, setPastDay] = useState<string | null>(null);
   const [pickingDay, setPickingDay] = useState(false);
@@ -51,10 +54,14 @@ export function TrainPage() {
     return <LoadingBlock />;
   }
 
-  const handleStart = (routineId: string | null) =>
+  const handleStart = (routineId: string | null, repeat?: RecentWorkout) =>
     start.mutate(
       {
-        ...(routineId ? { routine_id: routineId } : { routine_id: null, name: t('wk_default') }),
+        ...(repeat
+          ? { routine_id: repeat.routine_id, name: repeat.name, repeat_workout_id: repeat.id }
+          : routineId
+            ? { routine_id: routineId }
+            : { routine_id: null, name: t('wk_default') }),
         ...(pastDay ? { performed_on: pastDay } : {}),
         ...(chosenGym !== undefined ? { gym: chosenGym } : {}),
       },
@@ -104,6 +111,8 @@ export function TrainPage() {
           gym={chosenGym === undefined ? defaultGym : chosenGym}
           onGym={setChosenGym}
           onStart={handleStart}
+          recent={recent}
+          onRepeat={(workout) => handleStart(workout.routine_id, workout)}
           onPickPastDay={() => setPickingDay(true)}
           onClearPastDay={() => setPastDay(null)}
         />

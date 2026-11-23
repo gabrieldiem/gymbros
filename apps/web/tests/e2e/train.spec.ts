@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { logIn } from './members';
+import { logIn, setLanguage } from './members';
 
 // Run through `make e2e`. Logs a real workout for Jose in this project's e2e crew, which
 // `make e2e` rebuilds before every run.
@@ -10,7 +10,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await logIn(page, 'jose', testInfo, 'train');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
 
   // Leftover from an earlier failed run: throw it away.
@@ -25,7 +25,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
     path: `${SCREENS}/train-start-${testInfo.project.name}.png`,
     fullPage: true,
   });
-  await page.getByRole('button', { name: /Push day/ }).click();
+  await page.getByRole('button', { name: /^Push day/ }).click();
 
   const bench = page.getByRole('article', { name: 'Bench press' });
   await expect(bench).toBeVisible();
@@ -54,7 +54,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
 
 test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
   await logIn(page, 'santi', testInfo, 'train');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   await page.getByRole('button', { name: /^Swim/ }).click();
   const swim = page.getByRole('article', { name: 'Pool swim' });
@@ -74,7 +74,7 @@ test('log a swim: time and distance both pay', async ({ page }, testInfo) => {
 
 test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
   await logIn(page, 'matex', testInfo, 'train');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   await page.getByRole('button', { name: /Log a past workout/ }).click();
   const days = page.getByRole('dialog', { name: 'Which day was it?' });
@@ -107,7 +107,7 @@ test('log a workout you forgot, for a past day', async ({ page }, testInfo) => {
 
 test('stretching alone pays fixed points and leaves the week alone', async ({ page }, testInfo) => {
   await logIn(page, 'maxo', testInfo, 'train');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   const pips = page.getByRole('img', { name: /workouts this week/ });
   await expect(pips).toBeVisible();
@@ -127,7 +127,7 @@ test('stretching alone pays fixed points and leaves the week alone', async ({ pa
 
 test('add a gym photo and your crew sees it on the post', async ({ page }, testInfo) => {
   await logIn(page, 'gabi', testInfo, 'train');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   await page.getByRole('button', { name: /^Run/ }).click();
   const run = page.getByRole('article', { name: 'Outdoor run' });
@@ -172,7 +172,7 @@ test('a whole workout with no signal sends itself when the signal is back', asyn
   context,
 }, testInfo) => {
   await logIn(page, 'gabi', testInfo, 'offline');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   await expect(page.getByRole('button', { name: /^Cardio/ })).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -208,7 +208,7 @@ test('put a gym on a real map and friends get a link to it', async ({ page }, te
     }),
   );
   await logIn(page, 'santi', testInfo, 'offline');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/me');
   await page.getByRole('button', { name: 'Profile and settings' }).click();
   await page.getByRole('button', { name: 'Add a gym' }).click();
@@ -239,9 +239,9 @@ test('edit a finished workout: new points, a refused edit changes nothing', asyn
   page,
 }, testInfo) => {
   await logIn(page, 'matex', testInfo, 'offline');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
-  await page.getByRole('button', { name: /Push day/ }).click();
+  await page.getByRole('button', { name: /^Push day/ }).click();
   const logged = page.getByRole('article', { name: 'Bench press' });
   await logged.getByLabel('Bench press, set 1, disks').fill('40');
   await logged.getByLabel('Bench press, set 1, reps').fill('5');
@@ -324,7 +324,7 @@ test('edit a finished workout: new points, a refused edit changes nothing', asyn
 
 test('log steps on the real calendar and climb by them', async ({ page }, testInfo) => {
   await logIn(page, 'jose', testInfo, 'offline');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/train');
   const discard = page.getByRole('button', { name: 'Discard', exact: true });
   if (await discard.isVisible({ timeout: 1000 }).catch(() => false)) {
@@ -382,7 +382,7 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
   await page.getByRole('button', { name: 'Remove 30,000 steps' }).click();
   await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeEnabled();
   await page.goto('/crew');
-  await expect(page.getByRole('heading', { level: 1, name: 'Crew' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Activity' })).toBeVisible();
   await expect(page.locator('main li').filter({ hasText: '30,000 steps' })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     page.viewportSize()?.width,

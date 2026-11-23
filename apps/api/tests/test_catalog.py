@@ -5,8 +5,8 @@ from services.catalog import load_catalog
 
 def test_catalog_has_every_exercise_once():
     catalog = load_catalog()
-    assert len(catalog.exercises) == 80
-    assert len({ex.id for ex in catalog.exercises}) == 80
+    assert len(catalog.exercises) == 88
+    assert len({ex.id for ex in catalog.exercises}) == 88
 
 
 def test_every_routine_uses_known_exercises():
@@ -15,6 +15,7 @@ def test_every_routine_uses_known_exercises():
         "Push day",
         "Pull day",
         "Leg day",
+        "Calisthenics",
         "Cardio",
         "Run",
         "Swim",
@@ -63,6 +64,8 @@ def test_cardio_distance_is_weighed_for_every_sport():
 
 def test_only_lifts_have_a_push_pull_or_legs_day():
     for exercise in load_catalog().exercises:
+        if exercise.group == "Calisthenics":
+            continue  # Its own category: a push-up is a push, an L-sit is core.
         if exercise.is_cardio or exercise.is_stretch or exercise.group in {"Core", "Custom"}:
             assert exercise.ppl is None
         else:
@@ -85,3 +88,31 @@ def test_the_names_a_member_asked_for_can_be_found():
     by_id = {e.id: e for e in load_catalog().exercises}
     for name, exercise_id in wanted.items():
         assert name in by_id[exercise_id].aliases_es, name
+
+
+def test_every_hold_says_how_many_seconds_make_a_rep():
+    holds = [e for e in load_catalog().exercises if e.is_hold]
+    assert {e.id for e in holds} == {
+        "lsit",
+        "hanginglsit",
+        "frontlever",
+        "crow",
+        "crane",
+        "planchelean",
+    }
+    assert all(e.hold_s_per_rep and e.hold_s_per_rep > 0 for e in holds)
+    assert all(e.hold_s_per_rep is None for e in load_catalog().exercises if not e.is_hold)
+
+
+def test_calisthenics_has_its_own_category():
+    group = [e.id for e in load_catalog().exercises if e.group == "Calisthenics"]
+    assert group == [
+        "parallettepushup",
+        "declinepushup",
+        "frontlever",
+        "planchelean",
+        "crow",
+        "crane",
+        "lsit",
+        "hanginglsit",
+    ]

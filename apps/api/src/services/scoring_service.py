@@ -20,10 +20,12 @@ from services.scoring_types import (
 from services.training_rules import (
     LoggedSet,
     effective_load,
+    effective_reps,
     effort_km,
     endurance_score,
     estimated_1rm,
     is_completed,
+    set_volume,
 )
 
 __all__ = [
@@ -117,7 +119,7 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
                 timed_effort += sum(effort_km(logged.exercise, s) for s in done)
             best = _best_cardio(logged, done)
         else:
-            volume += sum(_set_volume(logged, s, rules) for s in done)
+            volume += sum(set_volume(logged.exercise, s, rules.bodyweight_kg) for s in done)
             best = _best_set(logged, done, rules)
         if best is not None:
             bests.append(best)
@@ -136,11 +138,6 @@ def _tally(log: WorkoutLog, rules: ScoringRules) -> _Tally:
     )
 
 
-def _set_volume(logged: LoggedExercise, logged_set: LoggedSet, rules: ScoringRules) -> float:
-    load = effective_load(logged.exercise, logged_set.load_kg, rules.bodyweight_kg)
-    return load * (logged_set.reps or 0)
-
-
 def _best_set(
     logged: LoggedExercise, done: list[LoggedSet], rules: ScoringRules
 ) -> RecordSet | None:
@@ -149,7 +146,7 @@ def _best_set(
         load = effective_load(logged.exercise, logged_set.load_kg, rules.bodyweight_kg)
         if load <= 0:
             continue  # With no weight there's nothing to beat, and no record to hold.
-        e1rm = estimated_1rm(load, logged_set.reps or 0)
+        e1rm = estimated_1rm(load, effective_reps(logged.exercise, logged_set.reps))
         if best is None or e1rm > best.e1rm:
             best = RecordSet(
                 logged.exercise.id,

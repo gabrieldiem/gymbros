@@ -21,6 +21,8 @@ function toDraft(workout: WorkoutDetail): Draft {
   return {
     name: workout.name,
     gym: workout.gym,
+    // Shown, never sent: a finished workout keeps its day.
+    performed_on: workout.performed_on,
     exercises: workout.exercises.map((e) => ({
       exercise_id: e.exercise_id,
       custom_name: e.custom_name ?? null,

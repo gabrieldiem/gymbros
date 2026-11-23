@@ -1,26 +1,27 @@
+/* Underline tabs: they change the page, so they don't look like the filters inside it. */
 .nav {
   position: sticky;
-  top: calc(8px + var(--safe-top));
+  top: 0;
   z-index: 20;
   display: flex;
-  gap: 2px;
-  margin-bottom: 18px;
-  padding: 3px;
-  background: rgba(23, 23, 23, 0.9);
+  gap: 24px;
+  margin: -6px -18px 18px;
+  padding: var(--safe-top) 18px 0;
+  background: rgba(13, 13, 13, 0.92);
   backdrop-filter: blur(12px);
-  border-radius: var(--r-control);
+  border-bottom: 1px solid var(--steel);
 }
 
 .thumb {
   position: absolute;
-  top: 0;
+  bottom: -1px;
   left: 0;
   width: var(--ind-w, 0);
-  height: var(--ind-h, 0);
-  border-radius: 9px;
-  background: var(--chalk);
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--volt);
   opacity: var(--ind-on, 0);
-  transform: translate(var(--ind-x, 0), var(--ind-y, 0));
+  transform: translateX(var(--ind-x, 0));
   transition:
     transform var(--dur) var(--ease-out),
     width var(--dur) var(--ease-out);
@@ -28,23 +29,23 @@
 
 .link {
   position: relative;
-  flex: 1 1 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 6px;
   min-height: var(--touch);
-  padding: 0 8px;
-  border-radius: 9px;
   color: var(--smoke);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
 }
 
+.link:hover {
+  color: var(--chalk);
+}
+
 .link[aria-current='page'] {
-  color: var(--iron);
+  color: var(--chalk);
 }
 
 .count {

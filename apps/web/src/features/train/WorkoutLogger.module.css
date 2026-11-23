@@ -36,8 +36,25 @@
 }
 
 .meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
   color: var(--smoke);
   font-size: var(--fs-small);
+}
+
+.day {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--touch);
+  color: var(--smoke);
+  font-size: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: none;
+  border: none;
 }
 
 .live {

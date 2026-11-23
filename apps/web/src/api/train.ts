@@ -17,9 +17,17 @@ import { gymsKey } from './gyms';
 import { liveInterval } from './liveInterval';
 import type { CrewColor } from './types';
 
-export type ExerciseType = 'w' | 'bw' | 'c' | 's' | 'x';
+export type ExerciseType = 'w' | 'bw' | 'h' | 'c' | 's' | 'x';
 export type MuscleGroup =
-  'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Core' | 'Cardio' | 'Mobility';
+  | 'Chest'
+  | 'Legs'
+  | 'Back'
+  | 'Shoulders'
+  | 'Arms'
+  | 'Core'
+  | 'Calisthenics'
+  | 'Cardio'
+  | 'Mobility';
 
 export type Exercise = {
   id: string;
@@ -35,6 +43,8 @@ export type Exercise = {
   default_minutes?: number | null;
   /** A sport with no distance: only minutes are logged. */
   minute_effort_km?: number;
+  /** Holds only: seconds of the hold that count as one bodyweight rep. Seconds go in `reps`. */
+  hold_s_per_rep?: number | null;
 };
 
 export type Routine = { id: string; name: string; exercise_ids: string[] };
@@ -151,6 +161,19 @@ export type StartBody = {
   name?: string;
   performed_on?: string;
   gym?: string | null;
+  /** One of your finished workouts to start again. With no signal, its routine starts instead. */
+  repeat_workout_id?: string;
+};
+
+/** A finished workout you can start again (`GET /api/workouts/recent`). */
+export type RecentWorkout = {
+  id: string;
+  name: string;
+  routine_id: string | null;
+  finished_at: string;
+  performed_on: string | null;
+  exercise_ids: string[];
+  custom_names: string[];
 };
 
 export type WorkoutTemplate = {
@@ -162,6 +185,8 @@ export type WorkoutTemplate = {
 export type SaveBody = {
   name?: string;
   gym: string | null;
+  /** Null for today, else one of `Week.past_days`. Left out, the day stays. */
+  performed_on?: string | null;
   exercises: { exercise_id: string; sets: SetData[]; custom_name?: string | null }[];
 };
 
@@ -170,6 +195,15 @@ export const activeWorkoutKey = ['workout', 'active'] as const;
 export const weekKey = ['workout', 'week'] as const;
 export const trainingNowKey = ['crew', 'training-now'] as const;
 export const templatesKey = ['workout', 'templates'] as const;
+export const recentWorkoutsKey = ['workout', 'recent'] as const;
+
+export function useRecentWorkouts() {
+  return useQuery({
+    queryKey: recentWorkoutsKey,
+    queryFn: ({ signal }) => apiRequest<RecentWorkout[]>('/workouts/recent', { signal }),
+    staleTime: 60_000,
+  });
+}
 
 export function useCatalog() {
   return useQuery({
@@ -285,6 +319,7 @@ export function useWorkoutPhoto(workoutId: string) {
 export function refreshAfterWorkout(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: weekKey });
   void queryClient.invalidateQueries({ queryKey: templatesKey });
+  void queryClient.invalidateQueries({ queryKey: recentWorkoutsKey });
   void queryClient.invalidateQueries({ queryKey: ['climb'] });
   void queryClient.invalidateQueries({ queryKey: trainingNowKey });
   void queryClient.invalidateQueries({ queryKey: ['feed'] });

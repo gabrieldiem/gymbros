@@ -39,6 +39,35 @@
   margin-top: 22px;
 }
 
+/* On a phone the map is what you open the app for: the slogan shrinks to one line and the
+   subtitle waits for the desktop. */
+@media (max-width: 959px) {
+  .hero {
+    padding: 0;
+  }
+
+  .hero h1 {
+    font-size: 1.9rem;
+    line-height: 1;
+  }
+
+  .hero h1 span {
+    display: inline;
+  }
+
+  .hero > p {
+    display: none;
+  }
+
+  .row {
+    margin-top: 10px;
+  }
+
+  .grid {
+    margin-top: 14px;
+  }
+}
+
 .grid > * {
   min-width: 0;
 }

@@ -10,6 +10,7 @@ import { InstallBanner } from './InstallBanner';
 import { UpdateBanner } from './UpdateBanner';
 import { NavRail } from './NavRail';
 import { NotificationToasts } from './NotificationToasts';
+import { PullToRefresh } from './PullToRefresh';
 import { DESKTOP_RAIL } from './tabs';
 import { TopBar } from './TopBar';
 import { useMediaQuery } from './useMediaQuery';
@@ -36,6 +37,7 @@ export function AppShell() {
       </main>
       <ActiveWorkoutBar />
       <NotificationToasts />
+      {!desktop && <PullToRefresh />}
     </div>
   );
 }

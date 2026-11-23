@@ -11,7 +11,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 | Tab | EN / ES | Purpose |
 |---|---|---|
 | ATUS Climb | ATUS Climb / ATUS Climb | Trail map leaderboard, your standing, weekly goal, "you vs 4 weeks ago", who is training now, rope order list |
-| Crew | Crew / Equipo | Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
+| Activity | Activity / Actividad | What the rest of the crew is doing. Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
 | Train | Train / Entrenar | Pick a routine or empty workout, log sets, a rest timer you start when you want, plate calculator, finish → points breakdown → climb animation |
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
 | You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
@@ -119,6 +119,11 @@ Forgot to log one? From Train you can log a workout for any of the last 7 days (
 - **Nothing is redone:** bonuses already paid aren't recalculated (a streak paid this week stays as paid), and a settled duel stays settled.
 - **The crew can see it:** it's posted to the feed when you log it, with the day it was for and no duration. It isn't "training now", the crew isn't told you're coming, and a goal in a week that's over isn't announced.
 - **Logging it:** routines pre-fill what you did last time as it was, without the overload. There's no clock or rest timer.
+- **Changing the day:** an open workout can move to any of those days, or back to today, from the logger ("Change day"), until you finish it. The sets you logged stay; the last-time column and the live points follow the new day. A workout moved to a past day stops being "training now", but a crew already told you were coming isn't told again.
+
+## Repeating a workout
+
+The Train start screen lists your last few workouts, one per set of exercises (three Push days show once), newest first. Tapping one starts it again: the same name, routine and exercises, custom ones included, each with the sets you completed, loaded to beat them like a routine (below). Exercises you skipped are left out. For a past day it loads them as they were. With no signal it starts from its routine, or empty.
 
 ## Progressive overload
 
@@ -212,10 +217,10 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 - A day counts once. A period can't overlap days already logged.
 - Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
 - Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or badges.
-- The crew sees each entry on the Crew tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
+- The crew sees each entry on the Activity tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 
-`/climb/steps` is a section of ATUS Climb, one tap from the points climb, with the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
+`/climb/steps` is a section of ATUS Climb, one tap from the points climb, with the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), opening on all time like the points climb, and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
 
 ## Timed sports, no weight and custom exercises
 
@@ -223,20 +228,21 @@ Point balance rules for anything that isn't a lift with a weight or a distance:
 
 - **Timed sports** (Muay Thai, boxing, HIIT, jump rope, stair climber) log minutes only. Each minute pays like cardio, plus an effort credit (`minute_effort_km` in the catalog, 8 km an hour), so an hour pays about 232 points, in line with a 10 km run at about 250. They count as a workout towards the weekly goal, and have no PR: longer isn't a record.
 - **No weight**: any weighted exercise can be done with just your body (`load_kg` 0, no bar). Sets pay as usual, with no volume and no PR, because there's no weight to measure.
+- **Holds** (L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose, Planche lean) log seconds per set, plus any added kg, and are stored where a lift keeps its reps. Each has `hold_s_per_rep` in the catalog: the seconds that count as one rep of bodyweight (80 kg + added), so a solid hold (20 s of L-sit, 10 s of front lever, 30 s of crow) pays like a set of 10 bodyweight reps, and an hour of holds pays about what an hour of lifting does. The harder the hold, the fewer seconds a rep takes. A longer hold is a PR, measured the same way; the first one sets the baseline. Holds have no e1RM chart, and pre-fill adds a second.
 - **Custom exercises** have a name the member types, stored on the sets (`custom_name`). They pay nothing, because a name anyone can type can't be balanced. A workout of only custom exercises can be finished and appears on the feed, but pays nothing, unlocks nothing and doesn't count towards the weekly goal.
 
 ## Exercise catalog (v1)
 
-Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
+Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Core, Calisthenics, Cardio, Mobility; the exercise picker lists them under these headings), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `h` a hold: bodyweight + kg × seconds, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
 
 Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim, Stretching.
 
-Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), Stretching, and Empty workout.
+Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Calisthenics (parallette push-up, L-sit, front lever, crow pose, planche lean), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), Stretching, and Empty workout.
 
 ## i18n
 
 - English and Spanish are complete for every screen, line item, feed event, notification and recap slide.
-- **Spanish uses classic English gym terms.** Exercise names stay in English (Bench press, Back squat, RDL…), and so do routine names (Push day, Pull day, Leg day) and the core vocabulary: sets, reps, PR, 1RM, spotter, "Light weight", "Beast mode". Sentences around them stay Spanish: "Nuevo PR: Bench press 110 kg × 3", "12 sets completados", "Nunca se salta el leg day". Muscle groups and the general UI are Spanish (Pecho, Piernas, Retos, Equipo).
+- **Spanish uses classic English gym terms.** Exercise names stay in English (Bench press, Back squat, RDL…), and so do routine names (Push day, Pull day, Leg day) and the core vocabulary: sets, reps, PR, 1RM, spotter, "Light weight", "Beast mode". Sentences around them stay Spanish: "Nuevo PR: Bench press 110 kg × 3", "12 sets completados", "Nunca se salta el leg day". Muscle groups and the general UI are Spanish (Pecho, Piernas, Retos, Actividad).
 - Exercise search also matches Spanish aliases (typing "sentadilla" finds Back squat).
 - Numbers use the locale format (`3,880` / `3.880`).
 

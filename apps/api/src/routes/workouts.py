@@ -20,8 +20,14 @@ from models.compete import WorkoutDetailResponse
 from models.compete_mappers import to_workout_detail
 from models.errors import error_responses
 from models.photos import PhotoResponse, photo_url
-from models.workout_mappers import to_finish_response, to_workout_response, to_workout_template
+from models.workout_mappers import (
+    to_finish_response,
+    to_recent_workout,
+    to_workout_response,
+    to_workout_template,
+)
 from models.workouts import (
+    RecentWorkoutModel,
     FinishResponse,
     PastDayModel,
     SaveWorkoutRequest,
@@ -42,7 +48,7 @@ from services.workout_editor import WorkoutChanges, WorkoutEditor
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
-from services.workout_types import ExerciseEntry, LoggedOffline
+from services.workout_types import ExerciseEntry, LoggedOffline, WorkoutStateChanges
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
@@ -52,7 +58,7 @@ router = APIRouter(prefix="/workouts", tags=["Train"])
     "",
     status_code=status.HTTP_201_CREATED,
     response_model=WorkoutResponse,
-    responses=error_responses(401, 403, 409, 422),
+    responses=error_responses(401, 403, 404, 409, 422),
 )
 async def start_workout(
     body: StartWorkoutRequest,
@@ -62,8 +68,19 @@ async def start_workout(
 ) -> WorkoutResponse:
     """Start a workout from a routine (pre-filled to beat last time) or empty, or log a past day."""
     gym = body.gym if "gym" in body.model_fields_set else await gyms.default_name(member.user.id)
-    view = await workouts.start(member, body.routine_id, body.name, body.performed_on, gym)
+    view = await workouts.start(
+        member, body.routine_id, body.name, body.performed_on, gym, body.repeat_workout_id
+    )
     return to_workout_response(view)
+
+
+@router.get("/recent", response_model=list[RecentWorkoutModel], responses=error_responses(401, 403))
+async def get_recent_workouts(
+    member: Member = Depends(get_current_member),
+    workouts: WorkoutService = Depends(get_workout_service),
+) -> list[RecentWorkoutModel]:
+    """Your latest finished workouts to repeat, one per set of exercises, newest first."""
+    return [to_recent_workout(r) for r in await workouts.recent(member)]
 
 
 @router.get("/active", response_model=WorkoutResponse | None, responses=error_responses(401, 403))
@@ -122,10 +139,15 @@ async def save_workout(
         )
         for e in body.exercises
     )
-    change_gym = "gym" in body.model_fields_set
-    return to_workout_response(
-        await workouts.save(member, workout_id, body.name, entries, change_gym, body.gym)
+    changes = WorkoutStateChanges(
+        name=body.name,
+        entries=entries,
+        change_gym="gym" in body.model_fields_set,
+        gym=body.gym,
+        change_day="performed_on" in body.model_fields_set,
+        performed_on=body.performed_on,
     )
+    return to_workout_response(await workouts.save(member, workout_id, changes))
 
 
 @router.delete(

@@ -42,3 +42,15 @@
 .seg button[aria-pressed='true'] {
   color: var(--iron);
 }
+
+.overlay {
+  background: rgba(8, 8, 8, 0.82);
+  border: 1px solid var(--steel);
+  backdrop-filter: blur(8px);
+}
+
+.overlay button {
+  min-width: var(--touch);
+  padding: 0 12px;
+  font-size: 0.85rem;
+}

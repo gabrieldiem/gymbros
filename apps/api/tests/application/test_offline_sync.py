@@ -176,6 +176,7 @@ async def test_the_templates_have_every_routine_ready_to_start(client, member):
         "push",
         "pull",
         "legs",
+        "calisthenics",
         "cardio",
         "run",
         "swim",

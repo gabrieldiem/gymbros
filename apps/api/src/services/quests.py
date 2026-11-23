@@ -7,7 +7,7 @@ from functools import cache
 from pathlib import Path
 
 from services.scoring_types import WorkoutLog
-from services.training_rules import effective_load, effort_km, is_completed
+from services.training_rules import effort_km, is_completed, set_volume
 
 QUESTS_PATH = Path(__file__).resolve().parent.parent / "resources" / "quests.json"
 
@@ -78,8 +78,6 @@ def week_activity(logs: Iterable[WorkoutLog], bodyweight_kg: float) -> WeekActiv
                 minutes += sum(s.minutes or 0 for s in done)
                 effort += sum(effort_km(exercise, s) for s in done)
             else:
-                volume += sum(
-                    effective_load(exercise, s.load_kg, bodyweight_kg) * (s.reps or 0) for s in done
-                )
+                volume += sum(set_volume(exercise, s, bodyweight_kg) for s in done)
         legs += int(trained_legs)
     return WeekActivity(legs, frozenset(groups), volume, minutes, effort)

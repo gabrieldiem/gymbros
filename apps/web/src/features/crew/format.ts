@@ -25,6 +25,8 @@ export function formatPostedSet(
     return km > 0 ? `${set.minutes ?? 0} min, ${n(km)} km` : `${set.minutes ?? 0} min`;
   }
   const load = set.load_kg ?? 0;
+  if (exercise?.type === 'h')
+    return load > 0 ? `+${n(load)}×${set.reps ?? 0} s` : `${set.reps ?? 0} s`;
   if (load === 0) return `BW×${set.reps ?? 0}`;
   if (exercise?.type === 'bw') return `+${n(load)}×${set.reps ?? 0}`;
   return `${n(load)}×${set.reps ?? 0}`;

@@ -11,6 +11,8 @@ const DRAFT_PREFIX = 'gymbros.offline.draft.';
 export type StoredDraft = {
   name: string;
   gym: string | null;
+  /** Missing on drafts saved before the day could change. */
+  performed_on?: string | null;
   exercises: {
     exercise_id: string;
     sets: SetData[];

@@ -1,15 +1,31 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import type { Standing } from '../../api/climb';
 import { cx } from '../../components/cx';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/en';
-import { buildContours, buildTrail, markerOffsets, TRAIL_D, VIEW_H, VIEW_W } from './trail';
+import {
+  buildContours,
+  buildTrail,
+  markerOffsets,
+  tagSide,
+  TRAIL_D,
+  VIEW_H,
+  VIEW_W,
+  type Point,
+  type TagSide,
+} from './trail';
 import styles from './TrailMap.module.css';
 import { useClimbAnimation } from './useClimbAnimation';
 import { inkOn, memberColorHex } from '../../components/memberColor';
 
 const TRAIL = buildTrail();
+/** Where "You" is drawn for each side tagSide() picks. */
+const TAG_AT: Record<TagSide, { x?: number; y: number; textAnchor?: 'start' | 'end' }> = {
+  above: { y: -35 },
+  left: { x: -24, y: 1, textAnchor: 'end' },
+  right: { x: 24, y: 1, textAnchor: 'start' },
+};
 const CONTOURS = buildContours();
 const CAMPS = 7;
 
@@ -22,6 +38,8 @@ type Props = {
   /** How a camp's value reads, for a climb that isn't in points. */
   campValue?: ((value: number) => string) | undefined;
   onClimbDone?: (() => void) | undefined;
+  /** Controls in the top-left corner, in place of the map's name. */
+  corner?: ReactNode;
 };
 
 function Camps({
@@ -86,6 +104,7 @@ export function TrailMap({
   climbFrom,
   onClimbDone,
   campValue,
+  corner,
 }: Props) {
   const { t, n } = useI18n();
   const targets = useMemo(
@@ -105,6 +124,21 @@ export function TrailMap({
     TRAIL,
     standings.map((s) => targets[s.user_id] ?? 0),
   );
+  const resting: Point[] = standings.map((s, i) => {
+    const f = targets[s.user_id] ?? 0;
+    const p = TRAIL.pointAt(f);
+    const nrm = TRAIL.normalAt(f);
+    const o = offsets[i] ?? 0;
+    return { x: p.x + nrm.x * o, y: p.y + nrm.y * o };
+  });
+  const meIndex = standings.findIndex((s) => s.is_me);
+  const mySide =
+    meIndex < 0
+      ? 'above'
+      : tagSide(
+          resting[meIndex] ?? { x: 0, y: 0 },
+          resting.filter((_, i) => i !== meIndex),
+        );
   const drawOrder = [...standings.keys()].sort(
     (a, b) => Number(standings[a]?.is_me) - Number(standings[b]?.is_me),
   );
@@ -196,7 +230,7 @@ export function TrailMap({
                 )}
                 {s.training_now && <circle className={styles.live} cx="13" cy="-13" r="6" />}
                 {s.is_me && (
-                  <text className={styles.tag} y="-35">
+                  <text className={styles.tag} {...TAG_AT[settled ? mySide : 'above']}>
                     {t('you').toUpperCase()}
                   </text>
                 )}
@@ -205,9 +239,13 @@ export function TrailMap({
           })}
         </g>
       </svg>
-      <div className={styles.title} aria-hidden="true">
-        {t('climb_title')}
-      </div>
+      {corner ? (
+        <div className={styles.corner}>{corner}</div>
+      ) : (
+        <div className={styles.title} aria-hidden="true">
+          {t('climb_title')}
+        </div>
+      )}
     </div>
   );
 }

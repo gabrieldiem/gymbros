@@ -11,6 +11,7 @@ const KEPT: readonly (readonly string[])[] = [
   ['workout', 'active'],
   ['workout', 'week'],
   ['workout', 'templates'],
+  ['workout', 'recent'],
 ];
 
 export function isKeptOnPhone(key: readonly unknown[]): boolean {

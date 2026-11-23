@@ -1,19 +1,24 @@
 import type { LucideIcon } from 'lucide-react';
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type ComponentType } from 'react';
 
 import styles from './Segmented.module.css';
 
-type Option<T extends string> = { value: T; label: string; icon?: LucideIcon };
+type Icon = LucideIcon | ComponentType<{ size?: number; 'aria-hidden'?: 'true' }>;
+
+type Option<T extends string> = { value: T; label: string; icon?: Icon };
 
 type Props<T extends string> = {
   label: string;
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
+  /** Floats on a map: a dark glass track, and only the chosen option shows its name. */
+  overlay?: boolean;
 };
 
 /** A plate track with a chalk thumb that slides to the selected option (docs/DESIGN.md). */
-export function Segmented<T extends string>({ label, options, value, onChange }: Props<T>) {
+export function Segmented<T extends string>(props: Props<T>) {
+  const { label, options, value, onChange, overlay = false } = props;
   const track = useRef<HTMLDivElement>(null);
   const labels = options.map((option) => option.label).join();
 
@@ -25,7 +30,12 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
   }, [value, labels]);
 
   return (
-    <div ref={track} className={styles.seg} role="group" aria-label={label}>
+    <div
+      ref={track}
+      className={overlay ? `${styles.seg} ${styles.overlay}` : styles.seg}
+      role="group"
+      aria-label={label}
+    >
       <span className={styles.thumb} aria-hidden="true" />
       {options.map((option) => (
         <button
@@ -35,7 +45,9 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
           onClick={() => onChange(option.value)}
         >
           {option.icon && <option.icon size={16} aria-hidden="true" />}
-          {option.label}
+          <span className={overlay && option.value !== value ? 'sr-only' : undefined}>
+            {option.label}
+          </span>
         </button>
       ))}
     </div>

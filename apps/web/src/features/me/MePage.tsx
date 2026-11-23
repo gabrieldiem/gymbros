@@ -181,8 +181,9 @@ export function MePage() {
                 pr.bar_kg,
               );
               const name = exercise(pr.exercise_id)?.name ?? pr.exercise_id;
-              // Cardio records have no e1RM and no lift chart.
-              if (exercise(pr.exercise_id)?.type === 'c') {
+              // Cardio and hold records have no e1RM and no lift chart.
+              const type = exercise(pr.exercise_id)?.type;
+              if (type === 'c' || type === 'h') {
                 return (
                   <li key={pr.exercise_id} className={styles.prStatic}>
                     <span>{name}</span>

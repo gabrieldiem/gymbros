@@ -411,6 +411,49 @@ describe('Train: logging a past workout', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Finish workout' }));
     expect(await screen.findByText(/^Push day logged for Fri,? 30 Oct$/)).toBeVisible();
   });
+
+  it('moves a workout already open to a past day', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, makeWorkout()],
+      'PUT /api/workouts/w1': () => [200, makeWorkout({ performed_on: '2026-10-30' })],
+    });
+    renderApp('/train');
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(screen.getByRole('timer')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Change day' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Which day was it?' }));
+    expect(sheet.getByRole('button', { name: 'Today' })).toHaveAttribute('aria-current', 'true');
+    await userEvent.click(sheet.getByRole('button', { name: /Fri,? 30 Oct/ }));
+    expect(await screen.findByText(/^For Fri,? 30 Oct$/)).toBeVisible();
+    expect(screen.queryByRole('timer')).toBeNull();
+    await waitFor(
+      () =>
+        expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+          performed_on: '2026-10-30',
+        }),
+      { timeout: 5000 },
+    );
+  });
+
+  it('moves a past workout back to today', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, makeWorkout({ performed_on: '2026-10-30' })],
+      'PUT /api/workouts/w1': () => [200, makeWorkout()],
+    });
+    renderApp('/train');
+    await screen.findByText(/^For Fri,? 30 Oct$/);
+    await userEvent.click(screen.getByRole('button', { name: 'Change day' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Which day was it?' }));
+    await userEvent.click(sheet.getByRole('button', { name: 'Today' }));
+    expect(await screen.findByRole('timer')).toBeVisible();
+    await waitFor(
+      () =>
+        expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+          performed_on: null,
+        }),
+      { timeout: 5000 },
+    );
+  });
 });
 
 describe('Train: start screen', () => {
@@ -426,6 +469,52 @@ describe('Train: start screen', () => {
       'Bench press, Overhead press',
     );
     expect(screen.getByText('Hit 3 workouts in a week').nextSibling).toHaveTextContent('150');
+  });
+
+  it('puts building your own first, then steps, then the routines', async () => {
+    trainApi();
+    renderApp('/train');
+    await screen.findByRole('button', { name: /Push day/ });
+    const cards = screen.getByRole('button', { name: /Build your own/ }).parentElement;
+    const names = [...(cards?.children ?? [])].map((card) => card.querySelector('h3')?.textContent);
+    expect(names.slice(0, 3)).toEqual(['Build your own', 'Steps', 'Push day']);
+  });
+
+  it('repeats a recent workout with one tap', async () => {
+    const recent = [
+      {
+        id: 'r1',
+        name: 'Park',
+        routine_id: null,
+        finished_at: '2026-10-31T15:00:00Z',
+        performed_on: null,
+        exercise_ids: ['bench', 'custom'],
+        custom_names: ['Muscle-up'],
+      },
+    ];
+    const fetchMock = trainApi({
+      'GET /api/workouts/recent': [200, recent],
+      'POST /api/workouts': [201, makeWorkout({ name: 'Park' })],
+    });
+    renderApp('/train');
+    const list = await screen.findByRole('region', { name: 'Repeat a recent workout' });
+    const park = within(list).getByRole('button', {
+      name: /^Repeat Park Sat,? 31 Oct · Bench press, Muscle-up$/,
+    });
+    await userEvent.click(park);
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({
+      routine_id: null,
+      name: 'Park',
+      repeat_workout_id: 'r1',
+    });
+  });
+
+  it('has nothing to repeat before your first workout', async () => {
+    trainApi({ 'GET /api/workouts/recent': [200, []] });
+    renderApp('/train');
+    await screen.findByRole('button', { name: /Push day/ });
+    expect(screen.queryByRole('region', { name: 'Repeat a recent workout' })).toBeNull();
   });
 
   it('starts a routine and opens the logger with last time and the overload hint', async () => {
@@ -482,6 +571,16 @@ describe('Train: logging', () => {
     await userEvent.click(within(dialog).getByRole('button', { name: /^Back squat/ }));
     expect(await screen.findByRole('article', { name: /^Back squat/ })).toBeVisible();
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('lists calisthenics under its own heading', async () => {
+    trainApi({ 'GET /api/workouts/active': [200, makeWorkout({ exercises: [] })] });
+    renderApp('/train');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add exercise' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Add exercise' }));
+    const group = dialog.getByRole('region', { name: 'Calisthenics' });
+    expect(within(group).getByRole('button', { name: 'L-sit' })).toBeVisible();
+    expect(within(group).queryByRole('button', { name: 'Bench press' })).toBeNull();
   });
 
   it('opens the plate calculator for a barbell lift', async () => {

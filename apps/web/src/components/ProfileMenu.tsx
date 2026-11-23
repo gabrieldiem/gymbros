@@ -1,4 +1,5 @@
 import {
+  Languages,
   LogOut,
   MessageSquarePlus,
   Settings,
@@ -16,15 +17,18 @@ import { useMe } from '../api/me';
 import { FeedbackSheet } from '../features/me/FeedbackSheet';
 import { SettingsSheet } from '../features/me/SettingsSheet';
 import { useI18n } from '../i18n/context';
+import { LANGUAGES } from '../i18n/translate';
+import { useChangeLanguage } from '../i18n/useLanguage';
 import { Avatar } from './Avatar';
 import { useShareInvite } from './useShareInvite';
 import styles from './ProfileMenu.module.css';
 
-const ITEMS = '[role="menuitem"]';
+const ITEMS = '[role="menuitem"], [role="menuitemradio"]';
 
-/** The avatar's menu: who you are, your profile, settings and log out. */
+/** The avatar's menu: who you are, your language, your profile, settings and log out. */
 export function ProfileMenu() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const changeLanguage = useChangeLanguage();
   const me = useMe().data;
   const logout = useLogout();
   const shareInvite = useShareInvite();
@@ -37,7 +41,7 @@ export function ProfileMenu() {
 
   useEffect(() => {
     if (!open) return;
-    menu.current?.querySelector<HTMLElement>(ITEMS)?.focus();
+    menu.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
     const handlePointer = (event: PointerEvent) => {
       if (!root.current?.contains(event.target as Node)) setOpen(false);
     };
@@ -165,6 +169,23 @@ export function ProfileMenu() {
               {t('admin_title')}
             </Link>
           )}
+          <div className={styles.language} role="group" aria-label={t('language')}>
+            <Languages size={18} aria-hidden="true" />
+            <span aria-hidden="true">{t('language')}</span>
+            <span className={styles.choices}>
+              {LANGUAGES.map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={lang === code}
+                  onClick={() => changeLanguage(code)}
+                >
+                  {code.toUpperCase()}
+                </button>
+              ))}
+            </span>
+          </div>
           <button
             type="button"
             role="menuitem"

@@ -10,7 +10,13 @@ import {
 } from '../../api/train';
 import { AutosaveQueue, type SaveStatus } from './autosaveQueue';
 import { forServer } from './barbell';
-import { clearDraft, loadDraft, saveDraft, saveLocalWorkout } from './offlineStore';
+import {
+  clearDraft,
+  loadDraft,
+  saveDraft,
+  saveLocalWorkout,
+  type StoredDraft,
+} from './offlineStore';
 
 export type DraftExercise = {
   exercise_id: string;
@@ -18,7 +24,13 @@ export type DraftExercise = {
   previous_sets: SetData[];
   custom_name?: string | null;
 };
-export type Draft = { name: string; gym: string | null; exercises: DraftExercise[] };
+export type Draft = {
+  name: string;
+  gym: string | null;
+  /** Null for today, else the past day it's for. */
+  performed_on: string | null;
+  exercises: DraftExercise[];
+};
 export type { SaveStatus };
 
 const RETRY_MS = 3000;
@@ -27,8 +39,23 @@ function toDraft(workout: Workout): Draft {
   return {
     name: workout.name,
     gym: workout.gym,
+    performed_on: workout.performed_on,
     exercises: workout.exercises.map((e) => ({ ...e })),
   };
+}
+
+function fromStored(stored: StoredDraft, workout: Workout): Draft {
+  const day = stored.performed_on === undefined ? workout.performed_on : stored.performed_on;
+  return { ...stored, performed_on: day };
+}
+
+/** Last time's sets as the server sees them now: they depend on the day the workout is for. */
+function withPrevious(draft: Draft, saved: Workout): Draft {
+  const exercises = draft.exercises.map((e, i) => {
+    const fresh = saved.exercises[i];
+    return fresh?.exercise_id === e.exercise_id ? { ...e, previous_sets: fresh.previous_sets } : e;
+  });
+  return { ...draft, exercises };
 }
 
 function toBody(draft: Draft): SaveBody {
@@ -38,7 +65,8 @@ function toBody(draft: Draft): SaveBody {
     ...(custom_name ? { custom_name } : {}),
   }));
   const name = draft.name.trim();
-  return name ? { name, gym: draft.gym, exercises } : { gym: draft.gym, exercises };
+  const rest = { gym: draft.gym, performed_on: draft.performed_on, exercises };
+  return name ? { name, ...rest } : rest;
 }
 
 /**
@@ -48,7 +76,10 @@ function toBody(draft: Draft): SaveBody {
 export function useWorkoutDraft(workout: Workout, debounceMs = 500) {
   const queryClient = useQueryClient();
   // Edits the server never got, from before a reload, win over what it last had.
-  const [restored] = useState(() => loadDraft(workout.id));
+  const [restored] = useState(() => {
+    const stored = loadDraft(workout.id);
+    return stored ? fromStored(stored, workout) : null;
+  });
   const [draft, setDraft] = useState<Draft>(() => restored ?? toDraft(workout));
   const [livePoints, setLivePoints] = useState(workout.live_points);
   const [status, setStatus] = useState<SaveStatus>('idle');
@@ -70,6 +101,7 @@ export function useWorkoutDraft(workout: Workout, debounceMs = 500) {
         },
         onSaved: (saved) => {
           setLivePoints(saved.live_points);
+          setDraft((current) => withPrevious(current, saved));
           queryClient.setQueryData(activeWorkoutKey, saved);
         },
         onStatus: setStatus,
@@ -79,9 +111,12 @@ export function useWorkoutDraft(workout: Workout, debounceMs = 500) {
   );
 
   useEffect(() => {
-    if (!workout.local && restored) queue.push(restored);
+    if (!workout.local && restored) {
+      saveDraft(workout.id, restored); // As it's sent, so it's cleared once the server has it.
+      queue.push(restored);
+    }
     return () => queue.dispose();
-  }, [queue, restored, workout.local]);
+  }, [queue, restored, workout.id, workout.local]);
 
   const update = useCallback(
     (change: (current: Draft) => Draft) =>

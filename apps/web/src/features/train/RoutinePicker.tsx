@@ -1,4 +1,5 @@
 import {
+  Accessibility,
   BicepsFlexed,
   CalendarDays,
   CalendarPlus,
@@ -12,13 +13,14 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { Link } from 'react-router';
-import type { Catalog, Week } from '../../api/train';
+import type { Catalog, RecentWorkout, Week } from '../../api/train';
 import { FormError } from '../../components/FormError';
 import { Pips } from '../../components/Pips';
 import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { goalText } from './goalText';
 import { GymSelect } from './GymSelect';
+import { RecentWorkouts } from './RecentWorkouts';
 import styles from './RoutinePicker.module.css';
 
 type Props = {
@@ -32,6 +34,9 @@ type Props = {
   gym: string | null;
   onGym: (gym: string | null) => void;
   onStart: (routineId: string | null) => void;
+  /** Your last few workouts, to start one again. */
+  recent: RecentWorkout[];
+  onRepeat: (workout: RecentWorkout) => void;
   onPickPastDay: () => void;
   onClearPastDay: () => void;
 };
@@ -41,6 +46,7 @@ const ROUTINE_ICONS: Record<string, LucideIcon> = {
   push: Dumbbell,
   pull: BicepsFlexed,
   legs: Weight,
+  calisthenics: Accessibility,
   cardio: HeartPulse,
   run: Footprints,
   swim: Waves,
@@ -49,7 +55,7 @@ const ROUTINE_ICONS: Record<string, LucideIcon> = {
 
 export function RoutinePicker(props: Props) {
   const { catalog, week, starting, error, pastDay, gym, onGym } = props;
-  const { onStart, onPickPastDay, onClearPastDay } = props;
+  const { onStart, onPickPastDay, onClearPastDay, recent, onRepeat } = props;
   const { t, lang } = useI18n();
   const legEvent = week?.leg_event_active ?? catalog.weekly_event === 'leg_day_x2';
   const exerciseName = (id: string) => catalog.exercises.find((e) => e.id === id)?.name ?? id;
@@ -93,7 +99,27 @@ export function RoutinePicker(props: Props) {
       <div className={styles.error}>
         <FormError error={error} />
       </div>
+      <RecentWorkouts recent={recent} catalog={catalog} starting={starting} onRepeat={onRepeat} />
       <div className={styles.routines}>
+        <button
+          type="button"
+          className={`${styles.routine} ${styles.build}`}
+          disabled={starting}
+          onClick={() => onStart(null)}
+        >
+          <h3 className={styles.routineTitle}>
+            <Plus size={18} aria-hidden="true" />
+            {t('empty_title')}
+          </h3>
+          <p>{t('empty_sub')}</p>
+        </button>
+        <Link to="/climb/steps" className={styles.routine}>
+          <h3 className={styles.routineTitle}>
+            <Footprints size={18} aria-hidden="true" />
+            {t('steps_title')}
+          </h3>
+          <p>{t('steps_card')}</p>
+        </Link>
         {catalog.routines.map((routine) => {
           const RoutineIcon = ROUTINE_ICONS[routine.id] ?? Dumbbell;
           return (
@@ -105,7 +131,7 @@ export function RoutinePicker(props: Props) {
               onClick={() => onStart(routine.id)}
             >
               <h3 className={styles.routineTitle}>
-                <RoutineIcon size={20} aria-hidden="true" />
+                <RoutineIcon size={18} aria-hidden="true" />
                 {routine.name}
               </h3>
               <p>{routine.exercise_ids.map(exerciseName).join(', ')}</p>
@@ -115,25 +141,6 @@ export function RoutinePicker(props: Props) {
             </button>
           );
         })}
-        <button
-          type="button"
-          className={`${styles.routine} ${styles.empty}`}
-          disabled={starting}
-          onClick={() => onStart(null)}
-        >
-          <h3 className={styles.routineTitle}>
-            <Plus size={20} aria-hidden="true" />
-            {t('empty_title')}
-          </h3>
-          <p>{t('empty_sub')}</p>
-        </button>
-        <Link to="/climb/steps" className={`${styles.routine} ${styles.empty}`}>
-          <h3 className={styles.routineTitle}>
-            <Footprints size={20} aria-hidden="true" />
-            {t('steps_title')}
-          </h3>
-          <p>{t('steps_card')}</p>
-        </Link>
       </div>
       <EarnList catalog={catalog} legEvent={legEvent} />
     </section>

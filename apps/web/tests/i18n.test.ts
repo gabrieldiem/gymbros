@@ -25,8 +25,8 @@ describe('i18n catalogs', () => {
 
 describe('translate', () => {
   it('returns the copy for the language', () => {
-    expect(translate('en', 'nav_crew')).toBe('Crew');
-    expect(translate('es', 'nav_crew')).toBe('Equipo');
+    expect(translate('en', 'nav_crew')).toBe('Activity');
+    expect(translate('es', 'nav_crew')).toBe('Actividad');
   });
 
   it('keeps unknown placeholders visible', () => {

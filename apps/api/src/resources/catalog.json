@@ -1,5 +1,5 @@
 {
-  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km, x = named by the member, pays nothing. minute_effort_km: a sport with no distance, credited as km per minute. ppl: push/pull/legs class (null for cardio and core).",
+  "_comment": "Exercise catalog and routines (docs/PRODUCT.md). Names stay in English in both languages; aliases_es let Spanish search find them. type: w = load x reps, bw = bodyweight +kg x reps, c = cardio minutes + km, h = a hold: bodyweight +kg × seconds (stored in reps), where hold_s_per_rep seconds count as one bodyweight rep, x = named by the member, pays nothing. minute_effort_km: a sport with no distance, credited as km per minute. ppl: push/pull/legs class (null for cardio and core).",
   "exercises": [
     {
       "id": "bench",
@@ -805,6 +805,118 @@
       ]
     },
     {
+      "id": "parallettepushup",
+      "name": "Parallette push-up",
+      "group": "Calisthenics",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "flexiones en paralelas",
+        "flexiones en parallettes",
+        "lagartijas en paralelas",
+        "parallettes"
+      ]
+    },
+    {
+      "id": "declinepushup",
+      "name": "Decline push-up",
+      "group": "Calisthenics",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "flexiones declinadas",
+        "flexiones con pies elevados",
+        "lagartijas declinadas"
+      ]
+    },
+    {
+      "id": "frontlever",
+      "name": "Front lever",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "palanca frontal",
+        "front lever en barra",
+        "front"
+      ],
+      "hold_s_per_rep": 1
+    },
+    {
+      "id": "planchelean",
+      "name": "Planche lean",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "inclinación de plancha",
+        "planche leans",
+        "plancha inclinada"
+      ],
+      "hold_s_per_rep": 3
+    },
+    {
+      "id": "crow",
+      "name": "Crow pose",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "postura del cuervo",
+        "cuervo",
+        "bakasana"
+      ],
+      "hold_s_per_rep": 3
+    },
+    {
+      "id": "crane",
+      "name": "Crane pose",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "postura de la grulla",
+        "grulla",
+        "bakasana con brazos rectos"
+      ],
+      "hold_s_per_rep": 2
+    },
+    {
+      "id": "lsit",
+      "name": "L-sit",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "l sit",
+        "escuadra",
+        "l-sit en paralelas"
+      ],
+      "hold_s_per_rep": 2
+    },
+    {
+      "id": "hanginglsit",
+      "name": "Hanging L-sit",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": null,
+      "aliases_es": [
+        "l-sit colgado",
+        "l-sit en barra",
+        "escuadra colgado",
+        "escuadra en barra"
+      ],
+      "hold_s_per_rep": 3
+    },
+    {
       "id": "outrun",
       "name": "Outdoor run",
       "group": "Cardio",
@@ -1051,6 +1163,17 @@
         "rdl",
         "legpress",
         "lunge"
+      ]
+    },
+    {
+      "id": "calisthenics",
+      "name": "Calisthenics",
+      "exercise_ids": [
+        "parallettepushup",
+        "lsit",
+        "frontlever",
+        "crow",
+        "planchelean"
       ]
     },
     {

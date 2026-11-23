@@ -1,4 +1,4 @@
-import { CalendarDays, Footprints, Infinity as AllTime, Trash2 } from 'lucide-react';
+import { Footprints, Infinity as AllTime, Trash2 } from 'lucide-react';
 import { lazy, Suspense, useState, type FormEvent } from 'react';
 
 import type { Standing } from '../../api/climb';
@@ -15,6 +15,7 @@ import { cx } from '../../components/cx';
 import { FormError } from '../../components/FormError';
 import { LoadingBlock, QueryState } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
+import { SevenDaysIcon } from '../../components/SevenDaysIcon';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
@@ -176,22 +177,14 @@ function Entries({ data }: { data: StepsData }) {
 /** Steps for a day or a period, and the crew climbing by them. */
 export function StepsPage() {
   const { t, n } = useI18n();
-  const [mode, setMode] = useState<StepsMode>('week');
+  // All time first, like ATUS Climb: the whole climb before this week's slice of it.
+  const [mode, setMode] = useState<StepsMode>('all');
   const query = useSteps(mode);
   return (
     <section aria-labelledby="page-title">
       <ClimbNav />
       <div className={styles.head}>
         <h1 id="page-title">{t('steps_title')}</h1>
-        <Segmented
-          label={t('mode_label')}
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: 'week', label: t('mode_week'), icon: CalendarDays },
-            { value: 'all', label: t('mode_all'), icon: AllTime },
-          ]}
-        />
       </div>
       <QueryState query={query} failed="steps_failed">
         {(data) => (
@@ -203,6 +196,18 @@ export function StepsPage() {
                 summit={data.summit}
                 campStep={data.camp_step}
                 campValue={(value) => t('steps_n', { n: n(value) })}
+                corner={
+                  <Segmented
+                    overlay
+                    label={t('mode_label')}
+                    value={mode}
+                    onChange={setMode}
+                    options={[
+                      { value: 'all', label: t('mode_all'), icon: AllTime },
+                      { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
+                    ]}
+                  />
+                }
               />
               <ol className={styles.rope} aria-label={t('rope_order')}>
                 {data.standings.map((s) => (

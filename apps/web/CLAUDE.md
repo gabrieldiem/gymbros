@@ -31,7 +31,7 @@ npm run e2e          # playwright test (needs the dev stack running)
 - **Every user-visible string goes through `t()`.** No hard-coded copy in components.
 - The API sends keys plus variables (score line items, feed events, notifications). Render them with `t()`.
 - Spanish uses classic English gym terms, the way people talk at the gym: *push day, pull day, leg day, sets, reps, PR, 1RM, spotter*, and every exercise name in English (Bench press, Back squat, Deadlift, RDL…). The surrounding sentence stays Spanish: "Nuevo PR: Back squat 137.5 kg × 5", "12 sets completados". See `docs/PRODUCT.md` → i18n.
-- The default language comes from `navigator.language`. The user can switch it in the top bar and in settings, and the choice is stored on the user profile.
+- The default language comes from `navigator.language`. Signed out, the top bar switches it; signed in, the profile menu and settings do (the top bar has no toggle then), and the choice is stored on the user profile.
 
 ## Rules
 

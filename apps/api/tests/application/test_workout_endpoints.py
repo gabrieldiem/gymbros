@@ -45,11 +45,12 @@ async def test_catalog_lists_exercises_routines_and_points(client, member):
     response = await client.get("/api/catalog")
     assert response.status_code == 200
     body = response.json()
-    assert len(body["exercises"]) == 80
+    assert len(body["exercises"]) == 88
     assert [r["id"] for r in body["routines"]] == [
         "push",
         "pull",
         "legs",
+        "calisthenics",
         "cardio",
         "run",
         "swim",
@@ -173,6 +174,19 @@ async def test_finish_scores_stores_point_events_and_closes_the_workout(client, 
     assert stored == body["total"]
     record = await db_session.get(PersonalRecord, (member["id"], "bench"))
     assert (record.load_kg, record.reps) == (60, 5)
+
+
+async def test_a_hold_logs_seconds_and_scores_them_as_bodyweight_reps(client, member, db_session):
+    # An L-sit counts a rep every 2 seconds: 2 × 20 s is 20 reps of 80 kg.
+    response = await log_and_finish(
+        client, None, [{"exercise_id": "lsit", "sets": [done(0, 20), done(0, 20)]}]
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["volume_kg"] == 1600
+    assert body["completed_sets"] == 2
+    record = await db_session.get(PersonalRecord, (member["id"], "lsit"))
+    assert (record.load_kg, record.reps) == (0, 20)
 
 
 async def test_finish_needs_a_completed_set(client, member):

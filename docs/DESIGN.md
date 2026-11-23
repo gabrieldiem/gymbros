@@ -35,7 +35,8 @@ Gym-brand energy, but easy to use. The prototype went through a very loud versio
 
 - Radius: cards 16px, buttons and inputs 12px (small 10px), chips and pills 999px, sheets 20px (top corners on mobile).
 - Buttons: primary (volt on iron), ghost (steel), quiet (text only). Min height 50px (40px small). Sentence case, Barlow 700.
-- Segmented control: a plate track with a 3px inset; the selected option is chalk with iron text.
+- Segmented control: a plate track with a 3px inset; the selected option is chalk with iron text. It filters what's on the screen (this week / all time). On the ATUS Climb and Steps maps it floats in the top-left corner (`overlay`): a dark glass track where only the chosen option shows its name.
+- Section tabs (ATUS Climb / Steps, the Quests sections) change the page, so they don't look like a filter: text tabs on a sticky bar with a volt underline that slides. Only on mobile; the rail lists them on desktop.
 - Bottom sheet on mobile, centered dialog at ≥700px.
 - Toast: a plate card with a steel border (red border for alerts). Top center.
 - Progress: 8px rounded bars. Pips are 10px circles (16px large), steel outline → volt filled → red for over target.
