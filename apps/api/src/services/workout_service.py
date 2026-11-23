@@ -36,6 +36,7 @@ from services.workout_types import (
     ExerciseEntry,
     ExerciseView,
     PastDay,
+    WorkoutStateChanges,
     WorkoutTemplateView,
     WorkoutView,
 )
@@ -150,24 +151,20 @@ class WorkoutService:
         return await self.view(member, workout) if workout else None
 
     async def save(
-        self,
-        member: Member,
-        workout_id: uuid.UUID,
-        name: str | None,
-        entries: tuple[ExerciseEntry, ...],
-        change_gym: bool = False,
-        gym: str | None = None,
+        self, member: Member, workout_id: uuid.UUID, changes: WorkoutStateChanges
     ) -> WorkoutView:
-        # pylint: disable=too-many-arguments,too-many-positional-arguments
         """Replace the logger state (exercises and sets) of an in-progress workout."""
         workout = await self.get_in_progress(member, workout_id)
-        for entry in entries:
+        for entry in changes.entries:
             self._exercise(entry.exercise_id)
-        if name is not None:
-            workout.name = name.strip()
-        if change_gym:
-            await self.set_gym(member, workout, gym)
-        workout.sets = to_rows(entries)
+        if changes.change_day and changes.performed_on != workout.performed_on:
+            self._check_past_day(member, changes.performed_on)
+            workout.performed_on = changes.performed_on
+        if changes.name is not None:
+            workout.name = changes.name.strip()
+        if changes.change_gym:
+            await self.set_gym(member, workout, changes.gym)
+        workout.sets = to_rows(changes.entries)
         return await self.view(member, await self._workouts.save(workout))
 
     def check_exercise(self, exercise_id: str) -> None:

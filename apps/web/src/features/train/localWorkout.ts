@@ -49,7 +49,7 @@ export function toQueued(workout: Workout, draft: StoredDraft, finishedAt: Date)
     routine_id: workout.routine_id,
     name: draft.name.trim() || workout.name,
     gym: draft.gym,
-    performed_on: workout.performed_on,
+    performed_on: draft.performed_on === undefined ? workout.performed_on : draft.performed_on,
     started_at: workout.started_at,
     finished_at: finishedAt.toISOString(),
     exercises: draft.exercises.map(({ exercise_id, sets, custom_name }) => ({

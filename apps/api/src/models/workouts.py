@@ -59,6 +59,8 @@ class SaveWorkoutRequest(BaseModel):
     exercises: list[ExerciseInput] = Field(max_length=20)
     # Leave it out to keep the gym; null for no gym.
     gym: GymName | None = None
+    # Leave it out to keep the day; null for today, else one of the past days you can log.
+    performed_on: date | None = None
 
 
 class SyncWorkoutRequest(BaseModel):

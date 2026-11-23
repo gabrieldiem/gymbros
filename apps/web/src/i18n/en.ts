@@ -621,6 +621,7 @@ export const en = {
   past_notice: 'Logging a workout for {day}.',
   past_change: 'Change day',
   past_today: 'Log today instead',
+  past_today_option: 'Today',
   sum_done_past: '{name} logged for {day}',
   err_workout_date_out_of_range: 'You can log a past workout up to a week back.',
   set_field: '{name}, set {n}, {field}',
@@ -842,6 +843,10 @@ export const en = {
   wn_faster_sets_body: 'Logging takes fewer taps, and your points don’t change.',
   wn_faster_sets_points:
     'Tap to repeat the set above\nRemove a row you don’t need\nSee barbell lifts as disks plus the bar',
+  wn_change_day_title: 'Change the day of a workout',
+  wn_change_day_body: 'Started one and it was really for yesterday? Move it while it’s open.',
+  wn_change_day_points:
+    'Tap Change day in the logger\nAny of the last 7 days, or back to today\nIt counts for the day you pick',
   wn_calisthenics_title: 'Calisthenics: holds and more push-ups',
   wn_calisthenics_body:
     'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose and Planche lean log seconds. Parallette and decline push-ups log reps.',

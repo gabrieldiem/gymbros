@@ -119,6 +119,7 @@ Forgot to log one? From Train you can log a workout for any of the last 7 days (
 - **Nothing is redone:** bonuses already paid aren't recalculated (a streak paid this week stays as paid), and a settled duel stays settled.
 - **The crew can see it:** it's posted to the feed when you log it, with the day it was for and no duration. It isn't "training now", the crew isn't told you're coming, and a goal in a week that's over isn't announced.
 - **Logging it:** routines pre-fill what you did last time as it was, without the overload. There's no clock or rest timer.
+- **Changing the day:** an open workout can move to any of those days, or back to today, from the logger ("Change day"), until you finish it. The sets you logged stay; the last-time column and the live points follow the new day. A workout moved to a past day stops being "training now", but a crew already told you were coming isn't told again.
 
 ## Progressive overload
 

@@ -164,6 +164,8 @@ export type WorkoutTemplate = {
 export type SaveBody = {
   name?: string;
   gym: string | null;
+  /** Null for today, else one of `Week.past_days`. Left out, the day stays. */
+  performed_on?: string | null;
   exercises: { exercise_id: string; sets: SetData[]; custom_name?: string | null }[];
 };
 

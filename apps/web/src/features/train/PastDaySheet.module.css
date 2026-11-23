@@ -27,7 +27,8 @@
   transition: border-color var(--dur-fast);
 }
 
-.days button:hover {
+.days button:hover,
+.days button[aria-current='true'] {
   border-color: var(--volt);
 }
 

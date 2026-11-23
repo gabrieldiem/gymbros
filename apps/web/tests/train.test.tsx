@@ -411,6 +411,49 @@ describe('Train: logging a past workout', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Finish workout' }));
     expect(await screen.findByText(/^Push day logged for Fri,? 30 Oct$/)).toBeVisible();
   });
+
+  it('moves a workout already open to a past day', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, makeWorkout()],
+      'PUT /api/workouts/w1': () => [200, makeWorkout({ performed_on: '2026-10-30' })],
+    });
+    renderApp('/train');
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(screen.getByRole('timer')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: 'Change day' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Which day was it?' }));
+    expect(sheet.getByRole('button', { name: 'Today' })).toHaveAttribute('aria-current', 'true');
+    await userEvent.click(sheet.getByRole('button', { name: /Fri,? 30 Oct/ }));
+    expect(await screen.findByText(/^For Fri,? 30 Oct$/)).toBeVisible();
+    expect(screen.queryByRole('timer')).toBeNull();
+    await waitFor(
+      () =>
+        expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+          performed_on: '2026-10-30',
+        }),
+      { timeout: 5000 },
+    );
+  });
+
+  it('moves a past workout back to today', async () => {
+    const fetchMock = trainApi({
+      'GET /api/workouts/active': [200, makeWorkout({ performed_on: '2026-10-30' })],
+      'PUT /api/workouts/w1': () => [200, makeWorkout()],
+    });
+    renderApp('/train');
+    await screen.findByText(/^For Fri,? 30 Oct$/);
+    await userEvent.click(screen.getByRole('button', { name: 'Change day' }));
+    const sheet = within(await screen.findByRole('dialog', { name: 'Which day was it?' }));
+    await userEvent.click(sheet.getByRole('button', { name: 'Today' }));
+    expect(await screen.findByRole('timer')).toBeVisible();
+    await waitFor(
+      () =>
+        expect(bodyOf(fetchMock, 'PUT', '/api/workouts/w1')).toMatchObject({
+          performed_on: null,
+        }),
+      { timeout: 5000 },
+    );
+  });
 });
 
 describe('Train: start screen', () => {

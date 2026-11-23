@@ -42,7 +42,7 @@ from services.workout_editor import WorkoutChanges, WorkoutEditor
 from services.workout_finisher import WorkoutFinisher
 from services.workout_photo_service import WorkoutPhotoService
 from services.workout_service import WorkoutService
-from services.workout_types import ExerciseEntry, LoggedOffline
+from services.workout_types import ExerciseEntry, LoggedOffline, WorkoutStateChanges
 from settings import Settings
 
 router = APIRouter(prefix="/workouts", tags=["Train"])
@@ -122,10 +122,15 @@ async def save_workout(
         )
         for e in body.exercises
     )
-    change_gym = "gym" in body.model_fields_set
-    return to_workout_response(
-        await workouts.save(member, workout_id, body.name, entries, change_gym, body.gym)
+    changes = WorkoutStateChanges(
+        name=body.name,
+        entries=entries,
+        change_gym="gym" in body.model_fields_set,
+        gym=body.gym,
+        change_day="performed_on" in body.model_fields_set,
+        performed_on=body.performed_on,
     )
+    return to_workout_response(await workouts.save(member, workout_id, changes))
 
 
 @router.delete(

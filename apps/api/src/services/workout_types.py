@@ -30,6 +30,19 @@ class ExerciseView:
 
 
 @dataclass(frozen=True, slots=True)
+class WorkoutStateChanges:
+    # pylint: disable=too-many-instance-attributes
+    """The logger's state for an in-progress workout. The gym and day change only when asked."""
+
+    name: str | None
+    entries: tuple[ExerciseEntry, ...]
+    change_gym: bool = False
+    gym: str | None = None
+    change_day: bool = False
+    performed_on: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class WorkoutView:
     """An in-progress workout with the live points preview."""
 

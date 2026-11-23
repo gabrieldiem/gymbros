@@ -210,3 +210,66 @@ async def test_the_crew_isnt_told_about_a_goal_in_a_week_thats_over(
         await log(client, 7)
     keys = (await db_session.execute(select(Notification.key))).scalars().all()
     assert "n_goal" not in keys
+
+
+# --- Changing the day ---------------------------------------------------------------------------
+
+
+async def save_day(client, workout_id, day, exercises=None):
+    body = {"exercises": exercises or BENCH, "performed_on": day}
+    return await client.put(f"/api/workouts/{workout_id}", json=body)
+
+
+async def test_a_workout_started_today_can_move_to_a_past_day(client, member):
+    workout = (await client.post("/api/workouts", json={"routine_id": "push"})).json()
+    saved = await save_day(client, workout["id"], days_ago(2).isoformat())
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["performed_on"] == days_ago(2).isoformat()
+    finished = (await client.post(f"/api/workouts/{workout['id']}/finish")).json()
+    assert finished["performed_on"] == days_ago(2).isoformat()
+    noon = local_noon(days_ago(2), ZONE)
+    assert datetime.fromisoformat(finished["finished_at"]) == noon
+
+
+async def test_a_past_workout_can_move_back_to_today(client, member):
+    body = {"routine_id": None, "name": "Old", "performed_on": days_ago(3).isoformat()}
+    workout = (await client.post("/api/workouts", json=body)).json()
+    saved = await save_day(client, workout["id"], None)
+    assert saved.status_code == 200
+    assert saved.json()["performed_on"] is None
+
+
+async def test_leaving_the_day_out_keeps_it(client, member):
+    body = {"routine_id": None, "name": "Old", "performed_on": days_ago(3).isoformat()}
+    workout = (await client.post("/api/workouts", json=body)).json()
+    saved = await client.put(f"/api/workouts/{workout['id']}", json={"exercises": BENCH})
+    assert saved.json()["performed_on"] == days_ago(3).isoformat()
+
+
+async def test_a_workout_can_only_move_to_a_day_you_could_log(client, member):
+    workout = (await client.post("/api/workouts", json={"routine_id": "push"})).json()
+    for days in (8, 0, -1):
+        saved = await save_day(client, workout["id"], days_ago(days).isoformat())
+        assert saved.status_code == 422, days
+        assert saved.json()["detail"]["code"] == "workout_date_out_of_range"
+
+
+async def test_moving_it_to_a_past_day_takes_it_off_training_now(client, member):
+    workout = (await client.post("/api/workouts", json={"routine_id": "push"})).json()
+    assert len((await client.get("/api/crew/training-now")).json()) == 1
+    await save_day(client, workout["id"], days_ago(1).isoformat())
+    assert (await client.get("/api/crew/training-now")).json() == []
+
+
+async def test_moving_the_day_compares_with_the_session_before_it(client, member):
+    await log(client, 7, [{"exercise_id": "bench", "sets": [done(60, 5)]}], "push")
+    today = (await client.post("/api/workouts", json={"routine_id": "push"})).json()
+    await client.put(
+        f"/api/workouts/{today['id']}",
+        json={"exercises": [{"exercise_id": "bench", "sets": [done(200, 5)]}]},
+    )
+    await client.post(f"/api/workouts/{today['id']}/finish")
+    workout = (await client.post("/api/workouts", json={"routine_id": "push"})).json()
+    saved = (await save_day(client, workout["id"], days_ago(6).isoformat())).json()
+    bench = next(e for e in saved["exercises"] if e["exercise_id"] == "bench")
+    assert bench["previous_sets"][0]["load_kg"] == 60

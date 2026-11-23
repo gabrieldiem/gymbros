@@ -1,4 +1,4 @@
-import { Flag, Trash2, X } from 'lucide-react';
+import { CalendarDays, Flag, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useMe } from '../../api/me';
@@ -11,6 +11,7 @@ import { useI18n } from '../../i18n/context';
 import { formatDay } from '../../i18n/formatDay';
 import { formatElapsed } from './format';
 import { GymSelect } from './GymSelect';
+import { PastDaySheet } from './PastDaySheet';
 import { RestTimer } from './RestTimer';
 import { DEFAULT_REST_S, useRestTimer } from './useRestTimer';
 import { useWorkoutDraft, type Draft } from './useWorkoutDraft';
@@ -60,8 +61,9 @@ function nthText(t: ReturnType<typeof useI18n>['t'], week: Week | undefined): st
 export function WorkoutLogger(props: Props) {
   const { workout, catalog, week, finishing, finishError, discarding, onFinish, onDiscard } = props;
   const { t, n, lang } = useI18n();
-  const past = workout.performed_on;
   const { draft, update, livePoints, status, flush } = useWorkoutDraft(workout);
+  const past = draft.performed_on;
+  const [changingDay, setChangingDay] = useState(false);
   const elapsed = useElapsed(workout.started_at);
   const gain = usePointsGain(livePoints);
   const rest = useRestTimer();
@@ -88,13 +90,21 @@ export function WorkoutLogger(props: Props) {
             onChange={(e) => update((d) => ({ ...d, name: e.target.value }))}
           />
           <span className={styles.meta}>
-            {past ? (
-              t('past_for', { day: formatDay(lang, past) })
-            ) : (
-              <>
-                <span role="timer">{elapsed}</span>
-                {stretchOnly ? `, ${t('stretch_only')}` : nthText(t, week)}
-              </>
+            <span>
+              {past ? (
+                t('past_for', { day: formatDay(lang, past) })
+              ) : (
+                <>
+                  <span role="timer">{elapsed}</span>
+                  {stretchOnly ? `, ${t('stretch_only')}` : nthText(t, week)}
+                </>
+              )}
+            </span>
+            {Boolean(week?.past_days.length) && (
+              <button type="button" className={styles.day} onClick={() => setChangingDay(true)}>
+                <CalendarDays size={14} aria-hidden="true" />
+                {t('past_change')}
+              </button>
             )}
           </span>
           <GymSelect value={draft.gym} onChange={(gym) => update((d) => ({ ...d, gym }))} />
@@ -149,6 +159,18 @@ export function WorkoutLogger(props: Props) {
           onStart={() => rest.start(restSeconds)}
           onAdjust={rest.adjust}
           onSkip={rest.skip}
+        />
+      )}
+      {changingDay && week && (
+        <PastDaySheet
+          days={week.past_days}
+          withToday
+          current={past}
+          onPick={(day) => {
+            update((d) => ({ ...d, performed_on: day }));
+            setChangingDay(false);
+          }}
+          onClose={() => setChangingDay(false)}
         />
       )}
       {confirmDiscard && (

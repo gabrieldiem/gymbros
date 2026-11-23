@@ -137,6 +137,16 @@ describe('A workout built with no signal', () => {
     expect(queued.exercises[0]).not.toHaveProperty('previous_sets');
   });
 
+  it('goes out for the day the logger moved it to', () => {
+    const workout = makeWorkout({ id: 'x', performed_on: null });
+    const draft = { name: 'Mine', gym: null, exercises: [], performed_on: '2026-10-30' };
+    expect(toQueued(workout, draft, new Date()).performed_on).toBe('2026-10-30');
+    const older = { name: 'Mine', gym: null, exercises: [] }; // Saved before the day could move.
+    expect(
+      toQueued({ ...workout, performed_on: '2026-10-31' }, older, new Date()).performed_on,
+    ).toBe('2026-10-31');
+  });
+
   it('knows when there is nothing to finish', () => {
     const empty = { ...DONE, done: false };
     const draft = (set: typeof DONE) => ({

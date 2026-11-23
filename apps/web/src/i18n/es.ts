@@ -632,6 +632,7 @@ export const es = {
   past_for: 'Del {day}',
   past_notice: 'Registrando un entreno del {day}.',
   past_change: 'Cambiar día',
+  past_today_option: 'Hoy',
   past_today: 'Registrar hoy',
   sum_done_past: '{name} registrado del {day}',
   err_workout_date_out_of_range: 'Puedes registrar un entreno pasado hasta una semana atrás.',
@@ -855,6 +856,10 @@ export const es = {
   wn_faster_sets_body: 'Registrar lleva menos toques, y tus puntos no cambian.',
   wn_faster_sets_points:
     'Toca para repetir el set de arriba\nQuita una fila que no necesitas\nMira los ejercicios con barra como discos más la barra',
+  wn_change_day_title: 'Cambia el día de un entreno',
+  wn_change_day_body: '¿Empezaste uno y en realidad era de ayer? Muévelo mientras está abierto.',
+  wn_change_day_points:
+    'Toca Cambiar día en el registro\nCualquiera de los últimos 7 días, o de vuelta a hoy\nCuenta para el día que elijas',
   wn_calisthenics_title: 'Calistenia: isométricos y más flexiones',
   wn_calisthenics_body:
     'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose y Planche lean se registran en segundos. Parallette push-up y Decline push-up, en reps.',
