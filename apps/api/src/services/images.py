@@ -1,6 +1,7 @@
 """Uploaded images: only what a browser shows as a picture, recognized by its bytes, and rebuilt
 from its pixels so that nothing else in the file survives: no location, camera, dates or names."""
 
+import asyncio
 import hashlib
 import io
 from dataclasses import dataclass
@@ -20,6 +21,12 @@ _MAX_PIXELS = 4_000_000
 _QUALITIES = (90, 80, 70)
 _FORMATS = {"JPEG": "image/jpeg", "PNG": "image/png", "WEBP": "image/webp"}
 _EXTENSIONS = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+
+
+# One decode at a time per process. At the 4 MP limit a decode takes ~60 MB, and the api runs in
+# 256 MB: two at once fit, three could OOM-kill it. Others wait on the event loop (no thread
+# held), about half a second each.
+_DECODING = asyncio.Semaphore(1)
 
 
 @dataclass(frozen=True, slots=True)
@@ -86,6 +93,12 @@ def clean_image(data: bytes, max_bytes: int) -> CleanImage:
         if len(cleaned) <= max_bytes:
             return CleanImage(cleaned, _FORMATS[image_format])
     raise ImageTooLarge(str(len(cleaned)))
+
+
+async def clean_upload(data: bytes, max_bytes: int) -> CleanImage:
+    """clean_image off the event loop, one upload at a time. Use this from request handlers."""
+    async with _DECODING:
+        return await asyncio.to_thread(clean_image, data, max_bytes)
 
 
 def image_file_name(data: bytes, content_type: str) -> str:
