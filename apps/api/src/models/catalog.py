@@ -13,7 +13,16 @@ class ExerciseModel(BaseModel):
     id: str
     name: str
     group: Literal[
-        "Chest", "Legs", "Back", "Shoulders", "Arms", "Core", "Cardio", "Mobility", "Custom"
+        "Chest",
+        "Legs",
+        "Back",
+        "Shoulders",
+        "Arms",
+        "Core",
+        "Calisthenics",
+        "Cardio",
+        "Mobility",
+        "Custom",
     ]
     type: Literal["w", "bw", "h", "c", "s", "x"]
     barbell: bool

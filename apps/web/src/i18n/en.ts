@@ -662,6 +662,7 @@ export const en = {
   group_Shoulders: 'Shoulders',
   group_Arms: 'Arms',
   group_Core: 'Core',
+  group_Calisthenics: 'Calisthenics',
   group_Cardio: 'Cardio',
   ln_show: 'Showed up',
   ln_set1: '1 completed set',

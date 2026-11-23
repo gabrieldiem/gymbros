@@ -19,7 +19,15 @@ import type { CrewColor } from './types';
 
 export type ExerciseType = 'w' | 'bw' | 'h' | 'c' | 's' | 'x';
 export type MuscleGroup =
-  'Chest' | 'Legs' | 'Back' | 'Shoulders' | 'Arms' | 'Core' | 'Cardio' | 'Mobility';
+  | 'Chest'
+  | 'Legs'
+  | 'Back'
+  | 'Shoulders'
+  | 'Arms'
+  | 'Core'
+  | 'Calisthenics'
+  | 'Cardio'
+  | 'Mobility';
 
 export type Exercise = {
   id: string;

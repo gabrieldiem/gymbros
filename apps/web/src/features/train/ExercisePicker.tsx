@@ -25,6 +25,7 @@ const GROUPS: MuscleGroup[] = [
   'Shoulders',
   'Arms',
   'Core',
+  'Calisthenics',
   'Cardio',
   'Mobility',
 ];

@@ -233,7 +233,7 @@ Point balance rules for anything that isn't a lift with a weight or a distance:
 
 ## Exercise catalog (v1)
 
-Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Cardio, Mobility), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `h` a hold: bodyweight + kg × seconds, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
+Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders, Arms, Core, Calisthenics, Cardio, Mobility; the exercise picker lists them under these headings), a type (`w` weight × reps, `bw` bodyweight ± kg × reps, `h` a hold: bodyweight + kg × seconds, `c` cardio minutes + km, `s` stretching minutes), a `barbell` flag, a push/pull/legs class, and for cardio a `km_factor`.
 
 Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim, Stretching.
 

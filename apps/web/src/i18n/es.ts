@@ -674,6 +674,7 @@ export const es = {
   group_Shoulders: 'Hombros',
   group_Arms: 'Brazos',
   group_Core: 'Abdomen',
+  group_Calisthenics: 'Calistenia',
   group_Cardio: 'Cardio',
   ln_show: 'Te presentaste',
   ln_set1: '1 set completado',

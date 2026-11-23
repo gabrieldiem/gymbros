@@ -113,33 +113,6 @@
       ]
     },
     {
-      "id": "parallettepushup",
-      "name": "Parallette push-up",
-      "group": "Chest",
-      "type": "bw",
-      "barbell": false,
-      "ppl": "push",
-      "aliases_es": [
-        "flexiones en paralelas",
-        "flexiones en parallettes",
-        "lagartijas en paralelas",
-        "parallettes"
-      ]
-    },
-    {
-      "id": "declinepushup",
-      "name": "Decline push-up",
-      "group": "Chest",
-      "type": "bw",
-      "barbell": false,
-      "ppl": "push",
-      "aliases_es": [
-        "flexiones declinadas",
-        "flexiones con pies elevados",
-        "lagartijas declinadas"
-      ]
-    },
-    {
       "id": "squat",
       "name": "Back squat",
       "group": "Legs",
@@ -519,20 +492,6 @@
       ]
     },
     {
-      "id": "frontlever",
-      "name": "Front lever",
-      "group": "Back",
-      "type": "h",
-      "barbell": false,
-      "ppl": "pull",
-      "aliases_es": [
-        "palanca frontal",
-        "front lever en barra",
-        "front"
-      ],
-      "hold_s_per_rep": 1
-    },
-    {
       "id": "straightarm",
       "name": "Straight-arm pulldown",
       "group": "Back",
@@ -665,48 +624,6 @@
         "remo al mentón",
         "remo al cuello"
       ]
-    },
-    {
-      "id": "planchelean",
-      "name": "Planche lean",
-      "group": "Shoulders",
-      "type": "h",
-      "barbell": false,
-      "ppl": "push",
-      "aliases_es": [
-        "inclinación de plancha",
-        "planche leans",
-        "plancha inclinada"
-      ],
-      "hold_s_per_rep": 3
-    },
-    {
-      "id": "crow",
-      "name": "Crow pose",
-      "group": "Shoulders",
-      "type": "h",
-      "barbell": false,
-      "ppl": "push",
-      "aliases_es": [
-        "postura del cuervo",
-        "cuervo",
-        "bakasana"
-      ],
-      "hold_s_per_rep": 3
-    },
-    {
-      "id": "crane",
-      "name": "Crane pose",
-      "group": "Shoulders",
-      "type": "h",
-      "barbell": false,
-      "ppl": "push",
-      "aliases_es": [
-        "postura de la grulla",
-        "grulla",
-        "bakasana con brazos rectos"
-      ],
-      "hold_s_per_rep": 2
     },
     {
       "id": "curl",
@@ -888,9 +805,92 @@
       ]
     },
     {
+      "id": "parallettepushup",
+      "name": "Parallette push-up",
+      "group": "Calisthenics",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "flexiones en paralelas",
+        "flexiones en parallettes",
+        "lagartijas en paralelas",
+        "parallettes"
+      ]
+    },
+    {
+      "id": "declinepushup",
+      "name": "Decline push-up",
+      "group": "Calisthenics",
+      "type": "bw",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "flexiones declinadas",
+        "flexiones con pies elevados",
+        "lagartijas declinadas"
+      ]
+    },
+    {
+      "id": "frontlever",
+      "name": "Front lever",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "pull",
+      "aliases_es": [
+        "palanca frontal",
+        "front lever en barra",
+        "front"
+      ],
+      "hold_s_per_rep": 1
+    },
+    {
+      "id": "planchelean",
+      "name": "Planche lean",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "inclinación de plancha",
+        "planche leans",
+        "plancha inclinada"
+      ],
+      "hold_s_per_rep": 3
+    },
+    {
+      "id": "crow",
+      "name": "Crow pose",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "postura del cuervo",
+        "cuervo",
+        "bakasana"
+      ],
+      "hold_s_per_rep": 3
+    },
+    {
+      "id": "crane",
+      "name": "Crane pose",
+      "group": "Calisthenics",
+      "type": "h",
+      "barbell": false,
+      "ppl": "push",
+      "aliases_es": [
+        "postura de la grulla",
+        "grulla",
+        "bakasana con brazos rectos"
+      ],
+      "hold_s_per_rep": 2
+    },
+    {
       "id": "lsit",
       "name": "L-sit",
-      "group": "Core",
+      "group": "Calisthenics",
       "type": "h",
       "barbell": false,
       "ppl": null,
@@ -904,7 +904,7 @@
     {
       "id": "hanginglsit",
       "name": "Hanging L-sit",
-      "group": "Core",
+      "group": "Calisthenics",
       "type": "h",
       "barbell": false,
       "ppl": null,

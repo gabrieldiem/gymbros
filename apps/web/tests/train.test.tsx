@@ -573,6 +573,16 @@ describe('Train: logging', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('lists calisthenics under its own heading', async () => {
+    trainApi({ 'GET /api/workouts/active': [200, makeWorkout({ exercises: [] })] });
+    renderApp('/train');
+    await userEvent.click(await screen.findByRole('button', { name: 'Add exercise' }));
+    const dialog = within(await screen.findByRole('dialog', { name: 'Add exercise' }));
+    const group = dialog.getByRole('region', { name: 'Calisthenics' });
+    expect(within(group).getByRole('button', { name: 'L-sit' })).toBeVisible();
+    expect(within(group).queryByRole('button', { name: 'Bench press' })).toBeNull();
+  });
+
   it('opens the plate calculator for a barbell lift', async () => {
     trainApi({ 'GET /api/workouts/active': [200, makeWorkout()] });
     renderApp('/train');
