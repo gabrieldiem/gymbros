@@ -54,7 +54,14 @@ async def lifespan(_app: FastAPI):
 _DOCS = settings.api_docs_enabled
 app: FastAPI = FastAPI(
     title="gymbros-api",
-    description="GYMBROS: workouts, scoring and the ATUS Climb leaderboard",
+    description=(
+        "GYMBROS: workouts, scoring and the ATUS Climb leaderboard.\n\n"
+        "**Signing in.** Routes with a lock need a session, and sessions come from Google sign-in. "
+        "In a browser that's signed in to the app, requests from this page already carry it. "
+        "Anywhere else, copy the value of your `gymbros_session` cookie (dev tools → Application "
+        "→ Cookies) and paste it under **Authorize** → *session token*. You get exactly what "
+        "that account can do; admin routes still need an admin account."
+    ),
     lifespan=lifespan,
     docs_url="/api/docs" if _DOCS else None,
     redoc_url="/api/redoc" if _DOCS else None,
