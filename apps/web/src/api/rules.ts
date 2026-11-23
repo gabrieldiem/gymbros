@@ -3,7 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from './client';
 import type { LineItem, PointsTable } from './train';
 
-export type RuleBadge = { id: string; goal: number; points: number; icon: string; color: string };
+export type RuleBadge = {
+  id: string;
+  goal: number;
+  points: number;
+  icon: string;
+  color: string;
+  /** The hard tier. */
+  elite?: boolean;
+};
 export type RuleQuest = { id: string; goal: number; bonus: number };
 
 export type SampleSession = {

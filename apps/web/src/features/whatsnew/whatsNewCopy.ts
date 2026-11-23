@@ -8,6 +8,11 @@ export const WHATS_NEW_COPY: Record<
   string,
   { title: MessageKey; body: MessageKey; points: MessageKey }
 > = {
+  'elite-badges': {
+    title: 'wn_elite_badges_title',
+    body: 'wn_elite_badges_body',
+    points: 'wn_elite_badges_points',
+  },
   'activity-badges': {
     title: 'wn_activity_badges_title',
     body: 'wn_activity_badges_body',

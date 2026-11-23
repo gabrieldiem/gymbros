@@ -34,7 +34,11 @@ export type QuestBoard = {
 export type BadgeId =
   | 'first' | 'better' | 'twoplates' | 'tonnage' | 'ironmonth' | 'plateclub' | 'dawn' | 'legs'
   | 'hunter' | 'rope' | 'hype' | 'trash' | 'owl' | 'comeback' | 'unstoppable'
-  | 'tenk' | 'mile' | 'longroad' | 'limber' | 'quarter' | 'engine' | 'ironhold'; // prettier-ignore
+  | 'tenk' | 'mile' | 'longroad' | 'limber' | 'quarter' | 'engine' | 'ironhold'
+  | 'lifer' | 'improver' | 'threeplates' | 'kilotonne' | 'ironseason' | 'bigbench'
+  | 'deadlift200' | 'halfmarathon' | 'openwater' | 'thousandk' | 'sunrise' | 'leglegend'
+  | 'mostwanted' | 'summitteam' | 'hypemachine' | 'commentator' | 'nightshift' | 'legend'
+  | 'rubberband' | 'twomillion' | 'fightcamp' | 'statue' | 'lsitminute'; // prettier-ignore
 
 export type Badge = {
   id: BadgeId;
@@ -45,6 +49,8 @@ export type Badge = {
   progress: number;
   unlocked_at: string | null;
   crew_count: number;
+  /** The hard tier: the same measure, much further. */
+  elite?: boolean;
 };
 
 export type DuelMetric = 'points' | 'bench_volume';
