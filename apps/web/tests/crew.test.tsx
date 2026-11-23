@@ -29,7 +29,7 @@ describe('Crew feed', () => {
   it('shows workout posts with stats, PRs, exercises and comments', async () => {
     crewApi();
     renderApp('/crew');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Crew' })).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Activity' })).toBeVisible();
     expect(screen.getByText('What Iron Ridge has been up to.')).toBeVisible();
     const post = (await screen.findByRole('heading', { name: 'Push day' })).closest(
       'li',

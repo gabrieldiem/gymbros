@@ -111,7 +111,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page.getByRole('status').filter({ hasText: 'Server online' })).toBeVisible();
   const nav = page.getByRole('navigation', { name: 'Main' });
   // Train's name also says "Training now" while a workout is in progress.
-  for (const name of [/^ATUS Climb$/, /^Crew$/, /^Train\b/, /^Quests$/, /^You$/]) {
+  for (const name of [/^ATUS Climb$/, /^Activity$/, /^Train\b/, /^Quests$/, /^You$/]) {
     await expect(nav.getByRole('link', { name })).toBeVisible();
   }
   await expect(page.getByRole('button', { name: /Your profile/ })).toBeVisible();
@@ -125,11 +125,11 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await setLanguage(page, 'ES');
   await page
     .getByRole('navigation', { name: 'Principal' })
-    .getByRole('link', { name: 'Equipo', exact: true })
+    .getByRole('link', { name: 'Actividad', exact: true })
     .click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Actividad' })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Actividad' })).toBeVisible();
   await shoot(page, 'crew-es', testInfo);
 
   await setLanguage(page, 'EN');
@@ -259,8 +259,8 @@ test('navbar: the indicator sits on the active tab and follows it', async ({ pag
   };
 
   await expectOnTab(/^(ATUS Climb)$/);
-  await nav.getByRole('link', { name: /^(Crew|Equipo)$/ }).click();
-  await expectOnTab(/^(Crew|Equipo)$/);
+  await nav.getByRole('link', { name: /^(Activity|Actividad)$/ }).click();
+  await expectOnTab(/^(Activity|Actividad)$/);
   await nav
     .getByRole('link', { name: /^(Quests|Retos)$/ })
     .first()

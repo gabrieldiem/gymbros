@@ -11,7 +11,7 @@ Five friends (Gabi, Santi, Maxo, Jose, Matex) train at the gym and want friendly
 | Tab | EN / ES | Purpose |
 |---|---|---|
 | ATUS Climb | ATUS Climb / ATUS Climb | Trail map leaderboard, your standing, weekly goal, "you vs 4 weeks ago", who is training now, rope order list |
-| Crew | Crew / Equipo | Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
+| Activity | Activity / Actividad | What the rest of the crew is doing. Feed (workouts, PRs, badges, nudges) with reactions and comments; Hall of fame (most improved, crew records) |
 | Train | Train / Entrenar | Pick a routine or empty workout, log sets, a rest timer you start when you want, plate calculator, finish → points breakdown → climb animation |
 | Quests | Quests / Retos | Three sections: this week (crew quest, weekly quests, duels), achievements (each one's condition, reward and your progress), points (what every task pays and an hour of each sport) |
 | You | You / Tú | Profile stats, you vs 4 weeks ago, heatmap, weekly tonnage chart, PRs with progress chart, rank ladder, history (tap a workout for its exercises, sets and points), settings |
@@ -213,7 +213,7 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 - A day counts once. A period can't overlap days already logged.
 - Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
 - Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or badges.
-- The crew sees each entry on the Crew tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
+- The crew sees each entry on the Activity tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 
 `/climb/steps` is a section of ATUS Climb, one tap from the points climb, with the crew on its own climb by steps, the same mountain with camps up to a summit of 70,000 this week (`game.steps_week_summit`, 10,000 a day) or 1,500,000 all time (`game.steps_all_summit`), and your last two weeks day by day. A total for a period is spread evenly over its days wherever steps are counted by day or week.
@@ -238,7 +238,7 @@ Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up
 ## i18n
 
 - English and Spanish are complete for every screen, line item, feed event, notification and recap slide.
-- **Spanish uses classic English gym terms.** Exercise names stay in English (Bench press, Back squat, RDL…), and so do routine names (Push day, Pull day, Leg day) and the core vocabulary: sets, reps, PR, 1RM, spotter, "Light weight", "Beast mode". Sentences around them stay Spanish: "Nuevo PR: Bench press 110 kg × 3", "12 sets completados", "Nunca se salta el leg day". Muscle groups and the general UI are Spanish (Pecho, Piernas, Retos, Equipo).
+- **Spanish uses classic English gym terms.** Exercise names stay in English (Bench press, Back squat, RDL…), and so do routine names (Push day, Pull day, Leg day) and the core vocabulary: sets, reps, PR, 1RM, spotter, "Light weight", "Beast mode". Sentences around them stay Spanish: "Nuevo PR: Bench press 110 kg × 3", "12 sets completados", "Nunca se salta el leg day". Muscle groups and the general UI are Spanish (Pecho, Piernas, Retos, Actividad).
 - Exercise search also matches Spanish aliases (typing "sentadilla" finds Back squat).
 - Numbers use the locale format (`3,880` / `3.880`).
 

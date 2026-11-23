@@ -23,7 +23,7 @@ describe('App shell (signed in)', () => {
       'ATUS Climb',
       'Climb',
       'Steps',
-      'Crew',
+      'Activity',
       'Train',
       'Quests',
       'This week',
@@ -63,7 +63,7 @@ describe('App shell (signed in)', () => {
     const english = screen.getByRole('menuitemradio', { name: 'EN' });
     expect(english).toHaveAttribute('aria-checked', 'true');
     await userEvent.click(screen.getByRole('menuitemradio', { name: 'ES' }));
-    expect(screen.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: 'Actividad' })).toBeVisible();
     expect(screen.getByRole('menuitemradio', { name: 'ES' })).toHaveAttribute(
       'aria-checked',
       'true',

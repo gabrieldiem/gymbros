@@ -382,7 +382,7 @@ test('log steps on the real calendar and climb by them', async ({ page }, testIn
   await page.getByRole('button', { name: 'Remove 30,000 steps' }).click();
   await expect(page.getByRole('button', { name: 'Today', exact: true })).toBeEnabled();
   await page.goto('/crew');
-  await expect(page.getByRole('heading', { level: 1, name: 'Crew' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Activity' })).toBeVisible();
   await expect(page.locator('main li').filter({ hasText: '30,000 steps' })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     page.viewportSize()?.width,

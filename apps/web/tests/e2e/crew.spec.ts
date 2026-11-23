@@ -20,7 +20,7 @@ test('crew feed, a reaction, hall of fame and the inbox', async ({ page }, testI
   );
 
   await page.goto('/crew');
-  await expect(page.getByRole('heading', { level: 1, name: 'Crew' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Activity' })).toBeVisible();
   // The oldest post on screen: other specs post to this crew in parallel, on top of the feed.
   const fist = page.getByRole('button', { name: /^Fist bump, \d+$/ }).last();
   await expect(fist).toBeVisible();
