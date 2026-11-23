@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { memberEmail } from './members';
+import { memberEmail, setLanguage } from './members';
 
 // Needs `make up`; run through `make e2e`, which rebuilds the e2e crews first.
 const SCREENS = 'test-results/screens';
@@ -102,7 +102,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
 
   await expect(page).toHaveURL(/\/climb$/);
   // Normalise the profile language, whatever an earlier run left behind.
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await expect(page.getByRole('heading', { level: 1, name: /Better than/ })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Rope order' }).getByRole('listitem')).toHaveCount(
     5,
@@ -122,11 +122,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
     fullPage: true,
   });
 
-  const profileSaved = page.waitForResponse(
-    (r) => r.url().endsWith('/api/me') && r.request().method() === 'PATCH',
-  );
-  await page.getByRole('button', { name: 'ES', exact: true }).click();
-  await profileSaved;
+  await setLanguage(page, 'ES');
   await page
     .getByRole('navigation', { name: 'Principal' })
     .getByRole('link', { name: 'Equipo', exact: true })
@@ -136,7 +132,7 @@ test('member: log in, see the tabs, language follows the profile, log out', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
   await shoot(page, 'crew-es', testInfo);
 
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.getByRole('button', { name: /Your profile/ }).click();
   await expect(page.getByRole('menu')).toBeVisible();
   await shoot(page, 'profile-menu', testInfo);

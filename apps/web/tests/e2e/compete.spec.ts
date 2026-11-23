@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { memberEmail } from './members';
+import { memberEmail, setLanguage } from './members';
 
 // Run through `make e2e`, which rebuilds the e2e crews first.
 const SCREENS = 'test-results/screens';
@@ -12,7 +12,7 @@ test('quests, badges, recap and the You tab', async ({ page }, testInfo) => {
   await page.getByLabel('Email').fill(memberEmail('maxo', testInfo));
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/climb$/);
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   const width = page.viewportSize()?.width;
 
   await page.goto('/quests');

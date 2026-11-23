@@ -57,8 +57,17 @@ describe('App shell (signed in)', () => {
       'PATCH /api/me': (body) => [200, makeMe(body as object)],
     });
     renderApp('/crew');
-    await userEvent.click(await screen.findByRole('button', { name: 'ES' }));
+    // Signed in, the top bar has no language switch: it lives in the profile menu.
+    await userEvent.click(await screen.findByRole('button', { name: /^Your profile/ }));
+    expect(screen.queryByRole('button', { name: 'ES' })).toBeNull();
+    const english = screen.getByRole('menuitemradio', { name: 'EN' });
+    expect(english).toHaveAttribute('aria-checked', 'true');
+    await userEvent.click(screen.getByRole('menuitemradio', { name: 'ES' }));
     expect(screen.getByRole('heading', { level: 1, name: 'Equipo' })).toBeVisible();
+    expect(screen.getByRole('menuitemradio', { name: 'ES' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
     expect(document.documentElement.lang).toBe('es');
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

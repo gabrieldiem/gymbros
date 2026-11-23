@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import { expect, test } from '@playwright/test';
-import { logIn, memberEmail } from './members';
+import { logIn, memberEmail, setLanguage } from './members';
 
 // Run through `make e2e` (the e2e crews are seeded with the last 10 days of workouts).
 const SCREENS = 'test-results/screens';
@@ -14,7 +14,7 @@ test('crew feed, a reaction, hall of fame and the inbox', async ({ page }, testI
   await page.getByLabel('Email').fill(memberEmail('santi', testInfo));
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/climb$/);
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
     page.viewportSize()?.width,
   );
@@ -51,7 +51,7 @@ test('react with any emoji from the real picker, and answer with a picture', asy
   page,
 }, testInfo) => {
   await logIn(page, 'santi', testInfo, 'offline');
-  await page.getByRole('button', { name: 'EN', exact: true }).click();
+  await setLanguage(page, 'EN');
   await page.goto('/crew');
   const post = page
     .locator('main li')

@@ -11,7 +11,8 @@ export function TopBar() {
     <header className={styles.topbar}>
       <Brand className={styles.brand} />
       <div className={styles.actions}>
-        <LanguageToggle />
+        {/* Signed in, the language lives in the profile menu and settings. */}
+        {!me && <LanguageToggle />}
         {me && <NotificationBell />}
         {me && <ProfileMenu />}
       </div>

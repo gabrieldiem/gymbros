@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import type { Standing } from '../../api/climb';
 import { cx } from '../../components/cx';
@@ -22,6 +22,8 @@ type Props = {
   /** How a camp's value reads, for a climb that isn't in points. */
   campValue?: ((value: number) => string) | undefined;
   onClimbDone?: (() => void) | undefined;
+  /** Controls in the top-left corner, in place of the map's name. */
+  corner?: ReactNode;
 };
 
 function Camps({
@@ -86,6 +88,7 @@ export function TrailMap({
   climbFrom,
   onClimbDone,
   campValue,
+  corner,
 }: Props) {
   const { t, n } = useI18n();
   const targets = useMemo(
@@ -205,9 +208,13 @@ export function TrailMap({
           })}
         </g>
       </svg>
-      <div className={styles.title} aria-hidden="true">
-        {t('climb_title')}
-      </div>
+      {corner ? (
+        <div className={styles.corner}>{corner}</div>
+      ) : (
+        <div className={styles.title} aria-hidden="true">
+          {t('climb_title')}
+        </div>
+      )}
     </div>
   );
 }

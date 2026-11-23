@@ -71,3 +71,41 @@
 .item:focus-visible {
   background: var(--steel);
 }
+
+.language {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 0 0 0 10px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.choices {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 3px;
+  background: var(--iron);
+  border-radius: var(--r-control-sm);
+}
+
+.choices button {
+  min-width: var(--touch);
+  min-height: calc(var(--touch) - 6px);
+  border-radius: 7px;
+  color: var(--smoke);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.choices button:hover,
+.choices button:focus-visible {
+  color: var(--chalk);
+}
+
+.choices button[aria-checked='true'] {
+  background: var(--chalk);
+  color: var(--iron);
+}

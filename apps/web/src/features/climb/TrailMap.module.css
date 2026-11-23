@@ -25,6 +25,12 @@
   pointer-events: none;
 }
 
+.corner {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+}
+
 .contour {
   fill: none;
   stroke: #f2f2ee;

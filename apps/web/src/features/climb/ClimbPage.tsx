@@ -58,6 +58,19 @@ export function ClimbPage() {
     navigate(location.pathname, { replace: true, state: null });
   };
 
+  const modeToggle = (
+    <Segmented
+      overlay
+      label={t('mode_label')}
+      value={mode}
+      onChange={setMode}
+      options={[
+        { value: 'all', label: t('mode_all'), icon: AllTime },
+        { value: 'week', label: t('mode_week'), icon: CalendarDays },
+      ]}
+    />
+  );
+
   return (
     <>
       <ClimbNav />
@@ -67,18 +80,11 @@ export function ClimbPage() {
           <span className={styles.volt}>{t('hero2')}</span>
         </h1>
         <p>{t('hero_sub')}</p>
-        <div className={styles.row}>
-          <div>{legEvent && <TimedEventChip endsAt={week?.event_ends_at} />}</div>
-          <Segmented
-            label={t('mode_label')}
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'all', label: t('mode_all'), icon: AllTime },
-              { value: 'week', label: t('mode_week'), icon: CalendarDays },
-            ]}
-          />
-        </div>
+        {legEvent && (
+          <div className={styles.row}>
+            <TimedEventChip endsAt={week?.event_ends_at} />
+          </div>
+        )}
       </section>
       {climb.data ? (
         <div className={styles.grid}>
@@ -93,6 +99,7 @@ export function ClimbPage() {
                 : undefined
             }
             onClimbDone={handleClimbDone}
+            corner={modeToggle}
           />
           <aside>
             {me && (

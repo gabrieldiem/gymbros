@@ -25,3 +25,17 @@ export async function logIn(
   await page.getByRole('button', { name: /Log in|Entrar/ }).click();
   await expect(page).toHaveURL(/\/climb$/);
 }
+
+/** Signed in, the language is in the profile menu. Waits for the profile to store it. */
+export async function setLanguage(page: Page, code: 'EN' | 'ES') {
+  await page.getByRole('button', { name: /^(Your profile|Tu perfil),/ }).click();
+  const choice = page.getByRole('menuitemradio', { name: code, exact: true });
+  if ((await choice.getAttribute('aria-checked')) !== 'true') {
+    const saved = page.waitForResponse(
+      (r) => r.url().endsWith('/api/me') && r.request().method() === 'PATCH',
+    );
+    await choice.click();
+    await saved;
+  }
+  await page.keyboard.press('Escape');
+}

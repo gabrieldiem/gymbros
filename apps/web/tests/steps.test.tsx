@@ -1,4 +1,5 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,13 +23,16 @@ vi.mock('../src/features/climb/TrailMap', () => ({
     standings,
     campStep,
     campValue,
+    corner,
   }: {
     standings: { display_name: string; points: number }[];
     campStep: number;
     campValue?: (value: number) => string;
+    corner?: ReactNode;
   }) => (
     <div data-testid="map">
       {standings.map((s) => `${s.display_name}:${s.points}`).join()}|{campValue?.(campStep)}
+      {corner}
     </div>
   ),
 }));

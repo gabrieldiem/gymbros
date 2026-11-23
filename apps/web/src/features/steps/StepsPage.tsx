@@ -183,15 +183,6 @@ export function StepsPage() {
       <ClimbNav />
       <div className={styles.head}>
         <h1 id="page-title">{t('steps_title')}</h1>
-        <Segmented
-          label={t('mode_label')}
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: 'week', label: t('mode_week'), icon: CalendarDays },
-            { value: 'all', label: t('mode_all'), icon: AllTime },
-          ]}
-        />
       </div>
       <QueryState query={query} failed="steps_failed">
         {(data) => (
@@ -203,6 +194,18 @@ export function StepsPage() {
                 summit={data.summit}
                 campStep={data.camp_step}
                 campValue={(value) => t('steps_n', { n: n(value) })}
+                corner={
+                  <Segmented
+                    overlay
+                    label={t('mode_label')}
+                    value={mode}
+                    onChange={setMode}
+                    options={[
+                      { value: 'week', label: t('mode_week'), icon: CalendarDays },
+                      { value: 'all', label: t('mode_all'), icon: AllTime },
+                    ]}
+                  />
+                }
               />
               <ol className={styles.rope} aria-label={t('rope_order')}>
                 {data.standings.map((s) => (
