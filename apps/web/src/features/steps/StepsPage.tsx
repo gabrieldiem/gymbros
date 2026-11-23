@@ -1,4 +1,4 @@
-import { CalendarDays, Footprints, Infinity as AllTime, Trash2 } from 'lucide-react';
+import { Footprints, Infinity as AllTime, Trash2 } from 'lucide-react';
 import { lazy, Suspense, useState, type FormEvent } from 'react';
 
 import type { Standing } from '../../api/climb';
@@ -15,6 +15,7 @@ import { cx } from '../../components/cx';
 import { FormError } from '../../components/FormError';
 import { LoadingBlock, QueryState } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
+import { SevenDaysIcon } from '../../components/SevenDaysIcon';
 import { TextField } from '../../components/TextField';
 import { useToast } from '../../components/toast';
 import { useI18n } from '../../i18n/context';
@@ -201,7 +202,7 @@ export function StepsPage() {
                     value={mode}
                     onChange={setMode}
                     options={[
-                      { value: 'week', label: t('mode_week'), icon: CalendarDays },
+                      { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
                       { value: 'all', label: t('mode_all'), icon: AllTime },
                     ]}
                   />

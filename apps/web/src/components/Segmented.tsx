@@ -1,9 +1,11 @@
 import type { LucideIcon } from 'lucide-react';
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type ComponentType } from 'react';
 
 import styles from './Segmented.module.css';
 
-type Option<T extends string> = { value: T; label: string; icon?: LucideIcon };
+type Icon = LucideIcon | ComponentType<{ size?: number; 'aria-hidden'?: 'true' }>;
+
+type Option<T extends string> = { value: T; label: string; icon?: Icon };
 
 type Props<T extends string> = {
   label: string;

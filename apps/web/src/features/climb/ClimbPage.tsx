@@ -1,4 +1,4 @@
-import { CalendarDays, Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
+import { Infinity as AllTime, RotateCw, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -9,6 +9,7 @@ import { RecapStories } from '../recap/RecapStories';
 import { Button } from '../../components/Button';
 import { LoadingBlock } from '../../components/QueryState';
 import { Segmented } from '../../components/Segmented';
+import { SevenDaysIcon } from '../../components/SevenDaysIcon';
 import { useToast } from '../../components/toast';
 import { useShareInvite } from '../../components/useShareInvite';
 import { TimedEventChip } from '../../components/TimedEvent';
@@ -66,7 +67,7 @@ export function ClimbPage() {
       onChange={setMode}
       options={[
         { value: 'all', label: t('mode_all'), icon: AllTime },
-        { value: 'week', label: t('mode_week'), icon: CalendarDays },
+        { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
       ]}
     />
   );
@@ -76,8 +77,7 @@ export function ClimbPage() {
       <ClimbNav />
       <section className={styles.hero} aria-labelledby="page-title">
         <h1 id="page-title">
-          <span>{t('hero1')}</span>
-          <span className={styles.volt}>{t('hero2')}</span>
+          <span>{t('hero1')}</span> <span className={styles.volt}>{t('hero2')}</span>
         </h1>
         <p>{t('hero_sub')}</p>
         {legEvent && (
