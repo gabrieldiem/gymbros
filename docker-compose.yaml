@@ -57,7 +57,7 @@ services:
       APP_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
-      # Swagger UI at /api/docs: on for this local copy of production.
+      # Swagger UI at /api/docs, as in production.
       API_DOCS_ENABLED: ${API_DOCS_ENABLED:-true}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
