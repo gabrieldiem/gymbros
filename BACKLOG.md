@@ -26,6 +26,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 
 ## Later
 
+- [ ] `GYM-90` **Bring the prototype's header and tabs up to date** (docs+design, S): `docs/prototype/index.html` no longer matches the app, and PRODUCT.md wins: Crew is now Activity / Actividad; on phones the Climb slogan is one line with no subtitle; signed in, EN/ES is in the profile menu; Climb/Steps and Quests sections are underline tabs; this week / all time floats on the map with a 7d icon. _Added 2026-11-22_
 - [ ] `GYM-89` **Update base images, packages and language versions** (infra+api+web, M): check the base Docker images, both apps' packages and the language versions, and bring them reasonably up to date. Node 22 is old, Python 3.13 is fine, and use alpine where possible to save RAM. To be done autonomously, with no input needed. Keep the no-blind-upgrades rule for Dockerfiles. _Added 2026-11-03_
 - [ ] `GYM-88` **Include steps in Download my data** (api, S): the export has workouts but not step entries, and the privacy policy says you can download all your training. `models/export.py`. _Added 2026-11-03_
 - [ ] `GYM-15` **Scoring balance pass** (game, M): a jackpot day reaches about 1,200 pts against 150 to 250 for a normal day. Simulate a month for 5 profiles and flatten it if one day decides the week. _Added 2026-10-31_
