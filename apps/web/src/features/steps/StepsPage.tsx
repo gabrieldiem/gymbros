@@ -177,7 +177,8 @@ function Entries({ data }: { data: StepsData }) {
 /** Steps for a day or a period, and the crew climbing by them. */
 export function StepsPage() {
   const { t, n } = useI18n();
-  const [mode, setMode] = useState<StepsMode>('week');
+  // All time first, like ATUS Climb: the whole climb before this week's slice of it.
+  const [mode, setMode] = useState<StepsMode>('all');
   const query = useSteps(mode);
   return (
     <section aria-labelledby="page-title">
@@ -202,8 +203,8 @@ export function StepsPage() {
                     value={mode}
                     onChange={setMode}
                     options={[
-                      { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
                       { value: 'all', label: t('mode_all'), icon: AllTime },
+                      { value: 'week', label: t('mode_week'), icon: SevenDaysIcon },
                     ]}
                   />
                 }

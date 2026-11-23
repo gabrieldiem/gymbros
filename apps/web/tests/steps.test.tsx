@@ -131,13 +131,18 @@ describe('The steps page', () => {
     expect(screen.getByText(/^1 point every 250 steps, up to 20,000 a day/)).toBeVisible();
   });
 
-  it('switches to all time', async () => {
+  it('opens on all time, like ATUS Climb, and switches to this week', async () => {
     const fetchMock = open();
     await screen.findByTestId('map');
-    await userEvent.click(screen.getByRole('button', { name: /all time/i }));
-    await waitFor(() =>
-      expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain('/api/steps?mode=all'),
+    const urls = () => fetchMock.mock.calls.map(([url]) => String(url));
+    expect(screen.getByRole('button', { name: /all time/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
     );
+    expect(urls()).toContain('/api/steps?mode=all');
+    expect(urls()).not.toContain('/api/steps?mode=week');
+    await userEvent.click(screen.getByRole('button', { name: /this week/i }));
+    await waitFor(() => expect(urls()).toContain('/api/steps?mode=week'));
   });
 
   it('can’t save until there are days and a number', async () => {
