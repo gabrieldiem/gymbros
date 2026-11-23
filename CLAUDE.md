@@ -40,7 +40,7 @@ make crew name="ATUS" tz="America/Argentina/Buenos_Aires"   # Create a crew and 
 make clean       # Stop both stacks and delete their database volumes
 ```
 
-Ports: web dev 5173, api 8080 (`/docs` for OpenAPI), postgres 127.0.0.1:5432, prod web 8081. All configurable in `.env`.
+Ports: web dev 5173, api 8080 (Swagger UI at `/api/docs`, spec at `/api/openapi.json`; in production only with `API_DOCS_ENABLED=true`), postgres 127.0.0.1:5432, prod web 8081. All configurable in `.env`.
 
 The `run-stack` skill describes how to start the stack and verify a change end to end.
 

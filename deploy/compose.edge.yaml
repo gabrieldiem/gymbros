@@ -82,6 +82,8 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-GYMBROS <contact@gabrieldiem.com>}
       # Comma-separated. Empty means nobody can open the backoffice.
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      # Swagger UI at /api/docs and the spec at /api/openapi.json. Off unless set to true here.
+      API_DOCS_ENABLED: ${API_DOCS_ENABLED:-false}
     healthcheck:
       # /health runs a query and answers 503 if the database is down, which fails urlopen.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]

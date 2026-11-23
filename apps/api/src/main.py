@@ -50,10 +50,15 @@ async def lifespan(_app: FastAPI):
     await engine.dispose()
 
 
+# Docs under /api, so the nginx and Vite proxies reach them like any other route.
+_DOCS = settings.api_docs_enabled
 app: FastAPI = FastAPI(
     title="gymbros-api",
     description="GYMBROS: workouts, scoring and the ATUS Climb leaderboard",
     lifespan=lifespan,
+    docs_url="/api/docs" if _DOCS else None,
+    redoc_url="/api/redoc" if _DOCS else None,
+    openapi_url="/api/openapi.json" if _DOCS else None,
 )
 
 # Root and health at `/` for the container HEALTHCHECK; the same router under `/api` for the

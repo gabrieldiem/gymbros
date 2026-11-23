@@ -32,7 +32,7 @@ make install            # optional: local deps for editors and the pre-commit ho
 ## Run it
 
 ```bash
-make up                 # dev stack: web http://localhost:5173, api http://localhost:8080/docs
+make up                 # dev stack: web http://localhost:5173, API docs http://localhost:5173/api/docs
 make seed               # demo crew "Iron Ridge" with the prototype's history
                         # dev login at /login with gabi@demo.gymbros.app, no password (also maxo, santi, jose, matex)
 make seed reset=1       # rebuild the demo crew from scratch
