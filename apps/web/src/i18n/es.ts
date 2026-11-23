@@ -294,6 +294,7 @@ export const es = {
   dur_m: '{m} min',
   rest_start: 'Descanso {x}',
   empty_title: 'Arma tu entreno',
+  repeat_title: 'Repite un entreno reciente',
   empty_sub: 'Añade ejercicios uno a uno.',
   earn_title: 'Cómo sumas puntos',
   e_log: 'Registrar un entreno',
@@ -857,6 +858,11 @@ export const es = {
   wn_faster_sets_body: 'Registrar lleva menos toques, y tus puntos no cambian.',
   wn_faster_sets_points:
     'Toca para repetir el set de arriba\nQuita una fila que no necesitas\nMira los ejercicios con barra como discos más la barra',
+  wn_repeat_title: 'Repite un entreno reciente',
+  wn_repeat_body:
+    'Tus últimos entrenos están arriba en Entrenar. Un toque y empiezas uno de nuevo.',
+  wn_repeat_points:
+    'Los mismos ejercicios, también los tuyos\nCada set cargado para superar lo que hiciste\nPara un día pasado, tal como fue',
   wn_change_day_title: 'Cambia el día de un entreno',
   wn_change_day_body: '¿Empezaste uno y en realidad era de ayer? Muévelo mientras está abierto.',
   wn_change_day_points:
@@ -865,7 +871,7 @@ export const es = {
   wn_calisthenics_body:
     'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose y Planche lean se registran en segundos. Parallette push-up y Decline push-up, en reps.',
   wn_calisthenics_points:
-    'Un isométrico registra segundos, con kg añadidos si llevas lastre\nUno sólido paga como un set de 10 reps con tu peso\nAguantar más es un PR',
+    'Un isométrico registra segundos, con kg añadidos si llevas lastre\nUno sólido paga como un set de 10 reps con tu peso\nAguantar más es un PR\nHay una rutina de Calisthenics para empezar',
   wn_past_workouts_title: 'Registra un entreno pasado',
   wn_past_workouts_body:
     '¿Olvidaste registrar uno? Puedes añadirlo en cualquiera de los últimos 7 días.',

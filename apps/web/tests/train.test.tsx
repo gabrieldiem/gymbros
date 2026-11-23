@@ -471,6 +471,51 @@ describe('Train: start screen', () => {
     expect(screen.getByText('Hit 3 workouts in a week').nextSibling).toHaveTextContent('150');
   });
 
+  it('puts building your own first, then steps, then the routines', async () => {
+    trainApi();
+    renderApp('/train');
+    await screen.findByRole('button', { name: /Push day/ });
+    const cards = screen.getByRole('button', { name: /Build your own/ }).parentElement;
+    const names = [...(cards?.children ?? [])].map((card) => card.querySelector('h3')?.textContent);
+    expect(names.slice(0, 3)).toEqual(['Build your own', 'Steps', 'Push day']);
+  });
+
+  it('repeats a recent workout with one tap', async () => {
+    const recent = [
+      {
+        id: 'r1',
+        name: 'Park',
+        routine_id: null,
+        finished_at: '2026-10-31T15:00:00Z',
+        performed_on: null,
+        exercise_ids: ['bench', 'custom'],
+        custom_names: ['Muscle-up'],
+      },
+    ];
+    const fetchMock = trainApi({
+      'GET /api/workouts/recent': [200, recent],
+      'POST /api/workouts': [201, makeWorkout({ name: 'Park' })],
+    });
+    renderApp('/train');
+    const list = await screen.findByRole('region', { name: 'Repeat a recent workout' });
+    const park = within(list).getByRole('button', { name: /Park/ });
+    expect(park).toHaveTextContent(/Sat,? 31 Oct · Bench press, Muscle-up/);
+    await userEvent.click(park);
+    await screen.findByRole('article', { name: 'Bench press' });
+    expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({
+      routine_id: null,
+      name: 'Park',
+      repeat_workout_id: 'r1',
+    });
+  });
+
+  it('has nothing to repeat before your first workout', async () => {
+    trainApi({ 'GET /api/workouts/recent': [200, []] });
+    renderApp('/train');
+    await screen.findByRole('button', { name: /Push day/ });
+    expect(screen.queryByRole('region', { name: 'Repeat a recent workout' })).toBeNull();
+  });
+
   it('starts a routine and opens the logger with last time and the overload hint', async () => {
     const fetchMock = trainApi({ 'POST /api/workouts': [201, makeWorkout()] });
     renderApp('/train');

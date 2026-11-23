@@ -8,6 +8,11 @@ export const WHATS_NEW_COPY: Record<
   string,
   { title: MessageKey; body: MessageKey; points: MessageKey }
 > = {
+  'repeat-workout': {
+    title: 'wn_repeat_title',
+    body: 'wn_repeat_body',
+    points: 'wn_repeat_points',
+  },
   'change-day': {
     title: 'wn_change_day_title',
     body: 'wn_change_day_body',

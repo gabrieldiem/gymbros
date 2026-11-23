@@ -287,6 +287,7 @@ export const en = {
   dur_m: '{m} min',
   rest_start: 'Rest {x}',
   empty_title: 'Build your own',
+  repeat_title: 'Repeat a recent workout',
   empty_sub: 'Add exercises one at a time.',
   earn_title: 'How you earn points',
   e_log: 'Log a workout',
@@ -844,6 +845,10 @@ export const en = {
   wn_faster_sets_body: 'Logging takes fewer taps, and your points don’t change.',
   wn_faster_sets_points:
     'Tap to repeat the set above\nRemove a row you don’t need\nSee barbell lifts as disks plus the bar',
+  wn_repeat_title: 'Repeat a recent workout',
+  wn_repeat_body: 'Your last workouts are at the top of Train. One tap starts one again.',
+  wn_repeat_points:
+    'The same exercises, your own ones too\nEach set loaded to beat what you did\nFor a past day, just as it was',
   wn_change_day_title: 'Change the day of a workout',
   wn_change_day_body: 'Started one and it was really for yesterday? Move it while it’s open.',
   wn_change_day_points:
@@ -852,7 +857,7 @@ export const en = {
   wn_calisthenics_body:
     'L-sit, Hanging L-sit, Front lever, Crow pose, Crane pose and Planche lean log seconds. Parallette and decline push-ups log reps.',
   wn_calisthenics_points:
-    'A hold logs seconds, with added kg if you wear any\nA solid hold pays like a set of 10 bodyweight reps\nHolding longer is a PR',
+    'A hold logs seconds, with added kg if you wear any\nA solid hold pays like a set of 10 bodyweight reps\nHolding longer is a PR\nThere’s a Calisthenics routine to start from',
   wn_past_workouts_title: 'Log a past workout',
   wn_past_workouts_body: 'Forgot to log one? You can add it for any of the last 7 days.',
   wn_past_workouts_points:

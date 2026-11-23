@@ -1,5 +1,6 @@
 {
   "entries": [
+    { "id": "repeat-workout", "date": "2026-11-22", "link": "/train" },
     { "id": "change-day", "date": "2026-11-22", "link": "/train" },
     { "id": "calisthenics", "date": "2026-11-22", "link": "/train" },
     { "id": "steps", "date": "2026-11-03", "link": "/climb/steps" },
