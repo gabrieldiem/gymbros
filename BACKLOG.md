@@ -54,6 +54,7 @@ Product or technical decisions that are still open. If one blocks work, pick the
 
 ## Tech debt
 
+- [ ] `GYM-91` **Navbar indicator e2e is flaky under full-suite load** (web, S): `tests/e2e/smoke.spec.ts` "navbar: the indicator…" failed once in a full `make e2e` run (2.4 px off after a full load of /quests/achievements) and passed 8 of 8 alone. Likely placed before web fonts settle; `useSlidingIndicator` should re-measure on `document.fonts.ready`. _Added 2026-11-22_
 - [ ] `GYM-74` **API access log keeps Google sign-in codes** (api+infra, S): uvicorn logs the query string, so `/api/auth/google/callback` puts Google's one-time code and the state in the prod logs. Low risk (single use, needs the secret and PKCE verifier), but they shouldn't be kept. _Added 2026-11-02_
 - [ ] `GYM-73` **nginx drops security headers on the app shell** (infra, S): `add_header` in a location replaces the server-level ones, so `index.html`, `sw.js` and SPA paths have no `X-Frame-Options` or `Referrer-Policy` (checked on prod). The app can currently be framed. `apps/web/nginx.conf`. _Added 2026-11-02_
 - [ ] `GYM-43` **Prototype is one 2,100-line file** (docs, S): `docs/prototype/index.html` is reference only. Don't extend it; port features into `apps/web`. Delete it once everything is ported. _Added 2026-10-31_
