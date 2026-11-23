@@ -85,7 +85,7 @@ gymbros/
     │       └── test_*.py        # unit tests per service
     └── web/                     # React + TypeScript + Vite; built static, served by nginx
         ├── CLAUDE.md
-        ├── Dockerfile           # node build stage → nginx:alpine runtime
+        ├── Dockerfile           # node:26-alpine build stage → nginx:mainline-alpine-slim runtime
         ├── Dockerfile.dev       # vite dev server
         ├── nginx.conf           # SPA fallback, /api → api:8080 proxy, cache headers
         ├── package.json  tsconfig.json  vite.config.ts  index.html
