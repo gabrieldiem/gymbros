@@ -37,6 +37,10 @@ class Settings:
     # Connections the api keeps open, and how many more it may open under load. Each one is a
     # Postgres backend process, so keep this under postgres's max_connections.
     db_pool_size: int = 4
+    # Swagger UI and the OpenAPI spec under /api, in production too: the repo is public, so the spec
+    # tells nobody anything new, and every route still checks its session. API_DOCS_ENABLED=false
+    # turns them off.
+    api_docs_enabled: bool = True
     db_max_overflow: int = 4
     # Where browsers reach the app. Google redirects back here, so it never comes from a header.
     public_url: str = "http://localhost:5173"
@@ -161,6 +165,7 @@ class Settings:
         """Load env vars. Infrastructure first, then any tuning key as an UPPERCASE override."""
         self.log_level = os.getenv("LOG_LEVEL", "") or self.log_level
         self.app_env = os.getenv("APP_ENV", "") or self.app_env
+        self.api_docs_enabled = self._env_bool("API_DOCS_ENABLED", self.api_docs_enabled)
         self.postgres_host = os.getenv("POSTGRES_HOST", "") or self.postgres_host
         self.postgres_port = self._env_int("POSTGRES_PORT", self.postgres_port)
         self.postgres_user = os.getenv("POSTGRES_USER", "") or self.postgres_user

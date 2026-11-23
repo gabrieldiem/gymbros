@@ -38,6 +38,20 @@ def test_the_connection_pool_is_small_and_set_from_the_environment(monkeypatch):
     assert (Settings().db_pool_size, Settings().db_max_overflow) == (2, 1)
 
 
+def test_api_docs_are_on_in_production_too_unless_turned_off(monkeypatch):
+    monkeypatch.delenv("API_DOCS_ENABLED", raising=False)
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("SESSION_SECRET", "x" * 32)
+    monkeypatch.setenv("POSTGRES_PASSWORD", "x")
+    monkeypatch.setenv("GOOGLE_CLIENT_ID", "x")
+    monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "x")
+    monkeypatch.setenv("COOKIE_SECURE", "true")
+    monkeypatch.setenv("DEV_LOGIN_ENABLED", "false")
+    assert Settings().api_docs_enabled is True
+    monkeypatch.setenv("API_DOCS_ENABLED", "false")
+    assert Settings().api_docs_enabled is False
+
+
 def test_unknown_settings_json_key_is_warned(tmp_path, caplog):
     path = tmp_path / "settings.json"
     path.write_text(json.dumps({"scoring": {"pr": 90, "typo": 1}}))

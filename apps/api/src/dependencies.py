@@ -6,7 +6,8 @@ from datetime import timedelta
 from logging import Logger
 from typing import AsyncIterator
 
-from fastapi import Depends, Request
+from fastapi import Depends, Security
+from fastapi.security import APIKeyCookie, HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -227,9 +228,29 @@ def get_auth_service(session: AsyncSession = DB_SESSION) -> AuthService:
     return build_auth_service(session)
 
 
-def get_session_token(request: Request) -> str | None:
-    """The raw session token from the cookie, if present."""
-    return request.cookies.get(settings.session_cookie_name)
+# How a request proves its session, as the OpenAPI spec shows it. The app sends the cookie;
+# Swagger's Authorize and tools like curl send the same token as a Bearer header, because a page
+# can't set a Cookie header. Either way it's one session, checked the same way.
+_SESSION_COOKIE = APIKeyCookie(
+    name=settings.session_cookie_name,
+    scheme_name="session cookie",
+    description="Set when you sign in with Google. Same-origin requests send it on their own.",
+    auto_error=False,
+)
+_SESSION_BEARER = HTTPBearer(
+    scheme_name="session token",
+    description=f"The value of your {settings.session_cookie_name} cookie, as a Bearer token.",
+    auto_error=False,
+)
+
+
+def get_session_token(
+    cookie: str | None = Security(_SESSION_COOKIE),
+    bearer: HTTPAuthorizationCredentials | None = Security(_SESSION_BEARER),
+) -> str | None:
+    """The raw session token. A Bearer header wins over the cookie, so a token pasted into Swagger's
+    Authorize is the one used even in a browser that's signed in as someone else."""
+    return bearer.credentials if bearer else cookie
 
 
 async def get_current_user(
