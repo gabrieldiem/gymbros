@@ -34,7 +34,7 @@ export type QuestBoard = {
 export type BadgeId =
   | 'first' | 'better' | 'twoplates' | 'tonnage' | 'ironmonth' | 'plateclub' | 'dawn' | 'legs'
   | 'hunter' | 'rope' | 'hype' | 'trash' | 'owl' | 'comeback' | 'unstoppable'
-  | 'tenk' | 'mile' | 'longroad'; // prettier-ignore
+  | 'tenk' | 'mile' | 'longroad' | 'limber' | 'quarter' | 'engine' | 'ironhold'; // prettier-ignore
 
 export type Badge = {
   id: BadgeId;

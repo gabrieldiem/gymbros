@@ -847,6 +847,10 @@ export const en = {
   wn_faster_sets_body: 'Logging takes fewer taps, and your points don’t change.',
   wn_faster_sets_points:
     'Tap to repeat the set above\nRemove a row you don’t need\nSee barbell lifts as disks plus the bar',
+  wn_activity_badges_title: 'Four new achievements',
+  wn_activity_badges_body: 'Every kind of training now has one to chase.',
+  wn_activity_badges_points:
+    'Limber: stretch in 10 sessions\nQuarter million: 250,000 steps\nEngine: 5 hours of Muay Thai, boxing, HIIT and more\nIron hold: 20 minutes of holds',
   wn_repeat_title: 'Repeat a recent workout',
   wn_repeat_body: 'Your last workouts are at the top of Train. One tap starts one again.',
   wn_repeat_points:
@@ -971,6 +975,14 @@ export const en = {
   badge_comeback_d: 'Return after 14 days away.',
   badge_unstoppable: 'Unstoppable',
   badge_unstoppable_d: 'Reach the Unstoppable rank at 9,000 pts.',
+  badge_limber: 'Limber',
+  badge_limber_d: 'Stretch in 10 sessions.',
+  badge_quarter: 'Quarter million',
+  badge_quarter_d: 'Log 250,000 steps in total.',
+  badge_engine: 'Engine',
+  badge_engine_d: 'Do 5 hours of Muay Thai, boxing, HIIT, jump rope or stairs.',
+  badge_ironhold: 'Iron hold',
+  badge_ironhold_d: 'Hold for 20 minutes in total: L-sit, front lever, crow pose and more.',
   ln_quest: 'Quest complete: {q}',
   ln_crew_quest: 'Crew quest complete',
   ln_bounty: 'Bounty claimed: passed {name}',

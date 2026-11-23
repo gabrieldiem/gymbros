@@ -860,6 +860,10 @@ export const es = {
   wn_faster_sets_body: 'Registrar lleva menos toques, y tus puntos no cambian.',
   wn_faster_sets_points:
     'Toca para repetir el set de arriba\nQuita una fila que no necesitas\nMira los ejercicios con barra como discos más la barra',
+  wn_activity_badges_title: 'Cuatro logros nuevos',
+  wn_activity_badges_body: 'Ahora cada tipo de entreno tiene uno que perseguir.',
+  wn_activity_badges_points:
+    'Flexible: estira en 10 sesiones\nUn cuarto de millón: 250.000 pasos\nMotor: 5 horas de Muay Thai, boxeo, HIIT y más\nAguante de hierro: 20 minutos de isométricos',
   wn_repeat_title: 'Repite un entreno reciente',
   wn_repeat_body:
     'Tus últimos entrenos están arriba en Entrenar. Un toque y empiezas uno de nuevo.',
@@ -986,6 +990,14 @@ export const es = {
   badge_comeback_d: 'Vuelve tras 14 días sin entrenar.',
   badge_unstoppable: 'Imparable',
   badge_unstoppable_d: 'Alcanza el rango Imparable con 9.000 pts.',
+  badge_limber: 'Flexible',
+  badge_limber_d: 'Estira en 10 sesiones.',
+  badge_quarter: 'Un cuarto de millón',
+  badge_quarter_d: 'Registra 250.000 pasos en total.',
+  badge_engine: 'Motor',
+  badge_engine_d: 'Suma 5 horas de Muay Thai, boxeo, HIIT, comba o escaleras.',
+  badge_ironhold: 'Aguante de hierro',
+  badge_ironhold_d: 'Aguanta 20 minutos en total: L-sit, front lever, crow pose y más.',
   ln_quest: 'Reto completado: {q}',
   ln_crew_quest: 'Reto de equipo completado',
   ln_bounty: 'Recompensa cobrada: pasaste a {name}',
