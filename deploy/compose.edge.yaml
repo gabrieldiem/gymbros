@@ -43,7 +43,10 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      # Ready means the real server answers a query in the app's database over TCP. On a new volume
+      # the image first runs a socket-only server for its setup, then restarts: pg_isready on the
+      # socket passes during that window, so the api would start against a database about to go.
+      test: ["CMD-SHELL", "pg_isready -q -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} && psql -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} -tAc 'select 1' >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -80,6 +83,7 @@ services:
       # Comma-separated. Empty means nobody can open the backoffice.
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     healthcheck:
+      # /health runs a query and answers 503 if the database is down, which fails urlopen.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
       interval: 10s
       timeout: 10s
@@ -99,7 +103,8 @@ services:
     ports:
       - "127.0.0.1:8090:80"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      # Serving the app, not just answering: the built index.html with the React root in it.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ | grep -q 'id=\"root\"'"]
       interval: 10s
       timeout: 5s
       retries: 5

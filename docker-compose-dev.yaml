@@ -43,7 +43,10 @@ services:
     volumes:
       - postgres_dev_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      # Ready means the real server answers a query in the app's database over TCP. On a new volume
+      # the image first runs a socket-only server for its setup, then restarts: pg_isready on the
+      # socket passes during that window, so the api would start against a database about to go.
+      test: ["CMD-SHELL", "pg_isready -q -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} && psql -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} -tAc 'select 1' >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -71,6 +74,7 @@ services:
       - ./apps/api/alembic.ini:/alembic.ini:ro
       - ./apps/api/migrations:/migrations
     healthcheck:
+      # /health runs a query and answers 503 if the database is down, which fails urlopen.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
       interval: 10s
       timeout: 10s
@@ -97,6 +101,15 @@ services:
       - ./apps/web:/app
       # Keep the image's node_modules (built for Linux) instead of the host's.
       - /app/node_modules
+    healthcheck:
+      # Vite serves the app's index.html with the React root once it's ready.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173/ | grep -q 'id=\"root\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      # The first start pre-bundles dependencies.
+      start_period: 60s
+      start_interval: 2s
 
 volumes:
   postgres_dev_data:

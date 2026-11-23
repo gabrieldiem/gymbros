@@ -22,6 +22,10 @@ RUN (poetry check --lock || poetry lock) && poetry install --without dev --no-ro
 # Expose port 8080 (FastAPI main.py sets default to 8080)
 EXPOSE 8080
 
+# /health runs a query and answers 503 if the database is down, which fails urlopen.
+HEALTHCHECK --interval=10s --timeout=10s --retries=3 --start-period=15s \
+    CMD python -c 'import urllib.request; urllib.request.urlopen("http://localhost:8080/health", timeout=5)'
+
 # Run the app with uvicorn and hot reload. Migrations run in the lifespan
 # (RUN_MIGRATIONS_ON_STARTUP=true in docker-compose-dev.yaml).
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

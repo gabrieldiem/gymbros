@@ -59,4 +59,7 @@ ENV MALLOC_ARENA_MAX=2
 # - workers      : WEB_CONCURRENCY env var
 CMD ["sh", "-c", "python cli.py migrate && exec uvicorn main:app --host=0.0.0.0 --port=8080 --workers=${WEB_CONCURRENCY} --proxy-headers --forwarded-allow-ips='*'"]
 
-HEALTHCHECK --interval=10s --timeout=10s --retries=5 CMD python -c 'import urllib.request; urllib.request.urlopen("http://localhost:8080/health", timeout=5)'
+# /health runs a query and answers 503 if the database is down, which fails urlopen. The start period
+# covers `cli.py migrate`, which runs before uvicorn listens.
+HEALTHCHECK --interval=10s --timeout=10s --retries=5 --start-period=30s \
+    CMD python -c 'import urllib.request; urllib.request.urlopen("http://localhost:8080/health", timeout=5)'
