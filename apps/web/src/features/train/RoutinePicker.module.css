@@ -116,7 +116,7 @@ a.routine:hover {
   color: var(--smoke);
 }
 
-.recent span {
+.recent button > span {
   display: grid;
   min-width: 0;
 }

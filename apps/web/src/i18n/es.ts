@@ -295,6 +295,7 @@ export const es = {
   rest_start: 'Descanso {x}',
   empty_title: 'Arma tu entreno',
   repeat_title: 'Repite un entreno reciente',
+  repeat_verb: 'Repetir',
   empty_sub: 'Añade ejercicios uno a uno.',
   earn_title: 'Cómo sumas puntos',
   e_log: 'Registrar un entreno',

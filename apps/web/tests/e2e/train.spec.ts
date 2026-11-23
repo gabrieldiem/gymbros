@@ -25,7 +25,7 @@ test('log a Push day and finish it', async ({ page }, testInfo) => {
     path: `${SCREENS}/train-start-${testInfo.project.name}.png`,
     fullPage: true,
   });
-  await page.getByRole('button', { name: /Push day/ }).click();
+  await page.getByRole('button', { name: /^Push day/ }).click();
 
   const bench = page.getByRole('article', { name: 'Bench press' });
   await expect(bench).toBeVisible();
@@ -241,7 +241,7 @@ test('edit a finished workout: new points, a refused edit changes nothing', asyn
   await logIn(page, 'matex', testInfo, 'offline');
   await setLanguage(page, 'EN');
   await page.goto('/train');
-  await page.getByRole('button', { name: /Push day/ }).click();
+  await page.getByRole('button', { name: /^Push day/ }).click();
   const logged = page.getByRole('article', { name: 'Bench press' });
   await logged.getByLabel('Bench press, set 1, disks').fill('40');
   await logged.getByLabel('Bench press, set 1, reps').fill('5');

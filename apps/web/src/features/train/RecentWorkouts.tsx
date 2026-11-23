@@ -32,21 +32,22 @@ export function RecentWorkouts({ recent, catalog, starting, onRepeat }: Props) {
     <section className={styles.recent} aria-labelledby="recent-title">
       <h2 id="recent-title">{t('repeat_title')}</h2>
       <ul>
-        {recent.slice(0, 3).map((workout) => (
-          <li key={workout.id}>
-            <button type="button" disabled={starting} onClick={() => onRepeat(workout)}>
-              <RotateCcw size={18} aria-hidden="true" />
-              <span>
-                <b>{workout.name}</b>
-                <small>
-                  {formatDay(lang, workout.performed_on ?? localDay(workout.finished_at))}
-                  {' · '}
-                  {names(workout)}
-                </small>
-              </span>
-            </button>
-          </li>
-        ))}
+        {recent.slice(0, 3).map((workout) => {
+          const day = formatDay(lang, workout.performed_on ?? localDay(workout.finished_at));
+          const meta = `${day} · ${names(workout)}`;
+          return (
+            <li key={workout.id}>
+              <button type="button" disabled={starting} onClick={() => onRepeat(workout)}>
+                <RotateCcw size={18} aria-hidden="true" />
+                <span>
+                  {/* Heard first, so the name starts with what the button does. */}
+                  <span className="sr-only">{t('repeat_verb')}</span> <b>{workout.name}</b>{' '}
+                  <small>{meta}</small>
+                </span>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

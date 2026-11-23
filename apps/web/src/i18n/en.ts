@@ -288,6 +288,7 @@ export const en = {
   rest_start: 'Rest {x}',
   empty_title: 'Build your own',
   repeat_title: 'Repeat a recent workout',
+  repeat_verb: 'Repeat',
   empty_sub: 'Add exercises one at a time.',
   earn_title: 'How you earn points',
   e_log: 'Log a workout',

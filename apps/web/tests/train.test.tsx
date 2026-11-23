@@ -498,8 +498,9 @@ describe('Train: start screen', () => {
     });
     renderApp('/train');
     const list = await screen.findByRole('region', { name: 'Repeat a recent workout' });
-    const park = within(list).getByRole('button', { name: /Park/ });
-    expect(park).toHaveTextContent(/Sat,? 31 Oct · Bench press, Muscle-up/);
+    const park = within(list).getByRole('button', {
+      name: /^Repeat Park Sat,? 31 Oct · Bench press, Muscle-up$/,
+    });
     await userEvent.click(park);
     await screen.findByRole('article', { name: 'Bench press' });
     expect(bodyOf(fetchMock, 'POST', '/api/workouts')).toEqual({
