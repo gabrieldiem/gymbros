@@ -129,6 +129,16 @@ class WorkoutRepository:
         )
         return list(result.scalars())
 
+    async def recent_finished(self, user_id: uuid.UUID, limit: int) -> list[Workout]:
+        """The user's latest finished workouts with their sets, newest first."""
+        result = await self._session.execute(
+            select(Workout)
+            .where(Workout.user_id == user_id, Workout.finished_at.is_not(None))
+            .order_by(Workout.finished_at.desc(), Workout.id)
+            .limit(limit)
+        )
+        return list(result.scalars())
+
     async def photo_versions(self, workout_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
         """Which of these workouts have a photo, and its version."""
         if not workout_ids:

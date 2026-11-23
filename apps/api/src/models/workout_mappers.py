@@ -6,6 +6,7 @@ from models.avatar import avatar_url
 from models.climb_mappers import to_climb_change
 from models.photos import photo_url
 from models.workouts import (
+    RecentWorkoutModel,
     ExerciseOutput,
     FinishResponse,
     LineItemModel,
@@ -17,7 +18,12 @@ from models.workouts import (
 )
 from services.training_now_service import ActiveWorkout
 from services.training_rules import LoggedSet
-from services.workout_types import FinishedWorkout, WorkoutTemplateView, WorkoutView
+from services.workout_types import (
+    FinishedWorkout,
+    RecentWorkout,
+    WorkoutTemplateView,
+    WorkoutView,
+)
 
 
 def _set(logged: LoggedSet) -> SetModel:
@@ -47,6 +53,20 @@ def to_workout_response(view: WorkoutView) -> WorkoutResponse:
             for e in view.exercises
         ],
         live_points=view.live.total,
+    )
+
+
+def to_recent_workout(recent: RecentWorkout) -> RecentWorkoutModel:
+    """A finished workout offered to repeat."""
+    workout = recent.workout
+    return RecentWorkoutModel(
+        id=workout.id,
+        name=workout.name,
+        routine_id=workout.routine_id,
+        finished_at=workout.finished_at or workout.started_at,
+        performed_on=workout.performed_on,
+        exercise_ids=[e.exercise_id for e in recent.entries],
+        custom_names=[e.custom_name for e in recent.entries if e.custom_name],
     )
 
 

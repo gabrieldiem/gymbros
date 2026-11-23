@@ -21,6 +21,7 @@ from services.errors import (
     WorkoutNotFound,
 )
 from services.member import Member
+from services.repeat_workout import recent_workouts, repeated_entries
 from services.scoring_service import score_workout
 from services.scoring_context import ScoringContextBuilder
 from services.scoring_types import ScoringRules
@@ -36,12 +37,16 @@ from services.workout_types import (
     ExerciseEntry,
     ExerciseView,
     PastDay,
+    RecentWorkout,
     WorkoutStateChanges,
     WorkoutTemplateView,
     WorkoutView,
 )
 
 DEFAULT_SETS = 3
+RECENT_LIMIT = 4
+# How many finished workouts to look through for that many different ones.
+RECENT_WINDOW = 5
 STRETCH_ROUTINE = "stretch"
 
 
@@ -76,9 +81,11 @@ class WorkoutService:
         name: str | None,
         performed_on: date | None = None,
         gym: str | None = None,
+        repeat_from: uuid.UUID | None = None,
     ) -> WorkoutView:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
-        """Start a workout from a routine (pre-filled to beat last time) or empty.
+        """Start a workout from a routine (pre-filled to beat last time), from one of your finished
+        workouts (`repeat_from`, its exercises loaded to beat it), or empty.
 
         With `performed_on`, this logs a past day instead: nothing is happening now, so the crew
         isn't told and the routine is pre-filled with what you did last time, as it was.
@@ -86,8 +93,13 @@ class WorkoutService:
         self._check_past_day(member, performed_on)
         if await self._workouts.get_active(member.user.id) is not None:
             raise WorkoutAlreadyActive(str(member.user.id))
-        exercise_ids = self._routine_exercises(routine_id)
-        entries = await self._prefilled(member, exercise_ids, performed_on)
+        if repeat_from is not None:
+            source = await self._finished(member, repeat_from)
+            routine_id, name = source.routine_id, name or source.name
+            entries = repeated_entries(source, self._exercise, past=performed_on is not None)
+        else:
+            exercise_ids = self._routine_exercises(routine_id)
+            entries = await self._prefilled(member, exercise_ids, performed_on)
         workout = Workout(
             user_id=member.user.id,
             crew_id=member.crew.id,
@@ -102,6 +114,17 @@ class WorkoutService:
         if self._activity is not None and performed_on is None and routine_id != STRETCH_ROUTINE:
             await self._activity.workout_started(member)
         return view
+
+    async def recent(self, member: Member, limit: int = RECENT_LIMIT) -> tuple[RecentWorkout, ...]:
+        """Your latest workouts to repeat, one per set of exercises, newest first."""
+        window = await self._workouts.recent_finished(member.user.id, limit * RECENT_WINDOW)
+        return recent_workouts(window, limit)
+
+    async def _finished(self, member: Member, workout_id: uuid.UUID) -> Workout:
+        workout = await self._workouts.get(workout_id)
+        if workout is None or workout.user_id != member.user.id or workout.finished_at is None:
+            raise WorkoutNotFound(str(workout_id))
+        return workout
 
     async def templates(self, member: Member) -> tuple[WorkoutTemplateView, ...]:
         """Every routine as it would start now, so a phone can start one with no signal."""

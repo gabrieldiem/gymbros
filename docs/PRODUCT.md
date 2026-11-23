@@ -121,6 +121,10 @@ Forgot to log one? From Train you can log a workout for any of the last 7 days (
 - **Logging it:** routines pre-fill what you did last time as it was, without the overload. There's no clock or rest timer.
 - **Changing the day:** an open workout can move to any of those days, or back to today, from the logger ("Change day"), until you finish it. The sets you logged stay; the last-time column and the live points follow the new day. A workout moved to a past day stops being "training now", but a crew already told you were coming isn't told again.
 
+## Repeating a workout
+
+The Train start screen lists your last few workouts, one per set of exercises (three Push days show once), newest first. Tapping one starts it again: the same name, routine and exercises, custom ones included, each with the sets you completed, loaded to beat them like a routine (below). Exercises you skipped are left out. For a past day it loads them as they were. With no signal it starts from its routine, or empty.
+
 ## Progressive overload
 
 When a routine starts, every set is pre-filled from the last session:

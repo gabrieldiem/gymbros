@@ -50,6 +50,8 @@ class StartWorkoutRequest(BaseModel):
     performed_on: date | None = None
     # Leave it out for your default gym; null for no gym.
     gym: GymName | None = None
+    # One of your finished workouts to start again: its exercises, loaded to beat it.
+    repeat_workout_id: uuid.UUID | None = None
 
 
 class SaveWorkoutRequest(BaseModel):
@@ -98,6 +100,19 @@ class WorkoutResponse(BaseModel):
     started_at: datetime
     exercises: list[ExerciseOutput]
     live_points: int
+
+
+class RecentWorkoutModel(BaseModel):
+    """A finished workout you can repeat."""
+
+    id: uuid.UUID
+    name: str
+    routine_id: str | None
+    finished_at: datetime
+    performed_on: date | None
+    exercise_ids: list[str]
+    # The names of its custom exercises, in order.
+    custom_names: list[str]
 
 
 class WorkoutTemplate(BaseModel):

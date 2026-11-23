@@ -30,6 +30,14 @@ class ExerciseView:
 
 
 @dataclass(frozen=True, slots=True)
+class RecentWorkout:
+    """A finished workout offered to repeat, with its exercises in order."""
+
+    workout: Workout
+    entries: tuple[ExerciseEntry, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class WorkoutStateChanges:
     # pylint: disable=too-many-instance-attributes
     """The logger's state for an in-progress workout. The gym and day change only when asked."""
