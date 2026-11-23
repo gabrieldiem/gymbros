@@ -93,6 +93,14 @@ def test_a_small_file_that_unpacks_into_a_huge_picture_is_refused():
         clean_image(bomb, MAX_PHOTO_BYTES)
 
 
+def test_pictures_stay_small_enough_to_decode_in_the_api_s_memory():
+    # The app sends at most 1280 px a side; the server takes up to 4 MP and no more.
+    assert clean_image(picture("JPEG", size=(1280, 960)), MAX_PHOTO_BYTES)
+    assert clean_image(picture("JPEG", size=(2000, 2000)), MAX_PHOTO_BYTES)
+    with pytest.raises(ImageNotSupported):
+        clean_image(picture("JPEG", size=(2001, 2000)), MAX_PHOTO_BYTES)
+
+
 def test_the_type_comes_from_the_bytes():
     assert image_type(PNG) == "image/png"
     assert clean_image(PNG, MAX_PHOTO_BYTES).content_type == "image/png"

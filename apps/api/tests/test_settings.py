@@ -27,6 +27,17 @@ def test_env_overrides_tuning_keys_with_their_type(monkeypatch):
     assert loaded.session_cookie_name == "other"
 
 
+def test_the_connection_pool_is_small_and_set_from_the_environment(monkeypatch):
+    monkeypatch.delenv("DB_POOL_SIZE", raising=False)
+    monkeypatch.delenv("DB_MAX_OVERFLOW", raising=False)
+    default = Settings()
+    # Postgres allows 20 connections (compose files); the api must leave room for migrations.
+    assert default.db_pool_size + default.db_max_overflow <= 10
+    monkeypatch.setenv("DB_POOL_SIZE", "2")
+    monkeypatch.setenv("DB_MAX_OVERFLOW", "1")
+    assert (Settings().db_pool_size, Settings().db_max_overflow) == (2, 1)
+
+
 def test_unknown_settings_json_key_is_warned(tmp_path, caplog):
     path = tmp_path / "settings.json"
     path.write_text(json.dumps({"scoring": {"pr": 90, "typo": 1}}))

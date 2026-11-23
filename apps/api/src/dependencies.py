@@ -86,7 +86,12 @@ from settings import Settings
 
 settings: Settings = Settings.get_settings()
 logger: Logger = init_logger(settings)
-engine: AsyncEngine = create_async_engine(settings.database_url, pool_pre_ping=True)
+engine: AsyncEngine = create_async_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    pool_size=settings.db_pool_size,
+    max_overflow=settings.db_max_overflow,
+)
 session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
     engine, expire_on_commit=False
 )

@@ -45,8 +45,11 @@ USER gymbros
 
 EXPOSE 8080
 
-ARG WEB_CONCURRENCY=2
+ARG WEB_CONCURRENCY=1
 ENV WEB_CONCURRENCY=${WEB_CONCURRENCY}
+# glibc gives each thread its own malloc arena, so Python's thread pool (image work, blocking I/O)
+# slowly grows memory that's never returned. Two arenas keep that flat on a small box.
+ENV MALLOC_ARENA_MAX=2
 
 # Migrate once, before the workers start (so workers never race each other on Alembic), then run
 # uvicorn:
