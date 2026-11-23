@@ -1,5 +1,7 @@
 """Every upload is rebuilt from its pixels, so nothing else in the file survives."""
 
+import asyncio
+import time
 import importlib.util
 import io
 from pathlib import Path
@@ -8,6 +10,7 @@ import pytest
 from PIL import Image, PngImagePlugin
 
 from services.errors import ImageNotSupported, ImageTooLarge
+from services import images
 from services.images import MAX_PHOTO_BYTES, clean_image, image_file_name, image_type
 from tests.images import JPEG, PNG, picture
 
@@ -93,6 +96,14 @@ def test_a_small_file_that_unpacks_into_a_huge_picture_is_refused():
         clean_image(bomb, MAX_PHOTO_BYTES)
 
 
+def test_pictures_stay_small_enough_to_decode_in_the_api_s_memory():
+    # The app sends at most 1280 px a side; the server takes up to 4 MP and no more.
+    assert clean_image(picture("JPEG", size=(1280, 960)), MAX_PHOTO_BYTES)
+    assert clean_image(picture("JPEG", size=(2000, 2000)), MAX_PHOTO_BYTES)
+    with pytest.raises(ImageNotSupported):
+        clean_image(picture("JPEG", size=(2001, 2000)), MAX_PHOTO_BYTES)
+
+
 def test_the_type_comes_from_the_bytes():
     assert image_type(PNG) == "image/png"
     assert clean_image(PNG, MAX_PHOTO_BYTES).content_type == "image/png"
@@ -116,3 +127,29 @@ def test_the_migration_cleans_images_stored_before_this():
     assert SECRET.encode() not in cleaned
     assert cleaned.startswith(b"\xff\xd8\xff")
     assert migration._without_metadata(b"not a picture") is None  # pylint: disable=protected-access
+
+
+async def test_uploads_are_decoded_one_at_a_time(monkeypatch):
+    # Decoding takes ~14 MB per megapixel and the api has 256 MB: three big uploads at once
+    # could get it killed, so they queue instead.
+    running = 0
+    most = 0
+
+    def slow_clean(data, max_bytes):
+        nonlocal running, most
+        running += 1
+        most = max(most, running)
+        time.sleep(0.05)
+        running -= 1
+        return images.CleanImage(data, "image/png")
+
+    monkeypatch.setattr(images, "clean_image", slow_clean)
+    results = await asyncio.gather(*(images.clean_upload(PNG, MAX_PHOTO_BYTES) for _ in range(4)))
+    assert len(results) == 4
+    assert most == 1
+
+
+async def test_an_upload_that_fails_lets_the_next_one_through():
+    with pytest.raises(ImageNotSupported):
+        await images.clean_upload(b"not a picture", MAX_PHOTO_BYTES)
+    assert (await images.clean_upload(PNG, MAX_PHOTO_BYTES)).content_type == "image/png"

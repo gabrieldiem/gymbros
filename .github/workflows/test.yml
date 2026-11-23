@@ -54,7 +54,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U gymbros"
+          --health-cmd "pg_isready -q -h 127.0.0.1 -U gymbros -d gymbros && psql -h 127.0.0.1 -U gymbros -d gymbros -tAc 'select 1'"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -105,7 +105,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "26"
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
 

@@ -1,21 +1,32 @@
 """Uploaded images: only what a browser shows as a picture, recognized by its bytes, and rebuilt
 from its pixels so that nothing else in the file survives: no location, camera, dates or names."""
 
+import asyncio
 import hashlib
 import io
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from PIL import Image, ImageOps, UnidentifiedImageError
+if TYPE_CHECKING:
+    from PIL import Image
 
 from services.errors import ImageNotSupported, ImageTooLarge
 
 MAX_AVATAR_BYTES = 300 * 1024
 MAX_PHOTO_BYTES = 2 * 1024 * 1024
-# Far past any phone, and it stops a small file that unpacks into an enormous picture.
-_MAX_PIXELS = 50_000_000
+# The app resizes on the phone to 1280 px at most (1.6 MP), so this leaves 2.5× room. It stops a
+# small file that unpacks into an enormous picture: decoding takes ~14 MB per megapixel, and the
+# api runs in 256 MB (deploy/compose.edge.yaml). At 48 MP one upload was enough to OOM-kill it.
+_MAX_PIXELS = 4_000_000
 _QUALITIES = (90, 80, 70)
 _FORMATS = {"JPEG": "image/jpeg", "PNG": "image/png", "WEBP": "image/webp"}
 _EXTENSIONS = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
+
+
+# One decode at a time per process. At the 4 MP limit a decode takes ~60 MB, and the api runs in
+# 256 MB: two at once fit, three could OOM-kill it. Others wait on the event loop (no thread
+# held), about half a second each.
+_DECODING = asyncio.Semaphore(1)
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,8 +48,10 @@ def image_type(data: bytes) -> str | None:
     return None
 
 
-def _pixels_only(image: Image.Image) -> Image.Image:
+def _pixels_only(image: "Image.Image") -> "Image.Image":
     """A new image from the pixels alone, upright, so no metadata can come along with it."""
+    from PIL import Image, ImageOps  # pylint: disable=import-outside-toplevel,redefined-outer-name
+
     upright = ImageOps.exif_transpose(image)
     has_alpha = upright.mode in ("RGBA", "LA", "PA") or "transparency" in upright.info
     if upright.mode not in ("RGB", "RGBA", "L"):
@@ -46,7 +59,7 @@ def _pixels_only(image: Image.Image) -> Image.Image:
     return Image.frombytes(upright.mode, upright.size, upright.tobytes())
 
 
-def _encode(image: Image.Image, image_format: str, quality: int) -> bytes:
+def _encode(image: "Image.Image", image_format: str, quality: int) -> bytes:
     if image_format == "JPEG" and image.mode == "RGBA":
         image = image.convert("RGB")
     output = io.BytesIO()
@@ -56,7 +69,13 @@ def _encode(image: Image.Image, image_format: str, quality: int) -> bytes:
 
 def clean_image(data: bytes, max_bytes: int) -> CleanImage:
     """A valid upload with everything but its pixels gone. Raises if it's too big or isn't a
-    picture. It decodes the image, so call it off the event loop."""
+    picture. It decodes the image, so call it off the event loop.
+
+    Pillow is imported on the first upload rather than at start: it's ~5 MB that most requests
+    never need."""
+    # pylint: disable-next=import-outside-toplevel,redefined-outer-name
+    from PIL import Image, UnidentifiedImageError
+
     if len(data) > max_bytes:
         raise ImageTooLarge(str(len(data)))
     if image_type(data) is None:
@@ -74,6 +93,12 @@ def clean_image(data: bytes, max_bytes: int) -> CleanImage:
         if len(cleaned) <= max_bytes:
             return CleanImage(cleaned, _FORMATS[image_format])
     raise ImageTooLarge(str(len(cleaned)))
+
+
+async def clean_upload(data: bytes, max_bytes: int) -> CleanImage:
+    """clean_image off the event loop, one upload at a time. Use this from request handlers."""
+    async with _DECODING:
+        return await asyncio.to_thread(clean_image, data, max_bytes)
 
 
 def image_file_name(data: bytes, content_type: str) -> str:

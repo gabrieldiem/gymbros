@@ -34,6 +34,10 @@ class Settings:
     session_secret: str = ""
     cookie_secure: bool = False
     run_migrations_on_startup: bool = False
+    # Connections the api keeps open, and how many more it may open under load. Each one is a
+    # Postgres backend process, so keep this under postgres's max_connections.
+    db_pool_size: int = 4
+    db_max_overflow: int = 4
     # Where browsers reach the app. Google redirects back here, so it never comes from a header.
     public_url: str = "http://localhost:5173"
     google_client_id: str = ""
@@ -167,6 +171,8 @@ class Settings:
         self.run_migrations_on_startup = self._env_bool(
             "RUN_MIGRATIONS_ON_STARTUP", self.run_migrations_on_startup
         )
+        self.db_pool_size = self._env_int("DB_POOL_SIZE", self.db_pool_size)
+        self.db_max_overflow = self._env_int("DB_MAX_OVERFLOW", self.db_max_overflow)
         self.public_url = (os.getenv("PUBLIC_URL", "") or self.public_url).rstrip("/")
         self.google_client_id = os.getenv("GOOGLE_CLIENT_ID", self.google_client_id)
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET", self.google_client_secret)

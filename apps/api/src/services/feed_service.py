@@ -1,6 +1,5 @@
 """The Crew feed: pages of items with reactions and comments, nudge prompts, react, comment."""
 
-import asyncio
 import uuid
 from collections import Counter
 from collections.abc import Callable
@@ -18,7 +17,7 @@ from db.tables.user import User
 from services.badge_service import BadgeService
 from services.emoji_text import shown_emoji, stored_kind
 from services.errors import CommentNotFound, FeedItemNotFound
-from services.images import MAX_PHOTO_BYTES, clean_image
+from services.images import MAX_PHOTO_BYTES, clean_upload
 from services.member import Member
 from services.notifier import Notifier
 from services.social_types import (
@@ -121,7 +120,7 @@ class FeedService:
     ) -> CommentView:
         """Answer a post with a picture, cleaned before anything is stored."""
         item = await self._item_in_crew(member, item_id)
-        clean = await asyncio.to_thread(clean_image, data, MAX_PHOTO_BYTES)
+        clean = await clean_upload(data, MAX_PHOTO_BYTES)
         now = self._now()
         comment = Comment(
             feed_item_id=item.id,

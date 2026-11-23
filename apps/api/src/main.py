@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from controller import general
-from db.migrate import run_migrations
 from dependencies import engine, logger, settings, run_digest_loop
 from routes import (
     admin,
@@ -38,6 +37,9 @@ async def lifespan(_app: FastAPI):
     """Migrate (dev only), then dispose of the engine's connection pool on shutdown."""
     logger.info("Starting gymbros-api (env=%s)...", settings.app_env)
     if settings.run_migrations_on_startup:
+        # Imported here: Alembic costs ~5 MB per process, and production migrates before uvicorn.
+        from db.migrate import run_migrations  # pylint: disable=import-outside-toplevel
+
         await asyncio.to_thread(run_migrations)
         logger.info("Database migrated to head")
     digests = asyncio.create_task(run_digest_loop()) if settings.email_scheduler_enabled else None

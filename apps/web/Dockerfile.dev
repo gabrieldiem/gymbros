@@ -1,6 +1,6 @@
 # Vite dev server with hot reload. The source is mounted at /app by docker-compose-dev.yaml;
 # node_modules stays in the image (an anonymous volume keeps the host's out).
-FROM node:22-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 
@@ -8,5 +8,10 @@ COPY package.json package-lock.json /app/
 RUN npm ci --no-audit --no-fund
 
 EXPOSE 5173
+
+# Vite serves the app's index.html with the React root once it's ready (the first start pre-bundles
+# dependencies, hence the long start period).
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=60s \
+    CMD wget -qO- http://127.0.0.1:5173/ | grep -q 'id="root"' || exit 1
 
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

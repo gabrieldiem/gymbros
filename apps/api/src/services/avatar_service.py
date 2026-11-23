@@ -1,6 +1,5 @@
 """Uploaded profile pictures: yours to change, your crew's to see."""
 
-import asyncio
 import uuid
 from collections.abc import Callable
 from datetime import datetime
@@ -11,7 +10,7 @@ from db.repositories.user_repository import UserRepository
 from db.tables.avatar import Avatar
 from db.tables.user import User
 from services.errors import AvatarNotFound
-from services.images import MAX_AVATAR_BYTES, clean_image
+from services.images import MAX_AVATAR_BYTES, clean_upload
 
 
 class AvatarService:
@@ -29,7 +28,7 @@ class AvatarService:
 
     async def upload(self, user: User, data: bytes) -> None:
         """Replace your picture. Raises if it's too big or isn't a picture."""
-        clean = await asyncio.to_thread(clean_image, data, MAX_AVATAR_BYTES)
+        clean = await clean_upload(data, MAX_AVATAR_BYTES)
         now = self._now()
         await self._avatars.store(
             Avatar(

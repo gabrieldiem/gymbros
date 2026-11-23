@@ -11,6 +11,20 @@ services:
     container_name: gymbros-postgres
     image: postgres:18-alpine
     restart: unless-stopped
+    # Sized for a 2 GB box shared with other stacks and a database of a few MB: small buffers, room
+    # for the api's pool (DB_POOL_SIZE + DB_MAX_OVERFLOW) plus migrations, one I/O worker.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=32MB
+      - -c
+      - max_connections=20
+      - -c
+      - io_workers=1
+      - -c
+      - maintenance_work_mem=16MB
+      - -c
+      - effective_cache_size=128MB
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
@@ -18,12 +32,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      # Ready means the real server answers a query in the app's database over TCP. On a new volume
+      # the image first runs a socket-only server for its setup, then restarts: pg_isready on the
+      # socket passes during that window, so the api would start against a database about to go.
+      test: ["CMD-SHELL", "pg_isready -q -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} && psql -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB} -tAc 'select 1' >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
       start_interval: 1s
+    mem_limit: 256m
 
   api:
     container_name: gymbros-api
@@ -38,7 +56,7 @@ services:
       # Always production here, whatever .env says: settings then demand a real SESSION_SECRET.
       APP_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: ${POSTGRES_USER}
@@ -53,12 +71,14 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
     healthcheck:
+      # /health runs a query and answers 503 if the database is down, which fails urlopen.
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health', timeout=5)"]
       interval: 10s
       timeout: 10s
       retries: 5
       start_period: 15s
       start_interval: 1s
+    mem_limit: 256m
 
   web:
     container_name: gymbros-web
@@ -74,11 +94,13 @@ services:
     ports:
       - "${WEB_HOST_PORT:-8081}:80"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      # Serving the app, not just answering: the built index.html with the React root in it.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ | grep -q 'id=\"root\"'"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 5s
+    mem_limit: 64m
 
 volumes:
   postgres_data:
