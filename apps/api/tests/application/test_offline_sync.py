@@ -1,7 +1,8 @@
 """A workout logged with no signal arrives whole: once, dated when it happened."""
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
 
 from clock import utc_now
 from services.training_rules import week_start
@@ -10,8 +11,17 @@ ZONE = "America/Argentina/Buenos_Aires"
 BENCH = {"exercise_id": "bench", "sets": [{"load_kg": 60, "bar_kg": 20, "reps": 5, "done": True}]}
 
 
+def recently() -> datetime:
+    """Two hours ago, or halfway into this crew week if it began less than that ago: the workout
+    has to land in the week the counts below read. Plain "two hours ago" broke every Monday from
+    00:00 to 02:45 crew time, when it fell in the week before."""
+    now = utc_now()
+    monday = datetime.combine(week_start(now, ZONE), time(0), ZoneInfo(ZONE))
+    return max(now - timedelta(hours=2), monday + (now - monday) / 2)
+
+
 def body(**overrides):
-    finished = utc_now() - timedelta(hours=2)
+    finished = recently()
     return {
         "routine_id": "push",
         "name": "Push day",
