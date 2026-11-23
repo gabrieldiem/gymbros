@@ -1,5 +1,7 @@
 {
   "entries": [
+    { "id": "elite-badges", "date": "2026-11-22", "link": "/quests/achievements" },
+    { "id": "activity-badges", "date": "2026-11-22", "link": "/quests/achievements" },
     { "id": "repeat-workout", "date": "2026-11-22", "link": "/train" },
     { "id": "change-day", "date": "2026-11-22", "link": "/train" },
     { "id": "calisthenics", "date": "2026-11-22", "link": "/train" },

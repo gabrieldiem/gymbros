@@ -46,7 +46,7 @@ Points are computed server-side when a workout is finished. Values live in `apps
 | Weekly quest complete | quest bonus (100 to 200) | Once per quest per week |
 | Crew quest complete | 200 to everyone | Crew total for the week reaches the goal (4,000) |
 | Bounty | 150 | Pass the current leader (all-time) while a bounty is active |
-| Badge unlocked | badge points (50 to 300) | Once per badge, ever |
+| Badge unlocked | badge points (50 to 500) | Once per badge, ever |
 
 **One hour of any sport pays about the same.** At an ordinary pace, 60 minutes pays 255 for a 10 km run, a 2.5 km swim or a 12.5 km row, against 250 for a 12-tonne, 16-set lifting session. Time always pays, so a longer session earns more in total; over the same time, going further pays more. Logging no distance pays time only. `test_an_hour_of_cardio_pays_about_the_same_as_an_hour_of_lifting` holds this in place: retune the numbers together.
 
@@ -84,7 +84,7 @@ One photo per workout, added while logging or later from its details on the You 
 
 Add it to any workout, or log it alone from its own routine. You tap how long you did (5 or 10 minutes) and it pays fixed points, once per crew-local day, so it can't be farmed.
 
-Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or badges, and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
+Alone, it pays only those points. It isn't a workout: it doesn't count towards the weekly goal, pips, streak, over-target bonus or the workout badges (it does count for Limber and Rubber band), and it doesn't tell the crew you're coming. Its points do count on ATUS Climb, and it shows in your history and the feed. A second session on a day that already paid has nothing to pay, so it can't be finished.
 
 ## Entering sets
 
@@ -185,7 +185,7 @@ Every uploaded image is rebuilt from its pixels on the server, so location, came
 - **Bounty:** every week the bounty is on the all-time leader; the first member to pass them that week takes 150 (then it's claimed until Monday). Checked after quests and the crew quest, before badges.
 - **Weekly event:** one twist per week, shown as a timed event with how long it has left until Sunday night. v1 has only "Leg day x2" (EN prototype name "Leg storm"; the app uses "Leg day x2" in both languages until the backlog decision closes). Every set of a leg exercise pays the bonus, in any workout, whatever the routine: squat, RDL, leg press, lunge and leg curl (the catalog's Legs group), each marked x2 in the logger and the exercise picker. It is always on in v1 (`game.weekly_event` in settings.json).
 
-## Badges (18)
+## Badges (45)
 
 | Badge | Condition | Pts |
 |---|---|---|
@@ -207,6 +207,42 @@ Every uploaded image is rebuilt from its pixels on the server, so location, came
 | Night owl | Finish a workout after 22:00 | 75 |
 | Comeback | Return after 14 days away | 100 |
 | Unstoppable | Reach 9,000 pts | 300 |
+| Limber | Stretch in 10 sessions (alone or in a workout) | 100 |
+| Quarter million | Log 250,000 steps in total | 150 |
+| Engine | 5 hours of timed sports (Muay Thai, boxing, HIIT, jump rope, stair climber) | 150 |
+| Iron hold | Hold for 20 minutes in total (L-sit, front lever, crow pose…) | 150 |
+
+Every kind of training has one: lifting, running, swimming, all cardio, stretching, steps, timed sports and calisthenics holds. Steps are checked when you log them, the rest when a workout or stretching session is finished.
+
+### The hard tier (23)
+
+The same measures, much further: months or a year of training, or a lift most people never reach. Each is listed right after its easy version and drawn with a double outline. Comeback has none, so leaving isn't rewarded.
+
+| Badge | Condition | Pts |
+|---|---|---|
+| Lifer | 200 workouts | 400 |
+| Never satisfied | Beat last-time volume on 50 workouts | 300 |
+| Three plates | Back squat 180 kg × 1 | 400 |
+| Thousand tonnes | 1,000 t lifetime volume | 400 |
+| Iron season | 26 goal weeks in a row | 500 |
+| Big bench | Bench press 140 kg | 400 |
+| Two hundred club | Deadlift 200 kg | 400 |
+| Half marathon | Run 21.1 km in one go | 400 |
+| Open water | Swim 5 km in one go | 400 |
+| Thousand kilometres | Run 1,000 km or swim 250 km in total | 500 |
+| Sunrise regular | 50 workouts finished before 07:00 | 300 |
+| Leg day legend | 100 leg days | 400 |
+| Most wanted | Claim 10 bounties | 400 |
+| Summit team | 25 crew quests | 400 |
+| Hype machine | 500 reactions given | 200 |
+| Commentator | 100 comments | 150 |
+| Night shift | 25 workouts finished after 22:00 | 300 |
+| Legend | Reach 50,000 pts | 500 |
+| Rubber band | Stretch in 100 sessions | 300 |
+| Two million steps | Log 2,000,000 steps in total | 400 |
+| Fight camp | 50 hours of timed sports | 400 |
+| Statue | Hold for 3 hours in total | 400 |
+| Sixty-second L-sit | An L-sit held 60 s in one set | 300 |
 
 ## Steps
 
@@ -216,7 +252,7 @@ The balance: 1 point every 250 steps (`scoring.steps_per_point`), up to 20,000 s
 
 - A day counts once. A period can't overlap days already logged.
 - Past the cap more steps pay nothing, and a period's cap is its days times the daily one, since a total can't say how the steps were spread.
-- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or badges.
+- Steps go into ATUS Climb like any points, split between weeks by days when a period crosses one. They don't count as a workout, so they don't touch the weekly goal, quests or the workout badges; they have their own, Quarter million, checked when you log them.
 - The crew sees each entry on the Activity tab, and can react and comment like on any post. Logging steps notifies nobody. Taking an entry back takes its post, and what was said under it.
 - Something logged can be taken back, with its points, for 2 days (`game.edit_workout_days`).
 

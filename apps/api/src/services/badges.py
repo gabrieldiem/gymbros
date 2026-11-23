@@ -37,6 +37,12 @@ class BadgeStats:
     best_run_km: float = 0.0
     best_swim_km: float = 0.0
     lifetime_effort_km: float = 0.0
+    stretch_sessions: int = 0
+    lifetime_steps: int = 0
+    timed_minutes: int = 0
+    hold_seconds: int = 0
+    best_deadlift_kg: float = 0.0
+    best_lsit_seconds: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +55,8 @@ class Badge:
     points: int
     icon: str
     color: str
+    # The hard tier: the same metrics, much further.
+    elite: bool = False
 
 
 # Open/closed: a new badge is a JSON entry plus, if needed, one metric registered here.
@@ -71,6 +79,12 @@ BADGE_METRICS: dict[str, Callable[[BadgeStats], float]] = {
     "best_run_km": lambda s: s.best_run_km,
     "best_swim_km": lambda s: s.best_swim_km,
     "lifetime_effort_km": lambda s: s.lifetime_effort_km,
+    "stretch_sessions": lambda s: s.stretch_sessions,
+    "lifetime_steps": lambda s: s.lifetime_steps,
+    "timed_hours": lambda s: s.timed_minutes / 60,
+    "hold_minutes": lambda s: s.hold_seconds / 60,
+    "best_deadlift_kg": lambda s: s.best_deadlift_kg,
+    "best_lsit_seconds": lambda s: s.best_lsit_seconds,
 }
 
 

@@ -161,7 +161,13 @@ export function AchievementList({ rules }: { rules: Rules }) {
         {rules.badges.map((badge) => (
           <li key={badge.id}>
             <span className={styles.patch}>
-              <BadgePatch icon={badge.icon} color={badge.color} locked={false} size={64} />
+              <BadgePatch
+                icon={badge.icon}
+                color={badge.color}
+                locked={false}
+                size={64}
+                elite={badge.elite}
+              />
             </span>
             <span>
               <b>{t(`badge_${badge.id}` as MessageKey)}</b>

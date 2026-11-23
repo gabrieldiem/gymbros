@@ -394,6 +394,7 @@ def get_steps_service(session: AsyncSession = DB_SESSION) -> StepsService:
             all_summit=settings.game_steps_all_summit,
         ),
         utc_now,
+        build_badge_service(session),
     )
 
 
@@ -491,6 +492,7 @@ def build_badge_service(session: AsyncSession) -> BadgeService:
         load_catalog(),
         settings.game_weekly_target,
         utc_now,
+        StepRepository(session),
     )
 
 

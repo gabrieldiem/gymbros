@@ -1,5 +1,5 @@
 {
-  "_comment": "The 15 badges (docs/PRODUCT.md). Each pays `points` once, ever. `metric` names an evaluator in services/badges.py; `icon` and `color` are for the web's badge patch.",
+  "_comment": "Every badge (docs/PRODUCT.md). Each pays `points` once, ever. `metric` names an evaluator in services/badges.py; `icon` and `color` are for the web's badge patch. elite: the hard tier, the same metrics much further (shown with a double outline).",
   "badges": [
     {
       "id": "first",
@@ -10,12 +10,30 @@
       "color": "#7CFF4F"
     },
     {
+      "id": "lifer",
+      "metric": "workouts",
+      "goal": 200,
+      "points": 400,
+      "icon": "boot",
+      "color": "#7CFF4F",
+      "elite": true
+    },
+    {
       "id": "better",
       "metric": "better_than_last_time",
       "goal": 5,
       "points": 150,
       "icon": "up",
       "color": "#FFE600"
+    },
+    {
+      "id": "improver",
+      "metric": "better_than_last_time",
+      "goal": 50,
+      "points": 300,
+      "icon": "up",
+      "color": "#FFE600",
+      "elite": true
     },
     {
       "id": "twoplates",
@@ -26,12 +44,30 @@
       "color": "#00D1FF"
     },
     {
+      "id": "threeplates",
+      "metric": "best_squat_kg",
+      "goal": 180,
+      "points": 400,
+      "icon": "barbell",
+      "color": "#00D1FF",
+      "elite": true
+    },
+    {
       "id": "tonnage",
       "metric": "lifetime_tonnes",
       "goal": 100,
       "points": 150,
       "icon": "kettle",
       "color": "#FFE600"
+    },
+    {
+      "id": "kilotonne",
+      "metric": "lifetime_tonnes",
+      "goal": 1000,
+      "points": 400,
+      "icon": "kettle",
+      "color": "#FFE600",
+      "elite": true
     },
     {
       "id": "ironmonth",
@@ -42,12 +78,39 @@
       "color": "#FF3B1F"
     },
     {
+      "id": "ironseason",
+      "metric": "longest_goal_streak",
+      "goal": 26,
+      "points": 500,
+      "icon": "flame",
+      "color": "#FF3B1F",
+      "elite": true
+    },
+    {
       "id": "plateclub",
       "metric": "best_bench_kg",
       "goal": 100,
       "points": 200,
       "icon": "plate",
       "color": "#FF4FD8"
+    },
+    {
+      "id": "bigbench",
+      "metric": "best_bench_kg",
+      "goal": 140,
+      "points": 400,
+      "icon": "plate",
+      "color": "#FF4FD8",
+      "elite": true
+    },
+    {
+      "id": "deadlift200",
+      "metric": "best_deadlift_kg",
+      "goal": 200,
+      "points": 400,
+      "icon": "barbell",
+      "color": "#FF3B1F",
+      "elite": true
     },
     {
       "id": "tenk",
@@ -58,12 +121,30 @@
       "color": "#00D1FF"
     },
     {
+      "id": "halfmarathon",
+      "metric": "best_run_km",
+      "goal": 21.1,
+      "points": 400,
+      "icon": "boot",
+      "color": "#00D1FF",
+      "elite": true
+    },
+    {
       "id": "mile",
       "metric": "best_swim_km",
       "goal": 1.5,
       "points": 200,
       "icon": "loop",
       "color": "#FF4FD8"
+    },
+    {
+      "id": "openwater",
+      "metric": "best_swim_km",
+      "goal": 5,
+      "points": 400,
+      "icon": "loop",
+      "color": "#FF4FD8",
+      "elite": true
     },
     {
       "id": "longroad",
@@ -74,12 +155,30 @@
       "color": "#FFE600"
     },
     {
+      "id": "thousandk",
+      "metric": "lifetime_effort_km",
+      "goal": 1000,
+      "points": 500,
+      "icon": "peak",
+      "color": "#FFE600",
+      "elite": true
+    },
+    {
       "id": "dawn",
       "metric": "dawn_workouts",
       "goal": 5,
       "points": 100,
       "icon": "sun",
       "color": "#FFE600"
+    },
+    {
+      "id": "sunrise",
+      "metric": "dawn_workouts",
+      "goal": 50,
+      "points": 300,
+      "icon": "sun",
+      "color": "#FFE600",
+      "elite": true
     },
     {
       "id": "legs",
@@ -90,12 +189,30 @@
       "color": "#B48CFF"
     },
     {
+      "id": "leglegend",
+      "metric": "leg_days",
+      "goal": 100,
+      "points": 400,
+      "icon": "bolt",
+      "color": "#B48CFF",
+      "elite": true
+    },
+    {
       "id": "hunter",
       "metric": "bounties",
       "goal": 1,
       "points": 100,
       "icon": "target",
       "color": "#FF3B1F"
+    },
+    {
+      "id": "mostwanted",
+      "metric": "bounties",
+      "goal": 10,
+      "points": 400,
+      "icon": "target",
+      "color": "#FF3B1F",
+      "elite": true
     },
     {
       "id": "rope",
@@ -106,12 +223,30 @@
       "color": "#00D1FF"
     },
     {
+      "id": "summitteam",
+      "metric": "crew_quests",
+      "goal": 25,
+      "points": 400,
+      "icon": "rope",
+      "color": "#00D1FF",
+      "elite": true
+    },
+    {
       "id": "hype",
       "metric": "reactions_given",
       "goal": 50,
       "points": 50,
       "icon": "star",
       "color": "#FF4FD8"
+    },
+    {
+      "id": "hypemachine",
+      "metric": "reactions_given",
+      "goal": 500,
+      "points": 200,
+      "icon": "star",
+      "color": "#FF4FD8",
+      "elite": true
     },
     {
       "id": "trash",
@@ -122,12 +257,30 @@
       "color": "#7CFF4F"
     },
     {
+      "id": "commentator",
+      "metric": "comments_written",
+      "goal": 100,
+      "points": 150,
+      "icon": "chat",
+      "color": "#7CFF4F",
+      "elite": true
+    },
+    {
       "id": "owl",
       "metric": "night_workouts",
       "goal": 1,
       "points": 75,
       "icon": "moon",
       "color": "#B48CFF"
+    },
+    {
+      "id": "nightshift",
+      "metric": "night_workouts",
+      "goal": 25,
+      "points": 300,
+      "icon": "moon",
+      "color": "#B48CFF",
+      "elite": true
     },
     {
       "id": "comeback",
@@ -144,6 +297,92 @@
       "points": 300,
       "icon": "peak",
       "color": "#F2F2EE"
+    },
+    {
+      "id": "legend",
+      "metric": "total_points",
+      "goal": 50000,
+      "points": 500,
+      "icon": "peak",
+      "color": "#F2F2EE",
+      "elite": true
+    },
+    {
+      "id": "limber",
+      "metric": "stretch_sessions",
+      "goal": 10,
+      "points": 100,
+      "icon": "stretch",
+      "color": "#7CFF4F"
+    },
+    {
+      "id": "rubberband",
+      "metric": "stretch_sessions",
+      "goal": 100,
+      "points": 300,
+      "icon": "stretch",
+      "color": "#7CFF4F",
+      "elite": true
+    },
+    {
+      "id": "quarter",
+      "metric": "lifetime_steps",
+      "goal": 250000,
+      "points": 150,
+      "icon": "steps",
+      "color": "#00D1FF"
+    },
+    {
+      "id": "twomillion",
+      "metric": "lifetime_steps",
+      "goal": 2000000,
+      "points": 400,
+      "icon": "steps",
+      "color": "#00D1FF",
+      "elite": true
+    },
+    {
+      "id": "engine",
+      "metric": "timed_hours",
+      "goal": 5,
+      "points": 150,
+      "icon": "stopwatch",
+      "color": "#FF3B1F"
+    },
+    {
+      "id": "fightcamp",
+      "metric": "timed_hours",
+      "goal": 50,
+      "points": 400,
+      "icon": "stopwatch",
+      "color": "#FF3B1F",
+      "elite": true
+    },
+    {
+      "id": "ironhold",
+      "metric": "hold_minutes",
+      "goal": 20,
+      "points": 150,
+      "icon": "rings",
+      "color": "#FF4FD8"
+    },
+    {
+      "id": "statue",
+      "metric": "hold_minutes",
+      "goal": 180,
+      "points": 400,
+      "icon": "rings",
+      "color": "#FF4FD8",
+      "elite": true
+    },
+    {
+      "id": "lsitminute",
+      "metric": "best_lsit_seconds",
+      "goal": 60,
+      "points": 300,
+      "icon": "rings",
+      "color": "#7CFF4F",
+      "elite": true
     }
   ]
 }

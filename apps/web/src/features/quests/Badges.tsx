@@ -29,9 +29,18 @@ export function Badges({ badges }: { badges: Badge[] }) {
             className={cx(styles.badge, !b.unlocked_at && styles.locked)}
             onClick={() => setOpen(b)}
           >
-            <BadgePatch icon={b.icon} color={b.color} locked={!b.unlocked_at} size={60} />
+            <BadgePatch
+              icon={b.icon}
+              color={b.color}
+              locked={!b.unlocked_at}
+              size={60}
+              elite={b.elite}
+            />
             <span className={styles.badgeBody}>
-              <b>{name(b)}</b>
+              <b>
+                {name(b)}
+                {b.elite && <span className={styles.elite}>{t('badge_elite')}</span>}
+              </b>
               {!b.unlocked_at && <span className="sr-only">{t('locked')}</span>}
               <small>{t(`badge_${b.id}_d` as MessageKey)}</small>
               {b.unlocked_at ? (
@@ -52,7 +61,13 @@ export function Badges({ badges }: { badges: Badge[] }) {
       {open && (
         <Sheet title={name(open)} onClose={() => setOpen(null)}>
           <div className={styles.centered}>
-            <BadgePatch icon={open.icon} color={open.color} locked={!open.unlocked_at} size={140} />
+            <BadgePatch
+              icon={open.icon}
+              color={open.color}
+              locked={!open.unlocked_at}
+              size={140}
+              elite={open.elite}
+            />
             <p className={styles.muted}>{t(`badge_${open.id}_d` as MessageKey)}</p>
           </div>
           <ul className={styles.kv}>

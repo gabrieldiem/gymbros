@@ -77,6 +77,7 @@ def to_badge(view: BadgeView) -> BadgeModel:
         progress=view.progress,
         unlocked_at=view.unlocked_at,
         crew_count=view.crew_count,
+        elite=b.elite,
     )
 
 

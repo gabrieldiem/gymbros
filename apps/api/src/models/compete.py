@@ -73,6 +73,7 @@ class BadgeModel(BaseModel):
     progress: float
     unlocked_at: datetime | None
     crew_count: int
+    elite: bool = False
 
 
 class DuelRequest(BaseModel):
