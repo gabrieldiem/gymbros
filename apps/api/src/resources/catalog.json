@@ -1166,6 +1166,17 @@
       ]
     },
     {
+      "id": "calisthenics",
+      "name": "Calisthenics",
+      "exercise_ids": [
+        "parallettepushup",
+        "lsit",
+        "frontlever",
+        "crow",
+        "planchelean"
+      ]
+    },
+    {
       "id": "cardio",
       "name": "Cardio",
       "exercise_ids": [

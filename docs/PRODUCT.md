@@ -233,7 +233,7 @@ Each exercise has an id, an English name, a group (Chest, Legs, Back, Shoulders,
 
 Bench press, Incline dumbbell press, Cable fly, Back squat, Romanian deadlift, Leg press, Walking lunge, Leg curl, Deadlift, Barbell row, Pull-up, Lat pulldown, Overhead press, Lateral raise, Barbell curl, Dips, Outdoor run, Treadmill run, Rowing machine, Pool swim, Stretching.
 
-Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), Stretching, and Empty workout.
+Routines: Push day (bench, ohp, incline, dips), Pull day (deadlift, row, pull-up, curl), Leg day (squat, rdl, leg press, lunge), Calisthenics (parallette push-up, L-sit, front lever, crow pose, planche lean), Cardio (treadmill, rower), Run (outdoor run), Swim (pool swim), Stretching, and Empty workout.
 
 ## i18n
 

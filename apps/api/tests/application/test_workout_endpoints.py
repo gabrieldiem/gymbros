@@ -50,6 +50,7 @@ async def test_catalog_lists_exercises_routines_and_points(client, member):
         "push",
         "pull",
         "legs",
+        "calisthenics",
         "cardio",
         "run",
         "swim",

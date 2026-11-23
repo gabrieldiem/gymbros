@@ -15,6 +15,7 @@ def test_every_routine_uses_known_exercises():
         "Push day",
         "Pull day",
         "Leg day",
+        "Calisthenics",
         "Cardio",
         "Run",
         "Swim",
