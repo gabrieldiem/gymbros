@@ -22,6 +22,20 @@ services:
     logging: *logging
     image: postgres:18-alpine
     restart: unless-stopped
+    # Sized for a 2 GB box shared with other stacks and a database of a few MB: small buffers, room
+    # for the api's pool (DB_POOL_SIZE + DB_MAX_OVERFLOW) plus migrations, one I/O worker.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=32MB
+      - -c
+      - max_connections=20
+      - -c
+      - io_workers=1
+      - -c
+      - maintenance_work_mem=16MB
+      - -c
+      - effective_cache_size=128MB
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-gymbros}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in Portainer}
@@ -35,7 +49,8 @@ services:
       retries: 5
       start_period: 10s
       start_interval: 1s
-    mem_limit: 384m
+    # Measured 2026-11-22: ~30 MB idle. The cap leaves room for vacuum and a busy evening.
+    mem_limit: 256m
 
   api:
     logging: *logging
@@ -47,7 +62,7 @@ services:
     environment:
       APP_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: ${POSTGRES_USER:-gymbros}
@@ -71,7 +86,8 @@ services:
       retries: 5
       start_period: 15s
       start_interval: 1s
-    mem_limit: 512m
+    # Measured 2026-11-22: one worker ~105 MB after warm-up; decoding a photo upload adds a burst.
+    mem_limit: 256m
 
   web:
     logging: *logging
@@ -88,7 +104,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
-    mem_limit: 128m
+    # One nginx worker (see apps/web/Dockerfile): ~10 MB.
+    mem_limit: 64m
 
 volumes:
   # A named volume (gymbros_pgdata on the edge), not a bind mount: Portainer forbids host bind mounts

@@ -11,6 +11,20 @@ services:
     container_name: gymbros-postgres
     image: postgres:18-alpine
     restart: unless-stopped
+    # Sized for a 2 GB box shared with other stacks and a database of a few MB: small buffers, room
+    # for the api's pool (DB_POOL_SIZE + DB_MAX_OVERFLOW) plus migrations, one I/O worker.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=32MB
+      - -c
+      - max_connections=20
+      - -c
+      - io_workers=1
+      - -c
+      - maintenance_work_mem=16MB
+      - -c
+      - effective_cache_size=128MB
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
@@ -24,6 +38,7 @@ services:
       retries: 5
       start_period: 10s
       start_interval: 1s
+    mem_limit: 256m
 
   api:
     container_name: gymbros-api
@@ -38,7 +53,7 @@ services:
       # Always production here, whatever .env says: settings then demand a real SESSION_SECRET.
       APP_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: ${POSTGRES_USER}
@@ -59,6 +74,7 @@ services:
       retries: 5
       start_period: 15s
       start_interval: 1s
+    mem_limit: 256m
 
   web:
     container_name: gymbros-web
@@ -79,6 +95,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+    mem_limit: 64m
 
 volumes:
   postgres_data:
