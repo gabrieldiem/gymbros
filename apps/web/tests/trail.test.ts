@@ -4,6 +4,7 @@ import {
   buildContours,
   buildTrail,
   markerOffsets,
+  tagSide,
   parseCubicPath,
   VIEW_H,
   VIEW_W,
@@ -39,9 +40,9 @@ describe('trail geometry', () => {
     expect(Math.hypot(n.x, n.y)).toBeCloseTo(1, 6);
   });
 
-  it('nudges overlapping markers apart, alternating sides', () => {
-    // 32-unit steps against a 34-unit clearance: the first step never clears (as in the prototype).
-    expect(markerOffsets(trail, [0.4, 0.4, 0.4])).toEqual([0, 64, -64]);
+  it('stacks markers on the same spot close together, alternating sides', () => {
+    // 26 units apart on 34-unit markers: they overlap, and each one's initials still show.
+    expect(markerOffsets(trail, [0.4, 0.4, 0.4])).toEqual([0, 26, -26]);
     expect(markerOffsets(trail, [0.1, 0.9])).toEqual([0, 0]);
   });
 
@@ -59,7 +60,27 @@ describe('trail geometry', () => {
         expect(place.x).toBeGreaterThanOrEqual(0);
       }
       expect(new Set(offsets).size).toBe(5);
+      // One step apart, not two: the stack stays tight.
+      const sorted = [...offsets].sort((a, b) => a - b);
+      const gaps = sorted.slice(1).map((o, i) => o - (sorted[i] ?? 0));
+      expect(new Set(gaps)).toEqual(new Set([26]));
     }
+  });
+
+  it('puts your label above your marker when nothing is there', () => {
+    expect(tagSide({ x: 300, y: 400 }, [{ x: 400, y: 400 }])).toBe('above');
+  });
+
+  it('moves your label beside your marker when someone is stacked above it', () => {
+    expect(tagSide({ x: 300, y: 400 }, [{ x: 300, y: 374 }])).toBe('left');
+    // Not off the left edge of the map, and not onto someone on the left either.
+    expect(tagSide({ x: 40, y: 400 }, [{ x: 40, y: 374 }])).toBe('right');
+    expect(
+      tagSide({ x: 300, y: 400 }, [
+        { x: 300, y: 374 },
+        { x: 250, y: 400 },
+      ]),
+    ).toBe('right');
   });
 
   it('draws 30 contour lines with every fifth main line as an index line', () => {

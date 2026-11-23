@@ -111,11 +111,22 @@
 .marker .tag {
   font-size: 18px;
   fill: var(--volt);
+  /* Readable over a marker stacked behind yours. */
+  paint-order: stroke;
+  stroke: #0a0a0a;
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
 
 .halo {
   fill: var(--volt);
   fill-opacity: 0.2;
+}
+
+/* A dark ring keeps stacked markers apart where they overlap. */
+.body {
+  stroke: #0a0a0a;
+  stroke-width: 2.5;
 }
 
 .me .body {
